@@ -62,7 +62,16 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     if (currentScene.isEnd) {
       setGameComplete(true);
     } else {
-      setCurrentSceneIndex(prev => prev + 1);
+      if (selectedChoice?.nextSceneId) {
+        const nextSceneIndex = scenes.findIndex(s => s.id === selectedChoice.nextSceneId);
+        if (nextSceneIndex !== -1) {
+          setCurrentSceneIndex(nextSceneIndex);
+        } else {
+          setCurrentSceneIndex(prev => prev + 1);
+        }
+      } else {
+        setCurrentSceneIndex(prev => prev + 1);
+      }
       setSelectedChoice(null);
     }
   };
