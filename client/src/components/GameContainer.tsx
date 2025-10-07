@@ -82,6 +82,68 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     return 'incorrect';
   };
 
+  const exportToJSON = () => {
+    const exportData = {
+      completionDate: new Date().toISOString(),
+      finalScore: score,
+      maxScore,
+      percentage: Math.round((score / maxScore) * 100),
+      sessionLog: sessionLog.map(log => ({
+        sceneId: log.sceneId,
+        choice: log.choice,
+        score: log.score,
+        timestamp: new Date(log.timestamp).toISOString(),
+      })),
+    };
+    
+    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `hipaa-training-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
+  const escapeCsvValue = (value: string | number): string => {
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n') || str.includes('\r')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  const exportToCSV = () => {
+    const headers = ['Scene ID', 'Choice Made', 'Score', 'Timestamp'];
+    const rows = sessionLog.map(log => [
+      escapeCsvValue(log.sceneId),
+      escapeCsvValue(log.choice),
+      escapeCsvValue(log.score),
+      escapeCsvValue(new Date(log.timestamp).toISOString()),
+    ]);
+    
+    const csvContent = [
+      headers.map(h => escapeCsvValue(h)).join(','),
+      ...rows.map(row => row.join(',')),
+      '',
+      `Total Score,${escapeCsvValue(score)}`,
+      `Max Score,${escapeCsvValue(maxScore)}`,
+      `Percentage,${escapeCsvValue(Math.round((score / maxScore) * 100))}%`,
+    ].join('\n');
+    
+    const blob = new Blob([csvContent], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `hipaa-training-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   if (gameComplete) {
     const percentage = Math.round((score / maxScore) * 100);
     const passed = percentage >= 70;
@@ -120,6 +182,27 @@ export default function GameContainer({ scenes }: GameContainerProps) {
                 ⚠ REVIEW RECOMMENDED
               </div>
             )}
+          </div>
+          
+          <div className="flex flex-col md:flex-row gap-3 justify-center items-center mb-4">
+            <Button
+              onClick={exportToCSV}
+              variant="outline"
+              size="lg"
+              className="text-xs md:text-sm"
+              data-testid="button-export-csv"
+            >
+              EXPORT CSV
+            </Button>
+            <Button
+              onClick={exportToJSON}
+              variant="outline"
+              size="lg"
+              className="text-xs md:text-sm"
+              data-testid="button-export-json"
+            >
+              EXPORT JSON
+            </Button>
           </div>
           
           <Button
