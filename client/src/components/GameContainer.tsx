@@ -24,6 +24,7 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     score: number;
     timestamp: Date;
   }>>([]);
+  const [showResumePrompt, setShowResumePrompt] = useState(false);
 
   const currentScene = scenes[currentSceneIndex];
   const maxScore = scenes.reduce(
@@ -32,19 +33,79 @@ export default function GameContainer({ scenes }: GameContainerProps) {
   );
 
   useEffect(() => {
+    const savedProgress = localStorage.getItem('hipaa-game-progress');
     const savedLog = localStorage.getItem('hipaa-game-log');
+    
+    let loadedLog: typeof sessionLog = [];
+    
     if (savedLog) {
       try {
-        setSessionLog(JSON.parse(savedLog));
+        loadedLog = JSON.parse(savedLog);
+        setSessionLog(loadedLog);
       } catch (e) {
         console.error('Failed to load session log:', e);
       }
     }
+    
+    if (savedProgress) {
+      try {
+        const progress = JSON.parse(savedProgress);
+        const hasProgress = progress.currentSceneIndex > 0 || progress.score !== 0 || loadedLog.length > 0;
+        
+        if (hasProgress) {
+          setShowResumePrompt(true);
+        }
+      } catch (e) {
+        console.error('Failed to load progress:', e);
+      }
+    }
   }, []);
 
+  const resumeProgress = () => {
+    const savedProgress = localStorage.getItem('hipaa-game-progress');
+    if (savedProgress) {
+      try {
+        const progress = JSON.parse(savedProgress);
+        setCurrentSceneIndex(progress.currentSceneIndex);
+        setScore(progress.score);
+        setGameComplete(progress.gameComplete);
+        
+        if (progress.selectedChoiceText) {
+          const scene = scenes[progress.currentSceneIndex];
+          if (scene) {
+            const choice = scene.choices.find(c => c.text === progress.selectedChoiceText);
+            if (choice) {
+              setSelectedChoice(choice);
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Failed to resume progress:', e);
+      }
+    }
+    setShowResumePrompt(false);
+  };
+
+  const startFresh = () => {
+    localStorage.removeItem('hipaa-game-progress');
+    localStorage.removeItem('hipaa-game-log');
+    setCurrentSceneIndex(0);
+    setScore(0);
+    setSelectedChoice(null);
+    setGameComplete(false);
+    setSessionLog([]);
+    setShowResumePrompt(false);
+  };
+
   const handleChoiceClick = (choice: Choice) => {
+    const sceneAlreadyAnswered = sessionLog.some(log => log.sceneId === currentScene.id);
+    if (sceneAlreadyAnswered) {
+      return;
+    }
+    
     setSelectedChoice(choice);
-    setScore(prev => prev + choice.score);
+    const newScore = score + choice.score;
+    setScore(newScore);
     
     const logEntry = {
       sceneId: currentScene.id,
@@ -57,6 +118,16 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     setSessionLog(updatedLog);
     localStorage.setItem('hipaa-game-log', JSON.stringify(updatedLog));
   };
+
+  useEffect(() => {
+    const progress = {
+      currentSceneIndex,
+      score,
+      gameComplete,
+      selectedChoiceText: selectedChoice?.text || null,
+    };
+    localStorage.setItem('hipaa-game-progress', JSON.stringify(progress));
+  }, [currentSceneIndex, score, gameComplete, selectedChoice]);
 
   const handleNextScene = () => {
     if (currentScene.isEnd) {
@@ -83,6 +154,7 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     setGameComplete(false);
     setSessionLog([]);
     localStorage.removeItem('hipaa-game-log');
+    localStorage.removeItem('hipaa-game-progress');
   };
 
   const getFeedbackType = (choice: Choice): 'correct' | 'partial' | 'incorrect' => {
@@ -152,6 +224,44 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     document.body.removeChild(link);
     URL.revokeObjectURL(url);
   };
+
+  if (showResumePrompt) {
+    return (
+      <div className="max-w-2xl mx-auto p-4 md:p-8">
+        <div className="bg-card border-4 border-game-border p-8 text-center" style={{ boxShadow: 'var(--shadow)' }}>
+          <h1 className="text-xl md:text-2xl font-bold text-foreground mb-6" data-testid="text-resume-prompt">
+            CONTINUE TRAINING?
+          </h1>
+          
+          <CharacterPortrait src={nurseNinaImg} alt="Nurse Nina" />
+          
+          <p className="text-sm text-foreground mb-6">
+            We found a saved training session. Would you like to continue where you left off or start fresh?
+          </p>
+          
+          <div className="flex flex-col md:flex-row gap-3 justify-center">
+            <Button
+              onClick={resumeProgress}
+              size="lg"
+              className="text-sm"
+              data-testid="button-resume"
+            >
+              RESUME TRAINING
+            </Button>
+            <Button
+              onClick={startFresh}
+              variant="outline"
+              size="lg"
+              className="text-sm"
+              data-testid="button-start-fresh"
+            >
+              START FRESH
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   if (gameComplete) {
     const percentage = Math.round((score / maxScore) * 100);
