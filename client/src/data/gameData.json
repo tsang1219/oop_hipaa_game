@@ -1,0 +1,160 @@
+{
+  "scenes": [
+    {
+      "id": "scene1",
+      "character": "Nurse Nina",
+      "dialogue": "Hi there! I need access to patient data to prepare for rounds tomorrow morning. Can you help me get into the EHR system?",
+      "choices": [
+        {
+          "text": "Sure, I'll give you full access to the EHR right now.",
+          "score": -2,
+          "feedback": "Incorrect. This violates the Minimum Necessary Rule. Access should be limited to only what's needed for the specific task.",
+          "nextSceneId": "scene2"
+        },
+        {
+          "text": "Let's confirm if it's needed for treatment before accessing any records.",
+          "score": 3,
+          "feedback": "Correct! HIPAA allows sharing PHI for treatment purposes, but it's important to verify the scope of access needed and ensure it's relevant to your duties.",
+          "nextSceneId": "scene2"
+        },
+        {
+          "text": "You can look up anything you need — it's all internal staff.",
+          "score": -3,
+          "feedback": "Incorrect. Even internal access must follow HIPAA rules. Access must be limited to job role and the Minimum Necessary standard.",
+          "nextSceneId": "scene2"
+        },
+        {
+          "text": "Check with your supervisor about the scope of your role first.",
+          "score": 1,
+          "feedback": "Partial credit. While verifying role scope is good practice, HIPAA does permit treatment-related access. The key is ensuring it's limited to what's necessary.",
+          "nextSceneId": "scene2"
+        }
+      ]
+    },
+    {
+      "id": "scene2",
+      "character": "Nurse Nina",
+      "dialogue": "A patient's family member just called asking about their loved one's condition. They sound very worried. What should I tell them?",
+      "choices": [
+        {
+          "text": "Give them a full update — they're family and deserve to know.",
+          "score": -3,
+          "feedback": "Incorrect. HIPAA requires patient authorization before disclosing PHI to family members, unless the patient has agreed or it's an emergency situation.",
+          "nextSceneId": "scene3"
+        },
+        {
+          "text": "Confirm the patient has authorized you to speak with this family member first.",
+          "score": 3,
+          "feedback": "Correct! Before sharing any PHI with family members, you must verify that the patient has authorized this disclosure or that an exception applies.",
+          "nextSceneId": "scene3"
+        },
+        {
+          "text": "Tell them general information only, nothing specific.",
+          "score": 1,
+          "feedback": "Partial credit. Even general information can be PHI. You still need patient authorization or a valid exception before any disclosure.",
+          "nextSceneId": "scene3"
+        },
+        {
+          "text": "Hang up immediately — you can't talk to anyone about patients.",
+          "score": -1,
+          "feedback": "Not quite. While protecting PHI is important, HIPAA does allow disclosure to family members involved in care with proper authorization. Don't be rude — verify authorization instead.",
+          "nextSceneId": "scene3"
+        }
+      ]
+    },
+    {
+      "id": "scene3",
+      "character": "Nurse Nina",
+      "dialogue": "A colleague from another department wants to review patient charts for a quality improvement study. How should I handle this request?",
+      "choices": [
+        {
+          "text": "Share the charts — quality improvement benefits everyone.",
+          "score": -2,
+          "feedback": "Incorrect. Quality improvement activities require proper authorization and must follow the Minimum Necessary Rule. Verify the request is legitimate first.",
+          "nextSceneId": "scene4"
+        },
+        {
+          "text": "Verify they have proper authorization and need only the minimum necessary PHI.",
+          "score": 3,
+          "feedback": "Correct! Quality improvement is a permitted use under HIPAA, but it must follow proper procedures including authorization and the Minimum Necessary Rule.",
+          "nextSceneId": "scene4"
+        },
+        {
+          "text": "Refuse — they're not on your team.",
+          "score": 0,
+          "feedback": "Not quite. HIPAA does permit sharing PHI for healthcare operations like quality improvement, but proper authorization and minimum necessary standards must be followed.",
+          "nextSceneId": "scene4"
+        },
+        {
+          "text": "Give them access after they sign a confidentiality agreement.",
+          "score": 1,
+          "feedback": "Partial credit. A confidentiality agreement is good, but you also need to verify proper authorization and ensure only minimum necessary information is shared.",
+          "nextSceneId": "scene4"
+        }
+      ]
+    },
+    {
+      "id": "scene4",
+      "character": "Nurse Nina",
+      "dialogue": "A patient has requested to see their medical records. What's the correct procedure?",
+      "choices": [
+        {
+          "text": "Tell them they need their doctor's permission first.",
+          "score": -2,
+          "feedback": "Incorrect. Under HIPAA's Privacy Rule, patients have the right to access their own medical records without needing permission from their healthcare provider.",
+          "nextSceneId": "scene5"
+        },
+        {
+          "text": "Provide access within 30 days, with possible 30-day extension if needed.",
+          "score": 3,
+          "feedback": "Correct! HIPAA requires covered entities to provide access to medical records within 30 days of the request, with one possible 30-day extension.",
+          "nextSceneId": "scene5"
+        },
+        {
+          "text": "Give them the records immediately on the spot.",
+          "score": 1,
+          "feedback": "Partial credit. While providing quick access is great service, HIPAA allows up to 30 days to fulfill the request. Immediate access isn't always required, though it's encouraged when possible.",
+          "nextSceneId": "scene5"
+        },
+        {
+          "text": "Explain that medical records are confidential and cannot be shared.",
+          "score": -3,
+          "feedback": "Incorrect. Patients have a fundamental right under HIPAA to access their own medical records. This is one of the core individual rights protected by the Privacy Rule.",
+          "nextSceneId": "scene5"
+        }
+      ]
+    },
+    {
+      "id": "scene5",
+      "character": "Nurse Nina",
+      "dialogue": "Thanks for helping me understand HIPAA better! One last scenario: A researcher wants patient data for a study. What should I do?",
+      "choices": [
+        {
+          "text": "Share de-identified data that removes all identifying information.",
+          "score": 2,
+          "feedback": "Good approach! De-identified data is not considered PHI under HIPAA and can be shared more freely. However, verify the de-identification meets HIPAA standards.",
+          "nextSceneId": "end"
+        },
+        {
+          "text": "Require patient authorization or an IRB waiver before sharing any identifiable data.",
+          "score": 3,
+          "feedback": "Correct! Research use of PHI requires either patient authorization or an Institutional Review Board (IRB) waiver under the Privacy Rule. Well done!",
+          "nextSceneId": "end"
+        },
+        {
+          "text": "Share the data — research is important for medical progress.",
+          "score": -3,
+          "feedback": "Incorrect. Research is valuable, but HIPAA requires proper authorization or an IRB waiver before sharing identifiable patient data for research purposes.",
+          "nextSceneId": "end"
+        },
+        {
+          "text": "Deny all research requests to be safe.",
+          "score": -1,
+          "feedback": "Too restrictive. HIPAA does allow PHI use for research with proper authorization or IRB waiver. Blanket denials aren't necessary when proper procedures are followed.",
+          "nextSceneId": "end"
+        }
+      ],
+      "isEnd": true
+    }
+  ]
+}
