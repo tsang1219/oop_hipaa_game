@@ -11,10 +11,12 @@ The game features both linear dialogue sequences and an explorable hospital envi
 **Educational Item Collection System:**
 - Players discover HIPAA educational items placed throughout hospital rooms
 - Items include: patient rights posters, training manuals, compliance computers, and whiteboards
-- Each item displays a HIPAA fact in a retro-styled modal when clicked
-- Collected items are visually dimmed (opacity 0.4) to indicate completion
+- Each item displays detailed HIPAA facts with Out-of-Pocket conversational tone when clicked
+- Collected items are visually dimmed (opacity 0.4) with smooth transition to indicate completion
+- React key management (`${item.id}-${isCollected}`) ensures proper remounting and attribute updates
 - Progress persists across room navigation and page refreshes via localStorage
-- Encourages exploration while providing educational value
+- Encourages exploration while providing authentic compliance training
+- Updated content: "Patient Rights 101", "Minimum Necessary: It's Not a Suggestion", "When You CAN Share PHI", "So You're Responsible for PHI Now", "The Art of the HIPAA Shutdown"
 
 **Knowledge Tracker:**
 - Visual progress bar showing "Privacy Principles Learned: X/4"
@@ -26,17 +28,19 @@ The game features both linear dialogue sequences and an explorable hospital envi
 
 **Exploration Mode:**
 - 32x32 pixel grid-based movement system (WASD/Arrow keys)
-- Multiple hospital rooms: Reception Area, Medical Records Room, Nurse Station, Billing Office, IT Department
-- NPCs and interaction zones trigger dialogue scenarios
+- Multiple hospital rooms: Reception Area, Medical Records Room, Nurse Station, Billing Office, IT Department, Break Room
+- NPCs and interaction zones are clickable (direct interaction) or activatable via Space key when nearby
 - Collision detection for realistic navigation
 - Room transitions maintain game state
+- Z-index layering ensures interaction zones (bouncing stars) are clickable above other elements
 
 **Dialogue & Decision Making:**
 - Interactive conversations with healthcare characters
 - Multiple choice decisions affecting HIPAA compliance scores
-- Educational feedback on each choice
+- Educational feedback on each choice with Out-of-Pocket tone
 - Scene progression based on player decisions
 - Session tracking of all choices and outcomes
+- New scenarios: Chatty Cathy (cafeteria gossip), Concerned Husband (family requests), Fax Machine Freddy (breach response), Boss Man Brad (employer requests), Celebrity Crisis (VIP privacy)
 
 ## User Preferences
 
