@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import EducationalItemModal from './EducationalItemModal';
+import KnowledgeTracker from './KnowledgeTracker';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 interface RoomExplorationProps {
@@ -167,6 +168,8 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
           Use arrow keys or WASD to move • Press SPACE to interact
         </p>
       </div>
+
+      <KnowledgeTracker />
 
       <div 
         className="relative border-4 border-primary bg-card"
