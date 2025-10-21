@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import CharacterPortrait from './CharacterPortrait';
 import DialogueBox from './DialogueBox';
 import ChoiceButton from './ChoiceButton';
@@ -11,9 +12,11 @@ import nurseNinaImg from '@assets/generated_images/Nurse_Nina_pixel_portrait_6f9
 
 interface GameContainerProps {
   scenes: Scene[];
+  onComplete?: () => void;
+  storageKey?: string;
 }
 
-export default function GameContainer({ scenes }: GameContainerProps) {
+export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-game' }: GameContainerProps) {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
@@ -33,8 +36,8 @@ export default function GameContainer({ scenes }: GameContainerProps) {
   );
 
   useEffect(() => {
-    const savedProgress = localStorage.getItem('hipaa-game-progress');
-    const savedLog = localStorage.getItem('hipaa-game-log');
+    const savedProgress = localStorage.getItem(`${storageKey}-progress`);
+    const savedLog = localStorage.getItem(`${storageKey}-log`);
     
     let loadedLog: typeof sessionLog = [];
     
@@ -59,19 +62,20 @@ export default function GameContainer({ scenes }: GameContainerProps) {
         console.error('Failed to load progress:', e);
       }
     }
-  }, []);
+  }, [storageKey]);
 
   const resumeProgress = () => {
-    const savedProgress = localStorage.getItem('hipaa-game-progress');
+    const savedProgress = localStorage.getItem(`${storageKey}-progress`);
     if (savedProgress) {
       try {
         const progress = JSON.parse(savedProgress);
-        setCurrentSceneIndex(progress.currentSceneIndex);
+        const safeSceneIndex = Math.min(progress.currentSceneIndex, scenes.length - 1);
+        setCurrentSceneIndex(Math.max(0, safeSceneIndex));
         setScore(progress.score);
         setGameComplete(progress.gameComplete);
         
         if (progress.selectedChoiceText) {
-          const scene = scenes[progress.currentSceneIndex];
+          const scene = scenes[safeSceneIndex];
           if (scene) {
             const choice = scene.choices.find(c => c.text === progress.selectedChoiceText);
             if (choice) {
@@ -87,8 +91,8 @@ export default function GameContainer({ scenes }: GameContainerProps) {
   };
 
   const startFresh = () => {
-    localStorage.removeItem('hipaa-game-progress');
-    localStorage.removeItem('hipaa-game-log');
+    localStorage.removeItem(`${storageKey}-progress`);
+    localStorage.removeItem(`${storageKey}-log`);
     setCurrentSceneIndex(0);
     setScore(0);
     setSelectedChoice(null);
@@ -116,7 +120,7 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     
     const updatedLog = [...sessionLog, logEntry];
     setSessionLog(updatedLog);
-    localStorage.setItem('hipaa-game-log', JSON.stringify(updatedLog));
+    localStorage.setItem(`${storageKey}-log`, JSON.stringify(updatedLog));
   };
 
   useEffect(() => {
@@ -126,22 +130,33 @@ export default function GameContainer({ scenes }: GameContainerProps) {
       gameComplete,
       selectedChoiceText: selectedChoice?.text || null,
     };
-    localStorage.setItem('hipaa-game-progress', JSON.stringify(progress));
-  }, [currentSceneIndex, score, gameComplete, selectedChoice]);
+    localStorage.setItem(`${storageKey}-progress`, JSON.stringify(progress));
+  }, [currentSceneIndex, score, gameComplete, selectedChoice, storageKey]);
 
   const handleNextScene = () => {
     if (currentScene.isEnd) {
       setGameComplete(true);
+      onComplete?.();
     } else {
       if (selectedChoice?.nextSceneId) {
         const nextSceneIndex = scenes.findIndex(s => s.id === selectedChoice.nextSceneId);
         if (nextSceneIndex !== -1) {
           setCurrentSceneIndex(nextSceneIndex);
         } else {
-          setCurrentSceneIndex(prev => prev + 1);
+          const nextIndex = currentSceneIndex + 1;
+          if (nextIndex >= scenes.length) {
+            onComplete?.();
+          } else {
+            setCurrentSceneIndex(nextIndex);
+          }
         }
       } else {
-        setCurrentSceneIndex(prev => prev + 1);
+        const nextIndex = currentSceneIndex + 1;
+        if (nextIndex >= scenes.length) {
+          onComplete?.();
+        } else {
+          setCurrentSceneIndex(nextIndex);
+        }
       }
       setSelectedChoice(null);
     }
@@ -153,8 +168,8 @@ export default function GameContainer({ scenes }: GameContainerProps) {
     setSelectedChoice(null);
     setGameComplete(false);
     setSessionLog([]);
-    localStorage.removeItem('hipaa-game-log');
-    localStorage.removeItem('hipaa-game-progress');
+    localStorage.removeItem(`${storageKey}-log`);
+    localStorage.removeItem(`${storageKey}-progress`);
   };
 
   const getFeedbackType = (choice: Choice): 'correct' | 'partial' | 'incorrect' => {
@@ -293,12 +308,14 @@ export default function GameContainer({ scenes }: GameContainerProps) {
             </div>
             
             {passed ? (
-              <div className="text-game-success text-lg mb-4" data-testid="text-passed">
-                ✓ PASSED
+              <div className="flex items-center justify-center gap-2 text-game-success text-lg mb-4" data-testid="text-passed">
+                <CheckCircle2 className="w-6 h-6" />
+                <span>PASSED</span>
               </div>
             ) : (
-              <div className="text-game-warning text-lg mb-4" data-testid="text-review">
-                ⚠ REVIEW RECOMMENDED
+              <div className="flex items-center justify-center gap-2 text-game-warning text-lg mb-4" data-testid="text-review">
+                <AlertTriangle className="w-6 h-6" />
+                <span>REVIEW RECOMMENDED</span>
               </div>
             )}
           </div>

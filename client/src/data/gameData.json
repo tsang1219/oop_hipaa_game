@@ -155,6 +155,224 @@
         }
       ],
       "isEnd": true
+    },
+    {
+      "id": "riley_scene1",
+      "character": "Receptionist Riley",
+      "dialogue": "I'm on the phone with a patient's employer who's asking about their appointment time. They need to verify the employee was here. Should I confirm?",
+      "choices": [
+        {
+          "text": "Yes, confirming appointment times is fine — it's just scheduling info.",
+          "score": -2,
+          "feedback": "Incorrect. Even appointment dates/times are PHI under HIPAA. You need patient authorization before confirming to an employer."
+        },
+        {
+          "text": "Ask if the patient authorized this disclosure first.",
+          "score": 3,
+          "feedback": "Correct! Appointment information is PHI. Always verify patient authorization before confirming any information, even to an employer."
+        },
+        {
+          "text": "Hang up immediately — never talk to employers.",
+          "score": -1,
+          "feedback": "Not quite. While protecting PHI is important, HIPAA allows disclosure to employers with proper patient authorization. Be professional and verify authorization."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "signin_violation",
+      "character": "Observation",
+      "dialogue": "You notice the sign-in sheet at reception shows the names of all patients who checked in today, plus their appointment times and reasons for visit. This is visible to anyone walking by.",
+      "choices": [
+        {
+          "text": "This is a HIPAA violation — patient names and visit reasons are PHI.",
+          "score": 3,
+          "feedback": "Correct! Sign-in sheets that display other patients' information violate HIPAA. Best practice is to use methods that don't reveal others' PHI."
+        },
+        {
+          "text": "This is fine — it's just a sign-in sheet.",
+          "score": -3,
+          "feedback": "Incorrect. Visible sign-in sheets that show other patients' names, times, and reasons for visit are a common HIPAA violation."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "phone_privacy",
+      "character": "Observation",
+      "dialogue": "You hear Riley discussing a patient's test results over the phone at the front desk, speaking loudly enough that others in the waiting room can hear specific medical details.",
+      "choices": [
+        {
+          "text": "This violates HIPAA — medical details shouldn't be discussed where others can hear.",
+          "score": 3,
+          "feedback": "Correct! The Minimum Necessary rule requires limiting PHI disclosures. Discussions should occur in private areas, not where other patients can overhear."
+        },
+        {
+          "text": "This is acceptable — it's a hospital, people expect to hear medical talk.",
+          "score": -3,
+          "feedback": "Incorrect. Even in medical settings, HIPAA requires reasonable safeguards to prevent incidental disclosures. Loud discussions of PHI in public areas violate this principle."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "unlocked_files",
+      "character": "Observation",
+      "dialogue": "The file cabinet containing patient medical records is unlocked and unattended. Anyone walking by could access these files. The room door is also propped open.",
+      "choices": [
+        {
+          "text": "This is a HIPAA violation — physical safeguards require securing PHI.",
+          "score": 3,
+          "feedback": "Correct! HIPAA's Security Rule requires physical safeguards for PHI. Unlocked cabinets and open doors create unauthorized access risks."
+        },
+        {
+          "text": "This is fine — it's in a records room, not a public area.",
+          "score": -3,
+          "feedback": "Incorrect. Location doesn't matter — PHI must be secured with locks and access controls to prevent unauthorized access, even in designated record areas."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "proper_disposal",
+      "character": "Observation",
+      "dialogue": "You find patient documents in the regular trash can instead of the designated shredder bin. The documents contain names, diagnoses, and Social Security numbers.",
+      "choices": [
+        {
+          "text": "This is a serious HIPAA violation — PHI must be properly destroyed.",
+          "score": 3,
+          "feedback": "Correct! HIPAA requires proper disposal of PHI through shredding, burning, or other destruction methods. Regular trash disposal risks unauthorized access."
+        },
+        {
+          "text": "This is fine — the trash is inside the building.",
+          "score": -3,
+          "feedback": "Incorrect. Disposing of PHI in regular trash is a serious violation. Janitors, cleaning crews, and others could access these documents. Always use secure disposal methods."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "dr_martinez_scene1",
+      "character": "Dr. Martinez",
+      "dialogue": "I'm discussing a patient's case with a colleague in the hallway. We're keeping our voices down, so it should be okay, right?",
+      "choices": [
+        {
+          "text": "No — hallway conversations risk incidental disclosure. Use private areas.",
+          "score": 3,
+          "feedback": "Correct! Even quiet conversations in hallways violate HIPAA's reasonable safeguards requirement. Use private offices, conference rooms, or designated areas for PHI discussions."
+        },
+        {
+          "text": "Yes, as long as you're quiet, hallway discussions are fine.",
+          "score": -2,
+          "feedback": "Incorrect. Volume doesn't eliminate the risk. HIPAA requires reasonable efforts to prevent incidental disclosures, which means avoiding public areas for PHI discussions."
+        },
+        {
+          "text": "It's fine — you're both doctors treating the same patient.",
+          "score": -1,
+          "feedback": "Partial truth. While discussing patient care between authorized providers is allowed, HIPAA still requires reasonable safeguards against incidental disclosure. Find a private location."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "whiteboard_phi",
+      "character": "Observation",
+      "dialogue": "The ER status board shows patient names, room numbers, and chief complaints (\"chest pain,\" \"broken arm\"). It's visible to anyone walking through the ER.",
+      "choices": [
+        {
+          "text": "This violates HIPAA — patient names linked to conditions shouldn't be publicly visible.",
+          "score": 3,
+          "feedback": "Correct! While status boards serve operational needs, displaying names with medical information violates HIPAA. Use room numbers or codes instead of names."
+        },
+        {
+          "text": "This is necessary for ER operations and therefore allowed.",
+          "score": -2,
+          "feedback": "Incorrect. While status boards are useful, HIPAA doesn't provide an exception for convenience. Use alternative methods like coded systems that don't display patient names publicly."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "unlocked_workstation",
+      "character": "Observation",
+      "dialogue": "A computer workstation is left unlocked with a patient's full medical record displayed on screen. The staff member stepped away 10 minutes ago and hasn't returned.",
+      "choices": [
+        {
+          "text": "This is a HIPAA violation — workstations must be locked when unattended.",
+          "score": 3,
+          "feedback": "Correct! HIPAA's Security Rule requires automatic logoff or manual lockout when leaving workstations unattended. This prevents unauthorized access to electronic PHI."
+        },
+        {
+          "text": "This is fine — it's in a staff-only area.",
+          "score": -3,
+          "feedback": "Incorrect. Even in restricted areas, unattended workstations displaying PHI violate HIPAA. All staff members, not just authorized users, could access this information."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "gary_gossip",
+      "character": "Gossipy Gary",
+      "dialogue": "Hey, did you hear about the celebrity who came into the ER last night? I saw their chart. Want to know what they were here for?",
+      "choices": [
+        {
+          "text": "No, and you shouldn't access or discuss patient records out of curiosity.",
+          "score": 3,
+          "feedback": "Correct! Accessing PHI without a job-related reason violates HIPAA, even for staff members. Discussing it compounds the violation. Report this to a supervisor."
+        },
+        {
+          "text": "Sure, tell me! We're both staff, so it's okay.",
+          "score": -3,
+          "feedback": "Incorrect. Being staff doesn't authorize curiosity-driven access to PHI. This is a serious HIPAA violation that can result in termination and legal penalties."
+        },
+        {
+          "text": "I won't listen, but you do you.",
+          "score": -1,
+          "feedback": "Insufficient. While not listening is good, you should actively discourage this behavior and report it. Allowing HIPAA violations to continue is a compliance failure."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "sam_access",
+      "character": "IT Tech Sam",
+      "dialogue": "I need to access patient records to test a new system update. I'll only look at the technical data, not the medical information. Is this okay?",
+      "choices": [
+        {
+          "text": "Use test/dummy data instead of real patient records for system testing.",
+          "score": 3,
+          "feedback": "Correct! IT personnel should use de-identified or dummy data for testing. Accessing real PHI requires specific authorization and a legitimate job-related need."
+        },
+        {
+          "text": "Yes, as IT staff you have access to everything for system maintenance.",
+          "score": -2,
+          "feedback": "Incorrect. IT staff must follow the Minimum Necessary rule and only access PHI when required for specific job duties. Testing should use dummy data."
+        },
+        {
+          "text": "Access is fine as long as you don't share what you see.",
+          "score": -2,
+          "feedback": "Incorrect. Even viewing PHI without a legitimate need violates HIPAA. The fact that you don't share it doesn't eliminate the violation."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "password_sharing",
+      "character": "Observation",
+      "dialogue": "You find a sticky note on a desk with a login username and password written on it. The credentials provide access to the patient database system.",
+      "choices": [
+        {
+          "text": "This is a HIPAA Security Rule violation — passwords must not be shared or written down.",
+          "score": 3,
+          "feedback": "Correct! Written passwords violate HIPAA's Security Rule. Each user must have unique credentials that aren't shared, and passwords must be stored securely."
+        },
+        {
+          "text": "This is fine — it's just for convenience and the desk is in a secure area.",
+          "score": -3,
+          "feedback": "Incorrect. Written passwords create security risks regardless of location. HIPAA requires safeguarding authentication credentials. This must be reported and corrected."
+        }
+      ],
+      "isEnd": true
     }
   ]
 }

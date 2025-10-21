@@ -1,0 +1,198 @@
+{
+  "rooms": [
+    {
+      "id": "reception",
+      "name": "Reception Area",
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "reception_bg",
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1},
+        {"x": 0, "y": 14, "width": 20, "height": 1},
+        {"x": 0, "y": 0, "width": 1, "height": 15},
+        {"x": 19, "y": 0, "width": 1, "height": 15},
+        {"x": 5, "y": 5, "width": 3, "height": 2},
+        {"x": 12, "y": 5, "width": 3, "height": 2}
+      ],
+      "npcs": [
+        {
+          "id": "riley",
+          "name": "Receptionist Riley",
+          "x": 10,
+          "y": 8,
+          "sceneId": "riley_scene1"
+        }
+      ],
+      "interactionZones": [
+        {
+          "id": "sign_in_sheet",
+          "name": "Sign-in Sheet",
+          "x": 6,
+          "y": 6,
+          "sceneId": "signin_violation"
+        },
+        {
+          "id": "phone",
+          "name": "Reception Phone",
+          "x": 13,
+          "y": 6,
+          "sceneId": "phone_privacy"
+        }
+      ],
+      "spawnPoint": {"x": 10, "y": 12}
+    },
+    {
+      "id": "records_room",
+      "name": "Medical Records Room",
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "records_bg",
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1},
+        {"x": 0, "y": 14, "width": 20, "height": 1},
+        {"x": 0, "y": 0, "width": 1, "height": 15},
+        {"x": 19, "y": 0, "width": 1, "height": 15},
+        {"x": 3, "y": 3, "width": 2, "height": 4},
+        {"x": 8, "y": 3, "width": 2, "height": 4},
+        {"x": 13, "y": 3, "width": 2, "height": 4}
+      ],
+      "npcs": [],
+      "interactionZones": [
+        {
+          "id": "unlocked_cabinet",
+          "name": "Unlocked File Cabinet",
+          "x": 4,
+          "y": 5,
+          "sceneId": "unlocked_files"
+        },
+        {
+          "id": "shredder",
+          "name": "Document Shredder",
+          "x": 14,
+          "y": 5,
+          "sceneId": "proper_disposal"
+        }
+      ],
+      "spawnPoint": {"x": 10, "y": 12}
+    },
+    {
+      "id": "er",
+      "name": "Emergency Room",
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "er_bg",
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1},
+        {"x": 0, "y": 14, "width": 20, "height": 1},
+        {"x": 0, "y": 0, "width": 1, "height": 15},
+        {"x": 19, "y": 0, "width": 1, "height": 15},
+        {"x": 4, "y": 4, "width": 3, "height": 3},
+        {"x": 13, "y": 4, "width": 3, "height": 3}
+      ],
+      "npcs": [
+        {
+          "id": "dr_martinez",
+          "name": "Dr. Martinez",
+          "x": 10,
+          "y": 7,
+          "sceneId": "dr_martinez_scene1"
+        }
+      ],
+      "interactionZones": [
+        {
+          "id": "whiteboard",
+          "name": "Patient Status Board",
+          "x": 10,
+          "y": 2,
+          "sceneId": "whiteboard_phi"
+        }
+      ],
+      "spawnPoint": {"x": 10, "y": 12}
+    },
+    {
+      "id": "lab",
+      "name": "Laboratory",
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "lab_bg",
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1},
+        {"x": 0, "y": 14, "width": 20, "height": 1},
+        {"x": 0, "y": 0, "width": 1, "height": 15},
+        {"x": 19, "y": 0, "width": 1, "height": 15},
+        {"x": 5, "y": 5, "width": 4, "height": 2},
+        {"x": 11, "y": 5, "width": 4, "height": 2}
+      ],
+      "npcs": [],
+      "interactionZones": [
+        {
+          "id": "unlocked_computer",
+          "name": "Unlocked Computer",
+          "x": 7,
+          "y": 6,
+          "sceneId": "unlocked_workstation"
+        }
+      ],
+      "spawnPoint": {"x": 10, "y": 12}
+    },
+    {
+      "id": "break_room",
+      "name": "Break Room",
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "break_bg",
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1},
+        {"x": 0, "y": 14, "width": 20, "height": 1},
+        {"x": 0, "y": 0, "width": 1, "height": 15},
+        {"x": 19, "y": 0, "width": 1, "height": 15},
+        {"x": 8, "y": 7, "width": 4, "height": 2}
+      ],
+      "npcs": [
+        {
+          "id": "gary",
+          "name": "Gossipy Gary",
+          "x": 6,
+          "y": 8,
+          "sceneId": "gary_gossip"
+        }
+      ],
+      "interactionZones": [],
+      "spawnPoint": {"x": 10, "y": 12}
+    },
+    {
+      "id": "it_office",
+      "name": "IT Office",
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "it_bg",
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1},
+        {"x": 0, "y": 14, "width": 20, "height": 1},
+        {"x": 0, "y": 0, "width": 1, "height": 15},
+        {"x": 19, "y": 0, "width": 1, "height": 15},
+        {"x": 3, "y": 5, "width": 3, "height": 2},
+        {"x": 10, "y": 5, "width": 3, "height": 2}
+      ],
+      "npcs": [
+        {
+          "id": "sam",
+          "name": "IT Tech Sam",
+          "x": 11,
+          "y": 6,
+          "sceneId": "sam_access"
+        }
+      ],
+      "interactionZones": [
+        {
+          "id": "password_note",
+          "name": "Password Sticky Note",
+          "x": 4,
+          "y": 6,
+          "sceneId": "password_sharing"
+        }
+      ],
+      "spawnPoint": {"x": 10, "y": 12}
+    }
+  ]
+}
