@@ -38,9 +38,9 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
   useEffect(() => {
     const savedProgress = localStorage.getItem(`${storageKey}-progress`);
     const savedLog = localStorage.getItem(`${storageKey}-log`);
-    
+
     let loadedLog: typeof sessionLog = [];
-    
+
     if (savedLog) {
       try {
         loadedLog = JSON.parse(savedLog);
@@ -49,12 +49,12 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
         console.error('Failed to load session log:', e);
       }
     }
-    
+
     if (savedProgress) {
       try {
         const progress = JSON.parse(savedProgress);
         const hasProgress = progress.currentSceneIndex > 0 || progress.score !== 0 || loadedLog.length > 0;
-        
+
         if (hasProgress) {
           setShowResumePrompt(true);
         }
@@ -73,7 +73,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
         setCurrentSceneIndex(Math.max(0, safeSceneIndex));
         setScore(progress.score);
         setGameComplete(progress.gameComplete);
-        
+
         if (progress.selectedChoiceText) {
           const scene = scenes[safeSceneIndex];
           if (scene) {
@@ -103,21 +103,21 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
 
   const handleChoiceClick = (choice: Choice) => {
     const sceneAlreadyAnswered = sessionLog.some(log => log.sceneId === currentScene.id);
-    if (sceneAlreadyAnswered) {
+    if (sceneAlreadyAnswered || selectedChoice !== null) {
       return;
     }
-    
+
     setSelectedChoice(choice);
     const newScore = score + choice.score;
     setScore(newScore);
-    
+
     const logEntry = {
       sceneId: currentScene.id,
       choice: choice.text,
       score: choice.score,
       timestamp: new Date(),
     };
-    
+
     const updatedLog = [...sessionLog, logEntry];
     setSessionLog(updatedLog);
     localStorage.setItem(`${storageKey}-log`, JSON.stringify(updatedLog));
@@ -191,7 +191,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
         timestamp: new Date(log.timestamp).toISOString(),
       })),
     };
-    
+
     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -219,7 +219,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
       escapeCsvValue(log.score),
       escapeCsvValue(new Date(log.timestamp).toISOString()),
     ]);
-    
+
     const csvContent = [
       headers.map(h => escapeCsvValue(h)).join(','),
       ...rows.map(row => row.join(',')),
@@ -228,7 +228,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
       `Max Score,${escapeCsvValue(maxScore)}`,
       `Percentage,${escapeCsvValue(Math.round((score / maxScore) * 100))}%`,
     ].join('\n');
-    
+
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
@@ -247,13 +247,13 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
           <h1 className="text-xl md:text-2xl font-bold text-foreground mb-6" data-testid="text-resume-prompt">
             CONTINUE TRAINING?
           </h1>
-          
+
           <CharacterPortrait src={nurseNinaImg} alt="Nurse Nina" />
-          
+
           <p className="text-sm text-foreground mb-6">
             We found a saved training session. Would you like to continue where you left off or start fresh?
           </p>
-          
+
           <div className="flex flex-col md:flex-row gap-3 justify-center">
             <Button
               onClick={resumeProgress}
@@ -281,23 +281,23 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
   if (gameComplete) {
     const percentage = Math.round((score / maxScore) * 100);
     const passed = percentage >= 70;
-    
+
     return (
       <div className="max-w-2xl mx-auto p-4 md:p-8">
         <div className="bg-card border-4 border-game-border p-8 text-center" style={{ boxShadow: 'var(--shadow)' }}>
           <h1 className="text-xl md:text-2xl font-bold text-foreground mb-6" data-testid="text-game-complete">
             TRAINING COMPLETE
           </h1>
-          
+
           <CharacterPortrait src={nurseNinaImg} alt="Nurse Nina" />
-          
+
           <div className="mb-6">
             <p className="text-sm text-foreground mb-4">
-              {passed 
+              {passed
                 ? "Excellent work! You've demonstrated strong understanding of HIPAA Privacy Rule compliance."
                 : "You've completed the training. Review the scenarios to strengthen your HIPAA knowledge."}
             </p>
-            
+
             <div className="bg-muted p-4 border-2 border-game-border mb-4">
               <div className="text-2xl font-bold text-foreground mb-2" data-testid="text-final-score">
                 {score} / {maxScore}
@@ -306,7 +306,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
                 {percentage}% Compliance Score
               </div>
             </div>
-            
+
             {passed ? (
               <div className="flex items-center justify-center gap-2 text-game-success text-lg mb-4" data-testid="text-passed">
                 <CheckCircle2 className="w-6 h-6" />
@@ -319,7 +319,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
               </div>
             )}
           </div>
-          
+
           <div className="flex flex-col md:flex-row gap-3 justify-center items-center mb-4">
             <Button
               onClick={exportToCSV}
@@ -340,7 +340,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
               EXPORT JSON
             </Button>
           </div>
-          
+
           <Button
             onClick={handleRestart}
             size="lg"
@@ -359,34 +359,34 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
       <div className="flex items-center justify-between mb-6">
         <SceneCounter current={currentSceneIndex + 1} total={scenes.length} />
       </div>
-      
+
       <ScoreMeter score={score} maxScore={maxScore} />
-      
+
       <CharacterPortrait src={nurseNinaImg} alt={currentScene.character} />
-      
+
       <DialogueBox
         character={currentScene.character}
         dialogue={currentScene.dialogue}
       />
-      
+
       <div className="space-y-2 mb-4">
         {currentScene.choices.map((choice, index) => (
           <ChoiceButton
             key={index}
             text={choice.text}
             onClick={() => handleChoiceClick(choice)}
-            disabled={selectedChoice !== null}
+            disabled={selectedChoice !== null || sessionLog.some(log => log.sceneId === currentScene.id)}
           />
         ))}
       </div>
-      
+
       {selectedChoice && (
         <>
           <FeedbackDisplay
             feedback={selectedChoice.feedback}
             type={getFeedbackType(selectedChoice)}
           />
-          
+
           <div className="mt-6 text-center">
             <Button
               onClick={handleNextScene}
