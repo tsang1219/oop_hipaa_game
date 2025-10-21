@@ -39,6 +39,16 @@
           "sceneId": "phone_privacy"
         }
       ],
+      "educationalItems": [
+        {
+          "id": "patient_rights_poster",
+          "title": "Patient Rights Poster",
+          "type": "poster",
+          "x": 3,
+          "y": 3,
+          "fact": "Under HIPAA, patients have the right to access their medical records, request corrections, and receive a copy of their privacy practices. These rights must be honored within 30 days of request."
+        }
+      ],
       "spawnPoint": {"x": 10, "y": 12}
     },
     {
@@ -71,6 +81,16 @@
           "x": 14,
           "y": 5,
           "sceneId": "proper_disposal"
+        }
+      ],
+      "educationalItems": [
+        {
+          "id": "minimum_necessary_manual",
+          "title": "HIPAA Training Manual",
+          "type": "manual",
+          "x": 17,
+          "y": 8,
+          "fact": "The Minimum Necessary Standard requires that only the minimum amount of PHI needed to accomplish the task should be accessed or disclosed. Always limit your access to what you truly need for your job."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
@@ -107,6 +127,16 @@
           "sceneId": "whiteboard_phi"
         }
       ],
+      "educationalItems": [
+        {
+          "id": "security_training",
+          "title": "Security Training Computer",
+          "type": "computer",
+          "x": 17,
+          "y": 10,
+          "fact": "HIPAA requires three types of safeguards: Administrative (policies & training), Physical (locks & badges), and Technical (passwords & encryption). All three work together to protect patient privacy."
+        }
+      ],
       "spawnPoint": {"x": 10, "y": 12}
     },
     {
@@ -131,6 +161,16 @@
           "x": 7,
           "y": 6,
           "sceneId": "unlocked_workstation"
+        }
+      ],
+      "educationalItems": [
+        {
+          "id": "authorization_guide",
+          "title": "Authorization Guidelines",
+          "type": "manual",
+          "x": 3,
+          "y": 10,
+          "fact": "PHI is information that can identify a patient and relates to their health condition, treatment, or payment. This includes names, addresses, dates, medical record numbers, photos, and any of the 18 HIPAA identifiers."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
@@ -158,6 +198,7 @@
         }
       ],
       "interactionZones": [],
+      "educationalItems": [],
       "spawnPoint": {"x": 10, "y": 12}
     },
     {
@@ -190,6 +231,16 @@
           "x": 4,
           "y": 6,
           "sceneId": "password_sharing"
+        }
+      ],
+      "educationalItems": [
+        {
+          "id": "breach_notification_board",
+          "title": "Breach Notification Whiteboard",
+          "type": "whiteboard",
+          "x": 17,
+          "y": 3,
+          "fact": "If a breach affects 500+ people, it must be reported to HHS within 60 days and media must be notified. Smaller breaches must be reported annually. Quick reporting helps limit damage and shows compliance."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
