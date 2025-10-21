@@ -235,12 +235,12 @@
       ],
       "educationalItems": [
         {
-          "id": "breach_notification_board",
-          "title": "Breach Notification Whiteboard",
+          "id": "security_practices_guide",
+          "title": "IT Security Best Practices",
           "type": "whiteboard",
           "x": 17,
           "y": 3,
-          "fact": "If a breach affects 500+ people, it must be reported to HHS within 60 days and media must be notified. Smaller breaches must be reported annually. Quick reporting helps limit damage and shows compliance."
+          "fact": "Strong passwords, automatic logoffs, access controls, and encryption are essential IT security practices. These technical safeguards work alongside privacy policies to keep patient information safe. More security training coming soon!"
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
