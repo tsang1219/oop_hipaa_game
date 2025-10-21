@@ -6,6 +6,30 @@ An interactive HIPAA Privacy Rule training game built with a retro 16-bit pixel 
 
 The game features both linear dialogue sequences and an explorable hospital environment with multiple rooms and NPCs, allowing users to discover compliance scenarios organically while tracking their progress.
 
+## Core Gameplay Features
+
+**Educational Item Collection System:**
+- Players discover HIPAA educational items placed throughout hospital rooms
+- Items include: patient rights posters, training manuals, compliance computers, and whiteboards
+- Each item displays a HIPAA fact in a retro-styled modal when clicked
+- Collected items are visually dimmed (opacity 0.4) to indicate completion
+- Progress persists across room navigation and page refreshes via localStorage
+- Encourages exploration while providing educational value
+
+**Exploration Mode:**
+- 32x32 pixel grid-based movement system (WASD/Arrow keys)
+- Multiple hospital rooms: Reception Area, Medical Records Room, Nurse Station, Billing Office, IT Department
+- NPCs and interaction zones trigger dialogue scenarios
+- Collision detection for realistic navigation
+- Room transitions maintain game state
+
+**Dialogue & Decision Making:**
+- Interactive conversations with healthcare characters
+- Multiple choice decisions affecting HIPAA compliance scores
+- Educational feedback on each choice
+- Scene progression based on player decisions
+- Session tracking of all choices and outcomes
+
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
@@ -24,14 +48,17 @@ Preferred communication style: Simple, everyday language.
 **Component Structure:**
 The application follows a component-based architecture with clear separation of concerns:
 - **Game Components**: CharacterPortrait, DialogueBox, ChoiceButton, ScoreMeter, FeedbackDisplay, SceneCounter
-- **Exploration Components**: HospitalHub (room selection), RoomExploration (2D tile-based movement), ExplorationGame (orchestrates game modes)
+- **Exploration Components**: HospitalHub (room selection), RoomExploration (2D tile-based movement), ExplorationGame (orchestrates game modes), EducationalItemModal (HIPAA fact display)
 - **UI Components**: Comprehensive shadcn/ui library providing accessible, styled primitives
 
 **State Management:**
 - React Query handles server state (though currently minimal API usage)
 - Local component state (useState, useEffect) for game progress
-- LocalStorage persistence for save/resume functionality and progress tracking
-- Session logging for user decisions and scoring
+- LocalStorage persistence for:
+  - Save/resume functionality and progress tracking
+  - Session logging for user decisions and scoring
+  - Educational items collection tracking (visual dimming after reading)
+- Component remounting via key prop ensures proper state initialization across room changes
 
 **Design System:**
 - Custom "Out-of-Pocket" retro color palette defined in CSS variables
@@ -64,11 +91,13 @@ The application is primarily client-side driven with game data stored in JSON fi
 - LocalStorage for:
   - Game progress (current scene, score, session log)
   - Exploration progress (completed rooms, visited scenes)
+  - Educational items collection (`collectedEducationalItems` array tracking item IDs)
   - Resume game state
 
 **Schema Validation:**
 - Zod schemas in `shared/schema.ts` define data contracts
-- Type-safe data structures for scenes, choices, rooms, NPCs, and interaction zones
+- Type-safe data structures for scenes, choices, rooms, NPCs, interaction zones, and educational items
+- Educational item schema includes: id, title, type (enum: poster, manual, computer, whiteboard), position (x, y), and fact content
 - Drizzle-zod integration prepared for future database usage
 
 **Database Architecture (Prepared but Not Active):**
