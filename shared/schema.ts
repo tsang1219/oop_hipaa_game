@@ -47,6 +47,15 @@ export const interactionZoneSchema = z.object({
   sceneId: z.string(),
 });
 
+export const educationalItemSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  type: z.enum(['poster', 'manual', 'computer', 'whiteboard']),
+  x: z.number(),
+  y: z.number(),
+  fact: z.string(),
+});
+
 export const roomSchema = z.object({
   id: z.string(),
   name: z.string(),
@@ -56,6 +65,7 @@ export const roomSchema = z.object({
   obstacles: z.array(obstacleSchema),
   npcs: z.array(npcSchema),
   interactionZones: z.array(interactionZoneSchema),
+  educationalItems: z.array(educationalItemSchema),
   spawnPoint: positionSchema,
 });
 
@@ -70,5 +80,6 @@ export type Position = z.infer<typeof positionSchema>;
 export type Obstacle = z.infer<typeof obstacleSchema>;
 export type NPC = z.infer<typeof npcSchema>;
 export type InteractionZone = z.infer<typeof interactionZoneSchema>;
+export type EducationalItem = z.infer<typeof educationalItemSchema>;
 export type Room = z.infer<typeof roomSchema>;
 export type RoomData = z.infer<typeof roomDataSchema>;

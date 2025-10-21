@@ -111,6 +111,7 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
   if (gameMode === 'exploration' && currentRoom) {
     return (
       <RoomExploration 
+        key={currentRoomId}
         room={currentRoom}
         onTriggerScene={handleTriggerScene}
         onExitRoom={handleExitRoom}

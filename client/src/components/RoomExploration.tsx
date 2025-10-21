@@ -1,56 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import EducationalItemModal from './EducationalItemModal';
-
-interface Position {
-  x: number;
-  y: number;
-}
-
-interface Obstacle {
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-interface NPC {
-  id: string;
-  name: string;
-  x: number;
-  y: number;
-  sceneId: string;
-}
-
-interface InteractionZone {
-  id: string;
-  name: string;
-  x: number;
-  y: number;
-  sceneId: string;
-}
-
-interface EducationalItem {
-  id: string;
-  title: string;
-  type: 'poster' | 'manual' | 'computer' | 'whiteboard';
-  x: number;
-  y: number;
-  fact: string;
-}
-
-interface Room {
-  id: string;
-  name: string;
-  width: number;
-  height: number;
-  backgroundImage: string;
-  obstacles: Obstacle[];
-  npcs: NPC[];
-  interactionZones: InteractionZone[];
-  educationalItems: EducationalItem[];
-  spawnPoint: Position;
-}
+import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 interface RoomExplorationProps {
   room: Room;
@@ -137,10 +88,6 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
       if (nearbyInteraction.type === 'item') {
         const item = nearbyInteraction.data as EducationalItem;
         setSelectedItem(item);
-        const newCollected = new Set(collectedItems);
-        newCollected.add(item.id);
-        setCollectedItems(newCollected);
-        localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(newCollected)));
       } else {
         const sceneId = nearbyInteraction.type === 'npc' 
           ? (nearbyInteraction.data as NPC).sceneId 
@@ -150,7 +97,17 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
     }
   };
 
+  const handleItemClick = (item: EducationalItem) => {
+    setSelectedItem(item);
+  };
+
   const handleCloseModal = () => {
+    if (selectedItem && !collectedItems.has(selectedItem.id)) {
+      const newCollected = new Set(collectedItems);
+      newCollected.add(selectedItem.id);
+      setCollectedItems(newCollected);
+      localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(newCollected)));
+    }
     setSelectedItem(null);
   };
 
@@ -277,7 +234,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
           return (
             <div
               key={item.id}
-              className={`absolute cursor-pointer transition-all ${isCollected ? 'opacity-40' : 'opacity-100 hover:scale-110'}`}
+              className={`absolute cursor-pointer transition-all ${isCollected ? '' : 'hover:scale-110'}`}
               style={{
                 left: item.x * TILE_SIZE,
                 top: item.y * TILE_SIZE,
@@ -287,16 +244,9 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
                 alignItems: 'center',
                 justifyContent: 'center',
                 fontSize: '24px',
+                opacity: isCollected ? 0.4 : 1,
               }}
-              onClick={() => {
-                setSelectedItem(item);
-                if (!isCollected) {
-                  const newCollected = new Set(collectedItems);
-                  newCollected.add(item.id);
-                  setCollectedItems(newCollected);
-                  localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(newCollected)));
-                }
-              }}
+              onClick={() => handleItemClick(item)}
               data-testid={`educational-item-${item.id}`}
             >
               <span style={{ imageRendering: 'auto' }}>{ITEM_ICONS[item.type]}</span>
