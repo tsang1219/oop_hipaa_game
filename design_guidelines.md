@@ -9,17 +9,18 @@
 
 ### A. Color Palette
 
-**Out-of-Pocket Retro Palette:**
-- Primary Background: `204 82% 90%` (soft cyan-blue, like Game Boy screen)
-- Game Container: `0 0% 100%` (pure white for dialogue boxes)
-- Dark Accents: `0 0% 10%` (deep black for text and borders)
-- Success/Correct: `140 60% 55%` (retro green)
-- Warning/Partial: `45 90% 60%` (golden yellow)
-- Error/Incorrect: `0 75% 60%` (coral red)
-- Trust Meter Fill: `200 70% 60%` (medical blue)
-- Border/Outline: `0 0% 20%` (charcoal for pixel borders)
+**Out-of-Pocket Branding Colors:**
+- Primary Pink: `340 100% 60%` (darker pink for better contrast) - Brand signature color for primary elements, buttons, highlights
+- Cream Background: `32 100% 97%` (#FFF8F0) - Main background, warm and inviting
+- Dark Text: `0 0% 10%` (#1A1A1A) - Primary text, strong borders, AND text on pink backgrounds for WCAG AA compliance
+- Card/Container: `0 0% 100%` (pure white for dialogue boxes and elevated surfaces)
+- Success/Correct: `140 60% 55%` (retro green for positive feedback)
+- Warning/Partial: `45 90% 60%` (golden yellow for cautionary feedback)
+- Error/Incorrect: `0 75% 60%` (coral red for negative feedback)
+- Muted/Secondary: `32 40% 94%` (light warm gray for secondary backgrounds)
+- Border/Accent: `32 20% 85%` (soft borders that complement the palette)
 
-**Dark Mode:** Not applicable - retro games used fixed palettes
+**Dark Mode Support:** Available with inverted palette maintaining the pink primary (#FF6B9D) as the signature color
 
 ### B. Typography
 
@@ -113,6 +114,12 @@
 
 ### E. Visual Effects
 
+**CRT Monitor Aesthetic:**
+- Scanline overlay: Subtle horizontal lines (2px repeat) at 3% opacity
+- Screen curvature: Radial gradient vignette (5% opacity) for authentic CRT look
+- Applied globally via `.crt-scanlines` class on main container
+- Enhances retro authenticity without hindering readability
+
 **Minimal Animations:**
 - Fade in dialogue text: 200ms ease
 - Choice button hover: 100ms color transition
@@ -121,9 +128,10 @@
 
 **Pixel-Perfect Details:**
 - All borders: solid, no gradients on strokes
-- Box shadows: hard edges only (no blur)
-- Images: crisp edges, no anti-aliasing
-- Cursor: custom pixel cursor sprite if feasible
+- Box shadows: hard edges only (4px 4px 0px black - retro drop shadow)
+- Images: crisp edges with `image-rendering: pixelated`
+- Pixel grid system: 32x32 tiles for room exploration and sprite alignment
+- Custom utility classes: `.pixel-grid-16`, `.pixel-grid-32`, `.pixel-perfect`
 
 ## Images
 

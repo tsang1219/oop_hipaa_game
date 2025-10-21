@@ -24,9 +24,9 @@ export default function Game() {
 
   return (
     <div 
-      className="min-h-screen py-8"
+      className="min-h-screen py-8 crt-scanlines"
       style={{
-        backgroundImage: `linear-gradient(rgba(204, 231, 255, 0.95), rgba(204, 231, 255, 0.95)), url(${hospitalBg})`,
+        backgroundImage: `linear-gradient(rgba(255, 248, 240, 0.95), rgba(255, 248, 240, 0.95)), url(${hospitalBg})`,
         backgroundSize: 'cover',
         backgroundPosition: 'center',
         backgroundAttachment: 'fixed',
