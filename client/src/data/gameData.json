@@ -373,6 +373,146 @@
         }
       ],
       "isEnd": true
+    },
+    {
+      "id": "chatty_cathy",
+      "character": "Chatty Cathy",
+      "dialogue": "OMG, did you hear about the patient in Room 405? Apparently he came in with a—",
+      "choices": [
+        {
+          "text": "Let her finish, then say 'Yeah I heard about that too!'",
+          "score": -10,
+          "feedback": "Your silence just made you an accessory to a HIPAA violation. The cafeteria has ears, and one of them might be that patient's lawyer. Intervene early, intervene politely, but INTERVENE."
+        },
+        {
+          "text": "Interrupt: 'Stop. We can't discuss patients by room number in public areas.'",
+          "score": 15,
+          "feedback": "Correct! Room numbers + public spaces = HIPAA violation combo. Minimum Necessary doesn't apply when the necessary amount is ZERO because you're in a cafeteria."
+        },
+        {
+          "text": "Say nothing and just eat your sad desk salad faster",
+          "score": -10,
+          "feedback": "Your silence enables bad behavior. The cafeteria has ears, and one of them might be that patient's lawyer. Intervene early, intervene politely, but INTERVENE."
+        },
+        {
+          "text": "Change the subject: 'Hey, did you see that email about parking?'",
+          "score": -5,
+          "feedback": "Passive avoidance doesn't address the violation. You need to actively shut down inappropriate PHI discussions in public spaces."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "concerned_husband",
+      "character": "Concerned Husband",
+      "dialogue": "Hi, I'm John Smith's husband. He was admitted yesterday and I'm at work—can you just tell me if his test results came back? I can't get him on the phone and I'm worried sick.",
+      "choices": [
+        {
+          "text": "He's stable, tests are pending. I'll have him call you when he wakes up.",
+          "score": -15,
+          "feedback": "You just violated privacy by assuming authorization. That patient might be in the hospital BECAUSE of this 'husband.' Domestic violence, estranged relationships, and legal separations exist. Always verify before sharing."
+        },
+        {
+          "text": "I cannot confirm or deny any patient information without authorization.",
+          "score": 5,
+          "feedback": "Technically correct but needlessly robotic. You CAN share if the person is on the authorized contact list. Check first, then share if authorized."
+        },
+        {
+          "text": "Let me verify you're on his authorized contact list first.",
+          "score": 15,
+          "feedback": "Correct! HIPAA allows disclosure to 'persons involved in care' BUT you need to verify the relationship and that the patient hasn't restricted this person. Always verify before sharing. Two minutes of checking could prevent a lifetime of trauma."
+        },
+        {
+          "text": "Pull up the chart to 'just check' if husband is listed as emergency contact",
+          "score": -10,
+          "feedback": "You're already accessing the chart before verification. Verify identity and relationship FIRST, then access the authorized contacts. Don't put the cart before the horse."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "fax_machine_freddy",
+      "character": "You (Internal Monologue)",
+      "dialogue": "Oh no. Oh no no no. You just faxed discharge paperwork with full medical history, medications, and diagnosis to 555-0123 instead of 555-0132. That's... that's Dr. Peterson's rival practice. They're going to see EVERYTHING.",
+      "choices": [
+        {
+          "text": "Call the wrong number immediately, explain the error, request they destroy the fax",
+          "score": 5,
+          "feedback": "Good first step, but not enough. This is a BREACH. You need to document everything and notify your Privacy Officer immediately. They'll conduct a risk assessment and determine if patient notification is required."
+        },
+        {
+          "text": "Don't tell anyone and hope they just throw it away",
+          "score": -20,
+          "feedback": "Congrats, you just turned a small mistake into a reportable breach with potential fines. The cover-up is always worse than the crime. Career suicide move."
+        },
+        {
+          "text": "Tell your supervisor but wait to see if the other office calls you first",
+          "score": -15,
+          "feedback": "Delays make it worse. This is a breach that requires immediate action: document, notify Privacy Officer, attempt retrieval, conduct risk assessment, and possibly notify the patient."
+        },
+        {
+          "text": "Document the incident and notify your Privacy Officer immediately",
+          "score": 20,
+          "feedback": "Correct! This is a BREACH. Unsecured PHI went to an unauthorized recipient. Your Privacy Officer needs to: (1) Document everything, (2) Attempt to retrieve/destroy the information, (3) Conduct risk assessment, (4) Possibly notify the patient. HIPAA has a whole process for this—use it."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "boss_man_brad",
+      "character": "Boss Man Brad (HR Director)",
+      "dialogue": "Hey, Jessica called in sick again. Third time this month. Can you pull her records and tell me what's actually going on? I need to know if this is legit or if she's just hungover.",
+      "choices": [
+        {
+          "text": "Sure, let me pull her chart... (He's HR, he's allowed to know, right?)",
+          "score": -15,
+          "feedback": "You just violated a coworker's privacy to appease HR. Jessica's medical information is HERS, not the company's. Employers get work status, not diagnoses. Now Jessica can sue both you AND Brad. Congrats!"
+        },
+        {
+          "text": "Jessica can provide a fitness-for-duty note, but I can't share her medical information.",
+          "score": 15,
+          "feedback": "Correct! Employers are NOT entitled to employee medical information under HIPAA. They can require a doctor's note confirming the employee can/can't work, but diagnosis and treatment details are off-limits. This is a trap. Brad has zero right to Jessica's chart, even if he signs your paycheck."
+        },
+        {
+          "text": "Let me check with Jessica first and see if she'll authorize me to share.",
+          "score": 5,
+          "feedback": "Better than just handing over the chart, but you're still treating this as negotiable. Employers don't get medical info, period. Jessica can provide a work note, but her diagnosis is none of HR's business."
+        },
+        {
+          "text": "I can tell you dates of service but not diagnosis or treatment details.",
+          "score": -10,
+          "feedback": "Still wrong. Even dates of service are PHI. HR gets a fitness-for-duty note from the employee, nothing from you. Don't share anything without authorization."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "celebrity_crisis",
+      "character": "Hospital Administrator",
+      "dialogue": "Code VIP! We have a celebrity in the ER—reality TV star, you'd know the name. Press is already circling. I need you to: (1) Pull the chart and brief our PR team on the situation (2) Make sure all staff know to keep it quiet (3) Move the patient to a private wing ASAP. This is huge for the hospital's reputation. Handle it.",
+      "choices": [
+        {
+          "text": "Brief PR team with medical details, Alert staff to maintain confidentiality, Coordinate private wing transfer",
+          "score": -20,
+          "feedback": "WRONG. You just violated HIPAA for PR purposes. Celebrity status doesn't override privacy rights. Sharing medical details with PR is a fireable offense and a lawsuit waiting to happen. The hospital's 'reputation' isn't worth the fines."
+        },
+        {
+          "text": "Verify patient wants privacy protections, Alert staff to maintain confidentiality, Coordinate private wing transfer (if patient agrees)",
+          "score": 20,
+          "feedback": "Correct! Even celebrities have HIPAA rights. You: (1) Verify the patient's wishes about privacy and accommodations, (2) Remind staff that celebrity status doesn't change HIPAA rules, (3) Offer enhanced privacy options if the patient wants them. The patient decides, not the administrator."
+        },
+        {
+          "text": "Alert staff to maintain confidentiality, Coordinate private wing transfer, Prepare generic statement for PR (no medical details)",
+          "score": 10,
+          "feedback": "Good effort, but you're assuming the patient wants special treatment without asking. Always verify patient preferences first. They might prefer standard care. Let the patient drive these decisions."
+        },
+        {
+          "text": "Refuse all special accommodations to treat them like any other patient",
+          "score": -5,
+          "feedback": "Too rigid. HIPAA allows offering enhanced privacy measures if the patient wants them. The key is patient choice, not blanket refusal. Ask what they prefer, then accommodate reasonable requests."
+        }
+      ],
+      "isEnd": true
     }
   ]
 }
