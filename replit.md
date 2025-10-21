@@ -16,6 +16,14 @@ The game features both linear dialogue sequences and an explorable hospital envi
 - Progress persists across room navigation and page refreshes via localStorage
 - Encourages exploration while providing educational value
 
+**Knowledge Tracker:**
+- Visual progress bar showing "Privacy Principles Learned: X/4"
+- Displays 4 Privacy Rule principles with icons: Patient Rights, Minimum Necessary, PHI Identifiers, Safeguards
+- Icons transition from gray to pink (#FF6B9D) when their associated educational items are collected
+- Updates in real-time as players collect items across different rooms
+- Provides clear sense of progression and completion status
+- IT Office item serves as transitional content for future security-focused game sections (not tracked)
+
 **Exploration Mode:**
 - 32x32 pixel grid-based movement system (WASD/Arrow keys)
 - Multiple hospital rooms: Reception Area, Medical Records Room, Nurse Station, Billing Office, IT Department
@@ -48,7 +56,7 @@ Preferred communication style: Simple, everyday language.
 **Component Structure:**
 The application follows a component-based architecture with clear separation of concerns:
 - **Game Components**: CharacterPortrait, DialogueBox, ChoiceButton, ScoreMeter, FeedbackDisplay, SceneCounter
-- **Exploration Components**: HospitalHub (room selection), RoomExploration (2D tile-based movement), ExplorationGame (orchestrates game modes), EducationalItemModal (HIPAA fact display)
+- **Exploration Components**: HospitalHub (room selection), RoomExploration (2D tile-based movement), ExplorationGame (orchestrates game modes), EducationalItemModal (HIPAA fact display), KnowledgeTracker (Privacy Rule progress visualization)
 - **UI Components**: Comprehensive shadcn/ui library providing accessible, styled primitives
 
 **State Management:**
