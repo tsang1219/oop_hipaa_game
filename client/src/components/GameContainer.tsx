@@ -103,7 +103,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
 
   const handleChoiceClick = (choice: Choice) => {
     const sceneAlreadyAnswered = sessionLog.some(log => log.sceneId === currentScene.id);
-    if (sceneAlreadyAnswered || selectedChoice !== null) {
+    if (sceneAlreadyAnswered) {
       return;
     }
 
@@ -375,7 +375,7 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
             key={index}
             text={choice.text}
             onClick={() => handleChoiceClick(choice)}
-            disabled={selectedChoice !== null || sessionLog.some(log => log.sceneId === currentScene.id)}
+            disabled={sessionLog.some(log => log.sceneId === currentScene.id)}
           />
         ))}
       </div>
