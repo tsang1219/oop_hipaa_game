@@ -21,6 +21,20 @@
           "x": 10,
           "y": 8,
           "sceneId": "riley_scene1"
+        },
+        {
+          "id": "husband",
+          "name": "Concerned Husband",
+          "x": 7,
+          "y": 10,
+          "sceneId": "concerned_husband"
+        },
+        {
+          "id": "admin",
+          "name": "Hospital Administrator",
+          "x": 13,
+          "y": 10,
+          "sceneId": "celebrity_crisis"
         }
       ],
       "interactionZones": [
@@ -81,6 +95,13 @@
           "x": 14,
           "y": 5,
           "sceneId": "proper_disposal"
+        },
+        {
+          "id": "fax_machine",
+          "name": "Fax Machine (Oh No...)",
+          "x": 9,
+          "y": 6,
+          "sceneId": "fax_machine_freddy"
         }
       ],
       "educationalItems": [
@@ -195,6 +216,13 @@
           "x": 6,
           "y": 8,
           "sceneId": "gary_gossip"
+        },
+        {
+          "id": "cathy",
+          "name": "Chatty Cathy",
+          "x": 14,
+          "y": 8,
+          "sceneId": "chatty_cathy"
         }
       ],
       "interactionZones": [],
@@ -240,6 +268,13 @@
           "x": 4,
           "y": 6,
           "sceneId": "password_sharing"
+        },
+        {
+          "id": "hr_phone",
+          "name": "Ringing Phone (HR)",
+          "x": 14,
+          "y": 8,
+          "sceneId": "boss_man_brad"
         }
       ],
       "educationalItems": [
