@@ -195,13 +195,14 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
         {room.npcs.map((npc) => (
           <div
             key={npc.id}
-            className="absolute"
+            className="absolute cursor-pointer hover:scale-110 transition-all"
             style={{
               left: npc.x * TILE_SIZE,
               top: npc.y * TILE_SIZE,
               width: TILE_SIZE,
               height: TILE_SIZE,
             }}
+            onClick={() => onTriggerScene(npc.sceneId)}
             data-testid={`npc-${npc.id}`}
           >
             <div className="relative w-full h-full">
@@ -217,13 +218,15 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
         {room.interactionZones.map((zone) => (
           <div
             key={zone.id}
-            className="absolute animate-bounce"
+            className="absolute animate-bounce cursor-pointer hover:scale-110 transition-all"
             style={{
               left: zone.x * TILE_SIZE + 8,
               top: zone.y * TILE_SIZE,
               width: TILE_SIZE - 16,
               height: TILE_SIZE,
+              zIndex: 20,
             }}
+            onClick={() => onTriggerScene(zone.sceneId)}
             data-testid={`zone-${zone.id}`}
           >
             <div className="w-full h-full bg-accent" style={{
@@ -236,8 +239,8 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
           const isCollected = collectedItems.has(item.id);
           return (
             <div
-              key={item.id}
-              className={`absolute cursor-pointer transition-all ${isCollected ? '' : 'hover:scale-110'}`}
+              key={`${item.id}-${isCollected}`}
+              className={`absolute cursor-pointer transition-opacity duration-300 ${isCollected ? '' : 'hover:scale-110 transition-all'}`}
               style={{
                 left: item.x * TILE_SIZE,
                 top: item.y * TILE_SIZE,
@@ -248,11 +251,13 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
                 justifyContent: 'center',
                 fontSize: '24px',
                 opacity: isCollected ? 0.4 : 1,
+                zIndex: 10,
               }}
               onClick={() => handleItemClick(item)}
               data-testid={`educational-item-${item.id}`}
+              data-collected={isCollected ? 'true' : 'false'}
             >
-              <span style={{ imageRendering: 'auto' }}>{ITEM_ICONS[item.type]}</span>
+              <span style={{ imageRendering: 'auto', opacity: 'inherit' }}>{ITEM_ICONS[item.type]}</span>
             </div>
           );
         })}
