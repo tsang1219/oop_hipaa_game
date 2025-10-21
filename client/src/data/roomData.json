@@ -42,11 +42,11 @@
       "educationalItems": [
         {
           "id": "patient_rights_poster",
-          "title": "Patient Rights Poster",
-          "type": "poster",
+          "title": "Patient Rights 101",
+          "type": "computer",
           "x": 3,
           "y": 3,
-          "fact": "Under HIPAA, patients have the right to access their medical records, request corrections, and receive a copy of their privacy practices. These rights must be honored within 30 days of request."
+          "fact": "Under HIPAA, patients aren't just bodies in beds—they have actual power. The Big 5 Patient Rights: (1) Right to Access Their Records within 30 days, (2) Right to Request Amendments to incorrect info, (3) Right to an Accounting of Disclosures for the last 6 years, (4) Right to Request Restrictions on who sees their info, (5) Right to Confidential Communications. Bottom line: Patients own their health data. We're just the janitors managing it."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
@@ -86,11 +86,11 @@
       "educationalItems": [
         {
           "id": "minimum_necessary_manual",
-          "title": "HIPAA Training Manual",
-          "type": "manual",
+          "title": "Minimum Necessary: It's Not a Suggestion",
+          "type": "poster",
           "x": 17,
           "y": 8,
-          "fact": "The Minimum Necessary Standard requires that only the minimum amount of PHI needed to accomplish the task should be accessed or disclosed. Always limit your access to what you truly need for your job."
+          "fact": "Healthcare is gossipy, but HIPAA has opinions about your oversharing habits. The Minimum Necessary Rule: Only access, use, or disclose the LEAST amount of PHI needed to get the job done. Not the most interesting amount. Not the juiciest amount. The MINIMUM. The Test: Ask yourself 'Do I NEED this to do my actual job, or do I just WANT to know?' If it's want? Close the chart. Walk away. Get a hobby."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
@@ -130,11 +130,11 @@
       "educationalItems": [
         {
           "id": "security_training",
-          "title": "Security Training Computer",
-          "type": "computer",
+          "title": "When You CAN Share PHI (Without Going to Jail)",
+          "type": "whiteboard",
           "x": 17,
           "y": 10,
-          "fact": "HIPAA requires three types of safeguards: Administrative (policies & training), Physical (locks & badges), and Technical (passwords & encryption). All three work together to protect patient privacy."
+          "fact": "HIPAA isn't trying to STOP healthcare—it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (with a warrant), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
@@ -166,11 +166,11 @@
       "educationalItems": [
         {
           "id": "authorization_guide",
-          "title": "Authorization Guidelines",
+          "title": "So You're Responsible for PHI Now (Good Luck!)",
           "type": "manual",
           "x": 3,
           "y": 10,
-          "fact": "PHI is information that can identify a patient and relates to their health condition, treatment, or payment. This includes names, addresses, dates, medical record numbers, photos, and any of the 18 HIPAA identifiers."
+          "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. PHI = The Big 18 Identifiers + Health Info. Think: names, addresses, SSNs, medical records, dates of birth, phone numbers, photos, basically anything that could identify a patient AND their health status. The Golden Rule: If you can connect health data to a specific person, congrats—it's PHI. Treat it like it's your own embarrassing medical history."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
@@ -198,7 +198,16 @@
         }
       ],
       "interactionZones": [],
-      "educationalItems": [],
+      "educationalItems": [
+        {
+          "id": "when_to_say_no",
+          "title": "The Art of the HIPAA Shutdown",
+          "type": "poster",
+          "x": 16,
+          "y": 3,
+          "fact": "Not everyone who asks for PHI gets it. Sometimes your job is to be the bouncer at Club Medical Records. Automatic NO Situations: Family Members Without Authorization, Employers asking for diagnosis (they get work notes only), Marketing Without Authorization, Anyone Via Unsecured Communication (no texting lab results!). The Script: 'I'm unable to confirm or deny any patient information without proper authorization.' Saying no to inappropriate requests is literally your job."
+        }
+      ],
       "spawnPoint": {"x": 10, "y": 12}
     },
     {
