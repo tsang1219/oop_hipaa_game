@@ -513,6 +513,99 @@
         }
       ],
       "isEnd": true
+    },
+    {
+      "id": "final_boss_1",
+      "character": "Chief Compliance Officer",
+      "dialogue": "I've been watching your performance. Now for the REAL test. Federal audit starts Monday, and I need to know you understand HIPAA inside and out. SCENARIO 1: You discover a colleague has been accessing patient charts they shouldn't have access to—including their ex-spouse's records. They beg you not to report it because they'll lose their job. What's your move?",
+      "choices": [
+        {
+          "text": "Report immediately to compliance and your supervisor.",
+          "score": 15,
+          "feedback": "Correct! This is a serious HIPAA violation (improper access + potential revenge snooping). You're required to report it. Their job loss is a consequence of THEIR actions, not yours. Document what you saw and escalate immediately.",
+          "nextSceneId": "final_boss_2"
+        },
+        {
+          "text": "Give them a warning but don't report this time.",
+          "score": -15,
+          "feedback": "Wrong. By not reporting, YOU'RE now complicit in the violation. This isn't a judgment call—it's a mandatory reporting situation. Unauthorized access to medical records, especially for personal reasons, is a federal crime.",
+          "nextSceneId": "final_boss_2"
+        },
+        {
+          "text": "Tell them to self-report and give them 24 hours to do it.",
+          "score": -10,
+          "feedback": "Wrong. This isn't their decision to make (or delay). You have a duty to report HIPAA violations immediately. Waiting 24 hours could mean more violations, and you'll be held accountable for the delay.",
+          "nextSceneId": "final_boss_2"
+        },
+        {
+          "text": "Mind your own business—it's not your problem.",
+          "score": -20,
+          "feedback": "Disastrous. If you witness a HIPAA violation and don't report it, you can be personally fined and face criminal charges. This is exactly your problem. Report it immediately or face the consequences.",
+          "nextSceneId": "final_boss_2"
+        }
+      ]
+    },
+    {
+      "id": "final_boss_2",
+      "character": "Chief Compliance Officer",
+      "dialogue": "SCENARIO 2: A patient's attorney calls demanding copies of medical records. They say it's for a malpractice case against another hospital, and they'll subpoena if you don't comply immediately. They're very aggressive and threatening. How do you respond?",
+      "choices": [
+        {
+          "text": "Verify the request is legitimate, confirm patient authorization, follow proper disclosure procedures.",
+          "score": 15,
+          "feedback": "Correct! Don't be bullied by aggressive attorneys. You need: (1) Written authorization from the patient, OR (2) A valid court order/subpoena (which you must verify), (3) Follow minimum necessary standards, (4) Document everything. Threats don't bypass HIPAA.",
+          "nextSceneId": "final_boss_3"
+        },
+        {
+          "text": "Comply immediately to avoid the subpoena.",
+          "score": -15,
+          "feedback": "Wrong. Aggressive attorneys don't scare HIPAA into submission. You still need proper authorization or a valid court order. Handing over records because someone sounds scary is a violation. Always verify and follow procedure.",
+          "nextSceneId": "final_boss_3"
+        },
+        {
+          "text": "Refuse to provide anything without a court order.",
+          "score": -5,
+          "feedback": "Too rigid. Patient authorization is sufficient—you don't always need a court order. But you're right to push back on aggressive demands. Verify authorization, confirm the request is legitimate, then proceed appropriately.",
+          "nextSceneId": "final_boss_3"
+        },
+        {
+          "text": "Transfer the call to your supervisor without gathering any information.",
+          "score": 5,
+          "feedback": "Not terrible (escalation is smart), but you should still gather basic info first: who's calling, what they're requesting, and what authorization they claim to have. Then escalate with that context.",
+          "nextSceneId": "final_boss_3"
+        }
+      ]
+    },
+    {
+      "id": "final_boss_3",
+      "character": "Chief Compliance Officer",
+      "dialogue": "Final question. SCENARIO 3: You're working late and notice the CEO of your hospital is logged into a workstation, looking at patient records. You're pretty sure they don't have a treatment relationship with these patients. The CEO outranks everyone. What do you do?",
+      "choices": [
+        {
+          "text": "Report the suspicious access to compliance, regardless of their title.",
+          "score": 20,
+          "feedback": "Absolutely correct! HIPAA doesn't care about org charts. The CEO has no special rights to snoop in patient records. This is potentially a massive violation. Document what you saw, report to compliance, and let them investigate. Your job is to protect patient privacy, not the CEO's reputation.",
+          "isEnd": true
+        },
+        {
+          "text": "Politely ask the CEO if they need the access for a legitimate reason.",
+          "score": -10,
+          "feedback": "Wrong. You're not their supervisor, and this isn't a casual conversation. Asking them directly could be seen as confrontational OR give them time to cover their tracks. Report to compliance and let them handle the investigation. Don't tip anyone off.",
+          "isEnd": true
+        },
+        {
+          "text": "Ignore it—they're the CEO, they probably have authorization.",
+          "score": -20,
+          "feedback": "Catastrophic. The CEO isn't above HIPAA. If they're improperly accessing records, you have a duty to report it. 'They're important' is not a defense. Ignoring this makes you complicit in what could be a massive violation.",
+          "isEnd": true
+        },
+        {
+          "text": "Mention it to your supervisor the next day but don't make it urgent.",
+          "score": -5,
+          "feedback": "Too slow. HIPAA violations need immediate reporting, regardless of who's involved. Waiting until 'next day' could mean more violations and shows you don't understand the urgency. Report immediately to compliance.",
+          "isEnd": true
+        }
+      ]
     }
   ]
 }

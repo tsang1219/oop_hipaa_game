@@ -35,6 +35,14 @@
           "x": 13,
           "y": 10,
           "sceneId": "celebrity_crisis"
+        },
+        {
+          "id": "final_boss",
+          "name": "Chief Compliance Officer",
+          "x": 10,
+          "y": 3,
+          "sceneId": "final_boss_1",
+          "isFinalBoss": true
         }
       ],
       "interactionZones": [

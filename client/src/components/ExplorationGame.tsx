@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react';
 import HospitalHub from './HospitalHub';
 import RoomExploration from './RoomExploration';
 import GameContainer from './GameContainer';
+import EndScreen from './EndScreen';
 import { useToast } from '@/hooks/use-toast';
 import type { Room, Scene } from '@shared/schema';
 
-type GameMode = 'hub' | 'exploration' | 'dialogue';
+type GameMode = 'hub' | 'exploration' | 'dialogue' | 'gameover' | 'win';
 
 interface ExplorationGameProps {
   rooms: Room[];
@@ -24,9 +25,18 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     const saved = localStorage.getItem('completedNPCs');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
+  const [finalPrivacyScore, setFinalPrivacyScore] = useState(100);
+  const [gameStartTime] = useState(() => {
+    const saved = localStorage.getItem('gameStartTime');
+    return saved ? parseInt(saved) : Date.now();
+  });
 
   const totalEducationalItems = rooms.reduce((sum, room) => sum + room.educationalItems.length, 0);
-  const totalScenarios = rooms.reduce((sum, room) => sum + room.npcs.length, 0);
+  const totalScenarios = rooms.reduce((sum, room) => sum + room.npcs.filter(npc => !npc.isFinalBoss).length, 0);
+
+  useEffect(() => {
+    localStorage.setItem('gameStartTime', gameStartTime.toString());
+  }, [gameStartTime]);
 
   useEffect(() => {
     const savedProgress = localStorage.getItem('hipaa-exploration-progress');
@@ -48,6 +58,23 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     };
     localStorage.setItem('hipaa-exploration-progress', JSON.stringify(progress));
   }, [completedRooms, visitedScenes]);
+
+  useEffect(() => {
+    if (completedNPCs.size === totalScenarios + 1) {
+      const savedProgress = localStorage.getItem('exploration-dialogue-final_boss_1-progress');
+      if (savedProgress) {
+        try {
+          const progress = JSON.parse(savedProgress);
+          if (progress.gameComplete) {
+            setFinalPrivacyScore(100);
+            setGameMode('win');
+          }
+        } catch (e) {
+          console.error('Failed to check win condition:', e);
+        }
+      }
+    }
+  }, [completedNPCs, totalScenarios]);
 
   const currentRoom = rooms.find(r => r.id === currentRoomId);
   
@@ -109,12 +136,50 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     setGameMode('exploration');
   };
 
+  const handleGameOver = (finalScore: number) => {
+    setFinalPrivacyScore(finalScore);
+    setGameMode('gameover');
+  };
+
+  const handlePlayAgain = () => {
+    localStorage.clear();
+    window.location.reload();
+  };
+
+  const formatElapsedTime = (): string => {
+    const elapsed = Date.now() - gameStartTime;
+    const seconds = Math.floor(elapsed / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+
+    if (hours > 0) {
+      return `${hours}h ${minutes % 60}m`;
+    } else if (minutes > 0) {
+      return `${minutes}m ${seconds % 60}s`;
+    } else {
+      return `${seconds}s`;
+    }
+  };
+
   const hospitalRooms = rooms.map(room => ({
     id: room.id,
     name: room.name,
     icon: '',
     description: '',
   }));
+
+  if (gameMode === 'gameover' || gameMode === 'win') {
+    return (
+      <EndScreen
+        isWin={gameMode === 'win'}
+        finalScore={finalPrivacyScore}
+        scenariosCompleted={completedNPCs.size}
+        totalScenarios={totalScenarios + 1}
+        timeElapsed={formatElapsedTime()}
+        onPlayAgain={handlePlayAgain}
+      />
+    );
+  }
 
   if (gameMode === 'hub') {
     return (
@@ -153,6 +218,7 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
         <GameContainer 
           scenes={scenesForDialogue}
           onComplete={handleDialogueComplete}
+          onGameOver={handleGameOver}
           storageKey={`exploration-dialogue-${currentSceneId}`}
         />
       </div>

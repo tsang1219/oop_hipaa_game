@@ -15,10 +15,11 @@ type GamePhase = 'dialogue' | 'choices' | 'feedback';
 interface GameContainerProps {
   scenes: Scene[];
   onComplete?: () => void;
+  onGameOver?: (finalScore: number) => void;
   storageKey?: string;
 }
 
-export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-game' }: GameContainerProps) {
+export default function GameContainer({ scenes, onComplete, onGameOver, storageKey = 'hipaa-game' }: GameContainerProps) {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [privacyScore, setPrivacyScore] = useState(100);
@@ -119,6 +120,11 @@ export default function GameContainer({ scenes, onComplete, storageKey = 'hipaa-
     const privacyChange = choice.score < 0 ? choice.score : choice.score > 0 ? 5 : 0;
     const newPrivacyScore = Math.max(0, Math.min(100, privacyScore + privacyChange));
     setPrivacyScore(newPrivacyScore);
+
+    if (newPrivacyScore <= 0) {
+      onGameOver?.(0);
+      return;
+    }
 
     const logEntry = {
       sceneId: currentScene.id,

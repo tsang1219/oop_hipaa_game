@@ -1,0 +1,112 @@
+import { Button } from '@/components/ui/button';
+import { Trophy, XCircle } from 'lucide-react';
+
+interface EndScreenProps {
+  isWin: boolean;
+  finalScore: number;
+  scenariosCompleted: number;
+  totalScenarios: number;
+  timeElapsed: string;
+  onPlayAgain: () => void;
+}
+
+export default function EndScreen({
+  isWin,
+  finalScore,
+  scenariosCompleted,
+  totalScenarios,
+  timeElapsed,
+  onPlayAgain,
+}: EndScreenProps) {
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-8">
+      <div className="max-w-2xl w-full bg-card border-4 border-primary rounded-md p-8 text-center space-y-6">
+        {isWin ? (
+          <>
+            <div className="flex justify-center">
+              <Trophy className="w-24 h-24 text-primary animate-bounce" data-testid="trophy-icon" />
+            </div>
+            <h1 className="text-3xl font-bold text-primary" data-testid="result-title">
+              🎉 HIPAA MASTER! 🎉
+            </h1>
+            <p className="text-lg text-foreground">
+              Congratulations! You've successfully completed HIPAA Privacy Rule training
+              and proved you can protect patient privacy like a pro.
+            </p>
+          </>
+        ) : (
+          <>
+            <div className="flex justify-center">
+              <XCircle className="w-24 h-24 text-destructive animate-pulse" data-testid="fail-icon" />
+            </div>
+            <h1 className="text-3xl font-bold text-destructive" data-testid="result-title">
+              PRIVACY BREACH!
+            </h1>
+            <p className="text-lg text-foreground">
+              Your Privacy Meter hit zero. In the real world, this would mean serious
+              HIPAA violations, federal fines, and potential criminal charges.
+              Time to review the rules and try again!
+            </p>
+          </>
+        )}
+
+        <div className="bg-card-foreground/5 border-2 border-primary/30 rounded-md p-6 space-y-3">
+          <h2 className="text-xl font-bold text-primary mb-4">FINAL STATS</h2>
+          
+          <div className="flex justify-between items-center text-base">
+            <span className="text-muted-foreground">Privacy Meter:</span>
+            <span 
+              className={`font-bold ${finalScore >= 70 ? 'text-green-500' : finalScore >= 40 ? 'text-orange-500' : 'text-pink-500'}`}
+              data-testid="final-score"
+            >
+              {finalScore}%
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center text-base">
+            <span className="text-muted-foreground">Scenarios Completed:</span>
+            <span className="font-bold text-foreground" data-testid="scenarios-completed">
+              {scenariosCompleted}/{totalScenarios}
+            </span>
+          </div>
+
+          <div className="flex justify-between items-center text-base">
+            <span className="text-muted-foreground">Time Elapsed:</span>
+            <span className="font-bold text-foreground" data-testid="time-elapsed">
+              {timeElapsed}
+            </span>
+          </div>
+        </div>
+
+        <div className="space-y-3">
+          <Button
+            onClick={onPlayAgain}
+            size="lg"
+            className="w-full text-lg"
+            data-testid="button-play-again"
+          >
+            {isWin ? '🔄 PLAY AGAIN' : '🔄 TRY AGAIN'}
+          </Button>
+
+          {isWin && (
+            <p className="text-sm text-muted-foreground italic">
+              "Remember: HIPAA isn't about memorizing rules. It's about making
+              privacy-first decisions every single day. Stay vigilant!" 
+              <br />
+              — Chief Compliance Officer
+            </p>
+          )}
+
+          {!isWin && (
+            <p className="text-sm text-muted-foreground italic">
+              "Every HIPAA violation you make in this game would be a career-ending
+              mistake in real life. Learn from these errors!"
+              <br />
+              — Chief Compliance Officer
+            </p>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}

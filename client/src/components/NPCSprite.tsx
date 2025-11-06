@@ -9,10 +9,14 @@ export default function NPCSprite({ npcId, direction = 'down' }: NPCSpriteProps)
   const npcCharacterMap: Record<string, string> = {
     'riley': 'receptionist',
     'nina': 'nurse',
+    'dr_martinez': 'doctor',
     'martinez': 'doctor',
     'sam': 'it_tech',
     'gary': 'staff',
-    'cathy': 'staff'
+    'cathy': 'staff',
+    'husband': 'staff',
+    'admin': 'doctor',
+    'final_boss': 'boss'
   };
 
   const characterType = npcCharacterMap[npcId] || 'staff';
@@ -28,6 +32,7 @@ export default function NPCSprite({ npcId, direction = 'down' }: NPCSpriteProps)
         {characterType === 'receptionist' && <ReceptionistSprite direction={direction} />}
         {characterType === 'doctor' && <DoctorSprite direction={direction} />}
         {characterType === 'it_tech' && <ITTechSprite direction={direction} />}
+        {characterType === 'boss' && <BossSprite direction={direction} />}
         {characterType === 'staff' && <StaffSprite direction={direction} />}
       </svg>
     </div>
@@ -286,6 +291,78 @@ function ITTechSprite({ direction }: { direction: string }) {
       {/* Shoes */}
       <rect x="11" y="30" width="5" height="2" fill="#8B4513" />
       <rect x="16" y="30" width="5" height="2" fill="#8B4513" />
+    </g>
+  );
+}
+
+// Boss sprite (Chief Compliance Officer - formal suit with intimidating presence)
+function BossSprite({ direction }: { direction: string }) {
+  const isLeft = direction === 'left';
+  const isRight = direction === 'right';
+  const isUp = direction === 'up';
+  
+  return (
+    <g>
+      {/* Head */}
+      <rect x="12" y="6" width="8" height="8" fill="#FDBCB4" />
+      
+      {/* Hair (slicked back, professional) */}
+      <rect x="12" y="5" width="8" height="2" fill="#2C2C2C" />
+      <rect x="11" y="6" width="10" height="2" fill="#2C2C2C" />
+      
+      {/* Eyes (stern look) */}
+      {isUp ? (
+        <>
+          <rect x="14" y="9" width="2" height="1" fill="#000" />
+          <rect x="18" y="9" width="2" height="1" fill="#000" />
+        </>
+      ) : (
+        <>
+          <rect x="14" y="10" width="2" height="2" fill="#000" />
+          <rect x="18" y="10" width="2" height="2" fill="#000" />
+        </>
+      )}
+      
+      {/* Body (black suit jacket) */}
+      <rect x="10" y="14" width="12" height="10" fill="#1A1A1A" />
+      
+      {/* White shirt */}
+      <rect x="14" y="15" width="4" height="8" fill="#FFF" />
+      
+      {/* Red power tie */}
+      <rect x="15" y="15" width="2" height="6" fill="#DC143C" />
+      
+      {/* Arms */}
+      {isLeft ? (
+        <>
+          <rect x="7" y="15" width="3" height="7" fill="#1A1A1A" />
+          <rect x="7" y="22" width="3" height="2" fill="#FDBCB4" />
+          <rect x="22" y="16" width="3" height="6" fill="#1A1A1A" />
+          <rect x="22" y="22" width="3" height="2" fill="#FDBCB4" />
+        </>
+      ) : isRight ? (
+        <>
+          <rect x="7" y="16" width="3" height="6" fill="#1A1A1A" />
+          <rect x="7" y="22" width="3" height="2" fill="#FDBCB4" />
+          <rect x="22" y="15" width="3" height="7" fill="#1A1A1A" />
+          <rect x="22" y="22" width="3" height="2" fill="#FDBCB4" />
+        </>
+      ) : (
+        <>
+          <rect x="7" y="15" width="3" height="7" fill="#1A1A1A" />
+          <rect x="7" y="22" width="3" height="2" fill="#FDBCB4" />
+          <rect x="22" y="15" width="3" height="7" fill="#1A1A1A" />
+          <rect x="22" y="22" width="3" height="2" fill="#FDBCB4" />
+        </>
+      )}
+      
+      {/* Legs (dress pants) */}
+      <rect x="12" y="24" width="4" height="6" fill="#2C2C2C" />
+      <rect x="16" y="24" width="4" height="6" fill="#2C2C2C" />
+      
+      {/* Shoes (polished black) */}
+      <rect x="11" y="30" width="5" height="2" fill="#000" />
+      <rect x="16" y="30" width="5" height="2" fill="#000" />
     </g>
   );
 }

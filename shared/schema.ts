@@ -37,6 +37,7 @@ export const npcSchema = z.object({
   x: z.number(),
   y: z.number(),
   sceneId: z.string(),
+  isFinalBoss: z.boolean().optional(),
 });
 
 export const interactionZoneSchema = z.object({

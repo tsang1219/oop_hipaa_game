@@ -229,7 +229,13 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
         ))}
 
         {room.npcs.map((npc) => {
+          if (npc.isFinalBoss && completedNPCs.size < totalScenarios - 1) {
+            return null;
+          }
+          
           const isCompleted = completedNPCs.has(npc.id);
+          const isBoss = npc.isFinalBoss;
+          
           return (
             <div key={npc.id} className="relative">
               <div 
@@ -254,6 +260,19 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
               >
                 <NPCSprite npcId={npc.id} direction="down" />
               </div>
+              {isBoss && !isCompleted && (
+                <div
+                  className="absolute pointer-events-none animate-pulse"
+                  style={{
+                    left: npc.x * TILE_SIZE + TILE_SIZE / 2 - 8,
+                    top: npc.y * TILE_SIZE - 12,
+                    zIndex: 35,
+                  }}
+                  data-testid="boss-indicator"
+                >
+                  <span className="text-xs font-bold text-destructive drop-shadow-md">⚠️ BOSS</span>
+                </div>
+              )}
               {isCompleted && (
                 <div
                   className="absolute pointer-events-none"
