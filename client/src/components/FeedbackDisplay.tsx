@@ -24,13 +24,13 @@ export default function FeedbackDisplay({ feedback, type, scoreChange }: Feedbac
   };
   
   const borderColors = {
-    correct: 'border-[#4CAF50]',
+    correct: 'border-[#00FF00]',
     partial: 'border-[#FFA726]',
     incorrect: 'border-[#FF6B9D]',
   };
   
   const textColors = {
-    correct: 'text-[#4CAF50]',
+    correct: 'text-[#00FF00]',
     partial: 'text-[#FFA726]',
     incorrect: 'text-[#FF6B9D]',
   };
@@ -44,7 +44,7 @@ export default function FeedbackDisplay({ feedback, type, scoreChange }: Feedbac
   return (
     <>
       {showFlash && (
-        <div className="fixed inset-0 bg-[#FF6B9D] opacity-30 animate-pulse z-40 pointer-events-none" />
+        <div className="fixed inset-0 bg-[#00FF00] opacity-30 animate-pulse z-40 pointer-events-none" />
       )}
       <div
         className={`${bgColors[type]} border-4 ${borderColors[type]} p-4 mt-4 bg-[#1a1a2e]`}
