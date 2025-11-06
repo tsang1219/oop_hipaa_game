@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import EducationalItemModal from './EducationalItemModal';
 import KnowledgeTracker from './KnowledgeTracker';
 import NPCSprite from './NPCSprite';
+import PlayerSprite from './PlayerSprite';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 interface RoomExplorationProps {
@@ -22,6 +23,7 @@ const ITEM_ICONS = {
 
 export default function RoomExploration({ room, onTriggerScene, onExitRoom }: RoomExplorationProps) {
   const [playerPos, setPlayerPos] = useState<Position>(room.spawnPoint);
+  const [playerDirection, setPlayerDirection] = useState<'down' | 'up' | 'left' | 'right'>('down');
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
   const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
@@ -72,6 +74,12 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
   }, [room.npcs, room.interactionZones, room.educationalItems]);
 
   const movePlayer = useCallback((dx: number, dy: number) => {
+    // Update direction
+    if (dx < 0) setPlayerDirection('left');
+    else if (dx > 0) setPlayerDirection('right');
+    else if (dy < 0) setPlayerDirection('up');
+    else if (dy > 0) setPlayerDirection('down');
+
     setPlayerPos(prev => {
       const newX = prev.x + dx;
       const newY = prev.y + dy;
@@ -258,17 +266,11 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
             width: TILE_SIZE,
             height: TILE_SIZE,
             imageRendering: 'pixelated',
+            zIndex: 30,
           }}
           data-testid="player-sprite"
         >
-          <div className="relative w-full h-full">
-            <div className="absolute inset-0 bg-primary" style={{
-              clipPath: 'polygon(30% 0, 70% 0, 70% 30%, 90% 30%, 90% 70%, 70% 70%, 70% 100%, 30% 100%, 30% 70%, 10% 70%, 10% 30%, 30% 30%)'
-            }} />
-            <div className="absolute top-1/2 left-1/2 w-1 h-1 bg-background" style={{
-              transform: 'translate(-50%, -50%)'
-            }} />
-          </div>
+          <PlayerSprite direction={playerDirection} characterType="blue" />
         </div>
       </div>
 
