@@ -43,14 +43,16 @@
           "name": "Sign-in Sheet",
           "x": 6,
           "y": 6,
-          "sceneId": "signin_violation"
+          "sceneId": "signin_violation",
+          "spriteType": "poster"
         },
         {
           "id": "phone",
           "name": "Reception Phone",
           "x": 13,
           "y": 6,
-          "sceneId": "phone_privacy"
+          "sceneId": "phone_privacy",
+          "spriteType": "computer"
         }
       ],
       "educationalItems": [
@@ -87,21 +89,24 @@
           "name": "Unlocked File Cabinet",
           "x": 4,
           "y": 5,
-          "sceneId": "unlocked_files"
+          "sceneId": "unlocked_files",
+          "spriteType": "manual"
         },
         {
           "id": "shredder",
           "name": "Document Shredder",
           "x": 14,
           "y": 5,
-          "sceneId": "proper_disposal"
+          "sceneId": "proper_disposal",
+          "spriteType": "manual"
         },
         {
           "id": "fax_machine",
           "name": "Fax Machine (Oh No...)",
           "x": 9,
           "y": 6,
-          "sceneId": "fax_machine_freddy"
+          "sceneId": "fax_machine_freddy",
+          "spriteType": "computer"
         }
       ],
       "educationalItems": [
@@ -145,7 +150,8 @@
           "name": "Patient Status Board",
           "x": 10,
           "y": 2,
-          "sceneId": "whiteboard_phi"
+          "sceneId": "whiteboard_phi",
+          "spriteType": "whiteboard"
         }
       ],
       "educationalItems": [
@@ -181,7 +187,8 @@
           "name": "Unlocked Computer",
           "x": 7,
           "y": 6,
-          "sceneId": "unlocked_workstation"
+          "sceneId": "unlocked_workstation",
+          "spriteType": "computer"
         }
       ],
       "educationalItems": [
@@ -267,14 +274,16 @@
           "name": "Password Sticky Note",
           "x": 4,
           "y": 6,
-          "sceneId": "password_sharing"
+          "sceneId": "password_sharing",
+          "spriteType": "poster"
         },
         {
           "id": "hr_phone",
           "name": "Ringing Phone (HR)",
           "x": 14,
           "y": 8,
-          "sceneId": "boss_man_brad"
+          "sceneId": "boss_man_brad",
+          "spriteType": "computer"
         }
       ],
       "educationalItems": [

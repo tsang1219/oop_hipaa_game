@@ -206,11 +206,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
         ))}
 
         {room.interactionZones.map((zone) => {
-          // Map zone types to sprite types
-          const spriteType = zone.name.toLowerCase().includes('computer') ? 'computer' :
-                           zone.name.toLowerCase().includes('poster') ? 'poster' :
-                           zone.name.toLowerCase().includes('whiteboard') ? 'whiteboard' :
-                           'computer'; // default
+          const spriteType = zone.spriteType || 'computer'; // default to computer if not specified
           
           return (
             <div

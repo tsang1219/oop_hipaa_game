@@ -45,6 +45,7 @@ export const interactionZoneSchema = z.object({
   x: z.number(),
   y: z.number(),
   sceneId: z.string(),
+  spriteType: z.enum(['poster', 'manual', 'computer', 'whiteboard']).optional(),
 });
 
 export const educationalItemSchema = z.object({
