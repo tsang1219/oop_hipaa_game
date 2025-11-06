@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import EducationalItemModal from './EducationalItemModal';
 import KnowledgeTracker from './KnowledgeTracker';
+import NPCSprite from './NPCSprite';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 interface RoomExplorationProps {
@@ -50,7 +51,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
         return;
       }
     }
-    
+
     for (const zone of room.interactionZones) {
       const distance = Math.abs(zone.x - x) + Math.abs(zone.y - y);
       if (distance <= 1) {
@@ -66,7 +67,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
         return;
       }
     }
-    
+
     setNearbyInteraction(null);
   }, [room.npcs, room.interactionZones, room.educationalItems]);
 
@@ -74,11 +75,11 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
     setPlayerPos(prev => {
       const newX = prev.x + dx;
       const newY = prev.y + dy;
-      
+
       if (checkCollision(newX, newY)) {
         return prev;
       }
-      
+
       checkNearbyInteraction(newX, newY);
       return { x: newX, y: newY };
     });
@@ -193,26 +194,13 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
         ))}
 
         {room.npcs.map((npc) => (
-          <div
+          <NPCSprite
             key={npc.id}
-            className="absolute cursor-pointer hover:scale-110 transition-all"
-            style={{
-              left: npc.x * TILE_SIZE,
-              top: npc.y * TILE_SIZE,
-              width: TILE_SIZE,
-              height: TILE_SIZE,
-            }}
+            npc={npc}
+            tileSize={TILE_SIZE}
             onClick={() => onTriggerScene(npc.sceneId)}
-            data-testid={`npc-${npc.id}`}
-          >
-            <div className="relative w-full h-full">
-              <div className="absolute inset-0 bg-destructive opacity-70" style={{
-                clipPath: 'polygon(30% 20%, 70% 20%, 70% 40%, 80% 40%, 80% 60%, 70% 60%, 70% 90%, 30% 90%, 30% 60%, 20% 60%, 20% 40%, 30% 40%)'
-              }} />
-              <div className="absolute top-[25%] left-[35%] w-2 h-2 bg-background rounded-full" />
-              <div className="absolute top-[25%] right-[35%] w-2 h-2 bg-background rounded-full" />
-            </div>
-          </div>
+            playerPos={playerPos}
+          />
         ))}
 
         {room.interactionZones.map((zone) => (
