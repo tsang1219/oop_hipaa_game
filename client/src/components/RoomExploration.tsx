@@ -1,7 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
+import { CheckCircle2 } from 'lucide-react';
 import EducationalItemModal from './EducationalItemModal';
 import KnowledgeTracker from './KnowledgeTracker';
+import ChecklistUI from './ChecklistUI';
 import NPCSprite from './NPCSprite';
 import PlayerSprite from './PlayerSprite';
 import ObjectSprite from './ObjectSprites';
@@ -11,17 +13,24 @@ interface RoomExplorationProps {
   room: Room;
   onTriggerScene: (sceneId: string) => void;
   onExitRoom: () => void;
+  totalEducationalItems: number;
+  totalScenarios: number;
 }
 
 const TILE_SIZE = 32;
 
-export default function RoomExploration({ room, onTriggerScene, onExitRoom }: RoomExplorationProps) {
+export default function RoomExploration({ room, onTriggerScene, onExitRoom, totalEducationalItems, totalScenarios }: RoomExplorationProps) {
   const [playerPos, setPlayerPos] = useState<Position>(room.spawnPoint);
   const [playerDirection, setPlayerDirection] = useState<'down' | 'up' | 'left' | 'right'>('down');
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
+  const [showLockedMessage, setShowLockedMessage] = useState(false);
   const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('collectedEducationalItems');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+  const [completedNPCs, setCompletedNPCs] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('completedNPCs');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
 
@@ -87,16 +96,24 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
     });
   }, [checkCollision, checkNearbyInteraction]);
 
+  const allItemsCollected = collectedItems.size >= totalEducationalItems;
+
   const handleInteraction = () => {
     if (nearbyInteraction) {
       if (nearbyInteraction.type === 'item') {
         const item = nearbyInteraction.data as EducationalItem;
         setSelectedItem(item);
+      } else if (nearbyInteraction.type === 'npc') {
+        if (!allItemsCollected) {
+          setShowLockedMessage(true);
+          setTimeout(() => setShowLockedMessage(false), 3000);
+          return;
+        }
+        const npc = nearbyInteraction.data as NPC;
+        onTriggerScene(npc.sceneId);
       } else {
-        const sceneId = nearbyInteraction.type === 'npc' 
-          ? (nearbyInteraction.data as NPC).sceneId 
-          : (nearbyInteraction.data as InteractionZone).sceneId;
-        onTriggerScene(sceneId);
+        const zone = nearbyInteraction.data as InteractionZone;
+        onTriggerScene(zone.sceneId);
       }
     }
   };
@@ -174,6 +191,22 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
 
       <KnowledgeTracker />
 
+      <ChecklistUI 
+        educationalItemsCollected={collectedItems.size}
+        totalEducationalItems={totalEducationalItems}
+        scenariosCompleted={completedNPCs.size}
+        totalScenarios={totalScenarios}
+      />
+
+      {showLockedMessage && (
+        <div className="bg-destructive/90 border-4 border-destructive text-destructive-foreground px-6 py-3 rounded-md text-center" data-testid="locked-message">
+          <p className="text-sm font-bold">⚠️ QUEST LOCKED ⚠️</p>
+          <p className="text-xs mt-1">
+            Learn the basics first! Read all {totalEducationalItems} educational items before talking to staff.
+          </p>
+        </div>
+      )}
+
       <div 
         className="relative border-4 border-primary bg-card"
         style={{
@@ -195,15 +228,48 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
           />
         ))}
 
-        {room.npcs.map((npc) => (
-          <NPCSprite
-            key={npc.id}
-            npc={npc}
-            tileSize={TILE_SIZE}
-            onClick={() => onTriggerScene(npc.sceneId)}
-            playerPos={playerPos}
-          />
-        ))}
+        {room.npcs.map((npc) => {
+          const isCompleted = completedNPCs.has(npc.id);
+          return (
+            <div key={npc.id} className="relative">
+              <div 
+                className="absolute cursor-pointer"
+                style={{
+                  left: npc.x * TILE_SIZE,
+                  top: npc.y * TILE_SIZE,
+                  width: TILE_SIZE,
+                  height: TILE_SIZE,
+                  opacity: isCompleted ? 0.5 : 1,
+                  zIndex: 25,
+                }}
+                onClick={() => {
+                  if (allItemsCollected) {
+                    onTriggerScene(npc.sceneId);
+                  } else {
+                    setShowLockedMessage(true);
+                    setTimeout(() => setShowLockedMessage(false), 3000);
+                  }
+                }}
+                data-testid={`npc-${npc.id}`}
+              >
+                <NPCSprite npcId={npc.id} direction="down" />
+              </div>
+              {isCompleted && (
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    left: npc.x * TILE_SIZE + TILE_SIZE / 2 - 8,
+                    top: npc.y * TILE_SIZE - 8,
+                    zIndex: 35,
+                  }}
+                  data-testid={`checkmark-${npc.id}`}
+                >
+                  <CheckCircle2 className="w-4 h-4 text-green-500 drop-shadow-md" />
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         {room.interactionZones.map((zone) => {
           const spriteType = zone.spriteType || 'computer'; // default to computer if not specified

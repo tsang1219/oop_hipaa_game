@@ -17,8 +17,16 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
   const [gameMode, setGameMode] = useState<GameMode>('hub');
   const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
   const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
+  const [currentNPCId, setCurrentNPCId] = useState<string | null>(null);
   const [completedRooms, setCompletedRooms] = useState<string[]>([]);
   const [visitedScenes, setVisitedScenes] = useState<Set<string>>(new Set());
+  const [completedNPCs, setCompletedNPCs] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('completedNPCs');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+
+  const totalEducationalItems = rooms.reduce((sum, room) => sum + room.educationalItems.length, 0);
+  const totalScenarios = rooms.reduce((sum, room) => sum + room.npcs.length, 0);
 
   useEffect(() => {
     const savedProgress = localStorage.getItem('hipaa-exploration-progress');
@@ -69,7 +77,7 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     setGameMode('hub');
   };
 
-  const handleTriggerScene = (sceneId: string) => {
+  const handleTriggerScene = (sceneId: string, npcId?: string) => {
     const sceneExists = scenes.some(s => s.id === sceneId);
     if (!sceneExists) {
       toast({
@@ -80,6 +88,7 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
       return;
     }
     setCurrentSceneId(sceneId);
+    setCurrentNPCId(npcId || null);
     setGameMode('dialogue');
   };
 
@@ -87,7 +96,16 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     if (currentSceneId) {
       setVisitedScenes(prev => new Set(Array.from(prev).concat(currentSceneId)));
     }
+    
+    if (currentNPCId) {
+      const newCompleted = new Set(completedNPCs);
+      newCompleted.add(currentNPCId);
+      setCompletedNPCs(newCompleted);
+      localStorage.setItem('completedNPCs', JSON.stringify(Array.from(newCompleted)));
+    }
+    
     setCurrentSceneId(null);
+    setCurrentNPCId(null);
     setGameMode('exploration');
   };
 
@@ -113,8 +131,13 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
       <RoomExploration 
         key={currentRoomId}
         room={currentRoom}
-        onTriggerScene={handleTriggerScene}
+        onTriggerScene={(sceneId) => {
+          const npc = currentRoom.npcs.find(n => n.sceneId === sceneId);
+          handleTriggerScene(sceneId, npc?.id);
+        }}
         onExitRoom={handleExitRoom}
+        totalEducationalItems={totalEducationalItems}
+        totalScenarios={totalScenarios}
       />
     );
   }
