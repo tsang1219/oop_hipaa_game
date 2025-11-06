@@ -129,6 +129,23 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
       newCompleted.add(currentNPCId);
       setCompletedNPCs(newCompleted);
       localStorage.setItem('completedNPCs', JSON.stringify(Array.from(newCompleted)));
+
+      if (currentSceneId === 'final_boss_1' && newCompleted.size === totalScenarios + 1) {
+        const savedProgress = localStorage.getItem(`exploration-dialogue-${currentSceneId}-progress`);
+        if (savedProgress) {
+          try {
+            const progress = JSON.parse(savedProgress);
+            const privacyScore = parseInt(localStorage.getItem('final-privacy-score') || '100');
+            if (privacyScore > 0) {
+              setFinalPrivacyScore(privacyScore);
+              setGameMode('win');
+              return;
+            }
+          } catch (e) {
+            console.error('Failed to check win condition:', e);
+          }
+        }
+      }
     }
     
     setCurrentSceneId(null);

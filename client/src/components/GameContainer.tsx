@@ -161,6 +161,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, storageK
   const handleNextScene = () => {
     if (currentScene.isEnd) {
       setGameComplete(true);
+      localStorage.setItem('final-privacy-score', privacyScore.toString());
       onComplete?.();
     } else {
       if (selectedChoice?.nextSceneId) {
@@ -170,6 +171,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, storageK
         } else {
           const nextIndex = currentSceneIndex + 1;
           if (nextIndex >= scenes.length) {
+            localStorage.setItem('final-privacy-score', privacyScore.toString());
             onComplete?.();
           } else {
             setCurrentSceneIndex(nextIndex);
@@ -178,6 +180,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, storageK
       } else {
         const nextIndex = currentSceneIndex + 1;
         if (nextIndex >= scenes.length) {
+          localStorage.setItem('final-privacy-score', privacyScore.toString());
           onComplete?.();
         } else {
           setCurrentSceneIndex(nextIndex);

@@ -199,7 +199,11 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
       />
 
       {showLockedMessage && (
-        <div className="bg-destructive/90 border-4 border-destructive text-destructive-foreground px-6 py-3 rounded-md text-center" data-testid="locked-message">
+        <div 
+          className="bg-destructive/90 border-4 border-destructive text-destructive-foreground px-6 py-3 rounded-md text-center pointer-events-none" 
+          data-testid="locked-message"
+          style={{ zIndex: 1000 }}
+        >
           <p className="text-sm font-bold">⚠️ QUEST LOCKED ⚠️</p>
           <p className="text-xs mt-1">
             Learn the basics first! Read all {totalEducationalItems} educational items before talking to staff.

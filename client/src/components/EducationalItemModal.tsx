@@ -19,6 +19,9 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
     <div 
       className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
       onClick={onClose}
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="educational-item-title"
       data-testid="modal-educational-item"
     >
       <div 
@@ -27,12 +30,14 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
         style={{
           imageRendering: 'pixelated',
         }}
+        data-testid="educational-item-modal"
       >
         <div className="flex items-center gap-3 mb-6">
           <span className="text-4xl" style={{ imageRendering: 'auto' }}>
             {ITEM_ICONS[type]}
           </span>
           <h2 
+            id="educational-item-title"
             className="text-lg md:text-xl font-bold text-foreground"
             data-testid="text-item-title"
           >

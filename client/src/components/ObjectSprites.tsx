@@ -7,7 +7,7 @@ interface ObjectSpriteProps {
 export default function ObjectSprite({ type, size = 32 }: ObjectSpriteProps) {
   const sprites = {
     computer: (
-      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated' }}>
+      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated', pointerEvents: 'none' }}>
         {/* Monitor stand */}
         <rect x="14" y="24" width="4" height="4" fill="#4a4a4a" />
         <rect x="10" y="28" width="12" height="2" fill="#4a4a4a" />
@@ -29,7 +29,7 @@ export default function ObjectSprite({ type, size = 32 }: ObjectSpriteProps) {
     ),
     
     poster: (
-      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated' }}>
+      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated', pointerEvents: 'none' }}>
         {/* Poster board */}
         <rect x="6" y="4" width="20" height="24" fill="#f5f5dc" />
         <rect x="7" y="5" width="18" height="22" fill="#ffffff" />
@@ -54,7 +54,7 @@ export default function ObjectSprite({ type, size = 32 }: ObjectSpriteProps) {
     ),
     
     manual: (
-      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated' }}>
+      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated', pointerEvents: 'none' }}>
         {/* Book base */}
         <rect x="8" y="6" width="16" height="20" fill="#8b4513" />
         <rect x="9" y="7" width="14" height="18" fill="#a0522d" />
@@ -79,7 +79,7 @@ export default function ObjectSprite({ type, size = 32 }: ObjectSpriteProps) {
     ),
     
     whiteboard: (
-      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated' }}>
+      <svg viewBox="0 0 32 32" width={size} height={size} style={{ imageRendering: 'pixelated', pointerEvents: 'none' }}>
         {/* Board frame */}
         <rect x="4" y="4" width="24" height="18" fill="#2a2a2a" />
         <rect x="5" y="5" width="22" height="16" fill="#ffffff" />
