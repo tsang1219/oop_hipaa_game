@@ -34,9 +34,24 @@ The game features both linear dialogue sequences and an explorable hospital envi
 - Room transitions maintain game state
 - Z-index layering ensures interaction zones (bouncing stars) are clickable above other elements
 
-**Dialogue & Decision Making:**
-- Interactive conversations with healthcare characters
-- Multiple choice decisions affecting HIPAA compliance scores
+**Pokémon-Style Dialogue System:**
+- Text box appears at bottom of screen with NPC portrait on left
+- Character-by-character typing animation (30ms per character)
+- Spacebar to skip typing or advance dialogue
+- Click dialogue box to skip/advance
+- Three-phase flow: dialogue → choices → feedback
+- Character portraits displayed in retro pixel style
+
+**Quiz & Decision Making:**
+- Interactive multiple choice scenarios (2-4 options)
+- Click buttons or press number keys (1-4) to select answers
+- Privacy Meter starts at 100 and changes based on choices:
+  - Correct answers (+5 privacy points)
+  - Wrong answers (deduct points based on severity)
+- Visual feedback with retro styling:
+  - Correct: Green border, pink screen flash, +points display
+  - Incorrect: Pink border, explanation shown, -points display
+  - Partial: Orange border for partial credit
 - Educational feedback on each choice with Out-of-Pocket tone
 - Scene progression based on player decisions
 - Session tracking of all choices and outcomes
@@ -59,7 +74,13 @@ Preferred communication style: Simple, everyday language.
 
 **Component Structure:**
 The application follows a component-based architecture with clear separation of concerns:
-- **Game Components**: CharacterPortrait, DialogueBox, ChoiceButton, ScoreMeter, FeedbackDisplay, SceneCounter
+- **Game Components**: 
+  - DialogueBox (Pokémon-style with typing animation, spacebar advance)
+  - PrivacyMeter (visual score starting at 100, depletes with wrong answers)
+  - ChoiceButton (number key support 1-4, retro styling)
+  - FeedbackDisplay (pink flash on correct, score change display)
+  - CharacterPortrait, SceneCounter
+  - GameContainer (orchestrates dialogue → choices → feedback flow)
 - **Exploration Components**: HospitalHub (room selection), RoomExploration (2D tile-based movement), ExplorationGame (orchestrates game modes), EducationalItemModal (HIPAA fact display), KnowledgeTracker (Privacy Rule progress visualization)
 - **UI Components**: Comprehensive shadcn/ui library providing accessible, styled primitives
 
