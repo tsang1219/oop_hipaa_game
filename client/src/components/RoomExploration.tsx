@@ -4,6 +4,7 @@ import EducationalItemModal from './EducationalItemModal';
 import KnowledgeTracker from './KnowledgeTracker';
 import NPCSprite from './NPCSprite';
 import PlayerSprite from './PlayerSprite';
+import ObjectSprite from './ObjectSprites';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 interface RoomExplorationProps {
@@ -13,13 +14,6 @@ interface RoomExplorationProps {
 }
 
 const TILE_SIZE = 32;
-
-const ITEM_ICONS = {
-  poster: '📋',
-  manual: '📖',
-  computer: '💻',
-  whiteboard: '📝'
-};
 
 export default function RoomExploration({ room, onTriggerScene, onExitRoom }: RoomExplorationProps) {
   const [playerPos, setPlayerPos] = useState<Position>(room.spawnPoint);
@@ -245,7 +239,6 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',
-                fontSize: '24px',
                 opacity: isCollected ? 0.4 : 1,
                 zIndex: 10,
               }}
@@ -253,7 +246,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
               data-testid={`educational-item-${item.id}`}
               data-collected={isCollected ? 'true' : 'false'}
             >
-              <span style={{ imageRendering: 'auto', opacity: 'inherit' }}>{ITEM_ICONS[item.type]}</span>
+              <ObjectSprite type={item.type} size={TILE_SIZE} />
             </div>
           );
         })}
