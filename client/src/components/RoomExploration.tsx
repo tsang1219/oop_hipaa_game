@@ -205,25 +205,31 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom }: Ro
           />
         ))}
 
-        {room.interactionZones.map((zone) => (
-          <div
-            key={zone.id}
-            className="absolute animate-bounce cursor-pointer hover:scale-110 transition-all"
-            style={{
-              left: zone.x * TILE_SIZE + 8,
-              top: zone.y * TILE_SIZE,
-              width: TILE_SIZE - 16,
-              height: TILE_SIZE,
-              zIndex: 20,
-            }}
-            onClick={() => onTriggerScene(zone.sceneId)}
-            data-testid={`zone-${zone.id}`}
-          >
-            <div className="w-full h-full bg-accent" style={{
-              clipPath: 'polygon(50% 0%, 100% 38%, 82% 100%, 18% 100%, 0% 38%)'
-            }} />
-          </div>
-        ))}
+        {room.interactionZones.map((zone) => {
+          // Map zone types to sprite types
+          const spriteType = zone.name.toLowerCase().includes('computer') ? 'computer' :
+                           zone.name.toLowerCase().includes('poster') ? 'poster' :
+                           zone.name.toLowerCase().includes('whiteboard') ? 'whiteboard' :
+                           'computer'; // default
+          
+          return (
+            <div
+              key={zone.id}
+              className="absolute animate-bounce cursor-pointer hover:scale-110 transition-all"
+              style={{
+                left: zone.x * TILE_SIZE,
+                top: zone.y * TILE_SIZE,
+                width: TILE_SIZE,
+                height: TILE_SIZE,
+                zIndex: 20,
+              }}
+              onClick={() => onTriggerScene(zone.sceneId)}
+              data-testid={`zone-${zone.id}`}
+            >
+              <ObjectSprite type={spriteType} size={TILE_SIZE} />
+            </div>
+          );
+        })}
 
         {room.educationalItems.map((item) => {
           const isCollected = collectedItems.has(item.id);
