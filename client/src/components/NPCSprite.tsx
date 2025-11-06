@@ -21,7 +21,7 @@ export default function NPCSprite({ npcId, direction = 'down' }: NPCSpriteProps)
     <div className="relative w-full h-full flex items-center justify-center">
       <svg
         viewBox="0 0 32 32"
-        className="w-full h-full"
+        className="w-8 h-8"
         style={{ imageRendering: 'pixelated' }}
       >
         {characterType === 'nurse' && <NurseSprite direction={direction} />}
