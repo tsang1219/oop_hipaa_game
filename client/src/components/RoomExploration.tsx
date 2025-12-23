@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2 } from 'lucide-react';
 import EducationalItemModal from './EducationalItemModal';
@@ -36,6 +36,9 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
   const [activeChoiceGate, setActiveChoiceGate] = useState<Gate | null>(null);
   const [autoMoveTarget, setAutoMoveTarget] = useState<Position | null>(null);
   const [pendingInteraction, setPendingInteraction] = useState<{ type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem } | null>(null);
+  const [movePath, setMovePath] = useState<Position[]>([]);
+  const [isMoving, setIsMoving] = useState(false);
+  const moveIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(() => {
     const saved = localStorage.getItem(`resolvedGates_${room.id}`);
     return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -113,9 +116,20 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
     const queue: Array<{ pos: Position; path: Position[] }> = [{ pos: start, path: [start] }];
     const visited = new Set<string>();
     visited.add(`${start.x},${start.y}`);
+    
+    let closestPos: Position = start;
+    let closestDist = Math.abs(goal.x - start.x) + Math.abs(goal.y - start.y);
+    let closestPath: Position[] = [];
 
     while (queue.length > 0) {
       const { pos, path } = queue.shift()!;
+      
+      const dist = Math.abs(goal.x - pos.x) + Math.abs(goal.y - pos.y);
+      if (dist < closestDist) {
+        closestDist = dist;
+        closestPos = pos;
+        closestPath = path;
+      }
 
       if (pos.x === goal.x && pos.y === goal.y) {
         return path.slice(1);
@@ -137,7 +151,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
       }
     }
 
-    return [];
+    return closestPath.slice(1);
   }, [checkCollision]);
 
   const checkNearbyInteraction = useCallback((x: number, y: number) => {
@@ -209,23 +223,23 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
     }
   };
 
-  const handleNpcClick = (npc: NPC) => {
+  const handleNpcClick = (npc: NPC, e: React.MouseEvent) => {
+    e.stopPropagation();
     const gate = isNpcGated(npc.id);
     if (gate) {
       return;
     }
-    setAutoMoveTarget({ x: npc.x, y: npc.y });
-    setPendingInteraction({ type: 'npc', data: npc });
+    startPathMovement({ x: npc.x, y: npc.y }, { type: 'npc', data: npc });
   };
 
-  const handleZoneClick = (zone: InteractionZone) => {
-    setAutoMoveTarget({ x: zone.x, y: zone.y });
-    setPendingInteraction({ type: 'zone', data: zone });
+  const handleZoneClick = (zone: InteractionZone, e: React.MouseEvent) => {
+    e.stopPropagation();
+    startPathMovement({ x: zone.x, y: zone.y }, { type: 'zone', data: zone });
   };
 
-  const handleItemClick = (item: EducationalItem) => {
-    setAutoMoveTarget({ x: item.x, y: item.y });
-    setPendingInteraction({ type: 'item', data: item });
+  const handleItemClick = (item: EducationalItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    startPathMovement({ x: item.x, y: item.y }, { type: 'item', data: item });
   };
 
   const handleCloseModal = () => {
@@ -235,28 +249,110 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
     setSelectedItem(null);
   };
 
-  useEffect(() => {
-    if (autoMoveTarget && pendingInteraction) {
-      const distance = Math.abs(playerPos.x - autoMoveTarget.x) + Math.abs(playerPos.y - autoMoveTarget.y);
-      
-      if (distance <= 1) {
-        setAutoMoveTarget(null);
-        setNearbyInteraction(pendingInteraction);
-      } else {
-        const path = findPath(playerPos, autoMoveTarget);
-        if (path.length > 0) {
-          const nextStep = path[0];
-          const dx = nextStep.x - playerPos.x;
-          const dy = nextStep.y - playerPos.y;
-          movePlayer(dx, dy);
+  const handleGameAreaClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = Math.floor((e.clientX - rect.left) / TILE_SIZE);
+    const y = Math.floor((e.clientY - rect.top) / TILE_SIZE);
+    
+    if (x >= 0 && x < room.width && y >= 0 && y < room.height) {
+      const path = findPath(playerPos, { x, y });
+      if (path.length > 0) {
+        if (moveIntervalRef.current) {
+          clearInterval(moveIntervalRef.current);
         }
+        setMovePath(path);
+        setIsMoving(true);
+        setPendingInteraction(null);
+        setAutoMoveTarget({ x, y });
       }
     }
-  }, [autoMoveTarget, playerPos, pendingInteraction, findPath, movePlayer]);
+  };
+
+  const startPathMovement = useCallback((targetPos: Position, interaction: { type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem } | null) => {
+    const path = findPath(playerPos, targetPos);
+    if (path.length > 0) {
+      if (moveIntervalRef.current) {
+        clearInterval(moveIntervalRef.current);
+      }
+      setMovePath(path);
+      setIsMoving(true);
+      setPendingInteraction(interaction);
+      setAutoMoveTarget(targetPos);
+    } else if (interaction) {
+      const distance = Math.abs(playerPos.x - targetPos.x) + Math.abs(playerPos.y - targetPos.y);
+      if (distance <= 1) {
+        setNearbyInteraction(interaction);
+      }
+    }
+  }, [playerPos, findPath]);
+
+  useEffect(() => {
+    if (isMoving && movePath.length > 0) {
+      moveIntervalRef.current = setInterval(() => {
+        setMovePath(currentPath => {
+          if (currentPath.length === 0) {
+            setIsMoving(false);
+            return [];
+          }
+          
+          const nextStep = currentPath[0];
+          const remainingPath = currentPath.slice(1);
+          
+          setPlayerPos(prev => {
+            const dx = nextStep.x - prev.x;
+            const dy = nextStep.y - prev.y;
+            if (dx < 0) setPlayerDirection('left');
+            else if (dx > 0) setPlayerDirection('right');
+            else if (dy < 0) setPlayerDirection('up');
+            else if (dy > 0) setPlayerDirection('down');
+            return nextStep;
+          });
+          
+          if (remainingPath.length === 0) {
+            setIsMoving(false);
+            setAutoMoveTarget(null);
+          }
+          
+          return remainingPath;
+        });
+      }, 150);
+
+      return () => {
+        if (moveIntervalRef.current) {
+          clearInterval(moveIntervalRef.current);
+        }
+      };
+    }
+  }, [isMoving]);
+
+  useEffect(() => {
+    if (!isMoving && pendingInteraction && autoMoveTarget === null) {
+      const targetPos = pendingInteraction.type === 'npc' 
+        ? { x: (pendingInteraction.data as NPC).x, y: (pendingInteraction.data as NPC).y }
+        : pendingInteraction.type === 'zone'
+        ? { x: (pendingInteraction.data as InteractionZone).x, y: (pendingInteraction.data as InteractionZone).y }
+        : { x: (pendingInteraction.data as EducationalItem).x, y: (pendingInteraction.data as EducationalItem).y };
+      
+      const distance = Math.abs(playerPos.x - targetPos.x) + Math.abs(playerPos.y - targetPos.y);
+      
+      if (distance <= 1) {
+        setNearbyInteraction(pendingInteraction);
+      }
+      setPendingInteraction(null);
+    }
+  }, [isMoving, pendingInteraction, autoMoveTarget, playerPos]);
+
+  useEffect(() => {
+    return () => {
+      if (moveIntervalRef.current) {
+        clearInterval(moveIntervalRef.current);
+      }
+    };
+  }, []);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (autoMoveTarget) return;
+      if (isMoving) return;
       
       switch (e.key) {
         case 'ArrowUp':
@@ -296,7 +392,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [movePlayer, nearbyInteraction, onExitRoom, autoMoveTarget]);
+  }, [movePlayer, nearbyInteraction, onExitRoom, isMoving]);
 
   useEffect(() => {
     checkNearbyInteraction(playerPos.x, playerPos.y);
@@ -323,12 +419,14 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
       />
 
       <div 
-        className="relative border-4 border-primary bg-card"
+        className="relative border-4 border-primary bg-card cursor-pointer"
         style={{
           width: room.width * TILE_SIZE,
           height: room.height * TILE_SIZE,
           imageRendering: 'pixelated',
         }}
+        onClick={handleGameAreaClick}
+        data-testid="game-area"
       >
         <RoomProgressHUD 
           room={room}
@@ -372,7 +470,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
                   filter: isGated ? 'grayscale(50%)' : 'none',
                   zIndex: 25,
                 }}
-                onClick={() => handleNpcClick(npc)}
+                onClick={(e) => handleNpcClick(npc, e)}
                 data-testid={`npc-${npc.id}`}
                 data-gated={isGated ? 'true' : 'false'}
               >
@@ -435,7 +533,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
                 height: TILE_SIZE,
                 zIndex: 20,
               }}
-              onClick={() => handleZoneClick(zone)}
+              onClick={(e) => handleZoneClick(zone, e)}
               data-testid={`zone-${zone.id}`}
             >
               <ObjectSprite type={spriteType} size={TILE_SIZE} />
@@ -460,7 +558,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
                 opacity: isCollected ? 0.4 : 1,
                 zIndex: 10,
               }}
-              onClick={() => handleItemClick(item)}
+              onClick={(e) => handleItemClick(item, e)}
               data-testid={`educational-item-${item.id}`}
               data-collected={isCollected ? 'true' : 'false'}
             >
