@@ -1,10 +1,12 @@
-# HIPAA Privacy Rule Interactive Training Game
+# HIPAA Privacy Guardian: Interactive Training Game
 
 ## Overview
 
-An interactive HIPAA Privacy Rule training game built with a retro 16-bit pixel art aesthetic. The application transforms compliance training into an engaging experience through dialogue-based gameplay where users interact with healthcare characters (like Nurse Nina) to make HIPAA-related decisions. Each choice impacts scoring and provides educational feedback, making regulatory compliance training both effective and enjoyable.
+You are a Privacy Guardian. Your role is not to check compliance boxes—it's to protect something sacred: the trust patients place in your organization when they share their most vulnerable information.
 
-The game features both linear dialogue sequences and an explorable hospital environment with multiple rooms and NPCs, allowing users to discover compliance scenarios organically while tracking their progress.
+This is a mission-driven game about protecting patient trust, not checking compliance boxes. The reward for completing scenarios is seeing who you protected through patient stories. Built with a retro 16-bit pixel art aesthetic, the game transforms compliance training into an engaging, emotionally resonant experience.
+
+Every principle learned, every scenario completed, every room cleared represents lives quietly protected. Patients who will never know your name, but whose trust you've honored.
 
 ## Core Gameplay Features
 
@@ -26,9 +28,23 @@ The game features both linear dialogue sequences and an explorable hospital envi
 - Provides clear sense of progression and completion status
 - IT Office item serves as transitional content for future security-focused game sections (not tracked)
 
+**Hallway Hub (Visual Map):**
+- Visual grid-based room selection map with spatial layout
+- Rooms arranged as: IT Office (top), Break Room/Medical Records (middle), Reception/ER/Laboratory (bottom)
+- Room status indicators: Locked (gray + lock icon), Available (pulsing animation), Cleared (green checkmark)
+- Thematic subtitles for each room:
+  - Reception: "The Entry Point"
+  - Emergency Room: "The Edge Cases"
+  - Laboratory: "The Source"
+  - Medical Records: "The Archive"
+  - IT Office: "The Vault"
+  - Break Room: "The Human Factor" (always unlocked)
+- Room unlock progression: Reception → ER → Lab → Medical Records → IT Office
+- Patient Story collection gallery showing earned stories from cleared rooms
+
 **Exploration Mode:**
 - 32x32 pixel grid-based movement system (WASD/Arrow keys)
-- Multiple hospital rooms: Reception Area, Medical Records Room, Nurse Station, Billing Office, IT Department, Break Room
+- Each room contains NPCs, interaction zones, and educational items
 - NPCs and interaction zones are clickable (direct interaction) or activatable via Space key when nearby
 - Collision detection for realistic navigation
 - Room transitions maintain game state
@@ -42,11 +58,20 @@ The game features both linear dialogue sequences and an explorable hospital envi
 - Three-phase flow: dialogue → choices → feedback
 - Character portraits displayed in retro pixel style
 
+**Community Trust Meter (0-100):**
+- Not your score—*theirs*. Represents community/patient trust in the organization.
+- 100: Warm, connected. Patients share openly, seek care freely.
+- 70-99: Healthy. Small lapses happen but trust holds.
+- 40-69: Eroding. Hesitation creeps in. Some avoid care.
+- Below 40: Breaking. People hide symptoms, skip treatment, suffer alone.
+- Drops quickly with mistakes. Rebuilds slowly with sustained good practice.
+- Dynamic status text: "Patients trust freely" / "Trust is eroding..." / "Trust is breaking!"
+
 **Quiz & Decision Making:**
 - Interactive multiple choice scenarios (2-4 options)
 - Click buttons or press number keys (1-4) to select answers
-- Privacy Meter starts at 100 and changes based on choices:
-  - Correct answers (+5 privacy points)
+- Trust impacts based on choices:
+  - Correct answers (+5 trust points)
   - Wrong answers (deduct points based on severity)
 - Visual feedback with retro styling:
   - Correct: Green border, pink screen flash, +points display
@@ -55,7 +80,13 @@ The game features both linear dialogue sequences and an explorable hospital envi
 - Educational feedback on each choice with Out-of-Pocket tone
 - Scene progression based on player decisions
 - Session tracking of all choices and outcomes
-- New scenarios: Chatty Cathy (cafeteria gossip), Concerned Husband (family requests), Fax Machine Freddy (breach response), Boss Man Brad (employer requests), Celebrity Crisis (VIP privacy)
+
+**Patient Story Collection:**
+- The true reward. Not badges—lives protected.
+- When a room is cleared, a patient story is earned showing who was protected
+- Each story is a specific person whose trust was honored
+- Stories collected in the Hallway Hub for viewing
+- Example: "Because you secured that sign-in sheet, Elena felt safe seeking treatment. Her employer in the waiting room never knew why she was there."
 
 ## User Preferences
 
