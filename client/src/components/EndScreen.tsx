@@ -27,11 +27,12 @@ export default function EndScreen({
               <Trophy className="w-24 h-24 text-primary animate-bounce" data-testid="trophy-icon" />
             </div>
             <h1 className="text-3xl font-bold text-primary" data-testid="result-title">
-              🎉 HIPAA MASTER! 🎉
+              PRIVACY GUARDIAN
             </h1>
             <p className="text-lg text-foreground">
-              Congratulations! You've successfully completed HIPAA Privacy Rule training
-              and proved you can protect patient privacy like a pro.
+              You've honored the trust patients placed in this organization.
+              Every room cleared represents lives quietly protected—patients who 
+              will never know your name, but whose trust you kept.
             </p>
           </>
         ) : (
@@ -43,9 +44,9 @@ export default function EndScreen({
               PRIVACY BREACH!
             </h1>
             <p className="text-lg text-foreground">
-              Your Privacy Meter hit zero. In the real world, this would mean serious
-              HIPAA violations, federal fines, and potential criminal charges.
-              Time to review the rules and try again!
+              Community Trust has been destroyed. Patients are hiding symptoms, 
+              skipping treatment, suffering alone. In the real world, this means 
+              lives lost—not just regulatory fines. Time to rebuild that trust.
             </p>
           </>
         )}
@@ -54,7 +55,7 @@ export default function EndScreen({
           <h2 className="text-xl font-bold text-primary mb-4">FINAL STATS</h2>
           
           <div className="flex justify-between items-center text-base">
-            <span className="text-muted-foreground">Privacy Meter:</span>
+            <span className="text-muted-foreground">Community Trust:</span>
             <span 
               className={`font-bold ${finalScore >= 70 ? 'text-green-500' : finalScore >= 40 ? 'text-orange-500' : 'text-pink-500'}`}
               data-testid="final-score"

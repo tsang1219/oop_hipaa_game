@@ -1,4 +1,4 @@
-import { Progress } from '@/components/ui/progress';
+import { Heart } from 'lucide-react';
 
 interface PrivacyMeterProps {
   privacyScore: number;
@@ -13,12 +13,21 @@ export default function PrivacyMeter({ privacyScore }: PrivacyMeterProps) {
     return 'bg-[#FF6B9D]';
   };
 
+  const getStatusText = () => {
+    if (percentage >= 70) return 'Patients trust freely';
+    if (percentage >= 40) return 'Trust is eroding...';
+    return 'Trust is breaking!';
+  };
+
   return (
     <div className="w-full mb-6 bg-[#1a1a2e] border-4 border-[#FF6B9D] p-4" data-testid="container-privacy-meter">
       <div className="flex items-center justify-between mb-2">
-        <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-xs" data-testid="text-privacy-label">
-          PRIVACY METER
-        </span>
+        <div className="flex items-center gap-2">
+          <Heart className="w-4 h-4 text-[#FF6B9D]" />
+          <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-xs" data-testid="text-privacy-label">
+            COMMUNITY TRUST
+          </span>
+        </div>
         <span className="font-['Press_Start_2P'] text-white text-xs font-bold" data-testid="text-privacy-score">
           {Math.round(privacyScore)}%
         </span>
@@ -29,6 +38,11 @@ export default function PrivacyMeter({ privacyScore }: PrivacyMeterProps) {
           style={{ width: `${percentage}%` }}
           data-testid="privacy-meter-bar"
         />
+      </div>
+      <div className="mt-2 text-center">
+        <span className="font-['Press_Start_2P'] text-[10px] text-muted-foreground">
+          {getStatusText()}
+        </span>
       </div>
     </div>
   );
