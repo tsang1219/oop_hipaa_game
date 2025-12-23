@@ -91,6 +91,7 @@ export const educationalItemSchema = z.object({
 export const roomSchema = z.object({
   id: z.string(),
   name: z.string(),
+  subtitle: z.string().optional(),
   width: z.number(),
   height: z.number(),
   backgroundImage: z.string(),

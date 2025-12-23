@@ -7,6 +7,7 @@ import ChecklistUI from './ChecklistUI';
 import NPCSprite from './NPCSprite';
 import PlayerSprite from './PlayerSprite';
 import ObjectSprite from './ObjectSprites';
+import RoomIntro from './RoomIntro';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 interface RoomExplorationProps {
@@ -25,6 +26,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
   const [playerDirection, setPlayerDirection] = useState<'down' | 'up' | 'left' | 'right'>('down');
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
+  const [showIntro, setShowIntro] = useState(true);
   const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('collectedEducationalItems');
     return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -359,6 +361,15 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
           fact={selectedItem.fact}
           type={selectedItem.type}
           onClose={handleCloseModal}
+        />
+      )}
+
+      {showIntro && room.config && (
+        <RoomIntro
+          roomName={room.name}
+          subtitle={room.subtitle}
+          config={room.config}
+          onComplete={() => setShowIntro(false)}
         />
       )}
     </div>
