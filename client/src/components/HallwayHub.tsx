@@ -157,7 +157,7 @@ export default function HallwayHub({
                   ? 'bg-[#16213e]/50 border-2 border-muted cursor-not-allowed opacity-60' 
                   : status === 'cleared'
                     ? 'bg-[#16213e] border-2 border-green-500 hover-elevate cursor-pointer'
-                    : 'bg-[#16213e] border-2 border-primary hover-elevate cursor-pointer animate-pulse'
+                    : 'bg-[#16213e] border-2 border-primary hover-elevate cursor-pointer'
                 }
               `}
               data-testid={`button-room-${room.id}`}
