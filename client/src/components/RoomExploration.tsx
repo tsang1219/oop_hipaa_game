@@ -216,9 +216,11 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
         onTriggerScene(npc.sceneId);
       } else {
         const zone = nearbyInteraction.data as InteractionZone;
-        checkObservationGateTrigger(zone.id);
-        onZoneComplete?.(zone.id);
-        onTriggerScene(zone.sceneId);
+        const hasGate = checkObservationGateTrigger(zone.id);
+        if (!hasGate) {
+          onZoneComplete?.(zone.id);
+          onTriggerScene(zone.sceneId);
+        }
       }
     }
   };
