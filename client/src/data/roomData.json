@@ -11,6 +11,13 @@
         "text": "Because you ensured that sign-in sheet was private, Elena felt safe seeking treatment for addiction. Her employer in the waiting room never knew why she was there. She got help. She's recovering.",
         "icon": "heart"
       },
+      "config": {
+        "pacing": "slow",
+        "layout": "linear",
+        "stance": "learner",
+        "stanceDescription": "You are the Learner. People teach you.",
+        "introText": "Your first day. Take your time. Watch. Listen. Learn."
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "reception_bg",
@@ -85,6 +92,23 @@
         "title": "Marcus's Story",
         "text": "Because you held the line when that officer demanded records without a warrant, Marcus's mental health crisis stayed between him and his care team. He got help. He's still here.",
         "icon": "shield"
+      },
+      "config": {
+        "pacing": "urgent",
+        "layout": "hub",
+        "stance": "responder",
+        "stanceDescription": "You are the Responder. Things happen to you.",
+        "introText": "Chaos. Everyone needs something. Now.",
+        "gates": [
+          {
+            "id": "whiteboard_first",
+            "type": "observation",
+            "description": "Notice the patient status board before the doctor will talk to you about it",
+            "targetId": "dr_martinez",
+            "prerequisiteId": "whiteboard",
+            "observationHint": "Something on that whiteboard shouldn't be visible..."
+          }
+        ]
       },
       "width": 20,
       "height": 15,
@@ -161,6 +185,23 @@
         "text": "Because you questioned that researcher's access request, David's genetic test results stayed confidential. He told his family on his own terms, not theirs. His story. His timing.",
         "icon": "lock"
       },
+      "config": {
+        "pacing": "normal",
+        "layout": "hub",
+        "stance": "investigator",
+        "stanceDescription": "You are the Investigator. You discover.",
+        "introText": "Quiet here. But look closer. Not everything is where it should be.",
+        "gates": [
+          {
+            "id": "sample_observation",
+            "type": "observation",
+            "description": "Spot the exposed results before speaking to the lab tech",
+            "targetId": "lab_tech",
+            "prerequisiteId": "results_printout",
+            "observationHint": "Those results on the counter... anyone could see them."
+          }
+        ]
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "lab_bg",
@@ -235,6 +276,25 @@
         "title": "Mrs. Chen's Story",
         "text": "Because you helped Mrs. Chen correct that error in her record, she got the insurance coverage she needed. A wrong diagnosis almost followed her forever. You stopped it.",
         "icon": "file"
+      },
+      "config": {
+        "pacing": "normal",
+        "layout": "circular",
+        "stance": "advocate",
+        "stanceDescription": "You are the Advocate. A patient needs your help.",
+        "introText": "The archive. Stories upon stories. Someone here needs you to listen.",
+        "gates": [
+          {
+            "id": "patient_choice",
+            "type": "choice",
+            "description": "Two people need help. Who do you assist first?",
+            "targetId": "patient_request",
+            "choiceOptions": [
+              {"text": "Help the patient first", "unlocksId": "patient_request"},
+              {"text": "Deal with the attorney first", "unlocksId": "attorney"}
+            ]
+          }
+        ]
       },
       "width": 20,
       "height": 15,
@@ -320,6 +380,23 @@
         "text": "Because you caught that phishing attempt, 50,000 patient records stayed secure. Fifty thousand people who will never know how close they came. That's the point.",
         "icon": "server"
       },
+      "config": {
+        "pacing": "normal",
+        "layout": "hub",
+        "stance": "defender",
+        "stanceDescription": "You are the Defender. Something's trying to get in.",
+        "introText": "The vault. Quiet. But threats don't always announce themselves.",
+        "gates": [
+          {
+            "id": "password_spot",
+            "type": "observation",
+            "description": "Notice the security issue before the analyst briefs you",
+            "targetId": "security_analyst",
+            "prerequisiteId": "password_note",
+            "observationHint": "Is that a password written on a sticky note?"
+          }
+        ]
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "it_bg",
@@ -395,6 +472,21 @@
         "title": "James's Story",
         "text": "Because you changed the subject when your coworkers started gossiping, James's coworker—sitting two tables away—never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
         "icon": "users"
+      },
+      "config": {
+        "pacing": "deceptive",
+        "layout": "hub",
+        "stance": "resister",
+        "stanceDescription": "You are the Resister. The threat is your own comfort.",
+        "introText": "Just a break room. Harmless chatter. But listen carefully...",
+        "gates": [
+          {
+            "id": "social_gossip",
+            "type": "social",
+            "description": "Your coworker wants to gossip. How do you navigate this?",
+            "targetId": "gossiping_coworker"
+          }
+        ]
       },
       "width": 20,
       "height": 15,
