@@ -8,7 +8,9 @@ import NPCSprite from './NPCSprite';
 import PlayerSprite from './PlayerSprite';
 import ObjectSprite from './ObjectSprites';
 import RoomIntro from './RoomIntro';
-import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
+import ObservationHint from './ObservationHint';
+import ChoicePrompt from './ChoicePrompt';
+import type { Room, NPC, InteractionZone, EducationalItem, Position, Gate } from '@shared/schema';
 
 interface RoomExplorationProps {
   room: Room;
@@ -27,10 +29,72 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
   const [showIntro, setShowIntro] = useState(true);
+  const [activeObservationGate, setActiveObservationGate] = useState<Gate | null>(null);
+  const [activeChoiceGate, setActiveChoiceGate] = useState<Gate | null>(null);
+  const [resolvedGates, setResolvedGates] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem(`resolvedGates_${room.id}`);
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+  const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem(`unlockedNpcs_${room.id}`);
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('collectedEducationalItems');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
+
+  const gates = room.config?.gates || [];
+
+  const isNpcGated = useCallback((npcId: string): Gate | null => {
+    if (unlockedNpcs.has(npcId)) {
+      return null;
+    }
+    for (const gate of gates) {
+      if (gate.type === 'choice' && gate.choiceOptions?.some(opt => opt.unlocksId === npcId)) {
+        if (!unlockedNpcs.has(npcId)) {
+          return gate;
+        }
+      }
+      if (gate.targetId === npcId && !resolvedGates.has(gate.id)) {
+        return gate;
+      }
+    }
+    return null;
+  }, [gates, resolvedGates, unlockedNpcs]);
+
+  const checkObservationGateTrigger = useCallback((zoneId: string) => {
+    for (const gate of gates) {
+      if (gate.type === 'observation' && gate.prerequisiteId === zoneId && !resolvedGates.has(gate.id)) {
+        setActiveObservationGate(gate);
+        return true;
+      }
+    }
+    return false;
+  }, [gates, resolvedGates]);
+
+  const resolveGate = useCallback((gateId: string, unlockNpcId?: string) => {
+    const newResolved = new Set(resolvedGates);
+    newResolved.add(gateId);
+    setResolvedGates(newResolved);
+    localStorage.setItem(`resolvedGates_${room.id}`, JSON.stringify(Array.from(newResolved)));
+    
+    if (unlockNpcId) {
+      const newUnlocked = new Set(unlockedNpcs);
+      newUnlocked.add(unlockNpcId);
+      setUnlockedNpcs(newUnlocked);
+      localStorage.setItem(`unlockedNpcs_${room.id}`, JSON.stringify(Array.from(newUnlocked)));
+    }
+  }, [resolvedGates, unlockedNpcs, room.id]);
+
+  useEffect(() => {
+    if (!showIntro) {
+      const choiceGate = gates.find(g => g.type === 'choice' && !resolvedGates.has(g.id));
+      if (choiceGate) {
+        setActiveChoiceGate(choiceGate);
+      }
+    }
+  }, [showIntro, gates, resolvedGates]);
 
   const checkCollision = useCallback((newX: number, newY: number): boolean => {
     for (const obstacle of room.obstacles) {
@@ -101,12 +165,30 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
         setSelectedItem(item);
       } else if (nearbyInteraction.type === 'npc') {
         const npc = nearbyInteraction.data as NPC;
+        const gate = isNpcGated(npc.id);
+        if (gate) {
+          return;
+        }
         onTriggerScene(npc.sceneId);
       } else {
         const zone = nearbyInteraction.data as InteractionZone;
+        checkObservationGateTrigger(zone.id);
         onTriggerScene(zone.sceneId);
       }
     }
+  };
+
+  const handleNpcClick = (npc: NPC) => {
+    const gate = isNpcGated(npc.id);
+    if (gate) {
+      return;
+    }
+    onTriggerScene(npc.sceneId);
+  };
+
+  const handleZoneClick = (zone: InteractionZone) => {
+    checkObservationGateTrigger(zone.id);
+    onTriggerScene(zone.sceneId);
   };
 
   const handleItemClick = (item: EducationalItem) => {
@@ -217,24 +299,41 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
           
           const isCompleted = completedNPCs.has(npc.id);
           const isBoss = npc.isFinalBoss;
+          const gatedBy = isNpcGated(npc.id);
+          const isGated = !!gatedBy;
           
           return (
             <div key={npc.id} className="relative">
               <div 
-                className="absolute cursor-pointer"
+                className={`absolute ${isGated ? 'cursor-not-allowed' : 'cursor-pointer'}`}
                 style={{
                   left: npc.x * TILE_SIZE,
                   top: npc.y * TILE_SIZE,
                   width: TILE_SIZE,
                   height: TILE_SIZE,
-                  opacity: isCompleted ? 0.5 : 1,
+                  opacity: isCompleted ? 0.5 : isGated ? 0.6 : 1,
+                  filter: isGated ? 'grayscale(50%)' : 'none',
                   zIndex: 25,
                 }}
-                onClick={() => onTriggerScene(npc.sceneId)}
+                onClick={() => handleNpcClick(npc)}
                 data-testid={`npc-${npc.id}`}
+                data-gated={isGated ? 'true' : 'false'}
               >
                 <NPCSprite npcId={npc.id} direction="down" />
               </div>
+              {isGated && (
+                <div
+                  className="absolute pointer-events-none"
+                  style={{
+                    left: npc.x * TILE_SIZE + TILE_SIZE / 2 - 6,
+                    top: npc.y * TILE_SIZE - 8,
+                    zIndex: 35,
+                  }}
+                  data-testid={`gate-indicator-${npc.id}`}
+                >
+                  <span className="text-xs">🔒</span>
+                </div>
+              )}
               {isBoss && !isCompleted && (
                 <div
                   className="absolute pointer-events-none animate-pulse"
@@ -245,7 +344,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
                   }}
                   data-testid="boss-indicator"
                 >
-                  <span className="text-xs font-bold text-destructive drop-shadow-md">⚠️ BOSS</span>
+                  <span className="text-xs font-bold text-destructive drop-shadow-md">BOSS</span>
                 </div>
               )}
               {isCompleted && (
@@ -266,7 +365,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
         })}
 
         {room.interactionZones.map((zone) => {
-          const spriteType = zone.spriteType || 'computer'; // default to computer if not specified
+          const spriteType = zone.spriteType || 'computer';
           
           return (
             <div
@@ -279,7 +378,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
                 height: TILE_SIZE,
                 zIndex: 20,
               }}
-              onClick={() => onTriggerScene(zone.sceneId)}
+              onClick={() => handleZoneClick(zone)}
               data-testid={`zone-${zone.id}`}
             >
               <ObjectSprite type={spriteType} size={TILE_SIZE} />
@@ -331,19 +430,32 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
 
       {nearbyInteraction && (
         <div className="text-center bg-card border-2 border-primary p-4">
-          <p className="text-sm text-foreground mb-2">
-            {nearbyInteraction.type === 'npc' 
-              ? `Talk to ${(nearbyInteraction.data as NPC).name}` 
-              : nearbyInteraction.type === 'zone'
-              ? `Examine ${(nearbyInteraction.data as InteractionZone).name}`
-              : `Read ${(nearbyInteraction.data as EducationalItem).title}`}
-          </p>
-          <Button 
-            onClick={handleInteraction}
-            data-testid="button-interact"
-          >
-            INTERACT (SPACE)
-          </Button>
+          {nearbyInteraction.type === 'npc' && isNpcGated((nearbyInteraction.data as NPC).id) ? (
+            <>
+              <p className="text-sm text-muted-foreground mb-2">
+                🔒 {(nearbyInteraction.data as NPC).name}
+              </p>
+              <p className="text-xs text-muted-foreground italic">
+                {isNpcGated((nearbyInteraction.data as NPC).id)?.observationHint || "Look around first..."}
+              </p>
+            </>
+          ) : (
+            <>
+              <p className="text-sm text-foreground mb-2">
+                {nearbyInteraction.type === 'npc' 
+                  ? `Talk to ${(nearbyInteraction.data as NPC).name}` 
+                  : nearbyInteraction.type === 'zone'
+                  ? `Examine ${(nearbyInteraction.data as InteractionZone).name}`
+                  : `Read ${(nearbyInteraction.data as EducationalItem).title}`}
+              </p>
+              <Button 
+                onClick={handleInteraction}
+                data-testid="button-interact"
+              >
+                INTERACT (SPACE)
+              </Button>
+            </>
+          )}
         </div>
       )}
 
@@ -370,6 +482,26 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
           subtitle={room.subtitle}
           config={room.config}
           onComplete={() => setShowIntro(false)}
+        />
+      )}
+
+      {activeObservationGate && (
+        <ObservationHint
+          gate={activeObservationGate}
+          onAcknowledge={() => {
+            resolveGate(activeObservationGate.id, activeObservationGate.targetId);
+            setActiveObservationGate(null);
+          }}
+        />
+      )}
+
+      {activeChoiceGate && (
+        <ChoicePrompt
+          gate={activeChoiceGate}
+          onChoice={(unlockedId) => {
+            resolveGate(activeChoiceGate.id, unlockedId);
+            setActiveChoiceGate(null);
+          }}
         />
       )}
     </div>

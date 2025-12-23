@@ -46,11 +46,36 @@ Every principle learned, every scenario completed, every room cleared represents
 - 32x32 pixel grid-based movement system (WASD/Arrow keys)
 - Each room contains NPCs, interaction zones, and educational items
 - NPCs and interaction zones are clickable (direct interaction) or activatable via Space key when nearby
-- No quest gating: Players can talk to NPCs immediately without collecting items first
 - Collision detection for realistic navigation
 - Room transitions maintain game state
 - Z-index layering ensures interaction zones (bouncing stars) are clickable above other elements
 - Room Progress HUD shows Items: X/Y and NPCs: X/Y as simple progress tracking
+
+**Room Configuration System (SNES-Era Design Philosophy):**
+- Each room has unique pacing, layout, and player stance for varied gameplay
+- Pacing modes: slow (tutorial), normal, urgent (ER chaos), deceptive (break room comfort)
+- Layout types: linear (guided path), hub (central area), circular (looping)
+- Player stances define role in each room:
+  - Learner: "People teach you" (Reception)
+  - Responder: "Things happen to you" (Emergency Room)
+  - Investigator: "You discover" (Laboratory)
+  - Advocate: "A patient needs your help" (Medical Records)
+  - Defender: "Something's trying to get in" (IT Office)
+  - Resister: "The threat is your own comfort" (Break Room)
+
+**Room Intro System:**
+- SNES-style room entrance announcements (like Pokemon location names)
+- Shows room name, subtitle, and stance description with typing animation
+- Fades out after brief display or when player presses any key
+- Sets the tone for each room's unique gameplay experience
+
+**Gate System (Discoverable Interactions):**
+- Observation gates: Player must spot something (e.g., PHI on whiteboard) before NPC unlocks
+- Choice gates: Two NPCs need help - player chooses who to assist first
+- Social gates: Navigate friendly-but-dangerous conversations
+- Gated NPCs show lock icon and grayed appearance until gate is resolved
+- Gates stored in localStorage per room for persistence
+- Designed to feel discovered, not assigned - SNES-era charm
 
 **Pokémon-Style Dialogue System:**
 - Text box appears at bottom of screen with NPC portrait on left
@@ -114,7 +139,7 @@ The application follows a component-based architecture with clear separation of 
   - FeedbackDisplay (pink flash on correct, score change display)
   - CharacterPortrait, SceneCounter
   - GameContainer (orchestrates dialogue → choices → feedback flow)
-- **Exploration Components**: HospitalHub (room selection), RoomExploration (2D tile-based movement), ExplorationGame (orchestrates game modes), EducationalItemModal (HIPAA fact display), KnowledgeTracker (Privacy Rule progress visualization)
+- **Exploration Components**: HospitalHub (room selection), RoomExploration (2D tile-based movement), ExplorationGame (orchestrates game modes), EducationalItemModal (HIPAA fact display), KnowledgeTracker (Privacy Rule progress visualization), RoomIntro (SNES-style room announcements), ObservationHint (spot-the-issue prompts), ChoicePrompt (NPC choice selection)
 - **UI Components**: Comprehensive shadcn/ui library providing accessible, styled primitives
 
 **State Management:**
@@ -124,6 +149,8 @@ The application follows a component-based architecture with clear separation of 
   - Educational items collection tracking (visual dimming after reading)
   - Completed NPCs tracking (checkmarks and faded opacity)
   - Completed rooms and patient stories collected
+  - Resolved gates per room (`resolvedGates_{roomId}`)
+  - Unlocked NPCs per room (`unlockedNpcs_{roomId}`) for choice gates
 - Component remounting via key prop ensures proper state initialization across room changes
 - completedNPCs state flows from ExplorationGame to RoomExploration as prop for live updates
 
@@ -165,6 +192,8 @@ The application is primarily client-side driven with game data stored in JSON fi
 - Zod schemas in `shared/schema.ts` define data contracts
 - Type-safe data structures for scenes, choices, rooms, NPCs, interaction zones, and educational items
 - Educational item schema includes: id, title, type (enum: poster, manual, computer, whiteboard), position (x, y), and fact content
+- Room configuration schema includes: pacing mode, layout type, player stance, stance description, intro text, and gates array
+- Gate schema includes: id, type (observation/social/choice), description, targetId, prerequisiteId, observationHint, choiceOptions
 - Drizzle-zod integration prepared for future database usage
 
 **Database Architecture (Prepared but Not Active):**
