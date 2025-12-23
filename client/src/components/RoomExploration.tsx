@@ -24,7 +24,6 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
   const [playerDirection, setPlayerDirection] = useState<'down' | 'up' | 'left' | 'right'>('down');
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
-  const [showLockedMessage, setShowLockedMessage] = useState(false);
   const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('collectedEducationalItems');
     return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -96,19 +95,12 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
     });
   }, [checkCollision, checkNearbyInteraction]);
 
-  const allItemsCollected = collectedItems.size >= totalEducationalItems;
-
   const handleInteraction = () => {
     if (nearbyInteraction) {
       if (nearbyInteraction.type === 'item') {
         const item = nearbyInteraction.data as EducationalItem;
         setSelectedItem(item);
       } else if (nearbyInteraction.type === 'npc') {
-        if (!allItemsCollected) {
-          setShowLockedMessage(true);
-          setTimeout(() => setShowLockedMessage(false), 3000);
-          return;
-        }
         const npc = nearbyInteraction.data as NPC;
         onTriggerScene(npc.sceneId);
       } else {
@@ -198,19 +190,6 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
         totalScenarios={totalScenarios}
       />
 
-      {showLockedMessage && (
-        <div 
-          className="bg-destructive/90 border-4 border-destructive text-destructive-foreground px-6 py-3 rounded-md text-center pointer-events-none" 
-          data-testid="locked-message"
-          style={{ zIndex: 1000 }}
-        >
-          <p className="text-sm font-bold">⚠️ QUEST LOCKED ⚠️</p>
-          <p className="text-xs mt-1">
-            Learn the basics first! Read all {totalEducationalItems} educational items before talking to staff.
-          </p>
-        </div>
-      )}
-
       <div 
         className="relative border-4 border-primary bg-card"
         style={{
@@ -252,14 +231,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
                   opacity: isCompleted ? 0.5 : 1,
                   zIndex: 25,
                 }}
-                onClick={() => {
-                  if (allItemsCollected) {
-                    onTriggerScene(npc.sceneId);
-                  } else {
-                    setShowLockedMessage(true);
-                    setTimeout(() => setShowLockedMessage(false), 3000);
-                  }
-                }}
+                onClick={() => onTriggerScene(npc.sceneId)}
                 data-testid={`npc-${npc.id}`}
               >
                 <NPCSprite npcId={npc.id} direction="down" />
