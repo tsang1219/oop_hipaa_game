@@ -34,6 +34,8 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
   const [activeObservationGate, setActiveObservationGate] = useState<Gate | null>(null);
   const [activeChoiceGate, setActiveChoiceGate] = useState<Gate | null>(null);
+  const [autoMoveTarget, setAutoMoveTarget] = useState<Position | null>(null);
+  const [pendingInteraction, setPendingInteraction] = useState<{ type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem } | null>(null);
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(() => {
     const saved = localStorage.getItem(`resolvedGates_${room.id}`);
     return saved ? new Set(JSON.parse(saved)) : new Set();
@@ -106,6 +108,37 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
     }
     return false;
   }, [room.obstacles]);
+
+  const findPath = useCallback((start: Position, goal: Position): Position[] => {
+    const queue: Array<{ pos: Position; path: Position[] }> = [{ pos: start, path: [start] }];
+    const visited = new Set<string>();
+    visited.add(`${start.x},${start.y}`);
+
+    while (queue.length > 0) {
+      const { pos, path } = queue.shift()!;
+
+      if (pos.x === goal.x && pos.y === goal.y) {
+        return path.slice(1);
+      }
+
+      const neighbors = [
+        { x: pos.x, y: pos.y - 1 },
+        { x: pos.x, y: pos.y + 1 },
+        { x: pos.x - 1, y: pos.y },
+        { x: pos.x + 1, y: pos.y },
+      ];
+
+      for (const neighbor of neighbors) {
+        const key = `${neighbor.x},${neighbor.y}`;
+        if (!visited.has(key) && !checkCollision(neighbor.x, neighbor.y)) {
+          visited.add(key);
+          queue.push({ pos: neighbor, path: [...path, neighbor] });
+        }
+      }
+    }
+
+    return [];
+  }, [checkCollision]);
 
   const checkNearbyInteraction = useCallback((x: number, y: number) => {
     for (const npc of room.npcs) {
@@ -181,17 +214,18 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
     if (gate) {
       return;
     }
-    onTriggerScene(npc.sceneId);
+    setAutoMoveTarget({ x: npc.x, y: npc.y });
+    setPendingInteraction({ type: 'npc', data: npc });
   };
 
   const handleZoneClick = (zone: InteractionZone) => {
-    checkObservationGateTrigger(zone.id);
-    onZoneComplete?.(zone.id);
-    onTriggerScene(zone.sceneId);
+    setAutoMoveTarget({ x: zone.x, y: zone.y });
+    setPendingInteraction({ type: 'zone', data: zone });
   };
 
   const handleItemClick = (item: EducationalItem) => {
-    setSelectedItem(item);
+    setAutoMoveTarget({ x: item.x, y: item.y });
+    setPendingInteraction({ type: 'item', data: item });
   };
 
   const handleCloseModal = () => {
@@ -202,7 +236,40 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
   };
 
   useEffect(() => {
+    if (autoMoveTarget && pendingInteraction) {
+      const distance = Math.abs(playerPos.x - autoMoveTarget.x) + Math.abs(playerPos.y - autoMoveTarget.y);
+      
+      if (distance <= 1) {
+        setAutoMoveTarget(null);
+        const interaction = pendingInteraction;
+        setPendingInteraction(null);
+        
+        if (interaction.type === 'item') {
+          setSelectedItem(interaction.data as EducationalItem);
+        } else if (interaction.type === 'npc') {
+          onTriggerScene((interaction.data as NPC).sceneId);
+        } else {
+          const zone = interaction.data as InteractionZone;
+          checkObservationGateTrigger(zone.id);
+          onZoneComplete?.(zone.id);
+          onTriggerScene(zone.sceneId);
+        }
+      } else {
+        const path = findPath(playerPos, autoMoveTarget);
+        if (path.length > 0) {
+          const nextStep = path[0];
+          const dx = nextStep.x - playerPos.x;
+          const dy = nextStep.y - playerPos.y;
+          movePlayer(dx, dy);
+        }
+      }
+    }
+  }, [autoMoveTarget, playerPos, pendingInteraction]);
+
+  useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      if (autoMoveTarget) return;
+      
       switch (e.key) {
         case 'ArrowUp':
         case 'w':
@@ -241,7 +308,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [movePlayer, nearbyInteraction, onExitRoom]);
+  }, [movePlayer, nearbyInteraction, onExitRoom, autoMoveTarget]);
 
   useEffect(() => {
     checkNearbyInteraction(playerPos.x, playerPos.y);
