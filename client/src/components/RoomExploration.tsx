@@ -7,7 +7,6 @@ import ChecklistUI from './ChecklistUI';
 import NPCSprite from './NPCSprite';
 import PlayerSprite from './PlayerSprite';
 import ObjectSprite from './ObjectSprites';
-import RoomIntro from './RoomIntro';
 import ObservationHint from './ObservationHint';
 import ChoicePrompt from './ChoicePrompt';
 import { RoomProgressHUD } from './RoomProgressHUD';
@@ -33,7 +32,6 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
   const [playerDirection, setPlayerDirection] = useState<'down' | 'up' | 'left' | 'right'>('down');
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
-  const [showIntro, setShowIntro] = useState(true);
   const [activeObservationGate, setActiveObservationGate] = useState<Gate | null>(null);
   const [activeChoiceGate, setActiveChoiceGate] = useState<Gate | null>(null);
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(() => {
@@ -89,13 +87,11 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
   }, [resolvedGates, unlockedNpcs, room.id]);
 
   useEffect(() => {
-    if (!showIntro) {
-      const choiceGate = gates.find(g => g.type === 'choice' && !resolvedGates.has(g.id));
-      if (choiceGate) {
-        setActiveChoiceGate(choiceGate);
-      }
+    const choiceGate = gates.find(g => g.type === 'choice' && !resolvedGates.has(g.id));
+    if (choiceGate) {
+      setActiveChoiceGate(choiceGate);
     }
-  }, [showIntro, gates, resolvedGates]);
+  }, [gates, resolvedGates]);
 
   const checkCollision = useCallback((newX: number, newY: number): boolean => {
     for (const obstacle of room.obstacles) {
@@ -479,15 +475,6 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
           fact={selectedItem.fact}
           type={selectedItem.type}
           onClose={handleCloseModal}
-        />
-      )}
-
-      {showIntro && room.config && (
-        <RoomIntro
-          roomName={room.name}
-          subtitle={room.subtitle}
-          config={room.config}
-          onComplete={() => setShowIntro(false)}
         />
       )}
 
