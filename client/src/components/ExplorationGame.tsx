@@ -276,6 +276,7 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
         onExitRoom={handleExitRoom}
         totalEducationalItems={totalEducationalItems}
         totalScenarios={totalScenarios}
+        completedNPCs={completedNPCs}
       />
     );
   }
@@ -292,7 +293,6 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
           scenes={scenesForDialogue}
           onComplete={handleDialogueComplete}
           onGameOver={handleGameOver}
-          storageKey={`exploration-dialogue-${currentSceneId}`}
         />
       </div>
     );

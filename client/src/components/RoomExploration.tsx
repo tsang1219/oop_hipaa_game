@@ -15,21 +15,18 @@ interface RoomExplorationProps {
   onExitRoom: () => void;
   totalEducationalItems: number;
   totalScenarios: number;
+  completedNPCs: Set<string>;
 }
 
 const TILE_SIZE = 32;
 
-export default function RoomExploration({ room, onTriggerScene, onExitRoom, totalEducationalItems, totalScenarios }: RoomExplorationProps) {
+export default function RoomExploration({ room, onTriggerScene, onExitRoom, totalEducationalItems, totalScenarios, completedNPCs }: RoomExplorationProps) {
   const [playerPos, setPlayerPos] = useState<Position>(room.spawnPoint);
   const [playerDirection, setPlayerDirection] = useState<'down' | 'up' | 'left' | 'right'>('down');
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
   const [selectedItem, setSelectedItem] = useState<EducationalItem | null>(null);
   const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('collectedEducationalItems');
-    return saved ? new Set(JSON.parse(saved)) : new Set();
-  });
-  const [completedNPCs, setCompletedNPCs] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('completedNPCs');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
 
