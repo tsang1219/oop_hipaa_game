@@ -1,15 +1,30 @@
 import { useState, useEffect } from 'react';
-import HospitalHub from './HospitalHub';
+import HallwayHub from './HallwayHub';
 import RoomExploration from './RoomExploration';
 import GameContainer from './GameContainer';
 import EndScreen from './EndScreen';
+import PatientStoryModal from './PatientStoryModal';
 import { useToast } from '@/hooks/use-toast';
 import type { Room, Scene } from '@shared/schema';
 
 type GameMode = 'hub' | 'exploration' | 'dialogue' | 'gameover' | 'win';
 
+interface PatientStory {
+  title: string;
+  text: string;
+  icon: string;
+}
+
+interface RoomWithStory extends Room {
+  subtitle?: string;
+  description?: string;
+  unlockRequirement?: string | null;
+  alwaysUnlocked?: boolean;
+  patientStory?: PatientStory;
+}
+
 interface ExplorationGameProps {
-  rooms: Room[];
+  rooms: RoomWithStory[];
   scenes: Scene[];
 }
 
@@ -19,7 +34,14 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
   const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
   const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
   const [currentNPCId, setCurrentNPCId] = useState<string | null>(null);
-  const [completedRooms, setCompletedRooms] = useState<string[]>([]);
+  const [completedRooms, setCompletedRooms] = useState<string[]>(() => {
+    const saved = localStorage.getItem('completedRooms');
+    return saved ? JSON.parse(saved) : [];
+  });
+  const [collectedStories, setCollectedStories] = useState<string[]>(() => {
+    const saved = localStorage.getItem('collectedStories');
+    return saved ? JSON.parse(saved) : [];
+  });
   const [visitedScenes, setVisitedScenes] = useState<Set<string>>(new Set());
   const [completedNPCs, setCompletedNPCs] = useState<Set<string>>(() => {
     const saved = localStorage.getItem('completedNPCs');
@@ -30,6 +52,9 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     const saved = localStorage.getItem('gameStartTime');
     return saved ? parseInt(saved) : Date.now();
   });
+  const [showStoryModal, setShowStoryModal] = useState(false);
+  const [currentStoryRoom, setCurrentStoryRoom] = useState<RoomWithStory | null>(null);
+  const [isNewStory, setIsNewStory] = useState(false);
 
   const totalEducationalItems = rooms.reduce((sum, room) => sum + room.educationalItems.length, 0);
   const totalScenarios = rooms.reduce((sum, room) => sum + room.npcs.filter(npc => !npc.isFinalBoss).length, 0);
@@ -39,11 +64,18 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
   }, [gameStartTime]);
 
   useEffect(() => {
+    localStorage.setItem('completedRooms', JSON.stringify(completedRooms));
+  }, [completedRooms]);
+
+  useEffect(() => {
+    localStorage.setItem('collectedStories', JSON.stringify(collectedStories));
+  }, [collectedStories]);
+
+  useEffect(() => {
     const savedProgress = localStorage.getItem('hipaa-exploration-progress');
     if (savedProgress) {
       try {
         const progress = JSON.parse(savedProgress);
-        setCompletedRooms(progress.completedRooms || []);
         setVisitedScenes(new Set(progress.visitedScenes || []));
       } catch (e) {
         console.error('Failed to load exploration progress:', e);
@@ -87,16 +119,33 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     setGameMode('exploration');
   };
 
+  const handleViewStory = (roomId: string) => {
+    const room = rooms.find(r => r.id === roomId);
+    if (room?.patientStory) {
+      setCurrentStoryRoom(room);
+      setIsNewStory(false);
+      setShowStoryModal(true);
+    }
+  };
+
   const handleExitRoom = () => {
     const room = rooms.find(r => r.id === currentRoomId);
     if (room) {
-      const allInteractions = [...room.npcs, ...room.interactionZones];
-      const allCompleted = allInteractions.every(interaction => 
-        visitedScenes.has(interaction.sceneId)
+      const roomNPCs = room.npcs.filter(npc => !npc.isFinalBoss);
+      const allNPCsCompleted = roomNPCs.every(npc => 
+        completedNPCs.has(npc.id)
       );
       
-      if (allCompleted && !completedRooms.includes(currentRoomId!)) {
+      if (allNPCsCompleted && roomNPCs.length > 0 && !completedRooms.includes(currentRoomId!)) {
         setCompletedRooms(prev => [...prev, currentRoomId!]);
+        
+        if (room.patientStory && !collectedStories.includes(currentRoomId!)) {
+          setCollectedStories(prev => [...prev, currentRoomId!]);
+          setCurrentStoryRoom(room);
+          setIsNewStory(true);
+          setShowStoryModal(true);
+          return;
+        }
       }
     }
     
@@ -104,12 +153,21 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     setGameMode('hub');
   };
 
+  const handleCloseStoryModal = () => {
+    setShowStoryModal(false);
+    setCurrentStoryRoom(null);
+    if (isNewStory) {
+      setCurrentRoomId(null);
+      setGameMode('hub');
+    }
+  };
+
   const handleTriggerScene = (sceneId: string, npcId?: string) => {
     const sceneExists = scenes.some(s => s.id === sceneId);
     if (!sceneExists) {
       toast({
         title: "Scene Not Found",
-        description: `The scene "${sceneId}" is not available. Please report this issue.`,
+        description: `The scene "${sceneId}" is not available yet. More content coming soon!`,
         variant: "destructive",
       });
       return;
@@ -131,19 +189,11 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
       localStorage.setItem('completedNPCs', JSON.stringify(Array.from(newCompleted)));
 
       if (currentSceneId === 'final_boss_1' && newCompleted.size === totalScenarios + 1) {
-        const savedProgress = localStorage.getItem(`exploration-dialogue-${currentSceneId}-progress`);
-        if (savedProgress) {
-          try {
-            const progress = JSON.parse(savedProgress);
-            const privacyScore = parseInt(localStorage.getItem('final-privacy-score') || '100');
-            if (privacyScore > 0) {
-              setFinalPrivacyScore(privacyScore);
-              setGameMode('win');
-              return;
-            }
-          } catch (e) {
-            console.error('Failed to check win condition:', e);
-          }
+        const privacyScore = parseInt(localStorage.getItem('final-privacy-score') || '100');
+        if (privacyScore > 0) {
+          setFinalPrivacyScore(privacyScore);
+          setGameMode('win');
+          return;
         }
       }
     }
@@ -178,13 +228,6 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     }
   };
 
-  const hospitalRooms = rooms.map(room => ({
-    id: room.id,
-    name: room.name,
-    icon: '',
-    description: '',
-  }));
-
   if (gameMode === 'gameover' || gameMode === 'win') {
     return (
       <EndScreen
@@ -198,12 +241,25 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     );
   }
 
+  if (showStoryModal && currentStoryRoom?.patientStory) {
+    return (
+      <PatientStoryModal
+        story={currentStoryRoom.patientStory}
+        roomName={currentStoryRoom.name}
+        onClose={handleCloseStoryModal}
+        isRoomClear={isNewStory}
+      />
+    );
+  }
+
   if (gameMode === 'hub') {
     return (
-      <HospitalHub 
-        rooms={hospitalRooms}
+      <HallwayHub 
+        rooms={rooms}
         onSelectRoom={handleSelectRoom}
         completedRooms={completedRooms}
+        collectedStories={collectedStories}
+        onViewStory={handleViewStory}
       />
     );
   }

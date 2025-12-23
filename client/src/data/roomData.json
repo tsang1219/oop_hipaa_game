@@ -2,7 +2,15 @@
   "rooms": [
     {
       "id": "reception",
-      "name": "Reception Area",
+      "name": "Reception",
+      "subtitle": "The Entry Point",
+      "description": "Where privacy begins. The first touch. The moment someone decides to trust you.",
+      "unlockRequirement": null,
+      "patientStory": {
+        "title": "Elena's Story",
+        "text": "Because you ensured that sign-in sheet was private, Elena felt safe seeking treatment for addiction. Her employer in the waiting room never knew why she was there. She got help. She's recovering.",
+        "icon": "heart"
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "reception_bg",
@@ -17,32 +25,24 @@
       "npcs": [
         {
           "id": "riley",
-          "name": "Receptionist Riley",
+          "name": "Front Desk Coordinator",
           "x": 10,
           "y": 8,
           "sceneId": "riley_scene1"
         },
         {
-          "id": "husband",
-          "name": "Concerned Husband",
+          "id": "nervous_patient",
+          "name": "Nervous New Patient",
           "x": 7,
           "y": 10,
           "sceneId": "concerned_husband"
         },
         {
-          "id": "admin",
-          "name": "Hospital Administrator",
+          "id": "chatty_visitor",
+          "name": "Chatty Visitor",
           "x": 13,
           "y": 10,
           "sceneId": "celebrity_crisis"
-        },
-        {
-          "id": "final_boss",
-          "name": "Chief Compliance Officer",
-          "x": 10,
-          "y": 3,
-          "sceneId": "final_boss_1",
-          "isFinalBoss": true
         }
       ],
       "interactionZones": [
@@ -55,12 +55,12 @@
           "spriteType": "poster"
         },
         {
-          "id": "phone",
-          "name": "Reception Phone",
+          "id": "privacy_notice",
+          "name": "Notice of Privacy Practices",
           "x": 13,
           "y": 6,
           "sceneId": "phone_privacy",
-          "spriteType": "computer"
+          "spriteType": "poster"
         }
       ],
       "educationalItems": [
@@ -76,62 +76,16 @@
       "spawnPoint": {"x": 10, "y": 12}
     },
     {
-      "id": "records_room",
-      "name": "Medical Records Room",
-      "width": 20,
-      "height": 15,
-      "backgroundImage": "records_bg",
-      "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1},
-        {"x": 0, "y": 14, "width": 20, "height": 1},
-        {"x": 0, "y": 0, "width": 1, "height": 15},
-        {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 3, "y": 3, "width": 2, "height": 4},
-        {"x": 8, "y": 3, "width": 2, "height": 4},
-        {"x": 13, "y": 3, "width": 2, "height": 4}
-      ],
-      "npcs": [],
-      "interactionZones": [
-        {
-          "id": "unlocked_cabinet",
-          "name": "Unlocked File Cabinet",
-          "x": 4,
-          "y": 5,
-          "sceneId": "unlocked_files",
-          "spriteType": "manual"
-        },
-        {
-          "id": "shredder",
-          "name": "Document Shredder",
-          "x": 14,
-          "y": 5,
-          "sceneId": "proper_disposal",
-          "spriteType": "manual"
-        },
-        {
-          "id": "fax_machine",
-          "name": "Fax Machine (Oh No...)",
-          "x": 9,
-          "y": 6,
-          "sceneId": "fax_machine_freddy",
-          "spriteType": "computer"
-        }
-      ],
-      "educationalItems": [
-        {
-          "id": "minimum_necessary_manual",
-          "title": "Minimum Necessary: It's Not a Suggestion",
-          "type": "poster",
-          "x": 17,
-          "y": 8,
-          "fact": "Healthcare is gossipy, but HIPAA has opinions about your oversharing habits. The Minimum Necessary Rule: Only access, use, or disclose the LEAST amount of PHI needed to get the job done. Not the most interesting amount. Not the juiciest amount. The MINIMUM. The Test: Ask yourself 'Do I NEED this to do my actual job, or do I just WANT to know?' If it's want? Close the chart. Walk away. Get a hobby."
-        }
-      ],
-      "spawnPoint": {"x": 10, "y": 12}
-    },
-    {
       "id": "er",
       "name": "Emergency Room",
+      "subtitle": "The Edge Cases",
+      "description": "Where rules meet urgency. The hardest judgment calls happen here.",
+      "unlockRequirement": "reception",
+      "patientStory": {
+        "title": "Marcus's Story",
+        "text": "Because you held the line when that officer demanded records without a warrant, Marcus's mental health crisis stayed between him and his care team. He got help. He's still here.",
+        "icon": "shield"
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "er_bg",
@@ -146,10 +100,24 @@
       "npcs": [
         {
           "id": "dr_martinez",
-          "name": "Dr. Martinez",
+          "name": "Rushed ER Doctor",
           "x": 10,
           "y": 7,
           "sceneId": "dr_martinez_scene1"
+        },
+        {
+          "id": "officer",
+          "name": "Police Officer",
+          "x": 6,
+          "y": 10,
+          "sceneId": "police_records"
+        },
+        {
+          "id": "frantic_family",
+          "name": "Frantic Family Member",
+          "x": 14,
+          "y": 10,
+          "sceneId": "family_pressure"
         }
       ],
       "interactionZones": [
@@ -160,12 +128,20 @@
           "y": 2,
           "sceneId": "whiteboard_phi",
           "spriteType": "whiteboard"
+        },
+        {
+          "id": "unlocked_computer",
+          "name": "Computer Left Logged In",
+          "x": 5,
+          "y": 5,
+          "sceneId": "unlocked_workstation",
+          "spriteType": "computer"
         }
       ],
       "educationalItems": [
         {
-          "id": "security_training",
-          "title": "When You CAN Share PHI (Without Going to Jail)",
+          "id": "emergency_exceptions",
+          "title": "When You CAN Share PHI",
           "type": "whiteboard",
           "x": 17,
           "y": 10,
@@ -177,6 +153,14 @@
     {
       "id": "lab",
       "name": "Laboratory",
+      "subtitle": "The Source",
+      "description": "Where data is born. Test results, diagnoses, the raw material of PHI.",
+      "unlockRequirement": "er",
+      "patientStory": {
+        "title": "David's Story",
+        "text": "Because you questioned that researcher's access request, David's genetic test results stayed confidential. He told his family on his own terms, not theirs. His story. His timing.",
+        "icon": "lock"
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "lab_bg",
@@ -188,21 +172,51 @@
         {"x": 5, "y": 5, "width": 4, "height": 2},
         {"x": 11, "y": 5, "width": 4, "height": 2}
       ],
-      "npcs": [],
+      "npcs": [
+        {
+          "id": "lab_tech",
+          "name": "Lab Technician",
+          "x": 10,
+          "y": 8,
+          "sceneId": "phi_identifiers"
+        },
+        {
+          "id": "researcher",
+          "name": "Curious Researcher",
+          "x": 6,
+          "y": 10,
+          "sceneId": "research_request"
+        },
+        {
+          "id": "courier",
+          "name": "Sample Courier",
+          "x": 14,
+          "y": 10,
+          "sceneId": "third_party_access"
+        }
+      ],
       "interactionZones": [
         {
-          "id": "unlocked_computer",
-          "name": "Unlocked Computer",
+          "id": "sample_labels",
+          "name": "Sample Labels",
           "x": 7,
           "y": 6,
-          "sceneId": "unlocked_workstation",
-          "spriteType": "computer"
+          "sceneId": "sample_phi",
+          "spriteType": "manual"
+        },
+        {
+          "id": "results_printout",
+          "name": "Results Left on Counter",
+          "x": 13,
+          "y": 6,
+          "sceneId": "exposed_results",
+          "spriteType": "poster"
         }
       ],
       "educationalItems": [
         {
-          "id": "authorization_guide",
-          "title": "So You're Responsible for PHI Now (Good Luck!)",
+          "id": "phi_identifiers",
+          "title": "The 18 PHI Identifiers",
           "type": "manual",
           "x": 3,
           "y": 10,
@@ -212,43 +226,85 @@
       "spawnPoint": {"x": 10, "y": 12}
     },
     {
-      "id": "break_room",
-      "name": "Break Room",
+      "id": "records_room",
+      "name": "Medical Records",
+      "subtitle": "The Archive",
+      "description": "The long memory. Everything lives here. Access, amendments, the right to your own story.",
+      "unlockRequirement": "lab",
+      "patientStory": {
+        "title": "Mrs. Chen's Story",
+        "text": "Because you helped Mrs. Chen correct that error in her record, she got the insurance coverage she needed. A wrong diagnosis almost followed her forever. You stopped it.",
+        "icon": "file"
+      },
       "width": 20,
       "height": 15,
-      "backgroundImage": "break_bg",
+      "backgroundImage": "records_bg",
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1},
         {"x": 0, "y": 14, "width": 20, "height": 1},
         {"x": 0, "y": 0, "width": 1, "height": 15},
         {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 8, "y": 7, "width": 4, "height": 2}
+        {"x": 3, "y": 3, "width": 2, "height": 4},
+        {"x": 8, "y": 3, "width": 2, "height": 4},
+        {"x": 13, "y": 3, "width": 2, "height": 4}
       ],
       "npcs": [
         {
-          "id": "gary",
-          "name": "Gossipy Gary",
-          "x": 6,
+          "id": "records_clerk",
+          "name": "Records Clerk",
+          "x": 10,
           "y": 8,
-          "sceneId": "gary_gossip"
+          "sceneId": "records_access"
         },
         {
-          "id": "cathy",
-          "name": "Chatty Cathy",
+          "id": "patient_request",
+          "name": "Patient Requesting File",
+          "x": 6,
+          "y": 10,
+          "sceneId": "patient_access_rights"
+        },
+        {
+          "id": "attorney",
+          "name": "Attorney with Subpoena",
           "x": 14,
-          "y": 8,
-          "sceneId": "chatty_cathy"
+          "y": 10,
+          "sceneId": "legal_request"
         }
       ],
-      "interactionZones": [],
+      "interactionZones": [
+        {
+          "id": "unlocked_cabinet",
+          "name": "Unlocked File Cabinet",
+          "x": 4,
+          "y": 5,
+          "sceneId": "unlocked_files",
+          "spriteType": "manual"
+        },
+        {
+          "id": "audit_log",
+          "name": "Audit Log Screen",
+          "x": 9,
+          "y": 5,
+          "sceneId": "access_audit",
+          "spriteType": "computer"
+        },
+        {
+          "id": "shredder",
+          "name": "Document Shredder",
+          "x": 14,
+          "y": 5,
+          "sceneId": "proper_disposal",
+          "spriteType": "manual"
+        }
+      ],
       "educationalItems": [
         {
-          "id": "when_to_say_no",
-          "title": "The Art of the HIPAA Shutdown",
+          "id": "minimum_necessary_manual",
+          "title": "Minimum Necessary Rule",
           "type": "poster",
-          "x": 16,
-          "y": 3,
-          "fact": "Not everyone who asks for PHI gets it. Sometimes your job is to be the bouncer at Club Medical Records. Automatic NO Situations: Family Members Without Authorization, Employers asking for diagnosis (they get work notes only), Marketing Without Authorization, Anyone Via Unsecured Communication (no texting lab results!). The Script: 'I'm unable to confirm or deny any patient information without proper authorization.' Saying no to inappropriate requests is literally your job."
+          "x": 17,
+          "y": 8,
+          "fact": "Healthcare is gossipy, but HIPAA has opinions about your oversharing habits. The Minimum Necessary Rule: Only access, use, or disclose the LEAST amount of PHI needed to get the job done. Not the most interesting amount. Not the juiciest amount. The MINIMUM. The Test: Ask yourself 'Do I NEED this to do my actual job, or do I just WANT to know?' If it's want? Close the chart. Walk away. Get a hobby."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
@@ -256,6 +312,14 @@
     {
       "id": "it_office",
       "name": "IT Office",
+      "subtitle": "The Vault",
+      "description": "The invisible infrastructure. Encryption, access controls, breach detection.",
+      "unlockRequirement": "records_room",
+      "patientStory": {
+        "title": "50,000 Patients Protected",
+        "text": "Because you caught that phishing attempt, 50,000 patient records stayed secure. Fifty thousand people who will never know how close they came. That's the point.",
+        "icon": "server"
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "it_bg",
@@ -269,11 +333,25 @@
       ],
       "npcs": [
         {
-          "id": "sam",
-          "name": "IT Tech Sam",
+          "id": "security_analyst",
+          "name": "Security Analyst",
           "x": 11,
           "y": 6,
-          "sceneId": "sam_access"
+          "sceneId": "security_training"
+        },
+        {
+          "id": "vendor",
+          "name": "Vendor Requesting Access",
+          "x": 6,
+          "y": 10,
+          "sceneId": "vendor_access"
+        },
+        {
+          "id": "workaround_employee",
+          "name": "Employee Needs Workaround",
+          "x": 14,
+          "y": 10,
+          "sceneId": "convenience_vs_security"
         }
       ],
       "interactionZones": [
@@ -286,22 +364,97 @@
           "spriteType": "poster"
         },
         {
-          "id": "hr_phone",
-          "name": "Ringing Phone (HR)",
+          "id": "breach_playbook",
+          "name": "Breach Response Playbook",
           "x": 14,
           "y": 8,
-          "sceneId": "boss_man_brad",
+          "sceneId": "breach_response",
+          "spriteType": "manual"
+        }
+      ],
+      "educationalItems": [
+        {
+          "id": "security_safeguards",
+          "title": "Technical Safeguards",
+          "type": "whiteboard",
+          "x": 17,
+          "y": 3,
+          "fact": "HIPAA's Security Rule demands three types of safeguards: Administrative (policies, training, risk assessments), Physical (locks, badge access, workstation security), and Technical (encryption, access controls, audit logs). The Three A's: Authentication (prove who you are), Authorization (prove you should have access), and Audit (prove what you did). Strong passwords, automatic logoffs, and encryption aren't optional—they're the walls that keep the vault secure."
+        }
+      ],
+      "spawnPoint": {"x": 10, "y": 12}
+    },
+    {
+      "id": "break_room",
+      "name": "Break Room",
+      "subtitle": "The Human Factor",
+      "description": "Where people are just people. Gossip, venting, casual lapses. The hardest place to stay vigilant.",
+      "unlockRequirement": null,
+      "alwaysUnlocked": true,
+      "patientStory": {
+        "title": "James's Story",
+        "text": "Because you changed the subject when your coworkers started gossiping, James's coworker—sitting two tables away—never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
+        "icon": "users"
+      },
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "break_bg",
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1},
+        {"x": 0, "y": 14, "width": 20, "height": 1},
+        {"x": 0, "y": 0, "width": 1, "height": 15},
+        {"x": 19, "y": 0, "width": 1, "height": 15},
+        {"x": 8, "y": 7, "width": 4, "height": 2}
+      ],
+      "npcs": [
+        {
+          "id": "gossiping_coworker",
+          "name": "Gossiping Coworker",
+          "x": 6,
+          "y": 8,
+          "sceneId": "gary_gossip"
+        },
+        {
+          "id": "friend_fishing",
+          "name": "Friend from Another Dept",
+          "x": 14,
+          "y": 8,
+          "sceneId": "chatty_cathy"
+        },
+        {
+          "id": "tired_employee",
+          "name": "Exhausted Employee",
+          "x": 10,
+          "y": 11,
+          "sceneId": "fatigue_lapse"
+        }
+      ],
+      "interactionZones": [
+        {
+          "id": "overheard_conversation",
+          "name": "Overheard Conversation",
+          "x": 9,
+          "y": 8,
+          "sceneId": "intervene_gossip",
+          "spriteType": "poster"
+        },
+        {
+          "id": "unlocked_phone",
+          "name": "Phone Left Unlocked",
+          "x": 14,
+          "y": 5,
+          "sceneId": "phone_security",
           "spriteType": "computer"
         }
       ],
       "educationalItems": [
         {
-          "id": "security_practices_guide",
-          "title": "IT Security Best Practices",
-          "type": "whiteboard",
-          "x": 17,
+          "id": "verbal_disclosure",
+          "title": "The Art of the HIPAA Shutdown",
+          "type": "poster",
+          "x": 16,
           "y": 3,
-          "fact": "Strong passwords, automatic logoffs, access controls, and encryption are essential IT security practices. These technical safeguards work alongside privacy policies to keep patient information safe. More security training coming soon!"
+          "fact": "Not everyone who asks for PHI gets it. Sometimes your job is to be the bouncer at Club Medical Records. Automatic NO Situations: Family Members Without Authorization, Employers asking for diagnosis (they get work notes only), Marketing Without Authorization, Anyone Via Unsecured Communication (no texting lab results!). The Script: 'I'm unable to confirm or deny any patient information without proper authorization.' Saying no to inappropriate requests is literally your job."
         }
       ],
       "spawnPoint": {"x": 10, "y": 12}
