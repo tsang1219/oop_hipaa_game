@@ -606,6 +606,400 @@
           "isEnd": true
         }
       ]
+    },
+    {
+      "id": "police_records",
+      "character": "Police Officer",
+      "dialogue": "I'm investigating a domestic assault. The victim is in your ER right now. I need to see their medical records immediately—this is an active investigation and time is critical.",
+      "choices": [
+        {
+          "text": "Of course, officer. Let me pull those records for you right away.",
+          "score": -15,
+          "feedback": "Wrong. Police badge doesn't bypass HIPAA. You need: (1) Patient consent, (2) A valid warrant or court order, OR (3) A specific legal exception like mandatory abuse reporting. 'Active investigation' isn't a magic phrase."
+        },
+        {
+          "text": "I can confirm if they're here, but I need a warrant or patient consent for medical records.",
+          "score": 15,
+          "feedback": "Correct! Law enforcement requests require proper legal process. You can confirm presence in some circumstances, but medical records require a warrant, court order, or patient authorization. Don't be intimidated by badges."
+        },
+        {
+          "text": "I can't help you at all. Come back with a lawyer.",
+          "score": -5,
+          "feedback": "Too rigid. HIPAA does allow some law enforcement disclosures with proper legal process. You can work with officers who follow the rules—just don't hand over records without proper authorization."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "family_pressure",
+      "character": "Frantic Family Member",
+      "dialogue": "Please, my mother was just brought in by ambulance. Nobody will tell me anything! Is she okay? What happened? I'm her daughter—I have a right to know!",
+      "choices": [
+        {
+          "text": "Let me check if your mother has you listed as an authorized contact.",
+          "score": 15,
+          "feedback": "Correct! Even for worried family members, you need to verify authorization. The patient may have restricted information sharing for personal reasons. Check the authorization list, then share appropriately."
+        },
+        {
+          "text": "She's stable. The doctors are running tests now.",
+          "score": -10,
+          "feedback": "Wrong. You just assumed authorization without checking. What if the patient is fleeing domestic abuse and doesn't want family to know where she is? Always verify before sharing."
+        },
+        {
+          "text": "I can't tell you anything. HIPAA prevents all family communication.",
+          "score": -5,
+          "feedback": "Too rigid and incorrect. HIPAA allows sharing with family members involved in care—but you need to verify authorization first. Don't use HIPAA as an excuse to be unhelpful."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "lab_tech_scene",
+      "character": "Lab Technician",
+      "dialogue": "Hey, new person! Welcome to the lab. Quick question—do you know what makes something PHI versus just regular health information?",
+      "choices": [
+        {
+          "text": "PHI is any health information that can be connected to a specific person.",
+          "score": 15,
+          "feedback": "Correct! PHI = Health Information + Identifiers. The magic formula. If you can connect health data to a specific person (through any of the 18 identifiers), it's PHI and protected under HIPAA."
+        },
+        {
+          "text": "PHI is only diagnoses and test results—nothing else.",
+          "score": -10,
+          "feedback": "Way too narrow! PHI includes ANY health information tied to identifiable individuals: appointments, billing records, prescription history, even the fact that someone is a patient. It's broader than you think."
+        },
+        {
+          "text": "Everything in a hospital is automatically PHI.",
+          "score": -5,
+          "feedback": "Close but not quite. De-identified data isn't PHI. If you properly remove all 18 identifiers, it's no longer protected under HIPAA. That's how research data often works."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "research_request",
+      "character": "Curious Researcher",
+      "dialogue": "I'm conducting a study on treatment outcomes. I just need to pull some patient data from the last year. I'm faculty here, so I should have access, right?",
+      "choices": [
+        {
+          "text": "Faculty status doesn't grant research access. You need IRB approval or patient authorization.",
+          "score": 15,
+          "feedback": "Correct! Research use of PHI requires either: (1) Patient authorization, (2) IRB waiver, or (3) Use of properly de-identified data. Being faculty doesn't bypass HIPAA. The rules apply to everyone."
+        },
+        {
+          "text": "Sure, you're faculty. Let me show you how to access the database.",
+          "score": -15,
+          "feedback": "Wrong! Faculty status doesn't override HIPAA. Research access requires proper authorization through IRB or patient consent. You just enabled a potential HIPAA violation."
+        },
+        {
+          "text": "I'll need to check with my supervisor first.",
+          "score": 5,
+          "feedback": "Good instinct to escalate, but you should know the answer: research requires IRB approval or patient authorization. Escalating is fine, but understand the underlying rule."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "third_party_access",
+      "character": "Sample Courier",
+      "dialogue": "I'm here to pick up samples for the reference lab. Can you also give me a printout of the patient info so they know whose samples these are?",
+      "choices": [
+        {
+          "text": "The sample labels should have the minimum necessary information. I can't give you additional patient details.",
+          "score": 15,
+          "feedback": "Correct! Third-party couriers and labs need only the minimum necessary information to do their job. That's usually on the sample label. Extra printouts with full patient info are a violation waiting to happen."
+        },
+        {
+          "text": "Sure, let me print their full chart summary for you.",
+          "score": -15,
+          "feedback": "Wrong! Massive oversharing. Couriers and reference labs need only what's on the sample label. Full chart summaries violate the Minimum Necessary rule and create unnecessary risk."
+        },
+        {
+          "text": "You'll need to request that through proper channels.",
+          "score": 5,
+          "feedback": "Reasonable response, but be clear about WHY: Minimum Necessary rule. The sample label has what they need. Additional patient info shouldn't be shared with third-party couriers."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "sample_phi",
+      "character": "Observation",
+      "dialogue": "You notice sample containers with patient labels sitting on an open counter near the hallway. The labels show full patient names, dates of birth, and the type of test being run (HIV screening, pregnancy test, etc.).",
+      "choices": [
+        {
+          "text": "This is a HIPAA violation—samples with identifiable PHI shouldn't be left in open areas.",
+          "score": 15,
+          "feedback": "Correct! Those labels contain PHI (name, DOB, test type). Leaving them visible in open areas violates physical safeguard requirements. Samples should be in secured areas, not on display."
+        },
+        {
+          "text": "This is fine—labs need quick access to samples.",
+          "score": -10,
+          "feedback": "Wrong. Operational convenience doesn't override privacy. Those labels reveal sensitive health information (HIV tests, pregnancy tests) linked to patient names. This needs to be secured."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "exposed_results",
+      "character": "Observation",
+      "dialogue": "Test results are sitting on the counter, clearly visible. You can see patient names, diagnoses, and lab values. The lab tech stepped away about 5 minutes ago.",
+      "choices": [
+        {
+          "text": "This violates HIPAA—PHI shouldn't be left visible and unattended.",
+          "score": 15,
+          "feedback": "Correct! Physical safeguards require protecting PHI from unauthorized viewing. Visible results with patient names and diagnoses left unattended is a clear violation. These should be face-down or secured."
+        },
+        {
+          "text": "The tech will be back soon—it's fine.",
+          "score": -10,
+          "feedback": "Wrong. '5 minutes' is 5 minutes too long for PHI to be visible and unattended. Anyone walking by could see patient names linked to diagnoses. Time doesn't make it okay."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "records_access",
+      "character": "Records Clerk",
+      "dialogue": "Welcome to Medical Records! This is where patient stories live. Quick quiz: how long does HIPAA give us to respond when a patient requests their own records?",
+      "choices": [
+        {
+          "text": "30 days, with one possible 30-day extension if needed.",
+          "score": 15,
+          "feedback": "Correct! HIPAA gives covered entities 30 days to fulfill access requests, with one optional 30-day extension if you notify the patient and explain why. Don't make them wait longer than necessary though!"
+        },
+        {
+          "text": "We can take as long as we need—medical records are complicated.",
+          "score": -15,
+          "feedback": "Wrong! Patients have a RIGHT to timely access. HIPAA mandates 30 days (plus possible extension). 'It's complicated' isn't an excuse. Delays can result in complaints and penalties."
+        },
+        {
+          "text": "Immediately—patients have instant access rights.",
+          "score": -5,
+          "feedback": "Close! While we should provide records as quickly as possible, HIPAA allows up to 30 days. Immediate access is ideal when possible, but not legally required."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "patient_access_rights",
+      "character": "Patient Requesting File",
+      "dialogue": "Hi, I need copies of all my medical records from the past two years. My new doctor wants them, and I'd also like to review everything myself. Can you help?",
+      "choices": [
+        {
+          "text": "Absolutely. You have the right to access your records. Let me start the request process.",
+          "score": 15,
+          "feedback": "Correct! Patients have a fundamental right under HIPAA to access their own medical records. Start the request process, explain the timeline (up to 30 days), and offer to send copies directly to their new doctor."
+        },
+        {
+          "text": "You'll need your doctor's permission before I can release anything.",
+          "score": -15,
+          "feedback": "Wrong! Patients don't need permission from ANYONE to access their own records. This is a core HIPAA right. Don't create barriers that don't exist."
+        },
+        {
+          "text": "I can send them to your new doctor, but you can't have copies for yourself.",
+          "score": -10,
+          "feedback": "Wrong! Patients have the right to obtain copies for themselves, not just for transfer to other providers. Personal access is explicitly protected under HIPAA."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "legal_request",
+      "character": "Attorney with Subpoena",
+      "dialogue": "I have a subpoena for patient records in a malpractice case. I need these records TODAY. My client is depending on this. Don't make me get a judge involved.",
+      "choices": [
+        {
+          "text": "I'll verify this subpoena is valid and follow our disclosure procedures. This may take a few days.",
+          "score": 15,
+          "feedback": "Correct! Don't be intimidated. Subpoenas require verification: Is it properly issued? Has the patient been notified? Is there a protective order needed? Follow your facility's legal disclosure procedures, not the attorney's timeline."
+        },
+        {
+          "text": "Here you go—I don't want any legal trouble.",
+          "score": -15,
+          "feedback": "Wrong! Immediate compliance without verification is a HIPAA violation waiting to happen. Subpoenas need to be verified. The patient may need to be notified. Follow procedure, not pressure."
+        },
+        {
+          "text": "I refuse. Attorneys don't get patient records.",
+          "score": -5,
+          "feedback": "Too rigid. Valid subpoenas CAN compel disclosure, but they must be verified and proper procedures followed. Don't refuse legitimate legal process—just don't rush it either."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "access_audit",
+      "character": "Observation",
+      "dialogue": "The audit log screen shows recent record access. You notice your coworker accessed a patient's chart 15 times yesterday, but that patient isn't on their assigned floor or care team.",
+      "choices": [
+        {
+          "text": "This is suspicious and should be reported—accessing records without a job-related need is a violation.",
+          "score": 15,
+          "feedback": "Correct! Repeated access to records without a treatment, payment, or operations reason is a red flag. This could be curiosity snooping (maybe they know the patient personally?) or worse. Report to your Privacy Officer."
+        },
+        {
+          "text": "They probably have a good reason. Mind your own business.",
+          "score": -10,
+          "feedback": "Wrong! 'Probably' isn't good enough when it comes to HIPAA. Unusual access patterns need investigation. If you see something, say something. It's literally your job."
+        },
+        {
+          "text": "Ask them directly why they accessed those records.",
+          "score": 0,
+          "feedback": "Risky approach. They might cover their tracks or get defensive. It's better to report to your Privacy Officer who can investigate properly through audit logs. Don't tip off potential violators."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "security_training",
+      "character": "Security Analyst",
+      "dialogue": "Welcome to IT Security. Fun fact: most breaches aren't from hackers—they're from employees. What's the #1 thing staff can do to prevent breaches?",
+      "choices": [
+        {
+          "text": "Use strong, unique passwords and never share login credentials.",
+          "score": 15,
+          "feedback": "Correct! Password hygiene is breach prevention 101. Shared passwords, weak passwords, and passwords on sticky notes are how breaches happen. Each person needs unique credentials that they never share."
+        },
+        {
+          "text": "Install better antivirus software.",
+          "score": -5,
+          "feedback": "That's IT's job, not individual staff. The human element—password hygiene, phishing awareness, access control—is where staff make the biggest difference in security."
+        },
+        {
+          "text": "Don't click on suspicious emails.",
+          "score": 10,
+          "feedback": "Good answer! Phishing is a major threat. But password hygiene is even more fundamental. Both matter, but credential management is the foundation of access control."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "vendor_access",
+      "character": "Vendor Requesting Access",
+      "dialogue": "Hi, I'm from MedTech Solutions. We maintain your imaging equipment. I need access to the system to run diagnostics. Can you log me in with your credentials real quick?",
+      "choices": [
+        {
+          "text": "No. Vendors need their own authorized credentials. I can't share mine.",
+          "score": 15,
+          "feedback": "Correct! Never share your credentials with ANYONE—especially vendors. They should have their own authorized access through your IT department. If they don't, that's their problem to solve properly."
+        },
+        {
+          "text": "Sure, just this once. You're a legitimate vendor.",
+          "score": -15,
+          "feedback": "Wrong! 'Just this once' is how breaches happen. When you share credentials, every action they take is logged under YOUR name. If something goes wrong, you're responsible. Vendors get their own access or no access."
+        },
+        {
+          "text": "Let me call IT to get you temporary access.",
+          "score": 10,
+          "feedback": "Good! Involving IT is the right move. They can provide proper vendor credentials with appropriate access levels. Never take shortcuts with access control."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "convenience_vs_security",
+      "character": "Employee Needs Workaround",
+      "dialogue": "These password requirements are ridiculous! I have to change it every 90 days and remember 47 different systems. Can't you just give me a master password that works everywhere?",
+      "choices": [
+        {
+          "text": "No. Those requirements exist to protect patient data. Try a password manager.",
+          "score": 15,
+          "feedback": "Correct! Security requirements aren't arbitrary—they protect patients. Password managers are the solution for 'too many passwords.' Never compromise security for convenience."
+        },
+        {
+          "text": "I'll set up a simpler system for you. Security shouldn't be this hard.",
+          "score": -15,
+          "feedback": "Wrong! 'Easier' often means 'less secure.' Those password requirements exist because breaches are expensive and harmful. Help them work within the system, not around it."
+        },
+        {
+          "text": "I understand it's frustrating, but these rules protect our patients.",
+          "score": 10,
+          "feedback": "Good empathy, but also offer a solution: password managers! Don't just validate the frustration—help them comply without going insane."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "breach_response",
+      "character": "Observation",
+      "dialogue": "You're reading the Breach Response Playbook. It outlines what happens when PHI is improperly accessed or disclosed. The first 72 hours are critical.",
+      "choices": [
+        {
+          "text": "Got it—document everything, notify the Privacy Officer immediately, don't try to fix it alone.",
+          "score": 15,
+          "feedback": "Correct! Breach response requires: (1) Immediate documentation, (2) Privacy Officer notification, (3) Risk assessment, (4) Possible patient notification, (5) Possible HHS reporting. The cover-up is always worse than the breach."
+        },
+        {
+          "text": "Seems like a lot of paperwork. I'd probably just try to fix it quietly first.",
+          "score": -15,
+          "feedback": "Wrong! 'Fixing it quietly' is how small mistakes become reportable breaches with massive fines. The process exists for a reason. Follow it. Every time. No exceptions."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "fatigue_lapse",
+      "character": "Exhausted Employee",
+      "dialogue": "*yawning* I've been here 14 hours. I was charting in patient records and I think I might have entered notes in the wrong patient's file. But I'm too tired to check. It's probably fine, right?",
+      "choices": [
+        {
+          "text": "No, you need to check and correct it now. Wrong-patient documentation is serious.",
+          "score": 15,
+          "feedback": "Correct! Wrong-patient documentation isn't just a HIPAA issue—it's a patient safety issue. That note could affect treatment decisions. Check it, fix it, and document the correction. Then go home and sleep!"
+        },
+        {
+          "text": "Yeah, you're exhausted. Deal with it tomorrow when you're fresh.",
+          "score": -15,
+          "feedback": "Wrong! Tomorrow might be too late. What if that incorrect note affects treatment decisions tonight? Wrong-patient documentation needs immediate correction. Fatigue doesn't excuse patient safety risks."
+        },
+        {
+          "text": "Just add a note saying you were tired. That covers you legally.",
+          "score": -10,
+          "feedback": "That's not how documentation works. You can't just annotate 'was tired, might be wrong.' Find the error, fix it properly, and follow your facility's amendment procedures."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "intervene_gossip",
+      "character": "Observation",
+      "dialogue": "You overhear two coworkers at the next table discussing a patient by name, including their diagnosis and family drama. They're speaking at normal volume. Other people can definitely hear.",
+      "choices": [
+        {
+          "text": "Interrupt politely: 'Hey, we should probably take this somewhere private.'",
+          "score": 15,
+          "feedback": "Correct! This is a HIPAA violation in progress. Patient names + diagnoses + public space = bad. A gentle redirect protects everyone. Don't be a silent bystander when you can prevent harm."
+        },
+        {
+          "text": "Mind your own business. They're not talking to you.",
+          "score": -10,
+          "feedback": "Wrong! Witnessing a HIPAA violation and doing nothing makes you complicit. You don't have to be aggressive—just redirect the conversation. Silence enables bad behavior."
+        },
+        {
+          "text": "Report them to HR immediately without saying anything.",
+          "score": 0,
+          "feedback": "Reporting is appropriate, but why not prevent ongoing harm first? A quick 'let's take this somewhere private' stops the violation immediately. Then report if the behavior continues."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "phone_security",
+      "character": "Observation",
+      "dialogue": "Someone left their work phone unlocked on the table with the patient scheduling app open. You can see today's appointments including patient names and reasons for visit. The owner is nowhere in sight.",
+      "choices": [
+        {
+          "text": "This is a HIPAA violation—mobile devices with PHI must be secured when unattended.",
+          "score": 15,
+          "feedback": "Correct! Mobile devices are governed by HIPAA's Security Rule. Unlocked devices with PHI visible are a breach waiting to happen. The owner needs to lock their screen. Consider locking it for them or finding the owner."
+        },
+        {
+          "text": "It's just a phone in the break room. Staff are trustworthy.",
+          "score": -10,
+          "feedback": "Wrong! 'Trust' doesn't replace security controls. Break rooms aren't secure areas. Anyone could see or photograph that screen. Mobile devices with PHI need the same protection as workstations."
+        }
+      ],
+      "isEnd": true
     }
   ]
 }

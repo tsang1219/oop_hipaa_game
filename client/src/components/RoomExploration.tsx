@@ -10,20 +10,25 @@ import ObjectSprite from './ObjectSprites';
 import RoomIntro from './RoomIntro';
 import ObservationHint from './ObservationHint';
 import ChoicePrompt from './ChoicePrompt';
+import { RoomProgressHUD } from './RoomProgressHUD';
 import type { Room, NPC, InteractionZone, EducationalItem, Position, Gate } from '@shared/schema';
 
 interface RoomExplorationProps {
   room: Room;
   onTriggerScene: (sceneId: string) => void;
   onExitRoom: () => void;
+  onZoneComplete?: (zoneId: string) => void;
+  onItemCollect?: (itemId: string) => void;
   totalEducationalItems: number;
   totalScenarios: number;
   completedNPCs: Set<string>;
+  completedZones: Set<string>;
+  collectedItems: Set<string>;
 }
 
 const TILE_SIZE = 32;
 
-export default function RoomExploration({ room, onTriggerScene, onExitRoom, totalEducationalItems, totalScenarios, completedNPCs }: RoomExplorationProps) {
+export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZoneComplete, onItemCollect, totalEducationalItems, totalScenarios, completedNPCs, completedZones, collectedItems }: RoomExplorationProps) {
   const [playerPos, setPlayerPos] = useState<Position>(room.spawnPoint);
   const [playerDirection, setPlayerDirection] = useState<'down' | 'up' | 'left' | 'right'>('down');
   const [nearbyInteraction, setNearbyInteraction] = useState<{type: 'npc' | 'zone' | 'item', data: NPC | InteractionZone | EducationalItem} | null>(null);
@@ -37,10 +42,6 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
   });
   const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(() => {
     const saved = localStorage.getItem(`unlockedNpcs_${room.id}`);
-    return saved ? new Set(JSON.parse(saved)) : new Set();
-  });
-  const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
-    const saved = localStorage.getItem('collectedEducationalItems');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
 
@@ -173,6 +174,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
       } else {
         const zone = nearbyInteraction.data as InteractionZone;
         checkObservationGateTrigger(zone.id);
+        onZoneComplete?.(zone.id);
         onTriggerScene(zone.sceneId);
       }
     }
@@ -188,6 +190,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
 
   const handleZoneClick = (zone: InteractionZone) => {
     checkObservationGateTrigger(zone.id);
+    onZoneComplete?.(zone.id);
     onTriggerScene(zone.sceneId);
   };
 
@@ -197,10 +200,7 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
 
   const handleCloseModal = () => {
     if (selectedItem && !collectedItems.has(selectedItem.id)) {
-      const newCollected = new Set(collectedItems);
-      newCollected.add(selectedItem.id);
-      setCollectedItems(newCollected);
-      localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(newCollected)));
+      onItemCollect?.(selectedItem.id);
     }
     setSelectedItem(null);
   };
@@ -279,6 +279,12 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, tota
           imageRendering: 'pixelated',
         }}
       >
+        <RoomProgressHUD 
+          room={room}
+          completedNpcs={completedNPCs}
+          completedZones={completedZones}
+          collectedItems={collectedItems}
+        />
         {room.obstacles.map((obstacle, index) => (
           <div
             key={`obstacle-${index}`}

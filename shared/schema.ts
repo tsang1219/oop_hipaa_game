@@ -88,10 +88,27 @@ export const educationalItemSchema = z.object({
   fact: z.string(),
 });
 
+export const completionRequirementsSchema = z.object({
+  requiredNpcs: z.array(z.string()),
+  requiredZones: z.array(z.string()),
+  requiredItems: z.array(z.string()),
+});
+
+export const patientStorySchema = z.object({
+  title: z.string(),
+  text: z.string(),
+  icon: z.string(),
+});
+
 export const roomSchema = z.object({
   id: z.string(),
   name: z.string(),
   subtitle: z.string().optional(),
+  description: z.string().optional(),
+  unlockRequirement: z.string().nullable().optional(),
+  alwaysUnlocked: z.boolean().optional(),
+  patientStory: patientStorySchema.optional(),
+  completionRequirements: completionRequirementsSchema.optional(),
   width: z.number(),
   height: z.number(),
   backgroundImage: z.string(),
@@ -100,7 +117,6 @@ export const roomSchema = z.object({
   interactionZones: z.array(interactionZoneSchema),
   educationalItems: z.array(educationalItemSchema),
   spawnPoint: positionSchema,
-  // Room atmosphere - SNES-style configuration
   config: roomConfigSchema.optional(),
 });
 
@@ -122,5 +138,7 @@ export type Obstacle = z.infer<typeof obstacleSchema>;
 export type NPC = z.infer<typeof npcSchema>;
 export type InteractionZone = z.infer<typeof interactionZoneSchema>;
 export type EducationalItem = z.infer<typeof educationalItemSchema>;
+export type CompletionRequirements = z.infer<typeof completionRequirementsSchema>;
+export type PatientStory = z.infer<typeof patientStorySchema>;
 export type Room = z.infer<typeof roomSchema>;
 export type RoomData = z.infer<typeof roomDataSchema>;

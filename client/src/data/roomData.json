@@ -18,6 +18,11 @@
         "stanceDescription": "You are the Learner. People teach you.",
         "introText": "Your first day. Take your time. Watch. Listen. Learn."
       },
+      "completionRequirements": {
+        "requiredNpcs": ["riley", "nervous_patient"],
+        "requiredZones": ["sign_in_sheet"],
+        "requiredItems": ["patient_rights_poster"]
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "reception_bg",
@@ -109,6 +114,11 @@
             "observationHint": "Something on that whiteboard shouldn't be visible..."
           }
         ]
+      },
+      "completionRequirements": {
+        "requiredNpcs": ["dr_martinez", "officer"],
+        "requiredZones": ["whiteboard"],
+        "requiredItems": ["emergency_exceptions"]
       },
       "width": 20,
       "height": 15,
@@ -202,6 +212,11 @@
           }
         ]
       },
+      "completionRequirements": {
+        "requiredNpcs": ["lab_tech", "researcher"],
+        "requiredZones": ["results_printout"],
+        "requiredItems": ["phi_identifiers"]
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "lab_bg",
@@ -219,7 +234,7 @@
           "name": "Lab Technician",
           "x": 10,
           "y": 8,
-          "sceneId": "phi_identifiers"
+          "sceneId": "lab_tech_scene"
         },
         {
           "id": "researcher",
@@ -295,6 +310,11 @@
             ]
           }
         ]
+      },
+      "completionRequirements": {
+        "requiredNpcs": ["records_clerk"],
+        "requiredZones": ["unlocked_cabinet"],
+        "requiredItems": ["minimum_necessary_manual"]
       },
       "width": 20,
       "height": 15,
@@ -397,6 +417,11 @@
           }
         ]
       },
+      "completionRequirements": {
+        "requiredNpcs": ["security_analyst", "vendor"],
+        "requiredZones": ["password_note"],
+        "requiredItems": ["security_safeguards"]
+      },
       "width": 20,
       "height": 15,
       "backgroundImage": "it_bg",
@@ -487,6 +512,11 @@
             "targetId": "gossiping_coworker"
           }
         ]
+      },
+      "completionRequirements": {
+        "requiredNpcs": ["gossiping_coworker", "friend_fishing"],
+        "requiredZones": ["overheard_conversation"],
+        "requiredItems": ["verbal_disclosure"]
       },
       "width": 20,
       "height": 15,

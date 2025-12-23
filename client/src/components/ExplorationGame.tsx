@@ -3,9 +3,9 @@ import HallwayHub from './HallwayHub';
 import RoomExploration from './RoomExploration';
 import GameContainer from './GameContainer';
 import EndScreen from './EndScreen';
-import PatientStoryModal from './PatientStoryModal';
+import { PatientStoryReveal } from './PatientStoryReveal';
 import { useToast } from '@/hooks/use-toast';
-import type { Room, Scene } from '@shared/schema';
+import type { Room, Scene, CompletionRequirements } from '@shared/schema';
 
 type GameMode = 'hub' | 'exploration' | 'dialogue' | 'gameover' | 'win';
 
@@ -21,6 +21,11 @@ interface RoomWithStory extends Room {
   unlockRequirement?: string | null;
   alwaysUnlocked?: boolean;
   patientStory?: PatientStory;
+  completionRequirements?: {
+    requiredNpcs: string[];
+    requiredZones: string[];
+    requiredItems: string[];
+  };
 }
 
 interface ExplorationGameProps {
@@ -47,6 +52,14 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     const saved = localStorage.getItem('completedNPCs');
     return saved ? new Set(JSON.parse(saved)) : new Set();
   });
+  const [completedZones, setCompletedZones] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('completedZones');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
+  const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
+    const saved = localStorage.getItem('collectedEducationalItems');
+    return saved ? new Set(JSON.parse(saved)) : new Set();
+  });
   const [finalPrivacyScore, setFinalPrivacyScore] = useState(100);
   const [gameStartTime] = useState(() => {
     const saved = localStorage.getItem('gameStartTime');
@@ -70,6 +83,14 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
   useEffect(() => {
     localStorage.setItem('collectedStories', JSON.stringify(collectedStories));
   }, [collectedStories]);
+
+  useEffect(() => {
+    localStorage.setItem('completedZones', JSON.stringify(Array.from(completedZones)));
+  }, [completedZones]);
+
+  useEffect(() => {
+    localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(collectedItems)));
+  }, [collectedItems]);
 
   useEffect(() => {
     const savedProgress = localStorage.getItem('hipaa-exploration-progress');
@@ -128,15 +149,26 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     }
   };
 
+  const checkRoomCompletion = (room: RoomWithStory): boolean => {
+    const requirements = room.completionRequirements;
+    if (!requirements) {
+      const roomNPCs = room.npcs.filter(npc => !npc.isFinalBoss);
+      return roomNPCs.every(npc => completedNPCs.has(npc.id));
+    }
+
+    const npcsComplete = requirements.requiredNpcs.every(id => completedNPCs.has(id));
+    const zonesComplete = requirements.requiredZones.every(id => completedZones.has(id));
+    const itemsComplete = requirements.requiredItems.every(id => collectedItems.has(id));
+
+    return npcsComplete && zonesComplete && itemsComplete;
+  };
+
   const handleExitRoom = () => {
     const room = rooms.find(r => r.id === currentRoomId);
     if (room) {
-      const roomNPCs = room.npcs.filter(npc => !npc.isFinalBoss);
-      const allNPCsCompleted = roomNPCs.every(npc => 
-        completedNPCs.has(npc.id)
-      );
+      const isComplete = checkRoomCompletion(room);
       
-      if (allNPCsCompleted && roomNPCs.length > 0 && !completedRooms.includes(currentRoomId!)) {
+      if (isComplete && !completedRooms.includes(currentRoomId!)) {
         setCompletedRooms(prev => [...prev, currentRoomId!]);
         
         if (room.patientStory && !collectedStories.includes(currentRoomId!)) {
@@ -175,6 +207,22 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
     setCurrentSceneId(sceneId);
     setCurrentNPCId(npcId || null);
     setGameMode('dialogue');
+  };
+
+  const handleZoneComplete = (zoneId: string) => {
+    if (!completedZones.has(zoneId)) {
+      const newZones = new Set(completedZones);
+      newZones.add(zoneId);
+      setCompletedZones(newZones);
+    }
+  };
+
+  const handleItemCollect = (itemId: string) => {
+    if (!collectedItems.has(itemId)) {
+      const newItems = new Set(collectedItems);
+      newItems.add(itemId);
+      setCollectedItems(newItems);
+    }
   };
 
   const handleDialogueComplete = () => {
@@ -243,11 +291,10 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
 
   if (showStoryModal && currentStoryRoom?.patientStory) {
     return (
-      <PatientStoryModal
+      <PatientStoryReveal
         story={currentStoryRoom.patientStory}
         roomName={currentStoryRoom.name}
         onClose={handleCloseStoryModal}
-        isRoomClear={isNewStory}
       />
     );
   }
@@ -274,9 +321,13 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
           handleTriggerScene(sceneId, npc?.id);
         }}
         onExitRoom={handleExitRoom}
+        onZoneComplete={handleZoneComplete}
+        onItemCollect={handleItemCollect}
         totalEducationalItems={totalEducationalItems}
         totalScenarios={totalScenarios}
         completedNPCs={completedNPCs}
+        completedZones={completedZones}
+        collectedItems={collectedItems}
       />
     );
   }
