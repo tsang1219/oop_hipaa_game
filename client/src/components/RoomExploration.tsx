@@ -590,9 +590,24 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
               <p className="text-sm text-muted-foreground mb-2">
                 🔒 {(nearbyInteraction.data as NPC).name}
               </p>
-              <p className="text-xs text-muted-foreground italic">
-                {isNpcGated((nearbyInteraction.data as NPC).id)?.observationHint || "Look around first..."}
-              </p>
+              <div className="mb-2 p-2 bg-muted rounded text-left">
+                <p className="text-xs text-muted-foreground mb-1 font-semibold">Gate Requirement:</p>
+                <p className="text-xs text-muted-foreground italic">
+                  {isNpcGated((nearbyInteraction.data as NPC).id)?.observationHint || "Look around first..."}
+                </p>
+                {(() => {
+                  const gate = isNpcGated((nearbyInteraction.data as NPC).id);
+                  const prerequisite = gate?.prerequisiteId ? room.interactionZones.find(z => z.id === gate.prerequisiteId) : null;
+                  if (prerequisite) {
+                    return (
+                      <p className="text-xs text-foreground mt-2 font-medium">
+                        👉 Find and examine: <span className="font-bold">{prerequisite.name}</span>
+                      </p>
+                    );
+                  }
+                  return null;
+                })()}
+              </div>
             </>
           ) : (
             <>
