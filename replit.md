@@ -46,9 +46,11 @@ Every principle learned, every scenario completed, every room cleared represents
 - 32x32 pixel grid-based movement system (WASD/Arrow keys)
 - Each room contains NPCs, interaction zones, and educational items
 - NPCs and interaction zones are clickable (direct interaction) or activatable via Space key when nearby
+- No quest gating: Players can talk to NPCs immediately without collecting items first
 - Collision detection for realistic navigation
 - Room transitions maintain game state
 - Z-index layering ensures interaction zones (bouncing stars) are clickable above other elements
+- Room Progress HUD shows Items: X/Y and NPCs: X/Y as simple progress tracking
 
 **Pokémon-Style Dialogue System:**
 - Text box appears at bottom of screen with NPC portrait on left
@@ -79,7 +81,7 @@ Every principle learned, every scenario completed, every room cleared represents
   - Partial: Orange border for partial credit
 - Educational feedback on each choice with Out-of-Pocket tone
 - Scene progression based on player decisions
-- Session tracking of all choices and outcomes
+- Fresh state for each scenario (no session log/resume between scenarios)
 
 **Patient Story Collection:**
 - The true reward. Not badges—lives protected.
@@ -119,10 +121,11 @@ The application follows a component-based architecture with clear separation of 
 - React Query handles server state (though currently minimal API usage)
 - Local component state (useState, useEffect) for game progress
 - LocalStorage persistence for:
-  - Save/resume functionality and progress tracking
-  - Session logging for user decisions and scoring
   - Educational items collection tracking (visual dimming after reading)
+  - Completed NPCs tracking (checkmarks and faded opacity)
+  - Completed rooms and patient stories collected
 - Component remounting via key prop ensures proper state initialization across room changes
+- completedNPCs state flows from ExplorationGame to RoomExploration as prop for live updates
 
 **Design System:**
 - Custom "Out-of-Pocket" retro color palette defined in CSS variables
