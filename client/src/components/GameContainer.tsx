@@ -2,10 +2,8 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import CharacterPortrait from './CharacterPortrait';
-import DialogueBox from './DialogueBox';
-import ChoiceButton from './ChoiceButton';
+import BattleEncounterScreen from './BattleEncounterScreen';
 import PrivacyMeter from './PrivacyMeter';
-import FeedbackDisplay from './FeedbackDisplay';
 import SceneCounter from './SceneCounter';
 import type { Scene, Choice } from '@shared/schema';
 import nurseNinaImg from '@assets/generated_images/Nurse_Nina_pixel_portrait_6f9bfea3.png';
@@ -16,9 +14,11 @@ interface GameContainerProps {
   scenes: Scene[];
   onComplete?: () => void;
   onGameOver?: (finalScore: number) => void;
+  npcId?: string;
+  npcName?: string;
 }
 
-export default function GameContainer({ scenes, onComplete, onGameOver }: GameContainerProps) {
+export default function GameContainer({ scenes, onComplete, onGameOver, npcId, npcName }: GameContainerProps) {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [privacyScore, setPrivacyScore] = useState(100);
@@ -96,23 +96,6 @@ export default function GameContainer({ scenes, onComplete, onGameOver }: GameCo
     }
   };
 
-  useEffect(() => {
-    if (gamePhase !== 'choices' || !currentScene) return;
-
-    const handleNumberKey = (e: KeyboardEvent) => {
-      const num = parseInt(e.key);
-      if (num >= 1 && num <= currentScene.choices.length) {
-        const choice = currentScene.choices[num - 1];
-        if (choice && !selectedChoice) {
-          handleChoiceClick(choice);
-        }
-      }
-    };
-
-    window.addEventListener('keydown', handleNumberKey);
-    return () => window.removeEventListener('keydown', handleNumberKey);
-  }, [gamePhase, currentScene, selectedChoice]);
-
   const handleRestart = () => {
     setCurrentSceneIndex(0);
     setScore(0);
@@ -181,72 +164,44 @@ export default function GameContainer({ scenes, onComplete, onGameOver }: GameCo
     );
   }
 
+  const handleBattleChoiceSelect = (choiceIndex: number) => {
+    const choice = currentScene.choices[choiceIndex];
+    if (choice) {
+      handleChoiceClick(choice);
+    }
+  };
+
+  const battleChoices = currentScene.choices.map((choice, idx) => ({
+    text: choice.text,
+    index: idx,
+  }));
+
+  const battleFeedback = selectedChoice ? {
+    text: selectedChoice.feedback,
+    type: getFeedbackType(selectedChoice),
+    scoreChange: selectedChoice.score,
+  } : null;
+
   return (
-    <div className="relative min-h-screen bg-[#0f0f1e] pb-32">
-      <div className="max-w-4xl mx-auto p-4 md:p-8">
-        <div className="flex items-center justify-between mb-4">
-          <SceneCounter current={currentSceneIndex + 1} total={scenes.length} />
-        </div>
-
+    <div className="relative min-h-screen bg-[#0f0f1e]">
+      {/* HUD overlay for privacy meter and scene counter */}
+      <div className="fixed top-0 left-0 right-0 z-50 bg-[#0f0f1e]/90 p-2 flex items-center justify-between">
+        <SceneCounter current={currentSceneIndex + 1} total={scenes.length} />
         <PrivacyMeter privacyScore={privacyScore} />
-
-        {gamePhase === 'dialogue' && (
-          <DialogueBox
-            character={currentScene.character}
-            dialogue={currentScene.dialogue}
-            isComplete={dialogueComplete}
-            onComplete={handleDialogueComplete}
-            onAdvance={handleDialogueAdvance}
-            portraitImage={nurseNinaImg}
-          />
-        )}
-
-        {gamePhase === 'choices' && (
-          <div className="space-y-3">
-            <div className="bg-[#1a1a2e] border-4 border-[#FF6B9D] p-6 mb-4">
-              <p className="font-['Press_Start_2P'] text-white text-xs leading-relaxed">
-                {currentScene.dialogue}
-              </p>
-            </div>
-            {currentScene.choices.map((choice, index) => (
-              <ChoiceButton
-                key={index}
-                text={choice.text}
-                onClick={() => handleChoiceClick(choice)}
-                disabled={!!selectedChoice}
-                numberKey={index + 1}
-              />
-            ))}
-          </div>
-        )}
-
-        {gamePhase === 'feedback' && selectedChoice && (
-          <div>
-            <div className="bg-[#1a1a2e] border-4 border-[#FF6B9D] p-6 mb-4">
-              <p className="font-['Press_Start_2P'] text-white text-xs leading-relaxed">
-                {currentScene.dialogue}
-              </p>
-            </div>
-            
-            <FeedbackDisplay
-              feedback={selectedChoice.feedback}
-              type={getFeedbackType(selectedChoice)}
-              scoreChange={selectedChoice.score}
-            />
-
-            <div className="mt-6 text-center">
-              <Button
-                onClick={handleNextScene}
-                size="lg"
-                className="font-['Press_Start_2P'] text-xs bg-[#FF6B9D] hover:bg-[#ff8fb5] border-4 border-[#FF6B9D]"
-                data-testid="button-next"
-              >
-                {currentScene.isEnd ? 'VIEW RESULTS' : 'NEXT SCENE →'}
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
+
+      {/* Battle Encounter Screen */}
+      <BattleEncounterScreen
+        npcId={npcId || currentScene.character.toLowerCase().replace(/\s+/g, '_')}
+        npcName={npcName || currentScene.character}
+        dialogue={currentScene.dialogue}
+        choices={gamePhase === 'choices' ? battleChoices : undefined}
+        feedback={gamePhase === 'feedback' ? battleFeedback : null}
+        onChoiceSelect={handleBattleChoiceSelect}
+        onAdvance={gamePhase === 'dialogue' ? handleDialogueAdvance : gamePhase === 'feedback' ? handleNextScene : undefined}
+        onDialogueComplete={handleDialogueComplete}
+        phase={gamePhase}
+      />
     </div>
   );
 }

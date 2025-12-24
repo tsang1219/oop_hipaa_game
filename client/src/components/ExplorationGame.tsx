@@ -338,12 +338,16 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
       return null;
     }
     
+    const npc = currentRoom?.npcs.find(n => n.id === currentNPCId);
+    
     return (
       <div className="relative">
         <GameContainer 
           scenes={scenesForDialogue}
           onComplete={handleDialogueComplete}
           onGameOver={handleGameOver}
+          npcId={currentNPCId || undefined}
+          npcName={npc?.name}
         />
       </div>
     );
