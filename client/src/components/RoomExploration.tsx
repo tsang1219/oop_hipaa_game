@@ -231,17 +231,36 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
     if (gate) {
       return;
     }
-    startPathMovement({ x: npc.x, y: npc.y }, { type: 'npc', data: npc });
+    const distance = Math.abs(playerPos.x - npc.x) + Math.abs(playerPos.y - npc.y);
+    if (distance <= 1) {
+      onTriggerScene(npc.sceneId);
+    } else {
+      startPathMovement({ x: npc.x, y: npc.y }, { type: 'npc', data: npc });
+    }
   };
 
   const handleZoneClick = (zone: InteractionZone, e: React.MouseEvent) => {
     e.stopPropagation();
-    startPathMovement({ x: zone.x, y: zone.y }, { type: 'zone', data: zone });
+    const distance = Math.abs(playerPos.x - zone.x) + Math.abs(playerPos.y - zone.y);
+    if (distance <= 1) {
+      const hasGate = checkObservationGateTrigger(zone.id);
+      if (!hasGate) {
+        onZoneComplete?.(zone.id);
+        onTriggerScene(zone.sceneId);
+      }
+    } else {
+      startPathMovement({ x: zone.x, y: zone.y }, { type: 'zone', data: zone });
+    }
   };
 
   const handleItemClick = (item: EducationalItem, e: React.MouseEvent) => {
     e.stopPropagation();
-    startPathMovement({ x: item.x, y: item.y }, { type: 'item', data: item });
+    const distance = Math.abs(playerPos.x - item.x) + Math.abs(playerPos.y - item.y);
+    if (distance <= 1) {
+      setSelectedItem(item);
+    } else {
+      startPathMovement({ x: item.x, y: item.y }, { type: 'item', data: item });
+    }
   };
 
   const handleCloseModal = () => {
