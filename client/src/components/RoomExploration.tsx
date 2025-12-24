@@ -7,6 +7,7 @@ import ChecklistUI from './ChecklistUI';
 import NPCSprite from './NPCSprite';
 import PlayerSprite from './PlayerSprite';
 import ObjectSprite from './ObjectSprites';
+import FurnitureSprite from './FurnitureSprite';
 import ObservationHint from './ObservationHint';
 import ChoicePrompt from './ChoicePrompt';
 import { RoomProgressHUD } from './RoomProgressHUD';
@@ -455,18 +456,51 @@ export default function RoomExploration({ room, onTriggerScene, onExitRoom, onZo
           completedZones={completedZones}
           collectedItems={collectedItems}
         />
-        {room.obstacles.map((obstacle, index) => (
-          <div
-            key={`obstacle-${index}`}
-            className="absolute bg-muted opacity-30"
-            style={{
-              left: obstacle.x * TILE_SIZE,
-              top: obstacle.y * TILE_SIZE,
-              width: obstacle.width * TILE_SIZE,
-              height: obstacle.height * TILE_SIZE,
-            }}
-          />
-        ))}
+        {room.obstacles.map((obstacle, index) => {
+          const getFurnitureType = (obstacleType?: string, width?: number, height?: number): 'desk' | 'bed' | 'cabinet' | 'table' | 'counter' | 'rack' | 'shelf' | 'chair' => {
+            if (obstacleType) {
+              const typeMap: { [key: string]: 'desk' | 'bed' | 'cabinet' | 'table' | 'counter' | 'rack' | 'shelf' | 'chair' } = {
+                'desk': 'desk', 'bed': 'bed', 'cabinet': 'cabinet', 'table': 'table',
+                'counter': 'counter', 'rack': 'rack', 'shelf': 'shelf', 'chair': 'chair'
+              };
+              return typeMap[obstacleType] || 'desk';
+            }
+            if (width && width >= 3 && height && height >= 3) return 'cabinet';
+            if (width && width >= 4) return 'counter';
+            if (width && width >= 2 && height && height >= 2) return 'table';
+            return 'desk';
+          };
+          const furnitureType = getFurnitureType((obstacle as any).type, obstacle.width, obstacle.height);
+          return (
+            <div
+              key={`obstacle-${index}`}
+              className="absolute flex items-center justify-center"
+              style={{
+                left: obstacle.x * TILE_SIZE,
+                top: obstacle.y * TILE_SIZE,
+                width: obstacle.width * TILE_SIZE,
+                height: obstacle.height * TILE_SIZE,
+              }}
+            >
+              {obstacle.width === 1 && obstacle.height === 1 ? (
+                <FurnitureSprite type={furnitureType} size={TILE_SIZE} />
+              ) : (
+                <div
+                  className="w-full h-full"
+                  style={{
+                    background: 'linear-gradient(135deg, #8b7355 0%, #a0826d 50%, #8b7355 100%)',
+                    borderRadius: '4px',
+                    boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.3), inset -2px -2px 4px rgba(255,255,255,0.1)',
+                  }}
+                >
+                  <div className="flex items-center justify-center h-full">
+                    <FurnitureSprite type={furnitureType} size={Math.min(TILE_SIZE * 2, 64)} />
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
 
         {room.npcs.map((npc) => {
           if (npc.isFinalBoss && completedNPCs.size < totalScenarios - 1) {
