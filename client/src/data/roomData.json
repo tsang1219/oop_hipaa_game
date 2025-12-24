@@ -27,33 +27,46 @@
       "height": 15,
       "backgroundImage": "reception_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1},
-        {"x": 0, "y": 14, "width": 20, "height": 1},
-        {"x": 0, "y": 0, "width": 1, "height": 15},
-        {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 5, "y": 5, "width": 3, "height": 2},
-        {"x": 12, "y": 5, "width": 3, "height": 2}
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        
+        {"x": 7, "y": 2, "width": 6, "height": 2, "type": "desk"},
+        {"x": 6, "y": 2, "width": 1, "height": 3, "type": "desk"},
+        {"x": 13, "y": 2, "width": 1, "height": 3, "type": "desk"},
+        
+        {"x": 2, "y": 6, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 2, "y": 8, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 2, "y": 10, "width": 2, "height": 1, "type": "chairs"},
+        
+        {"x": 16, "y": 6, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 16, "y": 8, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 16, "y": 10, "width": 2, "height": 1, "type": "chairs"},
+        
+        {"x": 2, "y": 2, "width": 2, "height": 2, "type": "plant"},
+        {"x": 16, "y": 2, "width": 2, "height": 2, "type": "plant"}
       ],
       "npcs": [
         {
           "id": "riley",
           "name": "Front Desk Coordinator",
           "x": 10,
-          "y": 8,
+          "y": 4,
           "sceneId": "riley_scene1"
         },
         {
           "id": "nervous_patient",
           "name": "Nervous New Patient",
-          "x": 7,
-          "y": 10,
+          "x": 5,
+          "y": 8,
           "sceneId": "concerned_husband"
         },
         {
           "id": "chatty_visitor",
           "name": "Chatty Visitor",
-          "x": 13,
-          "y": 10,
+          "x": 15,
+          "y": 8,
           "sceneId": "celebrity_crisis"
         }
       ],
@@ -61,16 +74,16 @@
         {
           "id": "sign_in_sheet",
           "name": "Sign-in Sheet",
-          "x": 6,
-          "y": 6,
+          "x": 8,
+          "y": 4,
           "sceneId": "signin_violation",
           "spriteType": "poster"
         },
         {
           "id": "privacy_notice",
           "name": "Notice of Privacy Practices",
-          "x": 13,
-          "y": 6,
+          "x": 12,
+          "y": 4,
           "sceneId": "phone_privacy",
           "spriteType": "poster"
         }
@@ -80,8 +93,8 @@
           "id": "patient_rights_poster",
           "title": "Patient Rights 101",
           "type": "computer",
-          "x": 3,
-          "y": 3,
+          "x": 2,
+          "y": 4,
           "fact": "Under HIPAA, patients aren't just bodies in beds—they have actual power. The Big 5 Patient Rights: (1) Right to Access Their Records within 30 days, (2) Right to Request Amendments to incorrect info, (3) Right to an Accounting of Disclosures for the last 6 years, (4) Right to Request Restrictions on who sees their info, (5) Right to Confidential Communications. Bottom line: Patients own their health data. We're just the janitors managing it."
         }
       ],
@@ -124,33 +137,42 @@
       "height": 15,
       "backgroundImage": "er_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1},
-        {"x": 0, "y": 14, "width": 20, "height": 1},
-        {"x": 0, "y": 0, "width": 1, "height": 15},
-        {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 4, "y": 4, "width": 3, "height": 3},
-        {"x": 13, "y": 4, "width": 3, "height": 3}
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        
+        {"x": 8, "y": 5, "width": 4, "height": 3, "type": "nurse_station"},
+        
+        {"x": 2, "y": 2, "width": 4, "height": 3, "type": "patient_bay"},
+        {"x": 14, "y": 2, "width": 4, "height": 3, "type": "patient_bay"},
+        
+        {"x": 2, "y": 9, "width": 3, "height": 2, "type": "gurney"},
+        {"x": 15, "y": 9, "width": 3, "height": 2, "type": "gurney"},
+        
+        {"x": 5, "y": 12, "width": 2, "height": 1, "type": "equipment"},
+        {"x": 13, "y": 12, "width": 2, "height": 1, "type": "equipment"}
       ],
       "npcs": [
         {
           "id": "dr_martinez",
           "name": "Rushed ER Doctor",
           "x": 10,
-          "y": 7,
+          "y": 8,
           "sceneId": "dr_martinez_scene1"
         },
         {
           "id": "officer",
           "name": "Police Officer",
-          "x": 6,
-          "y": 10,
+          "x": 2,
+          "y": 7,
           "sceneId": "police_records"
         },
         {
           "id": "frantic_family",
           "name": "Frantic Family Member",
-          "x": 14,
-          "y": 10,
+          "x": 17,
+          "y": 7,
           "sceneId": "family_pressure"
         }
       ],
@@ -166,8 +188,8 @@
         {
           "id": "unlocked_computer",
           "name": "Computer Left Logged In",
-          "x": 5,
-          "y": 5,
+          "x": 7,
+          "y": 6,
           "sceneId": "unlocked_workstation",
           "spriteType": "computer"
         }
@@ -178,7 +200,7 @@
           "title": "When You CAN Share PHI",
           "type": "whiteboard",
           "x": 17,
-          "y": 10,
+          "y": 12,
           "fact": "HIPAA isn't trying to STOP healthcare—it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (with a warrant), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
         }
       ],
@@ -221,33 +243,39 @@
       "height": 15,
       "backgroundImage": "lab_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1},
-        {"x": 0, "y": 14, "width": 20, "height": 1},
-        {"x": 0, "y": 0, "width": 1, "height": 15},
-        {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 5, "y": 5, "width": 4, "height": 2},
-        {"x": 11, "y": 5, "width": 4, "height": 2}
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        
+        {"x": 5, "y": 5, "width": 10, "height": 2, "type": "lab_bench"},
+        
+        {"x": 2, "y": 2, "width": 3, "height": 2, "type": "microscope_station"},
+        {"x": 15, "y": 2, "width": 3, "height": 2, "type": "centrifuge"},
+        
+        {"x": 2, "y": 10, "width": 2, "height": 2, "type": "specimen_fridge"},
+        {"x": 16, "y": 10, "width": 2, "height": 2, "type": "bio_cabinet"}
       ],
       "npcs": [
         {
           "id": "lab_tech",
           "name": "Lab Technician",
           "x": 10,
-          "y": 8,
+          "y": 7,
           "sceneId": "lab_tech_scene"
         },
         {
           "id": "researcher",
           "name": "Curious Researcher",
-          "x": 6,
-          "y": 10,
+          "x": 3,
+          "y": 5,
           "sceneId": "research_request"
         },
         {
           "id": "courier",
           "name": "Sample Courier",
-          "x": 14,
-          "y": 10,
+          "x": 16,
+          "y": 5,
           "sceneId": "third_party_access"
         }
       ],
@@ -256,7 +284,7 @@
           "id": "sample_labels",
           "name": "Sample Labels",
           "x": 7,
-          "y": 6,
+          "y": 7,
           "sceneId": "sample_phi",
           "spriteType": "manual"
         },
@@ -264,7 +292,7 @@
           "id": "results_printout",
           "name": "Results Left on Counter",
           "x": 13,
-          "y": 6,
+          "y": 7,
           "sceneId": "exposed_results",
           "spriteType": "poster"
         }
@@ -274,8 +302,8 @@
           "id": "phi_identifiers",
           "title": "The 18 PHI Identifiers",
           "type": "manual",
-          "x": 3,
-          "y": 10,
+          "x": 2,
+          "y": 8,
           "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. PHI = The Big 18 Identifiers + Health Info. Think: names, addresses, SSNs, medical records, dates of birth, phone numbers, photos, basically anything that could identify a patient AND their health status. The Golden Rule: If you can connect health data to a specific person, congrats—it's PHI. Treat it like it's your own embarrassing medical history."
         }
       ],
@@ -320,34 +348,44 @@
       "height": 15,
       "backgroundImage": "records_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1},
-        {"x": 0, "y": 14, "width": 20, "height": 1},
-        {"x": 0, "y": 0, "width": 1, "height": 15},
-        {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 3, "y": 3, "width": 2, "height": 4},
-        {"x": 8, "y": 3, "width": 2, "height": 4},
-        {"x": 13, "y": 3, "width": 2, "height": 4}
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        
+        {"x": 3, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+        {"x": 5, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+        {"x": 7, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+        
+        {"x": 12, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+        {"x": 14, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+        {"x": 16, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+        
+        {"x": 8, "y": 8, "width": 4, "height": 2, "type": "clerk_desk"},
+        
+        {"x": 2, "y": 11, "width": 2, "height": 2, "type": "shredder_station"},
+        {"x": 16, "y": 11, "width": 2, "height": 2, "type": "scanner_station"}
       ],
       "npcs": [
         {
           "id": "records_clerk",
           "name": "Records Clerk",
           "x": 10,
-          "y": 8,
+          "y": 10,
           "sceneId": "records_access"
         },
         {
           "id": "patient_request",
           "name": "Patient Requesting File",
-          "x": 6,
-          "y": 10,
+          "x": 4,
+          "y": 8,
           "sceneId": "patient_access_rights"
         },
         {
           "id": "attorney",
           "name": "Attorney with Subpoena",
-          "x": 14,
-          "y": 10,
+          "x": 15,
+          "y": 8,
           "sceneId": "legal_request"
         }
       ],
@@ -356,23 +394,23 @@
           "id": "unlocked_cabinet",
           "name": "Unlocked File Cabinet",
           "x": 4,
-          "y": 5,
+          "y": 4,
           "sceneId": "unlocked_files",
           "spriteType": "manual"
         },
         {
           "id": "audit_log",
           "name": "Audit Log Screen",
-          "x": 9,
-          "y": 5,
+          "x": 7,
+          "y": 9,
           "sceneId": "access_audit",
           "spriteType": "computer"
         },
         {
           "id": "shredder",
           "name": "Document Shredder",
-          "x": 14,
-          "y": 5,
+          "x": 4,
+          "y": 12,
           "sceneId": "proper_disposal",
           "spriteType": "manual"
         }
@@ -426,33 +464,42 @@
       "height": 15,
       "backgroundImage": "it_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1},
-        {"x": 0, "y": 14, "width": 20, "height": 1},
-        {"x": 0, "y": 0, "width": 1, "height": 15},
-        {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 3, "y": 5, "width": 3, "height": 2},
-        {"x": 10, "y": 5, "width": 3, "height": 2}
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        
+        {"x": 2, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
+        {"x": 5, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
+        
+        {"x": 13, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
+        {"x": 16, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
+        
+        {"x": 8, "y": 5, "width": 4, "height": 2, "type": "workstation_cluster"},
+        
+        {"x": 2, "y": 10, "width": 3, "height": 2, "type": "monitoring_desk"},
+        {"x": 15, "y": 10, "width": 3, "height": 2, "type": "printer_station"}
       ],
       "npcs": [
         {
           "id": "security_analyst",
           "name": "Security Analyst",
-          "x": 11,
-          "y": 6,
+          "x": 10,
+          "y": 7,
           "sceneId": "security_training"
         },
         {
           "id": "vendor",
           "name": "Vendor Requesting Access",
-          "x": 6,
-          "y": 10,
+          "x": 3,
+          "y": 8,
           "sceneId": "vendor_access"
         },
         {
           "id": "workaround_employee",
           "name": "Employee Needs Workaround",
-          "x": 14,
-          "y": 10,
+          "x": 16,
+          "y": 8,
           "sceneId": "convenience_vs_security"
         }
       ],
@@ -460,16 +507,16 @@
         {
           "id": "password_note",
           "name": "Password Sticky Note",
-          "x": 4,
-          "y": 6,
+          "x": 9,
+          "y": 7,
           "sceneId": "password_sharing",
           "spriteType": "poster"
         },
         {
           "id": "breach_playbook",
           "name": "Breach Response Playbook",
-          "x": 14,
-          "y": 8,
+          "x": 5,
+          "y": 10,
           "sceneId": "breach_response",
           "spriteType": "manual"
         }
@@ -479,8 +526,8 @@
           "id": "security_safeguards",
           "title": "Technical Safeguards",
           "type": "whiteboard",
-          "x": 17,
-          "y": 3,
+          "x": 10,
+          "y": 2,
           "fact": "HIPAA's Security Rule demands three types of safeguards: Administrative (policies, training, risk assessments), Physical (locks, badge access, workstation security), and Technical (encryption, access controls, audit logs). The Three A's: Authentication (prove who you are), Authorization (prove you should have access), and Audit (prove what you did). Strong passwords, automatic logoffs, and encryption aren't optional—they're the walls that keep the vault secure."
         }
       ],
@@ -522,32 +569,43 @@
       "height": 15,
       "backgroundImage": "break_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1},
-        {"x": 0, "y": 14, "width": 20, "height": 1},
-        {"x": 0, "y": 0, "width": 1, "height": 15},
-        {"x": 19, "y": 0, "width": 1, "height": 15},
-        {"x": 8, "y": 7, "width": 4, "height": 2}
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        
+        {"x": 8, "y": 6, "width": 4, "height": 3, "type": "lunch_table"},
+        
+        {"x": 2, "y": 2, "width": 2, "height": 3, "type": "vending_machine"},
+        {"x": 5, "y": 2, "width": 2, "height": 3, "type": "vending_machine"},
+        
+        {"x": 15, "y": 2, "width": 3, "height": 2, "type": "coffee_station"},
+        
+        {"x": 2, "y": 10, "width": 3, "height": 2, "type": "couch"},
+        {"x": 15, "y": 10, "width": 3, "height": 2, "type": "couch"},
+        
+        {"x": 13, "y": 6, "width": 1, "height": 2, "type": "trash_bin"}
       ],
       "npcs": [
         {
           "id": "gossiping_coworker",
           "name": "Gossiping Coworker",
-          "x": 6,
-          "y": 8,
+          "x": 7,
+          "y": 7,
           "sceneId": "gary_gossip"
         },
         {
           "id": "friend_fishing",
           "name": "Friend from Another Dept",
-          "x": 14,
-          "y": 8,
+          "x": 16,
+          "y": 5,
           "sceneId": "chatty_cathy"
         },
         {
           "id": "tired_employee",
           "name": "Exhausted Employee",
-          "x": 10,
-          "y": 11,
+          "x": 4,
+          "y": 12,
           "sceneId": "fatigue_lapse"
         }
       ],
@@ -555,16 +613,16 @@
         {
           "id": "overheard_conversation",
           "name": "Overheard Conversation",
-          "x": 9,
-          "y": 8,
+          "x": 10,
+          "y": 9,
           "sceneId": "intervene_gossip",
           "spriteType": "poster"
         },
         {
           "id": "unlocked_phone",
           "name": "Phone Left Unlocked",
-          "x": 14,
-          "y": 5,
+          "x": 6,
+          "y": 7,
           "sceneId": "phone_security",
           "spriteType": "computer"
         }
@@ -574,8 +632,8 @@
           "id": "verbal_disclosure",
           "title": "The Art of the HIPAA Shutdown",
           "type": "poster",
-          "x": 16,
-          "y": 3,
+          "x": 17,
+          "y": 4,
           "fact": "Not everyone who asks for PHI gets it. Sometimes your job is to be the bouncer at Club Medical Records. Automatic NO Situations: Family Members Without Authorization, Employers asking for diagnosis (they get work notes only), Marketing Without Authorization, Anyone Via Unsecured Communication (no texting lab results!). The Script: 'I'm unable to confirm or deny any patient information without proper authorization.' Saying no to inappropriate requests is literally your job."
         }
       ],
