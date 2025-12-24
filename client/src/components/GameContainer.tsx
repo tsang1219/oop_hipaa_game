@@ -41,7 +41,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
     const newScore = score + choice.score;
     setScore(newScore);
 
-    const privacyChange = choice.score < 0 ? choice.score : choice.score > 0 ? 5 : 0;
+    const privacyChange = choice.score < 0 ? choice.score : 0;
     const newPrivacyScore = Math.max(0, Math.min(100, privacyScore + privacyChange));
     setPrivacyScore(newPrivacyScore);
 
