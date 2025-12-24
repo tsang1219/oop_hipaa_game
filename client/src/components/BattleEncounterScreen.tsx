@@ -241,11 +241,11 @@ export default function BattleEncounterScreen({
                    feedback.type === 'partial' ? '~ PARTIAL' :
                    '✗ INCORRECT'}
                 </span>
-                <span className={`font-['Press_Start_2P'] text-xs ${
-                  feedback.scoreChange >= 0 ? 'text-green-400' : 'text-red-400'
-                }`}>
-                  {feedback.scoreChange >= 0 ? `+${feedback.scoreChange}` : feedback.scoreChange}
-                </span>
+                {feedback.scoreChange < 0 && (
+                  <span className="font-['Press_Start_2P'] text-xs text-red-400">
+                    {feedback.scoreChange} trust
+                  </span>
+                )}
               </div>
               <p className="font-['Press_Start_2P'] text-white text-xs leading-relaxed">
                 {feedback.text}
