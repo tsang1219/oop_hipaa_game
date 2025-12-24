@@ -39,6 +39,7 @@ interface HallwayHubProps {
   completedRooms: string[];
   collectedStories: string[];
   onViewStory: (roomId: string) => void;
+  privacyScore?: number;
 }
 
 const ROOM_ICONS: Record<string, LucideIcon> = {
@@ -73,9 +74,16 @@ export default function HallwayHub({
   onSelectRoom, 
   completedRooms, 
   collectedStories,
-  onViewStory 
+  onViewStory,
+  privacyScore = 100
 }: HallwayHubProps) {
   const [hoveredRoom, setHoveredRoom] = useState<string | null>(null);
+
+  const getTrustStatus = (): string => {
+    if (privacyScore >= 70) return 'Patients trust freely';
+    if (privacyScore >= 40) return 'Trust is eroding...';
+    return 'Trust is breaking!';
+  };
 
   const isRoomUnlocked = (room: Room): boolean => {
     if (room.alwaysUnlocked) return true;
@@ -101,6 +109,20 @@ export default function HallwayHub({
         <h2 className="text-xl font-bold text-primary mb-2" data-testid="text-hub-title">
           HALLWAY HUB
         </h2>
+        <div className="mb-4 p-4 bg-card border-2 border-game-border rounded">
+          <div className="text-xs text-muted-foreground mb-2">COMMUNITY TRUST METER</div>
+          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded h-3 overflow-hidden mb-2">
+            <div
+              className={`h-full transition-all duration-300 ${
+                privacyScore >= 70 ? 'bg-green-500' : privacyScore >= 40 ? 'bg-yellow-500' : 'bg-red-500'
+              }`}
+              style={{ width: `${privacyScore}%` }}
+            />
+          </div>
+          <div className="text-xs font-['Press_Start_2P'] text-foreground">
+            {getTrustStatus()} — {privacyScore}/100
+          </div>
+        </div>
         <p className="text-xs text-muted-foreground mb-1">
           Your first day as Privacy Guardian. Something feels off...
         </p>

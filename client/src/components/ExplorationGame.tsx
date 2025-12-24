@@ -68,6 +68,10 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
   const [showStoryModal, setShowStoryModal] = useState(false);
   const [currentStoryRoom, setCurrentStoryRoom] = useState<RoomWithStory | null>(null);
   const [isNewStory, setIsNewStory] = useState(false);
+  const [privacyScore, setPrivacyScore] = useState<number>(() => {
+    const saved = localStorage.getItem('current-privacy-score');
+    return saved ? parseInt(saved) : 100;
+  });
 
   const totalEducationalItems = rooms.reduce((sum, room) => sum + room.educationalItems.length, 0);
   const totalScenarios = rooms.reduce((sum, room) => sum + room.npcs.filter(npc => !npc.isFinalBoss).length, 0);
@@ -91,6 +95,10 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
   useEffect(() => {
     localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(collectedItems)));
   }, [collectedItems]);
+
+  useEffect(() => {
+    localStorage.setItem('current-privacy-score', privacyScore.toString());
+  }, [privacyScore]);
 
   useEffect(() => {
     const savedProgress = localStorage.getItem('hipaa-exploration-progress');
@@ -253,7 +261,12 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
 
   const handleGameOver = (finalScore: number) => {
     setFinalPrivacyScore(finalScore);
+    setPrivacyScore(finalScore);
     setGameMode('gameover');
+  };
+
+  const handlePrivacyScoreChange = (newScore: number) => {
+    setPrivacyScore(newScore);
   };
 
   const handlePlayAgain = () => {
@@ -307,6 +320,7 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
         completedRooms={completedRooms}
         collectedStories={collectedStories}
         onViewStory={handleViewStory}
+        privacyScore={privacyScore}
       />
     );
   }
@@ -348,6 +362,8 @@ export default function ExplorationGame({ rooms, scenes }: ExplorationGameProps)
           onGameOver={handleGameOver}
           npcId={currentNPCId || undefined}
           npcName={npc?.name}
+          initialPrivacyScore={privacyScore}
+          onPrivacyScoreChange={handlePrivacyScoreChange}
         />
       </div>
     );

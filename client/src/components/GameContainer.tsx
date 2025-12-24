@@ -16,12 +16,14 @@ interface GameContainerProps {
   onGameOver?: (finalScore: number) => void;
   npcId?: string;
   npcName?: string;
+  initialPrivacyScore?: number;
+  onPrivacyScoreChange?: (score: number) => void;
 }
 
-export default function GameContainer({ scenes, onComplete, onGameOver, npcId, npcName }: GameContainerProps) {
+export default function GameContainer({ scenes, onComplete, onGameOver, npcId, npcName, initialPrivacyScore = 100, onPrivacyScoreChange }: GameContainerProps) {
   const [currentSceneIndex, setCurrentSceneIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [privacyScore, setPrivacyScore] = useState(100);
+  const [privacyScore, setPrivacyScore] = useState(initialPrivacyScore);
   const [selectedChoice, setSelectedChoice] = useState<Choice | null>(null);
   const [gameComplete, setGameComplete] = useState(false);
   const [gamePhase, setGamePhase] = useState<GamePhase>('dialogue');
@@ -44,6 +46,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
     const privacyChange = choice.score < 0 ? choice.score : 0;
     const newPrivacyScore = Math.max(0, Math.min(100, privacyScore + privacyChange));
     setPrivacyScore(newPrivacyScore);
+    onPrivacyScoreChange?.(newPrivacyScore);
 
     if (newPrivacyScore <= 0) {
       onGameOver?.(0);
