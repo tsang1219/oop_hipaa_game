@@ -1,0 +1,177 @@
+PRD: HIPAA Security Tower Defense - "Breach Defense"
+Version: 1.0 - One-Shot Replit Build
+Target Duration: 10-12 minutes (gameplay + education)
+Platform: Desktop-first
+Aesthetic: Out of Pocket (pink #FF6B9D, cream #FFF8F0, snarky + compliant)
+
+Core Concept
+A tower defense game where players defend a hospital network from cyber threats by deploying security controls. No perfect defense exists - the game escalates until inevitable breach, teaching that security is about delay and mitigation, not invincibility.
+
+Visual Identity
+Color Palette
+
+Primary Pink: #FF6B9D (towers, correct actions, UI accents)
+Cream Background: #FFF8F0 (game board, UI panels)
+Text Black: #1A1A1A (all text, outlines)
+Danger Red: #E74C3C (breaches, critical alerts)
+Success Green: #2ECC71 (threat eliminated)
+
+Typography
+
+Press Start 2P: All UI text, numbers, tooltips
+Pixel-perfect 16-bit aesthetic throughout
+
+Grid Design
+Hospital Network Diagram Style:
+
+10x6 grid representing network infrastructure
+Left column: "Internet Entry Points" (where threats spawn)
+Right column: "Patient Data Servers" (what you're protecting)
+Middle cells: Network pathways + tower placement zones
+Visual elements: Pixelated server racks, workstation icons, network cables connecting cells
+
+
+Game Mechanics
+Grid System (Tier 3 - Multi-Path)
+
+10 columns × 6 rows = 60 total cells
+3 defined paths from left (spawn points) to right (servers)
+
+Path 1: Top route (rows 1-2)
+Path 2: Middle route (rows 3-4)
+Path 3: Bottom route (rows 5-6)
+
+
+Tower placement: Empty cells not on paths (approximately 30-35 placeable zones)
+No pathfinding AI: Threats follow preset paths, can't reroute
+
+Resource Economy (Moderate)
+
+Starting Budget: 250 Security Budget
+Tower Costs: Range from 75-200 (varied by power)
+Threat Rewards: 40-150 per elimination (based on threat difficulty)
+No upgrades, no selling: Keep it simple - placement decisions are permanent
+Balance goal: Player should be able to place 2-3 towers initially, then earn budget to expand
+
+Win/Loss Mechanics
+Security Score System:
+
+Start with 100 Security Score
+Each breach (threat reaches server) = -20 points
+Allows 5 total breaches before game over
+Score hits 0 = "Total Network Compromise" game over screen
+
+Escalation Design (Critical):
+
+Waves 1-5: Manageable with good strategy
+Waves 6-8: Difficulty spikes dramatically
+Waves 9-10: Nearly impossible - game SHOULD end in defeat
+Final screen messaging: "No security is perfect. You delayed the inevitable for X minutes. In real healthcare, that delay saves lives."
+
+Scoring:
+
+Base score = Security Score remaining × 10
++50 points per wave survived
++100 bonus if zero breaches occurred (unlikely by design)
+Time bonus: +5 points per second survived
+
+
+Threats (4 Types)
+1. Phishing Email 🎣
+
+Health: 50 HP
+Speed: Medium (1 cell/second)
+Reward: +50 budget
+Visual: Pink envelope with exaggerated fishhook
+Snarky Name: "Click Here to Win Free iPad!"
+Tooltip: "Sent from 'IT-Department-Definitely-Real@gmail.com' - Your employees will definitely click this."
+
+2. Ransomware 💀
+
+Health: 150 HP
+Speed: Slow (0.5 cells/second)
+Reward: +100 budget
+Visual: Skull icon with padlock, leaves "encrypted" visual trail
+Snarky Name: "CryptoLocker's Annoying Cousin"
+Tooltip: "Encrypts everything and demands Bitcoin. Yes, even the fax machine."
+
+3. Insider Threat 👤
+
+Health: 75 HP
+Speed: Fast (1.5 cells/second)
+Reward: +75 budget
+Visual: Employee badge icon with shifty eyes
+Snarky Name: "Disgruntled Dave from IT"
+Tooltip: "He's got legitimate access and a grudge. Good luck stopping him."
+
+4. Unpatched Vulnerability 🪲
+
+Health: 200 HP (increases +10 HP every 5 seconds it's alive)
+Speed: Very slow (0.3 cells/second)
+Reward: +150 budget
+Visual: Cracked shield icon, glowing red cracks expand over time
+Snarky Name: "That Windows Update You Keep Ignoring"
+Tooltip: "Gets stronger the longer you ignore it. Sound familiar?"
+
+
+Towers (4 Types)
+1. MFA Tower 🔐
+
+Cost: 100 budget
+Damage: 25 per shot
+Range: 2 cells (all directions)
+Fire Rate: 1 shot/second
+Visual: Pink padlock icon with two keys
+Snarky Name: "Password + Your Mom's Maiden Name"
+Tooltip: "Multi-Factor Authentication: Because 'Password123' wasn't cutting it."
+
+2. Firewall Wall 🧱
+
+Cost: 75 budget
+Damage: 10 per shot
+Range: 1 cell (adjacent only)
+Fire Rate: 2 shots/second
+Special: Can be placed ON paths, forcing threats to slow down
+Visual: Pixelated brick wall with flames
+Snarky Name: "The Bouncer"
+Tooltip: "Blocks sketchy traffic. Wishes it could block annoying coworkers too."
+
+3. Encryption Shield 🛡️
+
+Cost: 150 budget
+Damage: 15 per shot
+Range: 3 cells (wide coverage)
+Fire Rate: 0.5 shots/second (slow)
+Special: If breach occurs in its range, reduces Security Score loss by 50% (-10 instead of -20)
+Visual: Glowing pink shield with binary code
+Snarky Name: "AES-256 or Bust"
+Tooltip: "Encrypts your data so breaches hurt less. It's like insurance, but nerdier."
+
+4. Patch Cannon 🔧
+
+Cost: 200 budget
+Damage: 50 per shot (highest)
+Range: 2 cells
+Fire Rate: 0.75 shots/second
+Special: Deals 2x damage to Unpatched Vulnerabilities (100 per shot)
+Visual: Wrench launching from cannon
+Snarky Name: "Update and Pray"
+Tooltip: "Installs critical updates. Takes forever. Requires three restarts. But it works."
+
+
+Wave Structure (10 Waves Total)
+Design Philosophy: Manageable start → educational pacing → inevitable overwhelming finale
+WaveThreatsEducational Splash Screen15× Phishing"Welcome to Network Defense" (30 sec)27× Phishing, 2× InsiderNone35× Phishing, 3× Ransomware"The Ransomware Epidemic" (30 sec)44× Insider, 3× PhishingNone51× Unpatched Vuln, 5× Phishing"Patch Management 101" (30 sec)68× Phishing, 3× Ransomware, 2× InsiderNone72× Unpatched Vuln, 5× Ransomware"Defense in Depth" (30 sec)810× Insider, 3× RansomwareNone93× Unpatched Vuln, 8× Phishing, 4× InsiderNone1015× ALL TYPES (chaos wave)None - good luck
+Wave Timing:
+
+10 second pause between waves (except before educational splashes = 30 sec pause)
+Threats spawn with 2-second delays between each
+
+
+Educational Content (Option A: Pre-Wave Splash Screens)
+Splash Screen 1: Before Wave 1
+Title: "Welcome to Network Defense"
+Content:
+"You're the new Security Officer at Startup General Hospital. Your job? Keep patient data from leaking onto the dark web.
+Threats enter from the left. Your servers (with all the juicy PHI) are on the right. Deploy security controls to stop attacks.
+Spoiler alert: You're going to lose eventually. Real security is about buying time, not achieving perfection."
