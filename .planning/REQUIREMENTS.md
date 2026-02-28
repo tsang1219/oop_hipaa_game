@@ -95,30 +95,30 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SFX-01 | — | Pending |
-| SFX-02 | — | Pending |
-| SFX-03 | — | Pending |
-| SFX-04 | — | Pending |
-| SFX-05 | — | Pending |
-| SFX-06 | — | Pending |
-| SFX-07 | — | Pending |
-| ANIM-01 | — | Pending |
-| VFX-01 | — | Pending |
-| VFX-02 | — | Pending |
-| VFX-03 | — | Pending |
-| HUD-01 | — | Pending |
-| HUD-02 | — | Pending |
-| HUD-03 | — | Pending |
-| HUD-04 | — | Pending |
-| HUD-05 | — | Pending |
-| ONBD-01 | — | Pending |
-| ONBD-02 | — | Pending |
+| SFX-01 | Phase 1 | Pending |
+| SFX-02 | Phase 1 | Pending |
+| SFX-03 | Phase 1 | Pending |
+| SFX-04 | Phase 1 | Pending |
+| SFX-05 | Phase 1 | Pending |
+| SFX-06 | Phase 1 | Pending |
+| SFX-07 | Phase 1 | Pending |
+| ANIM-01 | Phase 2 | Pending |
+| VFX-01 | Phase 3 | Pending |
+| VFX-02 | Phase 3 | Pending |
+| VFX-03 | Phase 3 | Pending |
+| HUD-01 | Phase 4 | Pending |
+| HUD-02 | Phase 4 | Pending |
+| HUD-03 | Phase 4 | Pending |
+| HUD-04 | Phase 4 | Pending |
+| HUD-05 | Phase 4 | Pending |
+| ONBD-01 | Phase 5 | Pending |
+| ONBD-02 | Phase 5 | Pending |
 
 **Coverage:**
 - v1 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18 ⚠️
+- Mapped to phases: 18
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-02-28 after initial definition*
+*Last updated: 2026-02-28 after roadmap creation — all 18 requirements mapped*
