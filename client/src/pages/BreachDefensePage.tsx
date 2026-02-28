@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
 import { PhaserGame } from '../phaser/PhaserGame';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
-import { TOWERS, THREATS, WAVES } from '../game/breach-defense/constants';
+import { TOWERS, WAVES } from '../game/breach-defense/constants';
 import { TUTORIAL_CONTENT } from '../game/breach-defense/tutorialContent';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { RecapModal } from '../components/breach-defense/RecapModal';
@@ -44,6 +44,8 @@ export default function BreachDefensePage() {
   const sceneStarted = useRef(false);
 
   useEffect(() => {
+    sceneStarted.current = false;
+
     const onSceneReady = (sceneKey: string) => {
       if (sceneKey === 'Boot' && !sceneStarted.current) {
         sceneStarted.current = true;
