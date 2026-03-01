@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Both games must feel like real games — not prototypes. Sound, visual feedback, and player guidance close the gap between "it works" and "it's fun to play."
-**Current focus:** Phase 3 — BreachDefense Visual Effects
+**Current focus:** Phase 4 — BreachDefense HUD Data Events
 
 ## Current Position
 
-Phase: 3 of 5 (BreachDefense Visual Effects)
-Plan: 1 of 1 in current phase
-Status: Phase 03 plan 01 complete — 03-01 executed
-Last activity: 2026-03-01 — Completed 03-01: BreachDefense combat VFX (particles + recoil + color flash)
+Phase: 4 of 5 (BreachDefense HUD Data)
+Plan: 1 of 2 in current phase
+Status: Phase 04 plan 01 complete — 04-01 executed
+Last activity: 2026-03-01 — Completed 04-01: BreachDefense HUD data events (BREACH_WAVE_START, enhanced wave complete, per-wave kill tracking, tutorialContent gaps)
 
-Progress: [████░░░░░░] 33%
+Progress: [█████░░░░░] 40%
 
 ## Performance Metrics
 
@@ -42,9 +42,10 @@ Progress: [████░░░░░░] 33%
 |-------|-------|-------|----------|
 | 02-walk-cycle-animation | 1 | 2 min | 2 min |
 | 03-breachdefense-visual-effects | 1 | 2 min | 2 min |
+| 04-breachdefense-hud-data | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2 min), 03-01 (2 min)
+- Last 5 plans: 02-01 (2 min), 03-01 (2 min), 04-01 (2 min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -65,6 +66,8 @@ Recent decisions affecting current work:
 - 02-01: ignoreIfPlaying=true on all anims.play() prevents animation restart jitter on held keys
 - 03-01: depth not in ParticleEmitterConfig — set via emitter.setDepth() after construction
 - 03-01: Single white particle_circle texture tinted at emit time handles all 8 threat death colors
+- 04-01: BREACH_WAVE_START guarded by shownWaveStartBanners Set — fires exactly once per wave
+- 04-01: BREACH_TUTORIAL_TRIGGER delayed 3500ms via Phaser delayedCall so banner shows before modal
 
 ### Pending Todos
 
@@ -79,5 +82,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 03-01-PLAN.md (BreachDefense visual effects)
+Stopped at: Completed 04-01-PLAN.md (BreachDefense HUD data events)
 Resume file: None

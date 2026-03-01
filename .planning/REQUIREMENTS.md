@@ -106,11 +106,11 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VFX-01 | Phase 3 | Complete |
 | VFX-02 | Phase 3 | Complete |
 | VFX-03 | Phase 3 | Complete |
-| HUD-01 | Phase 4 | Pending |
+| HUD-01 | Phase 4 | In Progress (data events: 04-01) |
 | HUD-02 | Phase 4 | Pending |
 | HUD-03 | Phase 4 | Pending |
-| HUD-04 | Phase 4 | Pending |
-| HUD-05 | Phase 4 | Pending |
+| HUD-04 | Phase 4 | In Progress (data events: 04-01) |
+| HUD-05 | Phase 4 | In Progress (data events: 04-01) |
 | ONBD-01 | Phase 5 | Pending |
 | ONBD-02 | Phase 5 | Pending |
 

@@ -74,7 +74,11 @@ Plans:
   3. Hovering or selecting a tower in the selection panel shows that tower's description text
   4. A wave end message is displayed when a wave completes
   5. Incoming threat type icons are shown before wave enemies begin spawning
-**Plans**: TBD
+**Plans**: 2 plans
+
+Plans:
+- [x] 04-01-PLAN.md — EventBridge BREACH_WAVE_START event, enhanced BREACH_WAVE_COMPLETE with endMessage + stats, per-wave kill tracking, tutorialContent LAYERS/PASSWORDS recaps (completed 2026-03-01)
+- [ ] 04-02-PLAN.md — React HUD components: wave intro banner, suggested tower hints, tower hover descriptions, wave end message display
 
 ### Phase 5: PrivacyQuest Onboarding
 **Goal**: First-time players know how to move and interact without getting stuck on room entry
@@ -96,5 +100,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Audio Foundation | 0/? | Not started | - |
 | 2. Walk Cycle Animation | 1/1 | Complete    | 2026-03-01 |
 | 3. BreachDefense Visual Effects | 1/1 | Complete    | 2026-03-01 |
-| 4. BreachDefense HUD Data | 0/? | Not started | - |
+| 4. BreachDefense HUD Data | 1/2 | In progress | - |
 | 5. PrivacyQuest Onboarding | 0/? | Not started | - |
