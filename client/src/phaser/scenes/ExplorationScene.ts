@@ -53,6 +53,10 @@ export class ExplorationScene extends Phaser.Scene {
   // Track last facing direction for idle restore after animation stop
   private lastFacingTexture = 'player_down';
 
+  // NPC pulse tween for onboarding hint
+  private npcPulseTween: Phaser.Tweens.Tween | null = null;
+  private npcPulseTarget: InteractableData | null = null;
+
   constructor() {
     super({ key: 'Exploration' });
   }
@@ -73,6 +77,11 @@ export class ExplorationScene extends Phaser.Scene {
     this.moveTimer = null;
     this.pendingInteraction = null;
     this.paused = false;
+    if (this.npcPulseTween) {
+      this.npcPulseTween.stop();
+      this.npcPulseTween = null;
+    }
+    this.npcPulseTarget = null;
   }
 
   create() {
@@ -196,6 +205,22 @@ export class ExplorationScene extends Phaser.Scene {
       this.interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
     }
 
+    // Pulse first NPC if this room hasn't been pulsed yet
+    const firstNpc = this.interactables.find(ia => ia.type === 'npc');
+    const roomPulseKey = `pq:room:${this.room.id}:npcPulsed`;
+    if (firstNpc && !localStorage.getItem(roomPulseKey)) {
+      this.npcPulseTarget = firstNpc;
+      this.npcPulseTween = this.tweens.add({
+        targets: firstNpc.sprite,
+        scaleX: 1.15,
+        scaleY: 1.15,
+        duration: 500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+
     // ── Player ───────────────────────────────────────────────────
     this.tileX = room.spawnPoint.x;
     this.tileY = room.spawnPoint.y;
@@ -265,6 +290,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     // ── Listen for React events ──────────────────────────────────
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
   }
@@ -343,7 +369,12 @@ export class ExplorationScene extends Phaser.Scene {
 
   shutdown() {
     eventBridge.off(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     if (this.moveTimer) this.moveTimer.destroy();
+    if (this.npcPulseTween) {
+      this.npcPulseTween.stop();
+      this.npcPulseTween = null;
+    }
   }
 
   // ── Pathfinding (BFS on tile grid) ─────────────────────────────
@@ -483,6 +514,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   // ── Interaction ────────────────────────────────────────────────
   private triggerInteraction(ia: InteractableData) {
+    this.stopNpcPulse(ia);
     this.paused = true;
     this.movePath = [];
 
@@ -516,6 +548,22 @@ export class ExplorationScene extends Phaser.Scene {
   private onDialogueComplete = () => {
     this.paused = false;
   };
+
+  // ── Pause from modal (intro / help icon) ───────────────────────
+  private onPauseFromModal = () => {
+    this.paused = true;
+  };
+
+  // ── Stop NPC pulse on interaction ──────────────────────────────
+  private stopNpcPulse(ia: InteractableData) {
+    if (this.npcPulseTarget === ia && this.npcPulseTween) {
+      this.npcPulseTween.stop();
+      this.npcPulseTween = null;
+      ia.sprite.setScale(1); // Reset to neutral scale
+      localStorage.setItem(`pq:room:${this.room.id}:npcPulsed`, '1');
+      this.npcPulseTarget = null;
+    }
+  }
 
   // ── Public: update completion state from React ─────────────────
   updateCompletionState(npcs: string[], zones: string[], items: string[]) {
