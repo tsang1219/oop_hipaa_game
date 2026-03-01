@@ -121,4 +121,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-03-01 after 05-01 execution — ONBD-01 and ONBD-02 complete*
+*Last updated: 2026-03-01 after Phase 1 execution — all 18 v1 requirements complete*

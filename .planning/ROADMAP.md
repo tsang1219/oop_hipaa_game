@@ -12,7 +12,7 @@ Both games are functionally complete. This milestone closes the gap between "it 
 
 Decimal phases appear between their surrounding integers in numeric order.
 
-- [ ] **Phase 1: Audio Foundation** - Preload 6-7 SFX in BootScene and wire playback at each trigger point across both games
+- [x] **Phase 1: Audio Foundation** - Preload 6-7 SFX in BootScene and wire playback at each trigger point across both games (completed 2026-03-01)
 - [x] **Phase 2: Walk Cycle Animation** - Add 4-direction player walk animation in PrivacyQuest (spritesheet or programmatic) (completed 2026-03-01)
 - [x] **Phase 3: BreachDefense Visual Effects** - Enemy death particle burst, tower firing recoil tween, and strong-match color pulse (completed 2026-03-01)
 - [x] **Phase 4: BreachDefense HUD Data** - Surface wave intro, suggested towers, tower hover descriptions, and end messages from constants.ts (completed 2026-03-01)
@@ -33,10 +33,10 @@ Decimal phases appear between their surrounding integers in numeric order.
 **Plans**: 4 plans
 
 Plans:
-- [ ] 01-01-PLAN.md — Human checkpoint: curate/place 6 Kenney CC0 OGG files + register in BootScene.preload()
-- [ ] 01-02-PLAN.md — ExplorationScene SFX: footstep (WASD throttle + BFS step) + interact/confirm
-- [ ] 01-03-PLAN.md — BreachDefenseScene SFX: tower placement, enemy death + floating kill label, breach alert, wave-start activateWave()
-- [ ] 01-04-PLAN.md — Mute toggle: React HUD button in both pages with localStorage persistence
+- [x] 01-01-PLAN.md — Human checkpoint: curate/place 6 Kenney CC0 OGG files + register in BootScene.preload() (completed 2026-03-01)
+- [x] 01-02-PLAN.md — ExplorationScene SFX: footstep (WASD throttle + BFS step) + interact/confirm (completed 2026-03-01)
+- [x] 01-03-PLAN.md — BreachDefenseScene SFX: tower placement, enemy death + floating kill label, breach alert, wave-start activateWave() (completed 2026-03-01)
+- [x] 01-04-PLAN.md — Mute toggle: React HUD button in both pages with localStorage persistence (completed 2026-03-01)
 
 ### Phase 2: Walk Cycle Animation
 **Goal**: The PrivacyQuest player character animates while moving — no more gliding rectangle
@@ -100,7 +100,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Audio Foundation | 3/4 | In Progress|  |
+| 1. Audio Foundation | 4/4 | Complete    | 2026-03-01 |
 | 2. Walk Cycle Animation | 1/1 | Complete    | 2026-03-01 |
 | 3. BreachDefense Visual Effects | 1/1 | Complete    | 2026-03-01 |
 | 4. BreachDefense HUD Data | 2/2 | Complete    | 2026-03-01 |
