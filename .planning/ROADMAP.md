@@ -15,7 +15,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [ ] **Phase 1: Audio Foundation** - Preload 6-7 SFX in BootScene and wire playback at each trigger point across both games
 - [x] **Phase 2: Walk Cycle Animation** - Add 4-direction player walk animation in PrivacyQuest (spritesheet or programmatic) (completed 2026-03-01)
 - [x] **Phase 3: BreachDefense Visual Effects** - Enemy death particle burst, tower firing recoil tween, and strong-match color pulse (completed 2026-03-01)
-- [ ] **Phase 4: BreachDefense HUD Data** - Surface wave intro, suggested towers, tower hover descriptions, and end messages from constants.ts
+- [x] **Phase 4: BreachDefense HUD Data** - Surface wave intro, suggested towers, tower hover descriptions, and end messages from constants.ts (completed 2026-03-01)
 - [ ] **Phase 5: PrivacyQuest Onboarding** - First-visit intro modal and first-NPC pulsing highlight
 
 ## Phase Details
@@ -100,5 +100,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Audio Foundation | 0/? | Not started | - |
 | 2. Walk Cycle Animation | 1/1 | Complete    | 2026-03-01 |
 | 3. BreachDefense Visual Effects | 1/1 | Complete    | 2026-03-01 |
-| 4. BreachDefense HUD Data | 1/2 | In progress | - |
+| 4. BreachDefense HUD Data | 1/2 | Complete    | 2026-03-01 |
 | 5. PrivacyQuest Onboarding | 0/? | Not started | - |
