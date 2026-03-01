@@ -19,6 +19,8 @@ interface EnemyData {
   hpBarBg: Phaser.GameObjects.Rectangle;
   hpBarFill: Phaser.GameObjects.Rectangle;
   flashUntil: number;
+  strongFlashUntil: number;
+  strongFlashColor: number;
 }
 
 interface TowerData {
@@ -39,6 +41,7 @@ interface ProjectileData {
   speed: number;
   color: number;
   graphics: Phaser.GameObjects.Arc;
+  isStrong: boolean;
 }
 
 interface WaveState {
@@ -247,8 +250,9 @@ export class BreachDefenseScene extends Phaser.Scene {
   }
 
   private onRestart() {
-    // Destroy all game objects
+    // Destroy all game objects (kill active tweens first to prevent errors mid-animation)
     this.enemies.forEach(e => {
+      this.tweens.killTweensOf(e.sprite);
       e.sprite.destroy();
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();
@@ -365,9 +369,39 @@ export class BreachDefenseScene extends Phaser.Scene {
       sprite,
       hpBarBg,
       hpBarFill,
-      flashUntil: 0
+      flashUntil: 0,
+      strongFlashUntil: 0,
+      strongFlashColor: 0
     };
     this.enemies.push(enemy);
+  }
+
+  // ── VFX Helpers ────────────────────────────────────────────────
+
+  private spawnDeathParticles(x: number, y: number, color: number): void {
+    const emitter = this.add.particles(x, y, 'particle_circle', {
+      speed: { min: 40, max: 110 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 1.2, end: 0 },
+      alpha: { start: 1, end: 0 },
+      lifespan: 300,
+      tint: color,
+      frequency: -1
+    });
+    emitter.setDepth(18);
+    emitter.explode(10);
+    this.time.delayedCall(400, () => {
+      if (emitter && emitter.active) emitter.destroy();
+    });
+  }
+
+  private playRecoilTween(sprite: Phaser.GameObjects.Sprite): void {
+    this.tweens.add({
+      targets: sprite,
+      scale: [1.0, 1.15, 0.95, 1.0],
+      duration: 200,
+      ease: 'Quad.easeOut'
+    });
   }
 
   // ── Helpers ────────────────────────────────────────────────────
@@ -526,9 +560,11 @@ export class BreachDefenseScene extends Phaser.Scene {
         enemy.hpBarFill.setFillStyle(0xff4444);
       }
 
-      // Flash effect
+      // Flash effect: red on any hit, then tower color on strong-match hit
       if (enemy.flashUntil > time) {
         enemy.sprite.setTint(0xff0000);
+      } else if (enemy.strongFlashUntil > time) {
+        enemy.sprite.setTint(enemy.strongFlashColor);
       } else {
         enemy.sprite.clearTint();
       }
@@ -618,10 +654,12 @@ export class BreachDefenseScene extends Phaser.Scene {
           damage: Math.round(damage),
           speed: 2.5,
           color: colorNum,
-          graphics: arc
+          graphics: arc,
+          isStrong: !!isStrong
         });
 
         tower.lastFired = time;
+        this.playRecoilTween(tower.sprite);
       }
     }
 
@@ -641,6 +679,10 @@ export class BreachDefenseScene extends Phaser.Scene {
         // Hit!
         target.hp -= proj.damage;
         target.flashUntil = time + 120;
+        if (proj.isStrong) {
+          target.strongFlashUntil = time + 120 + 150;
+          target.strongFlashColor = proj.color;
+        }
         proj.damage = 0;
       } else {
         proj.x += (dx / dist) * proj.speed * CELL_SIZE * dt;
@@ -655,12 +697,23 @@ export class BreachDefenseScene extends Phaser.Scene {
     for (const p of deadProj) p.graphics.destroy();
     this.projectiles = this.projectiles.filter(p => p.damage > 0);
 
-    // Remove dead enemies
+    // Remove dead enemies (with particle burst + fade animation)
     const deadEnemies = this.enemies.filter(e => e.hp <= 0);
     for (const e of deadEnemies) {
-      e.sprite.destroy();
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();
+      const dyingSprite = e.sprite;
+      this.spawnDeathParticles(dyingSprite.x, dyingSprite.y, THREAT_COLORS[e.type]);
+      this.tweens.add({
+        targets: dyingSprite,
+        alpha: 0,
+        scale: 0.3,
+        duration: 300,
+        ease: 'Quad.easeIn',
+        onComplete: () => {
+          if (dyingSprite.active) dyingSprite.destroy();
+        }
+      });
     }
     this.enemies = this.enemies.filter(e => e.hp > 0);
 
