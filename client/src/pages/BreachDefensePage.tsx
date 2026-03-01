@@ -62,6 +62,11 @@ export default function BreachDefensePage() {
   const [waveEndMessage, setWaveEndMessage] = useState<string | undefined>(undefined);
   const [waveEndStats, setWaveEndStats] = useState<{ threatsStop: number; threatsTotal: number; towersActive: number } | undefined>(undefined);
 
+  // Mute toggle
+  const [muted, setMuted] = useState(() =>
+    localStorage.getItem('sfx_muted') === 'true'
+  );
+
   // ── Scene launch ───────────────────────────────────────────────
 
   const sceneStarted = useRef(false);
@@ -189,6 +194,14 @@ export default function BreachDefensePage() {
       }
     }
   }, [wave]);
+
+  // Mute toggle — apply to Phaser + persist
+  useEffect(() => {
+    if (gameRef.current?.sound) {
+      gameRef.current.sound.setMute(muted);
+    }
+    localStorage.setItem('sfx_muted', String(muted));
+  }, [muted]);
 
   // ── Handlers ───────────────────────────────────────────────────
 
@@ -328,6 +341,13 @@ export default function BreachDefensePage() {
         >
           <BookOpen className="w-3 h-3" />
           CODEX
+        </button>
+        <button
+          onClick={() => setMuted(m => !m)}
+          className="text-[10px] text-gray-300 hover:text-white transition-colors"
+          title={muted ? 'Unmute' : 'Mute'}
+        >
+          {muted ? '\u{1F507}' : '\u{1F50A}'}
         </button>
       </div>
 

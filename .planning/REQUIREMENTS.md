@@ -9,13 +9,13 @@ Requirements for this polish milestone. Each maps to roadmap phases.
 
 ### Sound
 
-- [ ] **SFX-01**: Player hears footstep sound when moving in PrivacyQuest
-- [ ] **SFX-02**: Player hears confirm/interact sound when talking to NPCs or collecting items
-- [ ] **SFX-03**: Player hears placement sound when placing a tower in BreachDefense
-- [ ] **SFX-04**: Player hears death sound when an enemy is destroyed in BreachDefense
-- [ ] **SFX-05**: Player hears breach alert when an enemy reaches the end in BreachDefense
-- [ ] **SFX-06**: Player hears wave start cue when a new wave begins in BreachDefense
-- [ ] **SFX-07**: Floating threat type label appears on enemy death ("PHISHING blocked!")
+- [x] **SFX-01**: Player hears footstep sound when moving in PrivacyQuest
+- [x] **SFX-02**: Player hears confirm/interact sound when talking to NPCs or collecting items
+- [x] **SFX-03**: Player hears placement sound when placing a tower in BreachDefense
+- [x] **SFX-04**: Player hears death sound when an enemy is destroyed in BreachDefense
+- [x] **SFX-05**: Player hears breach alert when an enemy reaches the end in BreachDefense
+- [x] **SFX-06**: Player hears wave start cue when a new wave begins in BreachDefense
+- [x] **SFX-07**: Floating threat type label appears on enemy death ("PHISHING blocked!")
 
 ### Sprites & Animation
 
@@ -95,13 +95,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| SFX-01 | Phase 1 | Pending |
-| SFX-02 | Phase 1 | Pending |
-| SFX-03 | Phase 1 | Pending |
-| SFX-04 | Phase 1 | Pending |
-| SFX-05 | Phase 1 | Pending |
-| SFX-06 | Phase 1 | Pending |
-| SFX-07 | Phase 1 | Pending |
+| SFX-01 | Phase 1 | Complete |
+| SFX-02 | Phase 1 | Complete |
+| SFX-03 | Phase 1 | Complete |
+| SFX-04 | Phase 1 | Complete |
+| SFX-05 | Phase 1 | Complete |
+| SFX-06 | Phase 1 | Complete |
+| SFX-07 | Phase 1 | Complete |
 | ANIM-01 | Phase 2 | Complete |
 | VFX-01 | Phase 3 | Complete |
 | VFX-02 | Phase 3 | Complete |

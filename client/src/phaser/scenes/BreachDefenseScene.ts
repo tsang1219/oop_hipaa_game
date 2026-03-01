@@ -262,7 +262,7 @@ export class BreachDefenseScene extends Phaser.Scene {
   private onDismissTutorial() {
     this.gameState = 'PLAYING';
     if (!this.waveState.active) {
-      this.waveState.active = true;
+      this.activateWave();
       this.waveState.nextSpawnTime = this.time.now + 2000;
     }
   }
@@ -333,6 +333,8 @@ export class BreachDefenseScene extends Phaser.Scene {
       lastFired: 0
     };
     this.towers.push(tower);
+
+    this.sound.play('sfx_tower_place', { volume: 0.5 });
 
     // If this is the first tower and wave hasn't started, start spawning
     if (this.towers.length === 1 && !this.waveState.active && this.gameState === 'PLAYING') {
@@ -453,6 +455,11 @@ export class BreachDefenseScene extends Phaser.Scene {
     });
   }
 
+  private activateWave() {
+    this.waveState.active = true;
+    this.sound.play('sfx_wave_start', { volume: 0.7 });
+  }
+
   // ── Main game loop ─────────────────────────────────────────────
 
   update(time: number, delta: number) {
@@ -542,7 +549,7 @@ export class BreachDefenseScene extends Phaser.Scene {
             });
           } else {
             // Auto-start next wave after delay
-            this.waveState.active = true;
+            this.activateWave();
           }
         } else {
           // Victory!
@@ -625,6 +632,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     if (breaching.length > 0) {
       this.securityScore = Math.max(0, this.securityScore - breaching.length * 20);
+      this.sound.play('sfx_breach_alert', { volume: 0.85 });
 
       for (const enemy of breaching) {
         enemy.sprite.destroy();
@@ -741,10 +749,29 @@ export class BreachDefenseScene extends Phaser.Scene {
     for (const p of deadProj) p.graphics.destroy();
     this.projectiles = this.projectiles.filter(p => p.damage > 0);
 
-    // Remove dead enemies (with particle burst + fade animation)
+    // Remove dead enemies (with particle burst + fade animation + SFX + floating label)
     const deadEnemies = this.enemies.filter(e => e.hp <= 0);
     this.waveKillCount += deadEnemies.length;
     for (const e of deadEnemies) {
+      this.sound.play('sfx_enemy_death', { volume: 0.6 });
+
+      const label = this.add.text(e.sprite.x, e.sprite.y - 20, `${e.type} blocked!`, {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '7px',
+        color: '#ffff44',
+        stroke: '#000000',
+        strokeThickness: 2,
+      }).setDepth(30).setOrigin(0.5);
+
+      this.tweens.add({
+        targets: label,
+        y: label.y - 44,
+        alpha: 0,
+        duration: 900,
+        ease: 'Cubic.easeOut',
+        onComplete: () => { label.destroy(); }
+      });
+
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();
       const dyingSprite = e.sprite;

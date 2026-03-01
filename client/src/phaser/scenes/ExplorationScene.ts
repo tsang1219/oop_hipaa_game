@@ -50,6 +50,9 @@ export class ExplorationScene extends Phaser.Scene {
   // Pause movement while in dialogue
   private paused = false;
 
+  // Footstep throttle — minimum interval between plays (ms)
+  private lastFootstepTime = 0;
+
   // Track last facing direction for idle restore after animation stop
   private lastFacingTexture = 'player_down';
 
@@ -343,6 +346,12 @@ export class ExplorationScene extends Phaser.Scene {
         body.velocity.normalize().scale(MOVE_SPEED);
       }
 
+      const isMoving = left || right || up || down;
+      if (isMoving && !this.paused && this.time.now - this.lastFootstepTime > 350) {
+        this.sound.play('sfx_footstep', { volume: 0.25 });
+        this.lastFootstepTime = this.time.now;
+      }
+
       if (!left && !right && !up && !down) {
         this.player.anims.stop();
         this.player.setTexture(this.lastFacingTexture);
@@ -450,6 +459,9 @@ export class ExplorationScene extends Phaser.Scene {
       const dx = next.x - this.tileX;
       const dy = next.y - this.tileY;
 
+      this.sound.play('sfx_footstep', { volume: 0.25 });
+      this.lastFootstepTime = this.time.now;
+
       if (dx < 0) {
         this.player.anims.play('walk_left', true);
         this.lastFacingTexture = 'player_left';
@@ -514,6 +526,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   // ── Interaction ────────────────────────────────────────────────
   private triggerInteraction(ia: InteractableData) {
+    this.sound.play('sfx_interact', { volume: 0.55 });
     this.stopNpcPulse(ia);
     this.paused = true;
     this.movePath = [];

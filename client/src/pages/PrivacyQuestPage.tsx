@@ -109,6 +109,11 @@ export default function PrivacyQuestPage() {
     return !localStorage.getItem('pq:onboarding:seen');
   });
 
+  // Mute toggle
+  const [muted, setMuted] = useState(() =>
+    localStorage.getItem('sfx_muted') === 'true'
+  );
+
   const totalEducationalItems = rooms.reduce((sum, r) => sum + r.educationalItems.length, 0);
   const totalScenarios = rooms.reduce((sum, r) => sum + r.npcs.filter((n: any) => !n.isFinalBoss).length, 0);
   const currentRoom = rooms.find(r => r.id === currentRoomId) || null;
@@ -137,6 +142,14 @@ export default function PrivacyQuestPage() {
     const choiceGate = gates.find(g => g.type === 'choice' && !resolved.has(g.id));
     if (choiceGate) setActiveChoiceGate(choiceGate);
   }, [currentRoomId]);
+
+  // Mute toggle — apply to Phaser + persist
+  useEffect(() => {
+    if (gameRef.current?.sound) {
+      gameRef.current.sound.setMute(muted);
+    }
+    localStorage.setItem('sfx_muted', String(muted));
+  }, [muted]);
 
   // ── Gate helpers ─────────────────────────────────────────────
   const isNpcGated = useCallback((npcId: string): Gate | null => {
@@ -459,6 +472,14 @@ export default function PrivacyQuestPage() {
           scenariosCompleted={completedNPCs.size}
           totalScenarios={totalScenarios}
         />
+        <button
+          onClick={() => setMuted(m => !m)}
+          className="text-[10px] text-gray-300 hover:text-white transition-colors"
+          title={muted ? 'Unmute' : 'Mute'}
+          style={{ fontFamily: '"Press Start 2P", monospace' }}
+        >
+          {muted ? '\u{1F507}' : '\u{1F50A}'}
+        </button>
       </div>
 
       {currentRoom && (

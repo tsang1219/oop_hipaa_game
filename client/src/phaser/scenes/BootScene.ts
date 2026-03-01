@@ -61,6 +61,14 @@ export class BootScene extends Phaser.Scene {
     this.load.image('threat_BRUTEFORCE', '/attached_assets/generated_images/brute_force_bot_enemy_sprite.png');
     this.load.image('threat_DEVICETHIEF', '/attached_assets/generated_images/device_thief_enemy_sprite.png');
     this.load.image('threat_SOCIAL', '/attached_assets/generated_images/social_engineer_enemy_sprite.png');
+
+    // Load SFX — loaded once here, available to all scenes globally
+    this.load.audio('sfx_footstep',    '/attached_assets/audio/sfx_footstep.ogg');
+    this.load.audio('sfx_interact',    '/attached_assets/audio/sfx_interact.ogg');
+    this.load.audio('sfx_tower_place', '/attached_assets/audio/sfx_tower_place.ogg');
+    this.load.audio('sfx_enemy_death', '/attached_assets/audio/sfx_enemy_death.ogg');
+    this.load.audio('sfx_breach_alert','/attached_assets/audio/sfx_breach_alert.ogg');
+    this.load.audio('sfx_wave_start',  '/attached_assets/audio/sfx_wave_start.ogg');
   }
 
   create() {

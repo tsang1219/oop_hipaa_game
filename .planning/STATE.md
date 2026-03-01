@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T17:38:52.061Z"
+last_updated: "2026-03-01T18:05:38.633Z"
 progress:
   total_phases: 5
   completed_phases: 4
   total_plans: 9
-  completed_plans: 5
+  completed_plans: 8
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-02-27)
 
 **Core value:** Both games must feel like real games — not prototypes. Sound, visual feedback, and player guidance close the gap between "it works" and "it's fun to play."
-**Current focus:** Phase 4 — BreachDefense HUD Data Events
+**Current focus:** Phase 1 — Audio Foundation
 
 ## Current Position
 
-Phase: 5 of 5 (PrivacyQuest Onboarding)
-Plan: 1 of 1 in current phase (05-01 complete)
-Status: Phase 05-01 complete — intro modal, help icon, NPC pulse tween
-Last activity: 2026-03-01 — Completed 05-01: one-time intro modal, REACT_PAUSE_EXPLORATION event, NPC scale pulse tween per room
+Phase: 1 of 5 (Audio Foundation)
+Plan: 4 of 4 in current phase (01-04 complete)
+Status: 01-04 complete — mute toggle in both game HUDs
+Last activity: 2026-03-01 — Completed 01-04: mute toggle button in BreachDefensePage and PrivacyQuestPage HUDs with localStorage persistence
 
-Progress: [███████░░░] 62%
+Progress: [███████░░░] 67%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 5
+- Total plans completed: 6
 - Average duration: 2 min
-- Total execution time: 9 min
+- Total execution time: 11 min
 
 **By Phase:**
 
@@ -44,9 +44,10 @@ Progress: [███████░░░] 62%
 | 03-breachdefense-visual-effects | 1 | 2 min | 2 min |
 | 04-breachdefense-hud-data | 2 | 4 min | 2 min |
 | 05-privacyquest-onboarding | 1 | 3 min | 3 min |
+| 01-audio-foundation | 1 | 2 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2 min), 03-01 (2 min), 04-01 (2 min), 04-02 (2 min), 05-01 (3 min)
+- Last 5 plans: 03-01 (2 min), 04-01 (2 min), 04-02 (2 min), 05-01 (3 min), 01-02 (2 min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -77,6 +78,12 @@ Recent decisions affecting current work:
 - 05-01: Modal-driven scene pause uses REACT_PAUSE_EXPLORATION / REACT_DIALOGUE_COMPLETE pair — same resume path as NPC dialogue
 - 05-01: stopNpcPulse called before paused=true in triggerInteraction — scale resets before dialogue overlay appears
 - 05-01: npcPulseTween cleaned in both init() and shutdown() — guards tween leak on room switch or scene restart
+- 01-02: Direct this.sound.play() for in-scene SFX — no EventBridge listeners needed when triggers are inside Phaser scene
+- 01-02: 350ms throttle on WASD footstep (lastFootstepTime guard) prevents 60fps spam while keeping natural rhythm
+- 01-02: BFS step() footstep has no extra throttle — 120ms tween duration naturally spaces tile-hop sounds
+- 01-04: Mute toggle uses gameRef.current.sound.setMute() — NOT direct .mute property — ensures all sound instances notified
+- 01-04: Shared localStorage key 'sfx_muted' between both pages — mute state persists across navigation and refreshes
+- [Phase 01]: activateWave() helper encapsulates waveState.active + sfx_wave_start to guarantee one sound per wave activation
 
 ### Pending Todos
 
@@ -91,5 +98,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 05-01-PLAN.md (intro modal, help icon, NPC pulse tween, REACT_PAUSE_EXPLORATION event)
+Stopped at: Completed 01-04-PLAN.md (mute toggle in BreachDefensePage and PrivacyQuestPage HUDs)
 Resume file: None
