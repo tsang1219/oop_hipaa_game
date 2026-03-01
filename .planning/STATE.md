@@ -34,7 +34,8 @@ Progress: [░░░░░░░░░░] 0% (v1.1)
 ### Decisions
 
 - [v1.0]: Global anim registration in BootScene — walk anims available in all scenes without re-registration (pattern to follow in Phase 6)
-- [v1.1]: Phase 6-9 each split into automated Gemini generation + code integration plans — script built in Phase 6 plan 01, reused in 07-01/08-01/09-01
+- [v1.1]: Hybrid asset sourcing — pre-made packs for characters (Phase 6) and tiles (Phase 9), Gemini generation for portraits (Phase 7) and furniture/objects (Phase 8)
+- [v1.1]: Gemini script built in Phase 7 plan 01 (first phase needing generation), reused in Phase 8
 - [v1.1]: FURN and ITEM requirements combined into Phase 8 — both integrate into ExplorationScene room layouts in a single pass
 
 ### Pending Todos

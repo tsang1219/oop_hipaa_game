@@ -44,7 +44,7 @@ Plans:
 
 **Milestone Goal:** Replace all programmatic fillRect sprites with AI-generated PNG pixel art across PrivacyQuest and the Hub World — characters, portraits, furniture, interactive objects, and floor tiles.
 
-**Note on phase structure:** Each phase (6-9) has two kinds of work: automated asset generation (a Node.js script calls Gemini's image generation API to produce PNGs) and code integration (wiring the PNGs into Phaser scenes). Phase 6 builds the generation script infrastructure; subsequent phases reuse it. The user's Gemini API key is stored in `.env` (gitignored).
+**Note on phase structure:** Hybrid asset sourcing — pre-made sprite packs for characters and tiles (where walk cycles and seamless tiling matter), Gemini API generation for simpler single-frame assets (portraits, furniture, collectibles). Each phase has an asset sourcing plan + a code integration plan. The user's Gemini API key is stored in `.env` (gitignored).
 
 ---
 
@@ -61,7 +61,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 06-01: Build Gemini sprite generation script (`scripts/generate-sprites.ts`) with asset manifest, .env setup, `sharp` for post-processing; generate 9 character spritesheets (player + 8 NPCs) to `attached_assets/generated_images/privacyquest/characters/`
+- [ ] 06-01: Source 9 character spritesheets from pre-made sprite pack (LPC/Kenney/itch.io), select and customize for hospital roles (player, nurse, doctor, etc.), place in `attached_assets/generated_images/privacyquest/characters/`
 - [ ] 06-02: Load character spritesheets in BootScene, register walk + idle animations, wire ExplorationScene and HubWorldScene to use new sprite keys
 
 ### Phase 7: NPC Portraits
@@ -75,7 +75,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 07-01: Run generation script for 6 NPC portraits with 2 expression variants each (12 PNGs total) to `attached_assets/generated_images/privacyquest/portraits/`
+- [ ] 07-01: Build Gemini generation script (`scripts/generate-sprites.ts`) and generate 6 NPC portraits with 2 expression variants each (12 PNGs total) to `attached_assets/generated_images/privacyquest/portraits/`
 - [ ] 07-02: Load portrait images in BootScene, update React dialogue overlay components to render portrait PNGs, wire expression variant selection to dialogue state
 
 ### Phase 8: Furniture and Interactive Objects
@@ -90,7 +90,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 08-01: Run generation script for ~14 furniture PNGs and 4 educational collectible PNGs to `attached_assets/generated_images/privacyquest/furniture/` and `attached_assets/generated_images/privacyquest/objects/`
+- [ ] 08-01: Run Gemini generation script for ~14 furniture PNGs and 4 educational collectible PNGs to `attached_assets/generated_images/privacyquest/furniture/` and `attached_assets/generated_images/privacyquest/objects/`
 - [ ] 08-02: Load furniture and object images in BootScene, replace SpriteFactory fillRect objects in ExplorationScene room layouts, add idle animations and collectible pickup sequence
 
 ### Phase 9: Floor Tiles
@@ -104,7 +104,7 @@ Plans:
 **Plans**: TBD
 
 Plans:
-- [ ] 09-01: Run generation script for 8 seamless 32x32 floor tile PNGs to `attached_assets/generated_images/privacyquest/tiles/`
+- [ ] 09-01: Source 8 seamless floor tile variants from pre-made tileset pack, place in `attached_assets/generated_images/privacyquest/tiles/`
 - [ ] 09-02: Load tiles in BootScene, replace programmatic floor rendering in ExplorationScene with tilemap-based rendering using the new tile set
 
 ### Phase 10: Final Integration and Cleanup
