@@ -39,6 +39,7 @@ export const BRIDGE_EVENTS = {
   BREACH_TUTORIAL_TRIGGER: 'breach:tutorial-trigger',
 
   // React -> Phaser
+  REACT_PAUSE_EXPLORATION: 'react:pause-exploration',
   REACT_DIALOGUE_COMPLETE: 'react:dialogue-complete',
   REACT_LOAD_ROOM: 'react:load-room',
   REACT_PLACE_TOWER: 'react:place-tower',

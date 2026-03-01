@@ -7,9 +7,10 @@ interface TutorialModalProps {
   description: string;
   onAcknowledge: () => void;
   type?: 'info' | 'threat' | 'tower';
+  ctaText?: string;
 }
 
-export function TutorialModal({ title, description, onAcknowledge, type = 'info' }: TutorialModalProps) {
+export function TutorialModal({ title, description, onAcknowledge, type = 'info', ctaText = "Got it! Let's go →" }: TutorialModalProps) {
   const Icon = type === 'threat' ? AlertCircle : type === 'tower' ? Lock : Shield;
   const iconColor = type === 'threat' ? 'text-red-500' : type === 'tower' ? 'text-[#FF6B9D]' : 'text-blue-500';
 
@@ -32,7 +33,7 @@ export function TutorialModal({ title, description, onAcknowledge, type = 'info'
               className="bg-[#2ECC71] hover:bg-[#27AE60] text-black font-bold px-8 py-4 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer"
               data-testid="button-acknowledge-tutorial"
             >
-              Got it! Let's go →
+              {ctaText}
             </Button>
           </div>
         </div>

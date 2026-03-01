@@ -12,6 +12,7 @@ import HallwayHub from '@/components/HallwayHub';
 import KnowledgeTracker from '@/components/KnowledgeTracker';
 import ChecklistUI from '@/components/ChecklistUI';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
+import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { useToast } from '@/hooks/use-toast';
 import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
@@ -103,6 +104,11 @@ export default function PrivacyQuestPage() {
     return s ? new Set(JSON.parse(s)) : new Set();
   });
 
+  // Intro modal — shown once (gated by localStorage flag)
+  const [showIntroModal, setShowIntroModal] = useState(() => {
+    return !localStorage.getItem('pq:onboarding:seen');
+  });
+
   const totalEducationalItems = rooms.reduce((sum, r) => sum + r.educationalItems.length, 0);
   const totalScenarios = rooms.reduce((sum, r) => sum + r.npcs.filter((n: any) => !n.isFinalBoss).length, 0);
   const currentRoom = rooms.find(r => r.id === currentRoomId) || null;
@@ -183,10 +189,13 @@ export default function PrivacyQuestPage() {
           completedZones: Array.from(completedZones),
           collectedItems: Array.from(collectedItems),
         });
+        if (showIntroModal) {
+          eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
+        }
       }
     }, 100);
     return () => clearTimeout(timer);
-  }, [pageMode, currentRoomId]);
+  }, [pageMode, currentRoomId, showIntroModal]);
 
   // ── EventBridge listeners ────────────────────────────────────
   useEffect(() => {
@@ -329,6 +338,17 @@ export default function PrivacyQuestPage() {
     setPrivacyScore(newScore);
   }, []);
 
+  const handleDismissIntroModal = useCallback(() => {
+    localStorage.setItem('pq:onboarding:seen', '1');
+    setShowIntroModal(false);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+  }, []);
+
+  const handleShowHelpModal = useCallback(() => {
+    setShowIntroModal(true);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
+  }, []);
+
   const handlePlayAgain = () => {
     localStorage.clear();
     window.location.reload();
@@ -450,9 +470,19 @@ export default function PrivacyQuestPage() {
         />
       )}
 
-      <p className="text-[8px] text-gray-500" style={{ fontFamily: '"Press Start 2P"' }}>
-        WASD or Arrow Keys to move &bull; SPACE to interact &bull; ESC to exit room
-      </p>
+      <div className="flex items-center gap-2">
+        <p className="text-[8px] text-gray-500" style={{ fontFamily: '"Press Start 2P"' }}>
+          WASD or Arrow Keys to move &bull; SPACE to interact &bull; ESC to exit room
+        </p>
+        <button
+          onClick={handleShowHelpModal}
+          className="text-[8px] text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 px-2 py-1 transition-colors"
+          style={{ fontFamily: '"Press Start 2P"' }}
+          title="Show controls"
+        >
+          ?
+        </button>
+      </div>
 
       {/* ── React overlays ── */}
 
@@ -505,6 +535,17 @@ export default function PrivacyQuestPage() {
             setActiveChoiceGate(null);
             eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
           }}
+        />
+      )}
+
+      {/* Intro modal — shown on first visit, re-openable via help icon */}
+      {showIntroModal && (
+        <TutorialModal
+          title="Welcome to HIPAA General"
+          description={"You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys — Move\nSPACE — Talk to people and interact\nESC — Exit the room"}
+          onAcknowledge={handleDismissIntroModal}
+          type="info"
+          ctaText="Start exploring →"
         />
       )}
     </div>
