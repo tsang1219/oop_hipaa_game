@@ -19,7 +19,7 @@ Requirements for this polish milestone. Each maps to roadmap phases.
 
 ### Sprites & Animation
 
-- [ ] **ANIM-01**: Player character has 4-direction walk cycle animation (2-3 frames per direction) in PrivacyQuest
+- [x] **ANIM-01**: Player character has 4-direction walk cycle animation (2-3 frames per direction) in PrivacyQuest
 
 ### Visual Effects
 
@@ -102,7 +102,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SFX-05 | Phase 1 | Pending |
 | SFX-06 | Phase 1 | Pending |
 | SFX-07 | Phase 1 | Pending |
-| ANIM-01 | Phase 2 | Pending |
+| ANIM-01 | Phase 2 | Complete |
 | VFX-01 | Phase 3 | Pending |
 | VFX-02 | Phase 3 | Pending |
 | VFX-03 | Phase 3 | Pending |

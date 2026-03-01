@@ -13,7 +13,7 @@ Both games are functionally complete. This milestone closes the gap between "it 
 Decimal phases appear between their surrounding integers in numeric order.
 
 - [ ] **Phase 1: Audio Foundation** - Preload 6-7 SFX in BootScene and wire playback at each trigger point across both games
-- [ ] **Phase 2: Walk Cycle Animation** - Add 4-direction player walk animation in PrivacyQuest (spritesheet or programmatic)
+- [x] **Phase 2: Walk Cycle Animation** - Add 4-direction player walk animation in PrivacyQuest (spritesheet or programmatic) (completed 2026-03-01)
 - [ ] **Phase 3: BreachDefense Visual Effects** - Enemy death particle burst, tower firing recoil tween, and strong-match color pulse
 - [ ] **Phase 4: BreachDefense HUD Data** - Surface wave intro, suggested towers, tower hover descriptions, and end messages from constants.ts
 - [ ] **Phase 5: PrivacyQuest Onboarding** - First-visit intro modal and first-NPC pulsing highlight
@@ -46,7 +46,10 @@ Plans:
   1. Player character shows a walk cycle animation (2-3 frames) while moving in any of the 4 directions
   2. Player character shows an idle pose when not moving
   3. Walk animation direction matches the direction of movement (up, down, left, right each have distinct frames)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 02-01-PLAN.md — Generate frame-2 walk textures in BootScene, register animations, wire play/stop in HubWorldScene + ExplorationScene
 
 ### Phase 3: BreachDefense Visual Effects
 **Goal**: Kills feel confirmed and towers feel active — combat has visual weight
@@ -88,7 +91,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Audio Foundation | 0/? | Not started | - |
-| 2. Walk Cycle Animation | 0/? | Not started | - |
+| 2. Walk Cycle Animation | 1/1 | Complete   | 2026-03-01 |
 | 3. BreachDefense Visual Effects | 0/? | Not started | - |
 | 4. BreachDefense HUD Data | 0/? | Not started | - |
 | 5. PrivacyQuest Onboarding | 0/? | Not started | - |
