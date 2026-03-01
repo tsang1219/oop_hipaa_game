@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-01T04:21:50.043Z"
+last_updated: "2026-03-01T17:10:00Z"
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 6
-  completed_plans: 2
+  completed_plans: 3
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 ## Current Position
 
 Phase: 4 of 5 (BreachDefense HUD Data)
-Plan: 1 of 2 in current phase
-Status: Phase 04 plan 01 complete — 04-01 executed
-Last activity: 2026-03-01 — Completed 04-01: BreachDefense HUD data events (BREACH_WAVE_START, enhanced wave complete, per-wave kill tracking, tutorialContent gaps)
+Plan: 2 of 2 in current phase (phase complete)
+Status: Phase 04 complete — 04-01 and 04-02 executed
+Last activity: 2026-03-01 — Completed 04-02: WaveIntroBanner, ThreatStrip, tower tooltips, suggested badges, enhanced RecapModal with endMessage + stats
 
-Progress: [█████░░░░░] 40%
+Progress: [██████░░░░] 50%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 2
+- Total plans completed: 3
 - Average duration: 2 min
-- Total execution time: 4 min
+- Total execution time: 6 min
 
 **By Phase:**
 
@@ -42,10 +42,10 @@ Progress: [█████░░░░░] 40%
 |-------|-------|-------|----------|
 | 02-walk-cycle-animation | 1 | 2 min | 2 min |
 | 03-breachdefense-visual-effects | 1 | 2 min | 2 min |
-| 04-breachdefense-hud-data | 1 | 2 min | 2 min |
+| 04-breachdefense-hud-data | 2 | 4 min | 2 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2 min), 03-01 (2 min), 04-01 (2 min)
+- Last 5 plans: 02-01 (2 min), 03-01 (2 min), 04-01 (2 min), 04-02 (2 min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -68,6 +68,10 @@ Recent decisions affecting current work:
 - 03-01: Single white particle_circle texture tinted at emit time handles all 8 threat death colors
 - 04-01: BREACH_WAVE_START guarded by shownWaveStartBanners Set — fires exactly once per wave
 - 04-01: BREACH_TUTORIAL_TRIGGER delayed 3500ms via Phaser delayedCall so banner shows before modal
+- 04-02: WaveIntroBanner absolute-positioned inside canvas relative wrapper to overlay Phaser canvas without layout shift
+- 04-02: ThreatStrip returns null when threats array is empty — clean gap between waves with no dead UI rows
+- 04-02: RecapModal concept type relaxed to string with safe cast, handles LAYERS/PASSWORDS/ALLDEFENSE without null render
+- 04-02: Tooltip.Portal used for Radix tooltips to escape Phaser canvas z-stacking context
 
 ### Pending Todos
 
@@ -82,5 +86,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-01-PLAN.md (BreachDefense HUD data events)
+Stopped at: Completed 04-02-PLAN.md (WaveIntroBanner, ThreatStrip, tower tooltips, enhanced RecapModal)
 Resume file: None

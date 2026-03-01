@@ -29,11 +29,11 @@ Requirements for this polish milestone. Each maps to roadmap phases.
 
 ### HUD
 
-- [ ] **HUD-01**: Wave intro text overlay displays wave name on wave start
-- [ ] **HUD-02**: Suggested tower hint shown per wave during prep phase
-- [ ] **HUD-03**: Tower description shown on hover in selection panel
-- [ ] **HUD-04**: Wave end message displayed on wave completion
-- [ ] **HUD-05**: Incoming threat type icons shown before wave starts
+- [x] **HUD-01**: Wave intro text overlay displays wave name on wave start
+- [x] **HUD-02**: Suggested tower hint shown per wave during prep phase
+- [x] **HUD-03**: Tower description shown on hover in selection panel
+- [x] **HUD-04**: Wave end message displayed on wave completion
+- [x] **HUD-05**: Incoming threat type icons shown before wave starts
 
 ### Onboarding
 
@@ -107,8 +107,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VFX-02 | Phase 3 | Complete |
 | VFX-03 | Phase 3 | Complete |
 | HUD-01 | Phase 4 | In Progress (data events: 04-01) |
-| HUD-02 | Phase 4 | Pending |
-| HUD-03 | Phase 4 | Pending |
+| HUD-02 | Phase 4 | Complete |
+| HUD-03 | Phase 4 | Complete |
 | HUD-04 | Phase 4 | In Progress (data events: 04-01) |
 | HUD-05 | Phase 4 | In Progress (data events: 04-01) |
 | ONBD-01 | Phase 5 | Pending |
