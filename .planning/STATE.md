@@ -51,5 +51,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Roadmap created, ready to plan Phase 6
+Stopped at: Phase 6 context gathered
 Resume: Run `/gsd:plan-phase 6`
