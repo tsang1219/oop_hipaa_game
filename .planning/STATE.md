@@ -34,7 +34,7 @@ Progress: [░░░░░░░░░░] 0% (v1.1)
 ### Decisions
 
 - [v1.0]: Global anim registration in BootScene — walk anims available in all scenes without re-registration (pattern to follow in Phase 6)
-- [v1.1]: Phase 6-9 each split into human checkpoint (asset gen) + code integration plans — assets must exist before integration plan runs
+- [v1.1]: Phase 6-9 each split into automated Gemini generation + code integration plans — script built in Phase 6 plan 01, reused in 07-01/08-01/09-01
 - [v1.1]: FURN and ITEM requirements combined into Phase 8 — both integrate into ExplorationScene room layouts in a single pass
 
 ### Pending Todos
@@ -43,7 +43,8 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 6-9 each have a human checkpoint plan — Claude Code cannot proceed on integration until the user places generated PNGs in `attached_assets/generated_images/privacyquest/`
+- Gemini API key must be in `.env` as `GEMINI_API_KEY` before running generation script
+- Generation script quality depends on Gemini's pixel art output — may need prompt iteration or manual touch-up for some sprites
 - SpriteFactory.ts retirement (INTG-02) is Phase 10 only — do not remove it during earlier phases
 
 ## Session Continuity
