@@ -205,6 +205,18 @@ export const THREATS = {
   }
 };
 
+// Threat death particle colors — visually distinctive at small scale
+export const THREAT_COLORS: Record<string, number> = {
+  PHISHING:    0xFF6B35,
+  CREDENTIAL:  0xFF2D55,
+  RANSOMWARE:  0x8B0000,
+  INSIDER:     0xFFD700,
+  ZERODAY:     0x00FFFF,
+  BRUTEFORCE:  0xFF4500,
+  DEVICETHIEF: 0xA855F7,
+  SOCIAL:      0x10B981,
+};
+
 // Wave designs - each level teaches ONE concept
 export const WAVES = [
   {

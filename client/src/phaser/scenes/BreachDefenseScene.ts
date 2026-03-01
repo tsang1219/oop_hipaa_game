@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import {
-  GRID_COLS, GRID_ROWS, CELL_SIZE, PATHS, TOWERS, THREATS, WAVES, WAVE_BUDGETS
+  GRID_COLS, GRID_ROWS, CELL_SIZE, PATHS, TOWERS, THREATS, THREAT_COLORS, WAVES, WAVE_BUDGETS
 } from '../../game/breach-defense/constants';
 
 type TowerType = keyof typeof TOWERS;

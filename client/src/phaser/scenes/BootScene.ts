@@ -87,6 +87,9 @@ export class BootScene extends Phaser.Scene {
       }
     }
 
+    // Generate particle texture for BreachDefense VFX
+    this.generateParticleTexture();
+
     // Start the hub world
     this.scene.start('HubWorld');
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Boot');
@@ -300,6 +303,15 @@ export class BootScene extends Phaser.Scene {
       gRightWalk.generateTexture('player_right_walk', TILE_SIZE, TILE_SIZE);
       gRightWalk.destroy();
     }
+  }
+
+  private generateParticleTexture(): void {
+    if (this.textures.exists('particle_circle')) return;
+    const g = this.add.graphics();
+    g.fillStyle(0xffffff, 1);
+    g.fillCircle(3, 3, 3);   // 6x6 white circle, tinted at emit time
+    g.generateTexture('particle_circle', 6, 6);
+    g.destroy();
   }
 
   private generateNPCTextures() {
