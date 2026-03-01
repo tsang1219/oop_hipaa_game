@@ -16,7 +16,7 @@ Decimal phases appear between their surrounding integers in numeric order.
 - [x] **Phase 2: Walk Cycle Animation** - Add 4-direction player walk animation in PrivacyQuest (spritesheet or programmatic) (completed 2026-03-01)
 - [x] **Phase 3: BreachDefense Visual Effects** - Enemy death particle burst, tower firing recoil tween, and strong-match color pulse (completed 2026-03-01)
 - [x] **Phase 4: BreachDefense HUD Data** - Surface wave intro, suggested towers, tower hover descriptions, and end messages from constants.ts (completed 2026-03-01)
-- [ ] **Phase 5: PrivacyQuest Onboarding** - First-visit intro modal and first-NPC pulsing highlight
+- [x] **Phase 5: PrivacyQuest Onboarding** - First-visit intro modal and first-NPC pulsing highlight (completed 2026-03-01)
 
 ## Phase Details
 
@@ -90,7 +90,7 @@ Plans:
 **Plans**: 1 plan
 
 Plans:
-- [ ] 05-01-PLAN.md — Intro modal (TutorialModal reuse + localStorage flag + help icon) + NPC pulse tween (per-room scale oscillation on first NPC, dismissed on interaction)
+- [x] 05-01-PLAN.md — Intro modal (TutorialModal reuse + localStorage flag + help icon) + NPC pulse tween (per-room scale oscillation on first NPC, dismissed on interaction) (completed 2026-03-01)
 
 ## Progress
 
@@ -103,5 +103,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 1. Audio Foundation | 0/? | Not started | - |
 | 2. Walk Cycle Animation | 1/1 | Complete    | 2026-03-01 |
 | 3. BreachDefense Visual Effects | 1/1 | Complete    | 2026-03-01 |
-| 4. BreachDefense HUD Data | 1/2 | Complete    | 2026-03-01 |
-| 5. PrivacyQuest Onboarding | 0/1 | Not started | - |
+| 4. BreachDefense HUD Data | 2/2 | Complete    | 2026-03-01 |
+| 5. PrivacyQuest Onboarding | 1/1 | Complete    | 2026-03-01 |

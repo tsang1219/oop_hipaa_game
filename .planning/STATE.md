@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: unknown
-last_updated: "2026-03-01T17:15:45.782Z"
+status: in-progress
+last_updated: "2026-03-01T17:33:14Z"
 progress:
   total_phases: 5
   completed_phases: 3
-  total_plans: 8
-  completed_plans: 4
+  total_plans: 9
+  completed_plans: 5
 ---
 
 # Project State
@@ -22,19 +22,19 @@ See: .planning/PROJECT.md (updated 2026-02-27)
 
 ## Current Position
 
-Phase: 4 of 5 (BreachDefense HUD Data)
-Plan: 2 of 2 in current phase (phase complete)
-Status: Phase 04 complete — 04-01 and 04-02 executed
-Last activity: 2026-03-01 — Completed 04-02: WaveIntroBanner, ThreatStrip, tower tooltips, suggested badges, enhanced RecapModal with endMessage + stats
+Phase: 5 of 5 (PrivacyQuest Onboarding)
+Plan: 1 of 1 in current phase (05-01 complete)
+Status: Phase 05-01 complete — intro modal, help icon, NPC pulse tween
+Last activity: 2026-03-01 — Completed 05-01: one-time intro modal, REACT_PAUSE_EXPLORATION event, NPC scale pulse tween per room
 
-Progress: [██████░░░░] 50%
+Progress: [███████░░░] 62%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 3
+- Total plans completed: 5
 - Average duration: 2 min
-- Total execution time: 6 min
+- Total execution time: 9 min
 
 **By Phase:**
 
@@ -43,9 +43,10 @@ Progress: [██████░░░░] 50%
 | 02-walk-cycle-animation | 1 | 2 min | 2 min |
 | 03-breachdefense-visual-effects | 1 | 2 min | 2 min |
 | 04-breachdefense-hud-data | 2 | 4 min | 2 min |
+| 05-privacyquest-onboarding | 1 | 3 min | 3 min |
 
 **Recent Trend:**
-- Last 5 plans: 02-01 (2 min), 03-01 (2 min), 04-01 (2 min), 04-02 (2 min)
+- Last 5 plans: 02-01 (2 min), 03-01 (2 min), 04-01 (2 min), 04-02 (2 min), 05-01 (3 min)
 - Trend: stable
 
 *Updated after each plan completion*
@@ -72,6 +73,10 @@ Recent decisions affecting current work:
 - 04-02: ThreatStrip returns null when threats array is empty — clean gap between waves with no dead UI rows
 - 04-02: RecapModal concept type relaxed to string with safe cast, handles LAYERS/PASSWORDS/ALLDEFENSE without null render
 - 04-02: Tooltip.Portal used for Radix tooltips to escape Phaser canvas z-stacking context
+- 05-01: ctaText prop added to TutorialModal as optional with same default — zero breakage to BreachDefense usages
+- 05-01: Modal-driven scene pause uses REACT_PAUSE_EXPLORATION / REACT_DIALOGUE_COMPLETE pair — same resume path as NPC dialogue
+- 05-01: stopNpcPulse called before paused=true in triggerInteraction — scale resets before dialogue overlay appears
+- 05-01: npcPulseTween cleaned in both init() and shutdown() — guards tween leak on room switch or scene restart
 
 ### Pending Todos
 
@@ -86,5 +91,5 @@ None yet.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Completed 04-02-PLAN.md (WaveIntroBanner, ThreatStrip, tower tooltips, enhanced RecapModal)
+Stopped at: Completed 05-01-PLAN.md (intro modal, help icon, NPC pulse tween, REACT_PAUSE_EXPLORATION event)
 Resume file: None

@@ -37,8 +37,8 @@ Requirements for this polish milestone. Each maps to roadmap phases.
 
 ### Onboarding
 
-- [ ] **ONBD-01**: First-visit intro modal explains controls (WASD/Space/ESC) in PrivacyQuest
-- [ ] **ONBD-02**: Pulsing indicator highlights first available NPC on room entry
+- [x] **ONBD-01**: First-visit intro modal explains controls (WASD/Space/ESC) in PrivacyQuest
+- [x] **ONBD-02**: Pulsing indicator highlights first available NPC on room entry
 
 ## v2 Requirements
 
@@ -106,13 +106,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | VFX-01 | Phase 3 | Complete |
 | VFX-02 | Phase 3 | Complete |
 | VFX-03 | Phase 3 | Complete |
-| HUD-01 | Phase 4 | In Progress (data events: 04-01) |
+| HUD-01 | Phase 4 | Complete |
 | HUD-02 | Phase 4 | Complete |
 | HUD-03 | Phase 4 | Complete |
-| HUD-04 | Phase 4 | In Progress (data events: 04-01) |
-| HUD-05 | Phase 4 | In Progress (data events: 04-01) |
-| ONBD-01 | Phase 5 | Pending |
-| ONBD-02 | Phase 5 | Pending |
+| HUD-04 | Phase 4 | Complete |
+| HUD-05 | Phase 4 | Complete |
+| ONBD-01 | Phase 5 | Complete |
+| ONBD-02 | Phase 5 | Complete |
 
 **Coverage:**
 - v1 requirements: 18 total
@@ -121,4 +121,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-02-28*
-*Last updated: 2026-02-28 after roadmap creation — all 18 requirements mapped*
+*Last updated: 2026-03-01 after 05-01 execution — ONBD-01 and ONBD-02 complete*
