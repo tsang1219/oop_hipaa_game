@@ -81,6 +81,8 @@ export class BreachDefenseScene extends Phaser.Scene {
   private rangeGraphics!: Phaser.GameObjects.Graphics;
   private selectedTowerType: TowerType | null = null;
   private shownWaveSplashes = new Set<number>();
+  private shownWaveStartBanners = new Set<number>();
+  private waveKillCount = 0;
 
   // State broadcast throttle
   private lastBroadcast = 0;
@@ -107,6 +109,8 @@ export class BreachDefenseScene extends Phaser.Scene {
     };
     this.selectedTowerType = null;
     this.shownWaveSplashes = new Set();
+    this.shownWaveStartBanners = new Set();
+    this.waveKillCount = 0;
     this.lastBroadcast = 0;
   }
 
@@ -232,11 +236,25 @@ export class BreachDefenseScene extends Phaser.Scene {
 
   private onStartGame() {
     this.gameState = 'PLAYING';
-    // Trigger wave 1 splash
+    // Emit wave start banner for wave 1
+    if (!this.shownWaveStartBanners.has(1)) {
+      this.shownWaveStartBanners.add(1);
+      const waveData = WAVES[0];
+      eventBridge.emit(BRIDGE_EVENTS.BREACH_WAVE_START, {
+        wave: 1,
+        name: waveData.name,
+        intro: waveData.intro,
+        suggestedTowers: waveData.suggestedTowers,
+        threats: waveData.threats,
+      });
+    }
+    // Trigger wave 1 splash (delayed so banner shows first)
     if (!this.shownWaveSplashes.has(1)) {
       this.shownWaveSplashes.add(1);
       this.gameState = 'PAUSED';
-      eventBridge.emit(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, { tutorialKey: 'wave_1' });
+      this.time.delayedCall(3500, () => {
+        eventBridge.emit(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, { tutorialKey: 'wave_1' });
+      });
     }
     this.broadcastState();
   }
@@ -276,6 +294,8 @@ export class BreachDefenseScene extends Phaser.Scene {
     };
     this.selectedTowerType = null;
     this.shownWaveSplashes = new Set();
+    this.shownWaveStartBanners = new Set();
+    this.waveKillCount = 0;
     this.gameState = 'WAITING';
     this.broadcastState();
   }
@@ -469,8 +489,15 @@ export class BreachDefenseScene extends Phaser.Scene {
           const concept = currentWaveData.concept;
           eventBridge.emit(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, {
             wave: this.wave,
-            concept
+            concept,
+            endMessage: currentWaveData.endMessage,
+            stats: {
+              threatsStop: this.waveKillCount,
+              threatsTotal: this.waveState.enemiesSpawned,
+              towersActive: this.towers.length
+            }
           });
+          this.waveKillCount = 0;
 
           this.wave++;
 
@@ -489,12 +516,29 @@ export class BreachDefenseScene extends Phaser.Scene {
             spawnedPerThreat: []
           };
 
+          // Emit wave start data for next wave
+          if (!this.shownWaveStartBanners.has(this.wave)) {
+            this.shownWaveStartBanners.add(this.wave);
+            const nextWaveData = WAVES[this.wave - 1];
+            if (nextWaveData) {
+              eventBridge.emit(BRIDGE_EVENTS.BREACH_WAVE_START, {
+                wave: this.wave,
+                name: nextWaveData.name,
+                intro: nextWaveData.intro,
+                suggestedTowers: nextWaveData.suggestedTowers,
+                threats: nextWaveData.threats,
+              });
+            }
+          }
+
           // Check for wave splash screen
           if ([1, 3, 5, 7, 9].includes(this.wave) && !this.shownWaveSplashes.has(this.wave)) {
             this.shownWaveSplashes.add(this.wave);
             this.gameState = 'PAUSED';
-            eventBridge.emit(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, {
-              tutorialKey: `wave_${this.wave}`
+            this.time.delayedCall(3500, () => {
+              eventBridge.emit(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, {
+                tutorialKey: `wave_${this.wave}`
+              });
             });
           } else {
             // Auto-start next wave after delay
@@ -699,6 +743,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     // Remove dead enemies (with particle burst + fade animation)
     const deadEnemies = this.enemies.filter(e => e.hp <= 0);
+    this.waveKillCount += deadEnemies.length;
     for (const e of deadEnemies) {
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();

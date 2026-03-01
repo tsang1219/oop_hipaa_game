@@ -31,6 +31,7 @@ export const BRIDGE_EVENTS = {
   EXPLORATION_EXIT_ROOM: 'exploration:exit-room',
   EXPLORATION_PLAYER_MOVED: 'exploration:player-moved',
   BREACH_STATE_UPDATE: 'breach:state-update',
+  BREACH_WAVE_START: 'breach:wave-start',
   BREACH_WAVE_COMPLETE: 'breach:wave-complete',
   BREACH_GAME_OVER: 'breach:game-over',
   BREACH_VICTORY: 'breach:victory',
