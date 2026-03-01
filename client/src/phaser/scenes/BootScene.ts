@@ -71,6 +71,22 @@ export class BootScene extends Phaser.Scene {
     // Generate all additional textures (objects, furniture, extra NPCs)
     generateAllTextures(this);
 
+    // Register global 4-direction walk animations (persist across all scenes)
+    const WALK_DIRS = ['down', 'up', 'left', 'right'] as const;
+    for (const dir of WALK_DIRS) {
+      if (!this.anims.exists(`walk_${dir}`)) {
+        this.anims.create({
+          key: `walk_${dir}`,
+          frames: [
+            { key: `player_${dir}` },
+            { key: `player_${dir}_walk` },
+          ],
+          frameRate: 7,
+          repeat: -1,
+        });
+      }
+    }
+
     // Start the hub world
     this.scene.start('HubWorld');
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Boot');
@@ -172,6 +188,118 @@ export class BootScene extends Phaser.Scene {
     gRight.fillRect(17, 28, 5, 2);
     gRight.generateTexture('player_right', TILE_SIZE, TILE_SIZE);
     gRight.destroy();
+
+    // ── Walk frame 2 textures (legs-only animation) ────────────────
+    // player_down_walk: front view, left leg forward / right leg back
+    if (!this.textures.exists('player_down_walk')) {
+      const gDownWalk = this.add.graphics();
+      // Upper body (identical to player_down)
+      gDownWalk.fillStyle(0x4a90e2);
+      gDownWalk.fillRect(10, 14, 12, 10);
+      gDownWalk.fillStyle(0xfdbcb4);
+      gDownWalk.fillRect(12, 6, 8, 8);
+      gDownWalk.fillStyle(0x4a90e2);
+      gDownWalk.fillRect(11, 5, 10, 3);
+      gDownWalk.fillRect(10, 6, 2, 4);
+      gDownWalk.fillRect(20, 6, 2, 4);
+      gDownWalk.fillStyle(0x000000);
+      gDownWalk.fillRect(14, 9, 2, 2);
+      gDownWalk.fillRect(18, 9, 2, 2);
+      // Left leg forward
+      gDownWalk.fillStyle(0x2c3e50);
+      gDownWalk.fillRect(8, 22, 5, 4);
+      gDownWalk.fillStyle(0x8b4513);
+      gDownWalk.fillRect(8, 26, 5, 2);
+      // Right leg back
+      gDownWalk.fillStyle(0x2c3e50);
+      gDownWalk.fillRect(19, 26, 5, 4);
+      gDownWalk.fillStyle(0x8b4513);
+      gDownWalk.fillRect(19, 30, 5, 2);
+      gDownWalk.generateTexture('player_down_walk', TILE_SIZE, TILE_SIZE);
+      gDownWalk.destroy();
+    }
+
+    // player_up_walk: back view, left leg forward / right leg back (mirrored)
+    if (!this.textures.exists('player_up_walk')) {
+      const gUpWalk = this.add.graphics();
+      // Upper body (identical to player_up)
+      gUpWalk.fillStyle(0x4a90e2);
+      gUpWalk.fillRect(10, 14, 12, 10);
+      gUpWalk.fillStyle(0xfdbcb4);
+      gUpWalk.fillRect(12, 6, 8, 8);
+      gUpWalk.fillStyle(0x4a90e2);
+      gUpWalk.fillRect(11, 4, 10, 6);
+      gUpWalk.fillRect(10, 6, 2, 4);
+      gUpWalk.fillRect(20, 6, 2, 4);
+      // Left leg forward
+      gUpWalk.fillStyle(0x2c3e50);
+      gUpWalk.fillRect(8, 22, 5, 4);
+      gUpWalk.fillStyle(0x8b4513);
+      gUpWalk.fillRect(8, 26, 5, 2);
+      // Right leg back
+      gUpWalk.fillStyle(0x2c3e50);
+      gUpWalk.fillRect(19, 26, 5, 4);
+      gUpWalk.fillStyle(0x8b4513);
+      gUpWalk.fillRect(19, 30, 5, 2);
+      gUpWalk.generateTexture('player_up_walk', TILE_SIZE, TILE_SIZE);
+      gUpWalk.destroy();
+    }
+
+    // player_left_walk: side view, horizontal leg splay in direction of travel
+    if (!this.textures.exists('player_left_walk')) {
+      const gLeftWalk = this.add.graphics();
+      // Upper body (identical to player_left)
+      gLeftWalk.fillStyle(0x4a90e2);
+      gLeftWalk.fillRect(10, 14, 12, 10);
+      gLeftWalk.fillStyle(0xfdbcb4);
+      gLeftWalk.fillRect(12, 6, 8, 8);
+      gLeftWalk.fillStyle(0x4a90e2);
+      gLeftWalk.fillRect(11, 5, 10, 3);
+      gLeftWalk.fillRect(10, 6, 2, 4);
+      gLeftWalk.fillRect(20, 6, 2, 4);
+      gLeftWalk.fillStyle(0x000000);
+      gLeftWalk.fillRect(13, 9, 2, 2);
+      // Front leg (toward travel direction - left)
+      gLeftWalk.fillStyle(0x2c3e50);
+      gLeftWalk.fillRect(8, 24, 5, 4);
+      gLeftWalk.fillStyle(0x8b4513);
+      gLeftWalk.fillRect(8, 28, 5, 2);
+      // Back leg (trailing - right)
+      gLeftWalk.fillStyle(0x2c3e50);
+      gLeftWalk.fillRect(19, 24, 5, 4);
+      gLeftWalk.fillStyle(0x8b4513);
+      gLeftWalk.fillRect(19, 28, 5, 2);
+      gLeftWalk.generateTexture('player_left_walk', TILE_SIZE, TILE_SIZE);
+      gLeftWalk.destroy();
+    }
+
+    // player_right_walk: side view, horizontal leg splay in direction of travel
+    if (!this.textures.exists('player_right_walk')) {
+      const gRightWalk = this.add.graphics();
+      // Upper body (identical to player_right)
+      gRightWalk.fillStyle(0x4a90e2);
+      gRightWalk.fillRect(10, 14, 12, 10);
+      gRightWalk.fillStyle(0xfdbcb4);
+      gRightWalk.fillRect(12, 6, 8, 8);
+      gRightWalk.fillStyle(0x4a90e2);
+      gRightWalk.fillRect(11, 5, 10, 3);
+      gRightWalk.fillRect(10, 6, 2, 4);
+      gRightWalk.fillRect(20, 6, 2, 4);
+      gRightWalk.fillStyle(0x000000);
+      gRightWalk.fillRect(17, 9, 2, 2);
+      // Front leg (toward travel direction - right)
+      gRightWalk.fillStyle(0x2c3e50);
+      gRightWalk.fillRect(19, 24, 5, 4);
+      gRightWalk.fillStyle(0x8b4513);
+      gRightWalk.fillRect(19, 28, 5, 2);
+      // Back leg (trailing - left)
+      gRightWalk.fillStyle(0x2c3e50);
+      gRightWalk.fillRect(8, 24, 5, 4);
+      gRightWalk.fillStyle(0x8b4513);
+      gRightWalk.fillRect(8, 28, 5, 2);
+      gRightWalk.generateTexture('player_right_walk', TILE_SIZE, TILE_SIZE);
+      gRightWalk.destroy();
+    }
   }
 
   private generateNPCTextures() {
