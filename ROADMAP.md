@@ -1,228 +1,199 @@
-# OOP HIPAA Game — Roadmap
+# Roadmap: PrivacyQuest + BreachDefense
 
-Phase 4 cleanup is done. This is the plan for getting both games to MVP quality.
+## Milestones
 
----
+- ✅ **v1.0 Polish** - Phases 1-5 (shipped 2026-03-01)
+- 🚧 **v1.1 Sprite Overhaul** - Phases 6-10 (in progress)
 
-## 1. Visual Enhancements
+## Phases
 
-### 1a. PrivacyQuest Sprites (HIGH — current sprites are colored rectangles)
-The exploration sprites (player, NPCs, furniture, objects) are all programmatic `fillRect` shapes — 32x32 pixel bodies with no arms, no detail, and near-identical directional frames. The SVG sprites in the battle dialogue screen are much better but only show during NPC encounters.
+<details>
+<summary>✅ v1.0 Polish (Phases 1-5) - SHIPPED 2026-03-01</summary>
 
-**Recommended steps:**
-- Design or source spritesheets for the player (4-direction, 2-3 walk frames each)
-- Design NPC portraits/sprites with more personality (lab coat, badge, etc.)
-- Replace `SpriteFactory.ts` programmatic textures with spritesheet loads in `BootScene.ts`
-- Furniture and room objects could stay simpler, but desks/computers/beds need at least a second pass
+### Phase 1: Foundation
+**Goal**: Project infrastructure and Phaser integration are in place.
+**Plans**: Complete
 
-**Considerations:**
-- Can use AI image generation (like the BreachDefense PNGs) or pixel art tools (Aseprite, Piskel)
-- Spritesheet format: Phaser supports atlas JSON or simple grid spritesheets
-- The SVG battle portraits (`NPCSprite.tsx`, `PlayerBackSprite.tsx`) could be converted to PNGs for consistency
+Plans:
+- [x] 01-01: Phaser scaffold + hub world scene
 
-### 1b. Walk Cycle Animation (HIGH — player is a static image that slides)
-There is zero frame animation in the project. No `anims.create()` anywhere. The player texture swaps direction but each direction is a single static frame.
+### Phase 2: PrivacyQuest Exploration
+**Goal**: Players can walk hospital rooms, interact with NPCs, and make privacy decisions.
+**Plans**: Complete
 
-**Recommended steps:**
-- Create 2-3 frame walk cycle per direction (minimum: idle + 2 step frames)
-- Add `this.anims.create()` calls in the scene for player walk animations
-- Play animation on movement, stop on idle
-- Stretch goal: NPC idle animations (breathing, blinking)
+### Phase 3: BreachDefense Tower Defense
+**Goal**: Players can place towers, defend against cyber threats, and complete 10 waves.
+**Plans**: Complete
 
-### 1c. BreachDefense Tower/Enemy Visual Feedback (MEDIUM)
-Towers have PNG sprites but zero firing animation. Enemies have no death effect. Projectiles are plain 4px circles.
+### Phase 4: BreachDefense Polish
+**Goal**: Combat feels alive with sound, visual feedback, and HUD data surfaced.
+**Plans**: Complete
 
-**Recommended steps:**
-- Tower firing: brief scale pulse or muzzle flash tween when firing
-- Enemy death: fade-out tween + small particle burst or screen flash
-- Projectiles: add a trail effect or glow, or at least make them larger/more visible
-- Tower cooldown: subtle fill or ring animation showing reload progress
-- Hit impact: small particle pop or screen shake on enemy kill
+### Phase 5: PrivacyQuest Onboarding
+**Goal**: First-time players understand the game and know how to start.
+**Plans**: Complete
 
-### 1d. Scene Transitions (MEDIUM — currently instant cuts)
-Navigating between Hub, PrivacyQuest, and BreachDefense is an instant React route change with no visual transition.
+Plans:
+- [x] 05-01: Intro modal + NPC pulse highlight
 
-**Recommended steps:**
-- Add a camera fade-out/fade-in on scene transitions within Phaser (`camera.fadeOut` / `camera.fadeIn`)
-- For cross-page navigation (React routes), add a brief CSS fade or slide transition
-- Room entry/exit in PrivacyQuest could use a door-opening animation or screen wipe
-
-### 1e. UI/HUD Visual Polish (MEDIUM)
-The React HUD overlays work but are plain text with Tailwind styling. The tower selection panel shows names and costs but no icons.
-
-**Recommended steps:**
-- Add tower PNG thumbnails to the selection panel buttons
-- Add threat icons to wave intro/recap screens
-- Style the HallwayHub room grid with more visual flair (room preview images, status icons)
-- Consistent color palette and styling across all three pages
+</details>
 
 ---
 
-## 2. Mechanics and Feel
+### 🚧 v1.1 Sprite Overhaul (In Progress)
 
-### 2a. Player Movement Feel (HIGH — starts/stops instantly, no weight)
-Movement is exactly 160px/sec with instant start/stop. Click-to-move teleports tile-by-tile at 120ms steps.
+**Milestone Goal:** Replace all programmatic fillRect sprites with AI-generated PNG pixel art across PrivacyQuest and the Hub World — characters, portraits, furniture, interactive objects, and floor tiles.
 
-**Recommended steps:**
-- Add slight acceleration/deceleration curve (ease into full speed, ease out on stop)
-- Smooth out click-to-move with continuous movement along the path instead of discrete tile hops
-- Add a subtle dust particle or footstep indicator on movement
-- Camera follow already has lerp (0.1) which is good — could add slight camera lead in movement direction
-
-### 2b. Interaction Feedback (HIGH — interactions are abrupt)
-Pressing Space near an NPC immediately opens a full-screen React overlay with no transition. Completing an NPC just dims them to 50% alpha.
-
-**Recommended steps:**
-- Add a brief zoom-in or focus tween on the NPC before opening dialogue
-- Animate the dialogue overlay in (slide up or fade in)
-- On NPC completion: play a satisfying "complete" effect (sparkle, checkmark pop-in, brief glow)
-- Add a subtle highlight/glow on interactable NPCs and objects when in range
-
-### 2c. Tower Placement Satisfaction (MEDIUM — towers just appear)
-The hover + range preview is good, but actual placement has no feedback.
-
-**Recommended steps:**
-- Add a "pop in" scale tween when placing a tower (0 → 1.1 → 1.0)
-- Play a placement confirmation sound (when audio is added)
-- Brief budget-deducted animation on the HUD (number flash/shake)
-- Show a brief "Tower Placed!" floating text at the grid cell
-- Add ability to click placed towers to see their range circle
-
-### 2d. Tower Sell/Upgrade System (LOW for MVP)
-Once placed, towers can't be modified. This limits strategy.
-
-**Recommended steps (if pursuing):**
-- Click a placed tower to select it → show info panel + sell button
-- Selling refunds 50-75% of cost
-- Upgrade is a stretch goal — would need balance design for upgraded stats
-- This changes game balance significantly, so test thoroughly
-
-### 2e. Game Speed Control (LOW for MVP)
-No fast-forward button. Slow waves can drag.
-
-**Recommended steps:**
-- Add a 1x/2x speed toggle button to the BreachDefense HUD
-- Multiply `dt` or Phaser time scale by the speed factor
-- Pause between waves is already automatic (3-second delay) — could add "Send Next Wave" button
+**Note on phase structure:** Each phase has two kinds of work. Asset generation is a human checkpoint — the user generates PNGs externally using AI image generation tools and places them in `attached_assets/generated_images/privacyquest/`. Code integration is Claude Code work that depends on those assets being present.
 
 ---
 
-## 3. Gameplay, HUD, and Menus
+### Phase 6: Character Sprites
+**Goal**: Player and all 8 NPCs move with AI-generated 4-direction spritesheets and proper walk cycle animations.
+**Depends on**: Phase 5
+**Requirements**: CHAR-01, CHAR-02, CHAR-03, CHAR-04
+**Success Criteria** (what must be TRUE):
+  1. Player character displays a distinct AI-generated pixel art sprite (not a colored rectangle) and animates through walk frames when moving in any direction.
+  2. All 8 NPC types (Receptionist, Nurse, Doctor, IT Tech, Compliance Officer, General Staff, Patient, Visitor) display unique AI-generated sprites recognizable by their role outfit.
+  3. Walk animations stop and return to idle when movement stops — no looping walk while standing still.
+  4. NPCs display a subtle idle animation (breathing or blinking) when standing still.
+  5. Walk animations work in both ExplorationScene and HubWorldScene without duplicate registration.
+**Plans**: TBD
 
-### 3a. Sound Effects and Music (HIGH — there is zero audio)
-No sound exists anywhere. This is the single biggest gap for game feel.
+Plans:
+- [ ] 06-01: [Human checkpoint] Generate 9 character spritesheets (player + 8 NPCs) using AI image generation and place in `attached_assets/generated_images/privacyquest/characters/`
+- [ ] 06-02: Load character spritesheets in BootScene, register walk + idle animations, wire ExplorationScene and HubWorldScene to use new sprite keys
 
-**Recommended steps:**
-- Choose a sound library: Phaser has built-in `this.sound.play()`, or use Howler.js for more control
-- Priority SFX: tower fire, enemy hit, enemy death, tower placement, wave start, game over, victory
-- Background music: ambient loop per game mode (PrivacyQuest: calm exploration, BreachDefense: tense/electronic)
-- NPC interaction: dialogue blip sound (classic RPG style)
-- UI sounds: button click, menu open/close
-- Add a mute/volume toggle in the HUD
+### Phase 7: NPC Portraits
+**Goal**: NPC dialogue screens show expressive AI-generated character portraits with multiple expression variants instead of placeholder SVG components.
+**Depends on**: Phase 6
+**Requirements**: PORT-01, PORT-02, PORT-03
+**Success Criteria** (what must be TRUE):
+  1. All 6 NPC dialogue portraits (Nurse Nina, Dr. HIPAA, Tech Tyler, Officer Knox, Receptionist Rosa, Boss Director) display as AI-generated 128x128 pixel art portraits in dialogue overlays.
+  2. The placeholder SVG portrait components are no longer visible anywhere in the application.
+  3. Each portrait switches expression during dialogue — at least one emotional variant (happy, stern, or surprised) appears at an appropriate dialogue moment.
+**Plans**: TBD
 
-**Considerations:**
-- Free SFX sources: freesound.org, Kenney.nl, OpenGameArt
-- Keep file sizes small — use MP3/OGG, not WAV
-- Phaser's `WebAudioSoundManager` handles autoplay policy automatically
-- Add sounds incrementally — SFX first, music second
+Plans:
+- [ ] 07-01: [Human checkpoint] Generate 6 NPC portraits with 2 expression variants each (12 PNGs total) and place in `attached_assets/generated_images/privacyquest/portraits/`
+- [ ] 07-02: Load portrait images in BootScene, update React dialogue overlay components to render portrait PNGs, wire expression variant selection to dialogue state
 
-### 3b. BreachDefense HUD Improvements (HIGH)
-The HUD works but is missing useful information that already exists in the data.
+### Phase 8: Furniture and Interactive Objects
+**Goal**: Hospital rooms are furnished with AI-generated pixel art objects, and educational collectibles glow visually distinct from regular furniture.
+**Depends on**: Phase 6
+**Requirements**: FURN-01, FURN-02, FURN-03, ITEM-01, ITEM-02, ITEM-03
+**Success Criteria** (what must be TRUE):
+  1. All ~14 hospital room objects (desk, hospital bed, filing cabinet, exam table, server rack, workstation, medicine cabinet, waiting chair, plant, water cooler, whiteboard, poster, computer terminal, bookshelf) display as AI-generated sprites instead of colored rectangles.
+  2. At least 3 furniture items display subtle idle animations (server rack lights blink, ceiling fan spins, monitor flickers).
+  3. The 4 educational collectibles (Privacy Manual, Security Poster, Training Computer, Incident Report Clipboard) are visually distinguishable from regular furniture at a glance — they glow or sparkle.
+  4. Collectibles play a pickup animation sequence when the player interacts with them.
+**Plans**: TBD
 
-**Recommended steps:**
-- Show wave name/narrative on wave start (the `intro` field exists for all 10 waves but is never displayed)
-- Show `suggestedTowers` hint for each wave (data exists, never surfaced)
-- Show tower description on hover in the selection panel (the `desc` field exists but isn't shown)
-- Add enemy count remaining indicator (enemy count is tracked but not displayed)
-- Show `endMessage` for each wave on completion (data exists, never displayed)
-- Add a visible pause button with resume
+Plans:
+- [ ] 08-01: [Human checkpoint] Generate ~14 furniture PNGs and 4 educational collectible PNGs and place in `attached_assets/generated_images/privacyquest/furniture/` and `attached_assets/generated_images/privacyquest/objects/`
+- [ ] 08-02: Load furniture and object images in BootScene, replace SpriteFactory fillRect objects in ExplorationScene room layouts, add idle animations and collectible pickup sequence
 
-### 3c. PrivacyQuest Onboarding (HIGH — no tutorial exists)
-BreachDefense has a 12-modal tutorial chain (maybe too much). PrivacyQuest has nothing — the player arrives at the HallwayHub with zero guidance.
+### Phase 9: Floor Tiles
+**Goal**: Hospital rooms render with AI-generated tileset floors that match each room's setting, replacing the programmatic checkerboard.
+**Depends on**: Phase 8
+**Requirements**: TILE-01, TILE-02, TILE-03
+**Success Criteria** (what must be TRUE):
+  1. All 8 floor tile variants (hospital floor, carpet, lab floor, lobby floor, wall top, wall bottom, door, window) are distinct and recognizable.
+  2. The programmatic checkerboard floor is gone — no more alternating colored rectangles anywhere in ExplorationScene or HubWorldScene.
+  3. Rooms use the contextually appropriate tile (exam rooms get lab floor, lobby gets lobby floor, admin offices get carpet) with visible wall/floor transitions at room boundaries.
+**Plans**: TBD
 
-**Recommended steps:**
-- Add a brief intro modal on first visit explaining the premise ("You're a new Privacy Guardian at Memorial Hospital...")
-- Show controls overlay on first room entry (WASD to move, Space to interact, ESC to exit)
-- Highlight the first available NPC with a pulsing indicator
-- Show the privacy meter prominently and explain what it means
+Plans:
+- [ ] 09-01: [Human checkpoint] Generate 8 seamless 32x32 floor tile PNGs and place in `attached_assets/generated_images/privacyquest/tiles/`
+- [ ] 09-02: Load tiles in BootScene, replace programmatic floor rendering in ExplorationScene with tilemap-based rendering using the new tile set
 
-### 3d. PrivacyQuest Privacy Score Visibility (MEDIUM)
-The trust/privacy meter is tracked in state and affects gameplay but is only visible at the HallwayHub room picker — not during room exploration where decisions actually happen.
+### Phase 10: Final Integration and Cleanup
+**Goal**: All sprites are loaded from a unified texture atlas, SpriteFactory.ts is deleted, and no programmatic fillRect textures remain anywhere.
+**Depends on**: Phase 9
+**Requirements**: INTG-01, INTG-02, INTG-03, INTG-04
+**Success Criteria** (what must be TRUE):
+  1. The file `SpriteFactory.ts` no longer exists in the codebase — it has been deleted, not commented out.
+  2. ExplorationScene and HubWorldScene reference only new PNG texture keys — no legacy SpriteFactory keys remain.
+  3. All PNG sprites (characters, portraits, furniture, objects, tiles) are preloaded in BootScene and available across all scenes.
+  4. Sprites are packed into a texture atlas and loaded via `this.load.atlas()` — the number of individual `load.image()` and `load.spritesheet()` calls is replaced by atlas loading.
+**Plans**: TBD
 
-**Recommended steps:**
-- Add a persistent privacy score indicator in the exploration HUD (top of screen or overlay)
-- Animate score changes with a brief flash/pulse when it goes up or down
-- Show score impact in the dialogue feedback ("Trust -5" or "Trust +10") visibly
-
-### 3e. BreachDefense Save State (LOW for MVP)
-PrivacyQuest saves to localStorage. BreachDefense doesn't save at all — refreshing resets to wave 1.
-
-**Recommended steps:**
-- Save current wave, budget, tower positions, and score to localStorage on wave completion
-- On page load, check for existing save and offer "Continue" or "New Game"
-- Clear save on victory or game over
-
-### 3f. Victory/Completion Screens (MEDIUM)
-BreachDefense victory shows waves completed + towers placed. No educational summary. PrivacyQuest end screen shows a score but no certificate or shareable result.
-
-**Recommended steps:**
-- BreachDefense victory: show which HIPAA Security concepts were covered, which threats were defeated, final score breakdown
-- PrivacyQuest end: show which principles were learned, room completion stats, patient stories collected
-- Stretch: a combined "HIPAA Certification" screen if both games are completed
-- Stretch: shareable result image/link
-
-### 3g. BreachDefense Tutorial Pacing (LOW)
-12 modal interruptions across 10 waves is dense. Waves 2, 4, 6, 8, 10 auto-start silently while odd waves get a tutorial + recap.
-
-**Recommended steps:**
-- Consider making tutorials skippable with a "Skip Tutorial" button for replay
-- Show wave intro text as a brief in-canvas banner instead of a modal (less disruptive)
-- Add a "Ready?" button before each wave instead of auto-starting after 3 seconds
-- Move some educational content to post-wave recaps instead of pre-wave interruptions
-
----
-
-## 4. Infrastructure
-
-### 4a. Code-Split Phaser Scenes (LOW)
-Vite warns about chunk size (1.9MB JS bundle). Phaser itself is ~1MB.
-
-**Recommended steps:**
-- Lazy-load Phaser with `React.lazy()` + `import()` so the bundle doesn't include Phaser on initial page load
-- Split each game page into its own chunk
-- This improves initial load time but doesn't affect gameplay
-
-### 4b. Deployment (MEDIUM — when ready to share)
-Currently runs via `npm run dev` locally only.
-
-**Recommended steps:**
-- The express server is just a static file server in production — could deploy to Vercel/Netlify as a static site
-- Or keep the express server for future API needs and deploy to Railway/Render
-- Set up a build-on-push CI pipeline (GitHub Actions)
-
-### 4c. Mobile/Responsive (LOW for MVP)
-Phaser canvas is fixed-size. HUD is desktop-only layout.
-
-**Considerations:**
-- Phaser `Scale.FIT` can auto-resize the canvas
-- Touch controls would need virtual joystick for PrivacyQuest and tap-to-place for BreachDefense
-- This is a significant effort — probably post-MVP
+Plans:
+- [ ] 10-01: Audit all remaining SpriteFactory usage, pack sprites into a texture atlas using the project's existing toolchain, update BootScene to use atlas loading, delete SpriteFactory.ts, verify no broken texture keys
 
 ---
 
-## Suggested MVP Priority Order
+## Phase Details
 
-| Priority | Item | Impact |
-|----------|------|--------|
-| 1 | Sound effects (3a) | Biggest single improvement to game feel |
-| 2 | PrivacyQuest sprites + walk cycle (1a, 1b) | Exploration currently looks like placeholder art |
-| 3 | BreachDefense visual feedback — death FX, firing FX (1c) | Makes combat feel alive |
-| 4 | BreachDefense HUD improvements (3b) | Surfaces existing data that players need |
-| 5 | PrivacyQuest onboarding (3c) | Players won't know what to do without it |
-| 6 | Interaction feedback + transitions (2b, 1d) | Smooths the rough edges |
-| 7 | Player movement feel (2a) | Improves exploration satisfaction |
-| 8 | Privacy score visibility (3d) | Players need to see consequences of choices |
-| 9 | Victory/completion screens (3f) | Ties the educational loop together |
-| 10 | Tower placement feel (2c) | Nice-to-have polish |
-| 11 | Deployment (4b) | When ready to share |
-| 12 | Everything else | Post-MVP |
+### Phase 6: Character Sprites
+**Goal**: Player and all 8 NPCs move with AI-generated 4-direction spritesheets and proper walk cycle animations.
+**Depends on**: Phase 5
+**Requirements**: CHAR-01, CHAR-02, CHAR-03, CHAR-04
+**Success Criteria** (what must be TRUE):
+  1. Player character displays a distinct AI-generated pixel art sprite (not a colored rectangle) and animates through walk frames when moving in any direction.
+  2. All 8 NPC types (Receptionist, Nurse, Doctor, IT Tech, Compliance Officer, General Staff, Patient, Visitor) display unique AI-generated sprites recognizable by their role outfit.
+  3. Walk animations stop and return to idle when movement stops — no looping walk while standing still.
+  4. NPCs display a subtle idle animation (breathing or blinking) when standing still.
+  5. Walk animations work in both ExplorationScene and HubWorldScene without duplicate registration.
+**Plans**: TBD
+
+### Phase 7: NPC Portraits
+**Goal**: NPC dialogue screens show expressive AI-generated character portraits with multiple expression variants instead of placeholder SVG components.
+**Depends on**: Phase 6
+**Requirements**: PORT-01, PORT-02, PORT-03
+**Success Criteria** (what must be TRUE):
+  1. All 6 NPC dialogue portraits (Nurse Nina, Dr. HIPAA, Tech Tyler, Officer Knox, Receptionist Rosa, Boss Director) display as AI-generated 128x128 pixel art portraits in dialogue overlays.
+  2. The placeholder SVG portrait components are no longer visible anywhere in the application.
+  3. Each portrait switches expression during dialogue — at least one emotional variant (happy, stern, or surprised) appears at an appropriate dialogue moment.
+**Plans**: TBD
+
+### Phase 8: Furniture and Interactive Objects
+**Goal**: Hospital rooms are furnished with AI-generated pixel art objects, and educational collectibles glow visually distinct from regular furniture.
+**Depends on**: Phase 6
+**Requirements**: FURN-01, FURN-02, FURN-03, ITEM-01, ITEM-02, ITEM-03
+**Success Criteria** (what must be TRUE):
+  1. All ~14 hospital room objects (desk, hospital bed, filing cabinet, exam table, server rack, workstation, medicine cabinet, waiting chair, plant, water cooler, whiteboard, poster, computer terminal, bookshelf) display as AI-generated sprites instead of colored rectangles.
+  2. At least 3 furniture items display subtle idle animations (server rack lights blink, ceiling fan spins, monitor flickers).
+  3. The 4 educational collectibles (Privacy Manual, Security Poster, Training Computer, Incident Report Clipboard) are visually distinguishable from regular furniture at a glance — they glow or sparkle.
+  4. Collectibles play a pickup animation sequence when the player interacts with them.
+**Plans**: TBD
+
+### Phase 9: Floor Tiles
+**Goal**: Hospital rooms render with AI-generated tileset floors that match each room's setting, replacing the programmatic checkerboard.
+**Depends on**: Phase 8
+**Requirements**: TILE-01, TILE-02, TILE-03
+**Success Criteria** (what must be TRUE):
+  1. All 8 floor tile variants (hospital floor, carpet, lab floor, lobby floor, wall top, wall bottom, door, window) are distinct and recognizable.
+  2. The programmatic checkerboard floor is gone — no more alternating colored rectangles anywhere in ExplorationScene or HubWorldScene.
+  3. Rooms use the contextually appropriate tile (exam rooms get lab floor, lobby gets lobby floor, admin offices get carpet) with visible wall/floor transitions at room boundaries.
+**Plans**: TBD
+
+### Phase 10: Final Integration and Cleanup
+**Goal**: All sprites are loaded from a unified texture atlas, SpriteFactory.ts is deleted, and no programmatic fillRect textures remain anywhere.
+**Depends on**: Phase 9
+**Requirements**: INTG-01, INTG-02, INTG-03, INTG-04
+**Success Criteria** (what must be TRUE):
+  1. The file `SpriteFactory.ts` no longer exists in the codebase — it has been deleted, not commented out.
+  2. ExplorationScene and HubWorldScene reference only new PNG texture keys — no legacy SpriteFactory keys remain.
+  3. All PNG sprites (characters, portraits, furniture, objects, tiles) are preloaded in BootScene and available across all scenes.
+  4. Sprites are packed into a texture atlas and loaded via `this.load.atlas()` — the number of individual `load.image()` and `load.spritesheet()` calls is replaced by atlas loading.
+**Plans**: TBD
+
+---
+
+## Progress
+
+**Execution Order:** 6 → 7 → 8 → 9 → 10
+
+| Phase | Milestone | Plans Complete | Status | Completed |
+|-------|-----------|----------------|--------|-----------|
+| 1. Foundation | v1.0 | - | Complete | 2026-03-01 |
+| 2. PrivacyQuest Exploration | v1.0 | - | Complete | 2026-03-01 |
+| 3. BreachDefense Tower Defense | v1.0 | - | Complete | 2026-03-01 |
+| 4. BreachDefense Polish | v1.0 | - | Complete | 2026-03-01 |
+| 5. PrivacyQuest Onboarding | v1.0 | - | Complete | 2026-03-01 |
+| 6. Character Sprites | v1.1 | 0/2 | Not started | - |
+| 7. NPC Portraits | v1.1 | 0/2 | Not started | - |
+| 8. Furniture and Interactive Objects | v1.1 | 0/2 | Not started | - |
+| 9. Floor Tiles | v1.1 | 0/2 | Not started | - |
+| 10. Final Integration and Cleanup | v1.1 | 0/1 | Not started | - |

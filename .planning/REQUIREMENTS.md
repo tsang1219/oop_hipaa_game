@@ -72,13 +72,32 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| (populated by roadmapper) | | |
+| CHAR-01 | Phase 6 | Pending |
+| CHAR-02 | Phase 6 | Pending |
+| CHAR-03 | Phase 6 | Pending |
+| CHAR-04 | Phase 6 | Pending |
+| PORT-01 | Phase 7 | Pending |
+| PORT-02 | Phase 7 | Pending |
+| PORT-03 | Phase 7 | Pending |
+| FURN-01 | Phase 8 | Pending |
+| FURN-02 | Phase 8 | Pending |
+| FURN-03 | Phase 8 | Pending |
+| ITEM-01 | Phase 8 | Pending |
+| ITEM-02 | Phase 8 | Pending |
+| ITEM-03 | Phase 8 | Pending |
+| TILE-01 | Phase 9 | Pending |
+| TILE-02 | Phase 9 | Pending |
+| TILE-03 | Phase 9 | Pending |
+| INTG-01 | Phase 10 | Pending |
+| INTG-02 | Phase 10 | Pending |
+| INTG-03 | Phase 10 | Pending |
+| INTG-04 | Phase 10 | Pending |
 
 **Coverage:**
-- v1.1 requirements: 18 total
-- Mapped to phases: 0
-- Unmapped: 18
+- v1.1 requirements: 20 total
+- Mapped to phases: 20
+- Unmapped: 0 ✓
 
 ---
 *Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after initial definition*
+*Last updated: 2026-03-01 after roadmap creation*
