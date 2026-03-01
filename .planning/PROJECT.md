@@ -30,7 +30,18 @@ Both games must feel like real games — not prototypes. Sound, visual feedback,
 
 ### Active
 
-(Next milestone requirements — to be defined via `/gsd:new-milestone`)
+## Current Milestone: v1.1 Sprite Overhaul
+
+**Goal:** Replace all programmatic fillRect sprites with AI-generated PNG pixel art across PrivacyQuest and the Hub World — characters, portraits, furniture, interactive objects, and floor tiles.
+
+**Target features:**
+
+- AI-generated 4-direction character spritesheets (9 characters) replacing SpriteFactory rectangles
+- NPC dialogue portraits (6 characters) replacing placeholder SVG components
+- Hospital furniture and room objects (\~14 items) as individual PNG sprites
+- Interactive educational objects (4 items) with glowing/magical aesthetic
+- Hospital floor tiles (8 variants) replacing checkerboard programmatic floors
+- BootScene sprite loading, animation registration, and SpriteFactory retirement
 
 ### Out of Scope
 
@@ -43,23 +54,23 @@ Both games must feel like real games — not prototypes. Sound, visual feedback,
 
 ## Context
 
-Shipped v1.0 Polish milestone with ~12,400 LOC across 68 files.
+Shipped v1.0 Polish milestone with \~12,400 LOC across 68 files.
 Tech stack: Phaser 3.90+ / React 18 / TypeScript / Vite 5 / Tailwind 3.
-Art: Programmatic pixel sprites (32px/64px), BreachDefense has PNG sprites for towers/threats.
+Art: Programmatic pixel sprites (32px/64px) for PrivacyQuest (being replaced in v1.1), BreachDefense has PNG sprites for towers/threats.
 Audio: 6 Kenney CC0 OGG files loaded in BootScene, played via `this.sound.play()`.
 Hosting: Desktop browser (Chrome/Firefox), no Safari support yet (OGG-only audio).
 
 ## Key Decisions
 
-| Decision | Rationale | Outcome |
-|----------|-----------|---------|
-| Sound: core actions only, no music | Biggest impact per effort | v1.0 Good |
-| Sprites: programmatic legs-only walk frames | Fastest to ship at 32px scale | v1.0 Good |
-| VFX: tweens + single white particle tinted per threat | Minimal assets, maximum variety | v1.0 Good |
-| Onboarding: TutorialModal reuse + NPC pulse | Consistent with BreachDefense pattern | v1.0 Good |
-| Global anim registration in BootScene | Walk anims available in all scenes without re-registration | v1.0 Good |
-| Direct this.sound.play() (not EventBridge) | No listener leak risk for in-scene triggers | v1.0 Good |
-| activateWave() helper | Encapsulates active flag + sound, prevents double-fire | v1.0 Good |
+| Decision                                              | Rationale                                                  | Outcome   |
+| ----------------------------------------------------- | ---------------------------------------------------------- | --------- |
+| Sound: core actions only, no music                    | Biggest impact per effort                                  | v1.0 Good |
+| Sprites: programmatic legs-only walk frames           | Fastest to ship at 32px scale                              | v1.0 Good |
+| VFX: tweens + single white particle tinted per threat | Minimal assets, maximum variety                            | v1.0 Good |
+| Onboarding: TutorialModal reuse + NPC pulse           | Consistent with BreachDefense pattern                      | v1.0 Good |
+| Global anim registration in BootScene                 | Walk anims available in all scenes without re-registration | v1.0 Good |
+| Direct this.sound.play() (not EventBridge)            | No listener leak risk for in-scene triggers                | v1.0 Good |
+| activateWave() helper                                 | Encapsulates active flag + sound, prevents double-fire     | v1.0 Good |
 
 ## Constraints
 
@@ -70,4 +81,5 @@ Hosting: Desktop browser (Chrome/Firefox), no Safari support yet (OGG-only audio
 - **EventBridge**: Every `on()` needs matching `off()` in `shutdown()`
 
 ---
-*Last updated: 2026-03-01 after v1.0 milestone*
+
+*Last updated: 2026-03-01 after v1.1 milestone start*

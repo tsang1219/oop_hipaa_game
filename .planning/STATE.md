@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.0
-milestone_name: Polish
-status: complete
+milestone: v1.1
+milestone_name: Sprite Overhaul
+status: defining_requirements
 last_updated: "2026-03-01"
 progress:
-  total_phases: 5
-  completed_phases: 5
-  total_plans: 9
-  completed_plans: 9
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
@@ -18,15 +18,17 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-01)
 
 **Core value:** Both games must feel like real games — not prototypes.
-**Current focus:** v1.0 complete. Next milestone not yet planned.
+**Current focus:** v1.1 Sprite Overhaul — replacing programmatic sprites with AI-generated PNG pixel art
 
 ## Current Position
 
-Milestone v1.0 Polish: SHIPPED 2026-03-01
-All 5 phases complete, all 18 requirements met.
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-03-01 — Milestone v1.1 started
 
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: v1.0 milestone archived
-Resume: `/gsd:new-milestone` to start next milestone
+Stopped at: Defining v1.1 requirements
+Resume: Continue requirements definition → roadmap creation
