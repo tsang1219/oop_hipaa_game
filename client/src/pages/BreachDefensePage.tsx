@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
 import { useLocation } from 'wouter';
+import * as Tooltip from '@radix-ui/react-tooltip';
 import { PhaserGame } from '../phaser/PhaserGame';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
 import { TOWERS, WAVES } from '../game/breach-defense/constants';
@@ -7,6 +8,8 @@ import { TUTORIAL_CONTENT } from '../game/breach-defense/tutorialContent';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { RecapModal } from '../components/breach-defense/RecapModal';
 import { CodexModal } from '../components/breach-defense/CodexModal';
+import { WaveIntroBanner } from '../components/breach-defense/WaveIntroBanner';
+import { ThreatStrip } from '../components/breach-defense/ThreatStrip';
 import { Shield, BookOpen, ArrowLeft, Heart, DollarSign, Layers } from 'lucide-react';
 
 type TowerType = keyof typeof TOWERS;
@@ -38,6 +41,26 @@ export default function BreachDefensePage() {
 
   // End stats
   const [endStats, setEndStats] = useState({ wavesCompleted: 0, towersPlaced: 0 });
+
+  // Wave banner
+  const [showWaveBanner, setShowWaveBanner] = useState(false);
+  const [waveBannerData, setWaveBannerData] = useState<{
+    wave: number;
+    name: string;
+    intro: string;
+    suggestedTowers: string[];
+    threats: Array<{ type: string; count: number }>;
+  } | null>(null);
+
+  // Persistent threat strip
+  const [currentWaveThreats, setCurrentWaveThreats] = useState<Array<{ type: string; count: number }>>([]);
+
+  // Suggested towers for badges
+  const [currentWaveSuggestedTowers, setCurrentWaveSuggestedTowers] = useState<string[]>([]);
+
+  // Wave end data for RecapModal
+  const [waveEndMessage, setWaveEndMessage] = useState<string | undefined>(undefined);
+  const [waveEndStats, setWaveEndStats] = useState<{ threatsStop: number; threatsTotal: number; towersActive: number } | undefined>(undefined);
 
   // ── Scene launch ───────────────────────────────────────────────
 
@@ -79,9 +102,36 @@ export default function BreachDefensePage() {
       setWave(data.wave);
     };
 
-    const onWaveComplete = (data: { wave: number; concept: string }) => {
+    const onWaveStart = (data: {
+      wave: number;
+      name: string;
+      intro: string;
+      suggestedTowers: string[];
+      threats: Array<{ type: string; count: number; interval?: number }>;
+    }) => {
+      setWaveBannerData({
+        wave: data.wave,
+        name: data.name,
+        intro: data.intro,
+        suggestedTowers: data.suggestedTowers,
+        threats: data.threats.map(t => ({ type: t.type, count: t.count })),
+      });
+      setShowWaveBanner(true);
+      setCurrentWaveThreats(data.threats.map(t => ({ type: t.type, count: t.count })));
+      setCurrentWaveSuggestedTowers(data.suggestedTowers);
+    };
+
+    const onWaveComplete = (data: {
+      wave: number;
+      concept: string;
+      endMessage?: string;
+      stats?: { threatsStop: number; threatsTotal: number; towersActive: number };
+    }) => {
       setShowRecap(true);
       setRecapConcept(data.concept);
+      setWaveEndMessage(data.endMessage);
+      setWaveEndStats(data.stats);
+      setCurrentWaveThreats([]); // Clear threat strip between waves
     };
 
     const onGameOver = (data: { wavesCompleted: number; towersPlaced: number }) => {
@@ -106,6 +156,7 @@ export default function BreachDefensePage() {
       setPageState('TUTORIAL');
     };
 
+    eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_START, onWaveStart);
     eventBridge.on(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onStateUpdate);
     eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, onWaveComplete);
     eventBridge.on(BRIDGE_EVENTS.BREACH_GAME_OVER, onGameOver);
@@ -114,6 +165,7 @@ export default function BreachDefensePage() {
     eventBridge.on(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, onTutorialTrigger);
 
     return () => {
+      eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_START, onWaveStart);
       eventBridge.off(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onStateUpdate);
       eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, onWaveComplete);
       eventBridge.off(BRIDGE_EVENTS.BREACH_GAME_OVER, onGameOver);
@@ -167,7 +219,13 @@ export default function BreachDefensePage() {
   const handleRecapContinue = useCallback(() => {
     setShowRecap(false);
     setRecapConcept(null);
+    setWaveEndMessage(undefined);
+    setWaveEndStats(undefined);
     eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
+  }, []);
+
+  const handleBannerDismiss = useCallback(() => {
+    setShowWaveBanner(false);
   }, []);
 
   const handleRestart = useCallback(() => {
@@ -181,6 +239,12 @@ export default function BreachDefensePage() {
     setShowCodex(false);
     setSeenThreats([]);
     setSeenTowers([]);
+    setShowWaveBanner(false);
+    setWaveBannerData(null);
+    setCurrentWaveThreats([]);
+    setCurrentWaveSuggestedTowers([]);
+    setWaveEndMessage(undefined);
+    setWaveEndStats(undefined);
     eventBridge.emit(BRIDGE_EVENTS.REACT_RESTART_BREACH);
   }, []);
 
@@ -217,7 +281,21 @@ export default function BreachDefensePage() {
       {/* Phaser canvas */}
       <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <PhaserGame ref={gameRef} width={640} height={480} />
+        {showWaveBanner && waveBannerData && (
+          <WaveIntroBanner
+            wave={waveBannerData.wave}
+            name={waveBannerData.name}
+            intro={waveBannerData.intro}
+            suggestedTowers={waveBannerData.suggestedTowers}
+            threats={waveBannerData.threats}
+            onDismiss={handleBannerDismiss}
+            autoDismissMs={3000}
+          />
+        )}
       </div>
+
+      {/* Incoming threat strip */}
+      <ThreatStrip threats={currentWaveThreats} />
 
       {/* HUD bar */}
       <div className="flex gap-6 items-center p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[640px] justify-between px-4">
@@ -254,34 +332,62 @@ export default function BreachDefensePage() {
       </div>
 
       {/* Tower selection panel */}
-      <div className="flex gap-1 p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[640px] justify-center flex-wrap">
-        {Object.entries(TOWERS).map(([id, tower]) => {
-          const locked = wave < tower.unlockWave;
-          const tooExpensive = budget < tower.cost;
-          const isSelected = selectedTower === id;
-          const disabled = locked || tooExpensive || pageState !== 'PLAYING';
+      <Tooltip.Provider delayDuration={200}>
+        <div className="flex gap-1 p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[640px] justify-center flex-wrap">
+          {Object.entries(TOWERS).map(([id, tower]) => {
+            const locked = wave < tower.unlockWave;
+            const tooExpensive = budget < tower.cost;
+            const isSelected = selectedTower === id;
+            const disabled = locked || tooExpensive || pageState !== 'PLAYING';
+            const isSuggested = currentWaveSuggestedTowers.includes(id);
 
-          return (
-            <button
-              key={id}
-              onClick={() => !disabled && handleSelectTower(id as TowerType)}
-              disabled={disabled}
-              className={`p-1.5 border-2 rounded text-center w-[100px] transition-all ${
-                isSelected
-                  ? 'border-yellow-400 bg-yellow-900/30 shadow-[0_0_8px_rgba(255,200,0,0.3)]'
-                  : 'border-gray-600 hover:border-gray-400'
-              } ${locked ? 'opacity-25 cursor-not-allowed' : tooExpensive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-            >
-              <div className="text-[7px] font-bold truncate" style={{ color: tower.color }}>
-                {locked ? '???' : tower.name}
-              </div>
-              <div className="text-[7px] text-gray-400">
-                {locked ? `Wave ${tower.unlockWave}` : `$${tower.cost}`}
-              </div>
-            </button>
-          );
-        })}
-      </div>
+            return (
+              <Tooltip.Root key={id}>
+                <Tooltip.Trigger asChild>
+                  <button
+                    onClick={() => !disabled && handleSelectTower(id as TowerType)}
+                    disabled={disabled}
+                    className={`relative p-1.5 border-2 rounded text-center w-[100px] transition-all ${
+                      isSelected
+                        ? 'border-yellow-400 bg-yellow-900/30 shadow-[0_0_8px_rgba(255,200,0,0.3)]'
+                        : isSuggested && !locked
+                          ? 'border-yellow-400 animate-pulse shadow-[0_0_8px_rgba(255,200,0,0.4)]'
+                          : 'border-gray-600 hover:border-gray-400'
+                    } ${locked ? 'opacity-25 cursor-not-allowed' : tooExpensive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                  >
+                    {isSuggested && !locked && (
+                      <span className="absolute -top-1.5 -right-1.5 text-[5px] bg-yellow-400 text-black px-1 font-bold border border-black leading-tight">
+                        HINT
+                      </span>
+                    )}
+                    <div className="text-[7px] font-bold truncate" style={{ color: tower.color }}>
+                      {locked ? '???' : tower.name}
+                    </div>
+                    <div className="text-[7px] text-gray-400">
+                      {locked ? `Wave ${tower.unlockWave}` : `$${tower.cost}`}
+                    </div>
+                  </button>
+                </Tooltip.Trigger>
+                {!locked && (
+                  <Tooltip.Portal>
+                    <Tooltip.Content
+                      className="bg-[#1a1a2e] border-2 border-[#FF6B9D] p-2 rounded max-w-[200px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
+                      style={{ fontFamily: '"Press Start 2P", monospace' }}
+                      side="top"
+                      sideOffset={4}
+                    >
+                      <p className="text-[7px] text-gray-200 mb-1.5 leading-relaxed">{tower.desc}</p>
+                      <p className="text-[6px] text-green-400">+ {tower.strongAgainst.join(', ')}</p>
+                      <p className="text-[6px] text-red-400">- {tower.weakAgainst.join(', ')}</p>
+                      <Tooltip.Arrow className="fill-[#FF6B9D]" />
+                    </Tooltip.Content>
+                  </Tooltip.Portal>
+                )}
+              </Tooltip.Root>
+            );
+          })}
+        </div>
+      </Tooltip.Provider>
 
       {/* Controls hint + back button */}
       <div className="flex items-center gap-4 w-[640px] justify-between">
@@ -333,8 +439,10 @@ export default function BreachDefensePage() {
       {/* ── RECAP MODAL ───────────────────────────────────────── */}
       {showRecap && recapConcept && (
         <RecapModal
-          concept={recapConcept as keyof typeof TUTORIAL_CONTENT.recaps}
+          concept={recapConcept}
           onContinue={handleRecapContinue}
+          endMessage={waveEndMessage}
+          stats={waveEndStats}
         />
       )}
 
