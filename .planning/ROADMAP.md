@@ -59,7 +59,10 @@ Plans:
   1. Enemies burst into a particle explosion and fade out at their death position — they do not simply disappear
   2. Towers visibly recoil (scale tween) each time they fire a projectile
   3. Towers show a distinct color pulse when firing at an enemy type they counter (strong-match relationship visible to player)
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 03-01-PLAN.md — Particle texture + threat colors, death burst + fade, tower recoil tween, strong-match two-phase flash
 
 ### Phase 4: BreachDefense HUD Data
 **Goal**: The educational data that already exists in constants.ts is visible to players during gameplay
