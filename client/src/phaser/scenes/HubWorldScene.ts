@@ -21,6 +21,7 @@ export class HubWorldScene extends Phaser.Scene {
   private nearDoor: 'privacy-quest' | 'breach-defense' | null = null;
   private promptText!: Phaser.GameObjects.Text;
   private titleText!: Phaser.GameObjects.Text;
+  private lastFacingTexture = 'player_down';
 
   constructor() {
     super({ key: 'HubWorld' });
@@ -132,18 +133,31 @@ export class HubWorldScene extends Phaser.Scene {
 
     if (left) {
       body.setVelocityX(-MOVE_SPEED);
-      this.player.setTexture('player_left');
+      this.player.anims.play('walk_left', true);
+      this.lastFacingTexture = 'player_left';
     } else if (right) {
       body.setVelocityX(MOVE_SPEED);
-      this.player.setTexture('player_right');
+      this.player.anims.play('walk_right', true);
+      this.lastFacingTexture = 'player_right';
     }
 
     if (up) {
       body.setVelocityY(-MOVE_SPEED);
-      if (!left && !right) this.player.setTexture('player_up');
+      if (!left && !right) {
+        this.player.anims.play('walk_up', true);
+        this.lastFacingTexture = 'player_up';
+      }
     } else if (down) {
       body.setVelocityY(MOVE_SPEED);
-      if (!left && !right) this.player.setTexture('player_down');
+      if (!left && !right) {
+        this.player.anims.play('walk_down', true);
+        this.lastFacingTexture = 'player_down';
+      }
+    }
+
+    if (!left && !right && !up && !down) {
+      this.player.anims.stop();
+      this.player.setTexture(this.lastFacingTexture);
     }
 
     // Normalize diagonal movement

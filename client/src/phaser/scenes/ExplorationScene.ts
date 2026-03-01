@@ -50,6 +50,9 @@ export class ExplorationScene extends Phaser.Scene {
   // Pause movement while in dialogue
   private paused = false;
 
+  // Track last facing direction for idle restore after animation stop
+  private lastFacingTexture = 'player_down';
+
   constructor() {
     super({ key: 'Exploration' });
   }
@@ -268,7 +271,10 @@ export class ExplorationScene extends Phaser.Scene {
 
   update() {
     if (this.paused) {
-      (this.player.body as Phaser.Physics.Arcade.Body).setVelocity(0);
+      const pauseBody = this.player.body as Phaser.Physics.Arcade.Body;
+      pauseBody.setVelocity(0);
+      this.player.anims.stop();
+      this.player.setTexture(this.lastFacingTexture);
       return;
     }
 
@@ -285,22 +291,35 @@ export class ExplorationScene extends Phaser.Scene {
 
       if (left) {
         body.setVelocityX(-MOVE_SPEED);
-        this.player.setTexture('player_left');
+        this.player.anims.play('walk_left', true);
+        this.lastFacingTexture = 'player_left';
       } else if (right) {
         body.setVelocityX(MOVE_SPEED);
-        this.player.setTexture('player_right');
+        this.player.anims.play('walk_right', true);
+        this.lastFacingTexture = 'player_right';
       }
 
       if (up) {
         body.setVelocityY(-MOVE_SPEED);
-        if (!left && !right) this.player.setTexture('player_up');
+        if (!left && !right) {
+          this.player.anims.play('walk_up', true);
+          this.lastFacingTexture = 'player_up';
+        }
       } else if (down) {
         body.setVelocityY(MOVE_SPEED);
-        if (!left && !right) this.player.setTexture('player_down');
+        if (!left && !right) {
+          this.player.anims.play('walk_down', true);
+          this.lastFacingTexture = 'player_down';
+        }
       }
 
       if ((left || right) && (up || down)) {
         body.velocity.normalize().scale(MOVE_SPEED);
+      }
+
+      if (!left && !right && !up && !down) {
+        this.player.anims.stop();
+        this.player.setTexture(this.lastFacingTexture);
       }
 
       // Track tile position from continuous movement
@@ -380,7 +399,10 @@ export class ExplorationScene extends Phaser.Scene {
     const step = () => {
       if (this.movePath.length === 0) {
         this.moveTimer = null;
-        // Arrived — trigger pending interaction if adjacent
+        // Arrived — stop walk animation, restore idle pose
+        this.player.anims.stop();
+        this.player.setTexture(this.lastFacingTexture);
+        // Trigger pending interaction if adjacent
         if (this.pendingInteraction) {
           const d = this.pendingInteraction.data as { x: number; y: number };
           const dist = Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y);
@@ -397,10 +419,19 @@ export class ExplorationScene extends Phaser.Scene {
       const dx = next.x - this.tileX;
       const dy = next.y - this.tileY;
 
-      if (dx < 0) this.player.setTexture('player_left');
-      else if (dx > 0) this.player.setTexture('player_right');
-      else if (dy < 0) this.player.setTexture('player_up');
-      else if (dy > 0) this.player.setTexture('player_down');
+      if (dx < 0) {
+        this.player.anims.play('walk_left', true);
+        this.lastFacingTexture = 'player_left';
+      } else if (dx > 0) {
+        this.player.anims.play('walk_right', true);
+        this.lastFacingTexture = 'player_right';
+      } else if (dy < 0) {
+        this.player.anims.play('walk_up', true);
+        this.lastFacingTexture = 'player_up';
+      } else if (dy > 0) {
+        this.player.anims.play('walk_down', true);
+        this.lastFacingTexture = 'player_down';
+      }
 
       this.tileX = next.x;
       this.tileY = next.y;
