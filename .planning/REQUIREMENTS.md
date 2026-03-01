@@ -23,9 +23,9 @@ Requirements for this polish milestone. Each maps to roadmap phases.
 
 ### Visual Effects
 
-- [ ] **VFX-01**: Enemies fade out with particle burst on death in BreachDefense
-- [ ] **VFX-02**: Towers show scale tween recoil when firing in BreachDefense
-- [ ] **VFX-03**: Towers show distinct color pulse when firing at an enemy they're strong against
+- [x] **VFX-01**: Enemies fade out with particle burst on death in BreachDefense
+- [x] **VFX-02**: Towers show scale tween recoil when firing in BreachDefense
+- [x] **VFX-03**: Towers show distinct color pulse when firing at an enemy they're strong against
 
 ### HUD
 
@@ -103,9 +103,9 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SFX-06 | Phase 1 | Pending |
 | SFX-07 | Phase 1 | Pending |
 | ANIM-01 | Phase 2 | Complete |
-| VFX-01 | Phase 3 | Pending |
-| VFX-02 | Phase 3 | Pending |
-| VFX-03 | Phase 3 | Pending |
+| VFX-01 | Phase 3 | Complete |
+| VFX-02 | Phase 3 | Complete |
+| VFX-03 | Phase 3 | Complete |
 | HUD-01 | Phase 4 | Pending |
 | HUD-02 | Phase 4 | Pending |
 | HUD-03 | Phase 4 | Pending |
