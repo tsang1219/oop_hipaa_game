@@ -160,6 +160,16 @@ export const TUTORIAL_CONTENT = {
       summary: "Lost devices cause major breaches. An unlocked laptop is an open door.",
       action: "Lock your screen every time you step away. Enable encryption. Never leave devices unattended."
     },
+    LAYERS: {
+      title: "Defense in Depth: Key Takeaway",
+      summary: "No single defense catches everything. Coordinated attacks require layered responses — when one control fails, others catch the threat.",
+      action: "Use multiple overlapping security controls. Firewalls, MFA, encryption, and training each cover different attack vectors."
+    },
+    PASSWORDS: {
+      title: "Strong Passwords: Key Takeaway",
+      summary: "Weak passwords like 'Password123' fall to brute force in seconds. MFA makes stolen passwords useless without a second factor.",
+      action: "Use a password manager for unique, complex passwords on every account. Enable multi-factor authentication everywhere it's available."
+    },
     ALLDEFENSE: {
       title: "Defense in Depth: Key Takeaway",
       summary: "No single defense catches everything. Layered security has no single point of failure.",
