@@ -87,7 +87,10 @@ Plans:
 **Success Criteria** (what must be TRUE):
   1. A first-visit intro modal appears on the player's first entry into PrivacyQuest, explaining movement (WASD) and interaction (Space/ESC) controls, and does not appear on subsequent visits
   2. The first available NPC in a room has a pulsing visual indicator that draws the player's attention, which dismisses once the player moves toward it
-**Plans**: TBD
+**Plans**: 1 plan
+
+Plans:
+- [ ] 05-01-PLAN.md — Intro modal (TutorialModal reuse + localStorage flag + help icon) + NPC pulse tween (per-room scale oscillation on first NPC, dismissed on interaction)
 
 ## Progress
 
@@ -101,4 +104,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5
 | 2. Walk Cycle Animation | 1/1 | Complete    | 2026-03-01 |
 | 3. BreachDefense Visual Effects | 1/1 | Complete    | 2026-03-01 |
 | 4. BreachDefense HUD Data | 1/2 | Complete    | 2026-03-01 |
-| 5. PrivacyQuest Onboarding | 0/? | Not started | - |
+| 5. PrivacyQuest Onboarding | 0/1 | Not started | - |
