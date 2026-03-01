@@ -30,7 +30,13 @@ Decimal phases appear between their surrounding integers in numeric order.
   3. Player hears a placement sound when dropping a tower in BreachDefense
   4. Player hears a death sound and sees a floating threat-type label ("PHISHING blocked!") when an enemy is destroyed in BreachDefense
   5. Player hears a breach alert when an enemy reaches the end, and a wave-start cue when a new wave begins
-**Plans**: TBD
+**Plans**: 4 plans
+
+Plans:
+- [ ] 01-01-PLAN.md — Human checkpoint: curate/place 6 Kenney CC0 OGG files + register in BootScene.preload()
+- [ ] 01-02-PLAN.md — ExplorationScene SFX: footstep (WASD throttle + BFS step) + interact/confirm
+- [ ] 01-03-PLAN.md — BreachDefenseScene SFX: tower placement, enemy death + floating kill label, breach alert, wave-start activateWave()
+- [ ] 01-04-PLAN.md — Mute toggle: React HUD button in both pages with localStorage persistence
 
 ### Phase 2: Walk Cycle Animation
 **Goal**: The PrivacyQuest player character animates while moving — no more gliding rectangle
