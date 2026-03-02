@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: unknown
-last_updated: "2026-03-02T00:29:50.332Z"
+last_updated: "2026-03-02T03:06:44.091Z"
 progress:
   total_phases: 6
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 11
-  completed_plans: 10
+  completed_plans: 11
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 
 ## Current Position
 
-Phase: 6 of 10 (Character Sprites)
-Plan: 1 of 2 in current phase (06-01 complete)
-Status: In progress
-Last activity: 2026-03-01 — 06-01 Character Sprites asset preparation complete, user approved
+Phase: 6 of 10 (Character Sprites) — COMPLETE
+Plan: 2 of 2 in current phase (06-02 complete)
+Status: Phase 6 complete — ready for Phase 7 (Portraits)
+Last activity: 2026-03-02 — 06-02 Character Sprite Integration complete (spritesheets, walk anims, idle breathing)
 
-Progress: [█░░░░░░░░░] 10% (v1.1)
+Progress: [██░░░░░░░░] 20% (v1.1)
 
 ## Accumulated Context
 
@@ -40,6 +40,7 @@ Progress: [█░░░░░░░░░] 10% (v1.1)
 - [Phase 06-character-sprites]: Programmatic PIL generation instead of sprite pack sourcing: Python/PIL creates CC0 sprites at exact 32px tile size, avoids network dependency; plan CONTEXT.md explicitly allows color-swap approach
 - [Phase 06-character-sprites]: Spritesheet format: 96x128px, 3 cols x 4 rows, 32x32 frames. Frame index = row*3+col. Direction order: down(0)/left(1)/right(2)/up(3)
 - [06-01]: 10 character PNGs approved — player + 9 NPC types. Load via Phaser spritesheet() with frameWidth:32, frameHeight:32. Ready for Plan 02 code integration.
+- [Phase 06-02]: lastFacingFrame (int) replaces lastFacingTexture (string) — setFrame() is correct API for spritesheet sprites, setTexture() resets frame context
 
 ### Pending Todos
 
@@ -53,6 +54,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-01
-Stopped at: Completed 06-01-PLAN.md (character spritesheets sourced and user-approved)
-Resume: Run `/gsd:execute-phase 6` to execute Plan 02 (code integration)
+Last session: 2026-03-02
+Stopped at: Completed 06-02-PLAN.md (character sprite integration — spritesheets, walk animations, idle breathing)
+Resume: Run `/gsd:execute-phase 7` to start Phase 7 (Portraits)
