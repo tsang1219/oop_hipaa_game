@@ -306,25 +306,48 @@ export function furnitureTextureKey(obstacleType?: string): string {
 }
 
 /**
- * Map an NPC id to a texture key, falling back to generic.
+ * Map an NPC id to the spritesheet texture key.
+ * Returns the key used in this.load.spritesheet() — frame 0 is idle-down pose.
  */
 export function npcTextureKey(npcId: string): string {
   const map: Record<string, string> = {
-    riley: 'npc_receptionist',
-    nervous_patient: 'npc_patient',
-    chatty_visitor: 'npc_visitor',
-    dr_martinez: 'npc_doctor',
-    officer: 'npc_officer',
-    nurse_chen: 'npc_nurse',
-    it_tech: 'npc_it_tech',
-    dr_patel: 'npc_doctor',
-    pharmacist: 'npc_staff',
-    intern: 'npc_staff',
-    lab_tech: 'npc_it_tech',
-    admin: 'npc_boss',
-    final_boss_1: 'npc_boss',
+    riley: 'npc_receptionist_sheet',
+    nervous_patient: 'npc_patient_sheet',
+    chatty_visitor: 'npc_visitor_sheet',
+    dr_martinez: 'npc_doctor_sheet',
+    officer: 'npc_officer_sheet',
+    nurse_chen: 'npc_nurse_sheet',
+    it_tech: 'npc_it_tech_sheet',
+    dr_patel: 'npc_doctor_sheet',
+    pharmacist: 'npc_staff_sheet',
+    intern: 'npc_staff_sheet',
+    lab_tech: 'npc_it_tech_sheet',
+    admin: 'npc_boss_sheet',
+    final_boss_1: 'npc_boss_sheet',
   };
-  return map[npcId] || 'npc_staff';
+  return map[npcId] || 'npc_staff_sheet';
+}
+
+/**
+ * Map an NPC id to the NPC type string used in animation keys (e.g. 'npc_TYPE_walk_DIR').
+ */
+export function npcTypeFromId(npcId: string): string {
+  const map: Record<string, string> = {
+    riley: 'receptionist',
+    nervous_patient: 'patient',
+    chatty_visitor: 'visitor',
+    dr_martinez: 'doctor',
+    officer: 'officer',
+    nurse_chen: 'nurse',
+    it_tech: 'it_tech',
+    dr_patel: 'doctor',
+    pharmacist: 'staff',
+    intern: 'staff',
+    lab_tech: 'it_tech',
+    admin: 'boss',
+    final_boss_1: 'boss',
+  };
+  return map[npcId] || 'staff';
 }
 
 /**

@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
-import { generateAllTextures, furnitureTextureKey, npcTextureKey, objectTextureKey } from '../SpriteFactory';
+import { generateAllTextures, furnitureTextureKey, npcTextureKey, npcTypeFromId, objectTextureKey } from '../SpriteFactory';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 const TILE = 32;
@@ -53,8 +53,9 @@ export class ExplorationScene extends Phaser.Scene {
   // Footstep throttle — minimum interval between plays (ms)
   private lastFootstepTime = 0;
 
-  // Track last facing direction for idle restore after animation stop
-  private lastFacingTexture = 'player_down';
+  // Idle frame index per direction (row * 3 + 0 for idle col) — from CREDITS.md layout
+  // down=0, left=3, right=6, up=9
+  private lastFacingFrame = 0;
 
   // NPC pulse tween for onboarding hint
   private npcPulseTween: Phaser.Tweens.Tween | null = null;
@@ -185,10 +186,20 @@ export class ExplorationScene extends Phaser.Scene {
     // ── NPCs ─────────────────────────────────────────────────────
     for (const npc of room.npcs) {
       const texKey = npcTextureKey(npc.id);
-      const sprite = this.add.sprite(npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2, texKey);
+      const sprite = this.add.sprite(npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2, texKey, 0);
       sprite.setDepth(25);
       const completed = this.completedNPCs.has(npc.id);
       if (completed) sprite.setAlpha(0.5);
+
+      // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
+      this.tweens.add({
+        targets: sprite,
+        scaleY: { from: 1.0, to: 1.02 },
+        duration: 1500 + Math.random() * 500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
 
       // Completed checkmark
       if (completed) {
@@ -225,14 +236,27 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // ── Player ───────────────────────────────────────────────────
+    // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
+    // PLAYER_IDLE_FRAMES: down=0, left=3, right=6, up=9 (row * 3 + 0)
     this.tileX = room.spawnPoint.x;
     this.tileY = room.spawnPoint.y;
     this.player = this.physics.add.sprite(
       this.tileX * TILE + TILE / 2,
       this.tileY * TILE + TILE / 2,
-      'player_down',
+      'player_sheet',
+      0, // frame 0 = idle facing down
     );
     this.player.setDepth(30);
+
+    // Idle breathing tween — continuous subtle vertical scale oscillation
+    this.tweens.add({
+      targets: this.player,
+      scaleY: { from: 1.0, to: 1.02 },
+      duration: 750,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setSize(24, 24);
     body.setOffset(4, 4);
@@ -299,11 +323,14 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   update() {
+    // Idle frame indices per direction: down=0, left=3, right=6, up=9 (row*3+0)
+    const IDLE_DOWN = 0; const IDLE_LEFT = 3; const IDLE_RIGHT = 6; const IDLE_UP = 9;
+
     if (this.paused) {
       const pauseBody = this.player.body as Phaser.Physics.Arcade.Body;
       pauseBody.setVelocity(0);
       this.player.anims.stop();
-      this.player.setTexture(this.lastFacingTexture);
+      this.player.setFrame(this.lastFacingFrame);
       return;
     }
 
@@ -321,24 +348,24 @@ export class ExplorationScene extends Phaser.Scene {
       if (left) {
         body.setVelocityX(-MOVE_SPEED);
         this.player.anims.play('walk_left', true);
-        this.lastFacingTexture = 'player_left';
+        this.lastFacingFrame = IDLE_LEFT;
       } else if (right) {
         body.setVelocityX(MOVE_SPEED);
         this.player.anims.play('walk_right', true);
-        this.lastFacingTexture = 'player_right';
+        this.lastFacingFrame = IDLE_RIGHT;
       }
 
       if (up) {
         body.setVelocityY(-MOVE_SPEED);
         if (!left && !right) {
           this.player.anims.play('walk_up', true);
-          this.lastFacingTexture = 'player_up';
+          this.lastFacingFrame = IDLE_UP;
         }
       } else if (down) {
         body.setVelocityY(MOVE_SPEED);
         if (!left && !right) {
           this.player.anims.play('walk_down', true);
-          this.lastFacingTexture = 'player_down';
+          this.lastFacingFrame = IDLE_DOWN;
         }
       }
 
@@ -354,7 +381,7 @@ export class ExplorationScene extends Phaser.Scene {
 
       if (!left && !right && !up && !down) {
         this.player.anims.stop();
-        this.player.setTexture(this.lastFacingTexture);
+        this.player.setFrame(this.lastFacingFrame);
       }
 
       // Track tile position from continuous movement
@@ -432,6 +459,9 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private startPathMovement(path: Position[], pending: InteractableData | null) {
+    // Idle frame indices per direction: down=0, left=3, right=6, up=9 (row*3+0)
+    const IDLE_DOWN = 0; const IDLE_LEFT = 3; const IDLE_RIGHT = 6; const IDLE_UP = 9;
+
     if (this.moveTimer) { this.moveTimer.destroy(); this.moveTimer = null; }
     this.movePath = path;
     this.pendingInteraction = pending;
@@ -439,9 +469,9 @@ export class ExplorationScene extends Phaser.Scene {
     const step = () => {
       if (this.movePath.length === 0) {
         this.moveTimer = null;
-        // Arrived — stop walk animation, restore idle pose
+        // Arrived — stop walk animation, restore idle pose frame
         this.player.anims.stop();
-        this.player.setTexture(this.lastFacingTexture);
+        this.player.setFrame(this.lastFacingFrame);
         // Trigger pending interaction if adjacent
         if (this.pendingInteraction) {
           const d = this.pendingInteraction.data as { x: number; y: number };
@@ -464,16 +494,16 @@ export class ExplorationScene extends Phaser.Scene {
 
       if (dx < 0) {
         this.player.anims.play('walk_left', true);
-        this.lastFacingTexture = 'player_left';
+        this.lastFacingFrame = IDLE_LEFT;
       } else if (dx > 0) {
         this.player.anims.play('walk_right', true);
-        this.lastFacingTexture = 'player_right';
+        this.lastFacingFrame = IDLE_RIGHT;
       } else if (dy < 0) {
         this.player.anims.play('walk_up', true);
-        this.lastFacingTexture = 'player_up';
+        this.lastFacingFrame = IDLE_UP;
       } else if (dy > 0) {
         this.player.anims.play('walk_down', true);
-        this.lastFacingTexture = 'player_down';
+        this.lastFacingFrame = IDLE_DOWN;
       }
 
       this.tileX = next.x;

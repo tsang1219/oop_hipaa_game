@@ -21,7 +21,8 @@ export class HubWorldScene extends Phaser.Scene {
   private nearDoor: 'privacy-quest' | 'breach-defense' | null = null;
   private promptText!: Phaser.GameObjects.Text;
   private titleText!: Phaser.GameObjects.Text;
-  private lastFacingTexture = 'player_down';
+  // Idle frame index per direction: down=0, left=3, right=6, up=9 (row*3+0)
+  private lastFacingFrame = 0;
 
   constructor() {
     super({ key: 'HubWorld' });
@@ -67,9 +68,19 @@ export class HubWorldScene extends Phaser.Scene {
     // Decorative elements
     this.createFurniture();
 
-    // Receptionist NPC near center
-    const npc = this.add.sprite(10 * TILE_SIZE, 8 * TILE_SIZE, 'npc_receptionist');
+    // Receptionist NPC near center — frame 0 = idle facing down
+    const npc = this.add.sprite(10 * TILE_SIZE, 8 * TILE_SIZE, 'npc_receptionist_sheet', 0);
     npc.setOrigin(0, 0);
+
+    // Idle breathing tween for receptionist
+    this.tweens.add({
+      targets: npc,
+      scaleY: { from: 1.0, to: 1.02 },
+      duration: 1500 + Math.random() * 500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
 
     // NPC speech bubble
     this.add.text(10 * TILE_SIZE + 16, 7 * TILE_SIZE - 4, 'Welcome!', {
@@ -80,13 +91,24 @@ export class HubWorldScene extends Phaser.Scene {
       padding: { x: 4, y: 3 },
     }).setOrigin(0.5);
 
-    // Player
+    // Player — frame 0 = idle facing down
     this.player = this.physics.add.sprite(
       10 * TILE_SIZE,
       11 * TILE_SIZE,
-      'player_down'
+      'player_sheet',
+      0, // frame 0 = idle facing down
     );
     this.player.setOrigin(0, 0);
+
+    // Idle breathing tween for player
+    this.tweens.add({
+      targets: this.player,
+      scaleY: { from: 1.0, to: 1.02 },
+      duration: 750,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
     const playerBody = this.player.body as Phaser.Physics.Arcade.Body;
     playerBody.setSize(24, 24);
     playerBody.setOffset(4, 4);
@@ -122,6 +144,9 @@ export class HubWorldScene extends Phaser.Scene {
   }
 
   update() {
+    // Idle frame indices per direction: down=0, left=3, right=6, up=9 (row*3+0)
+    const IDLE_DOWN = 0; const IDLE_LEFT = 3; const IDLE_RIGHT = 6; const IDLE_UP = 9;
+
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
 
@@ -134,30 +159,30 @@ export class HubWorldScene extends Phaser.Scene {
     if (left) {
       body.setVelocityX(-MOVE_SPEED);
       this.player.anims.play('walk_left', true);
-      this.lastFacingTexture = 'player_left';
+      this.lastFacingFrame = IDLE_LEFT;
     } else if (right) {
       body.setVelocityX(MOVE_SPEED);
       this.player.anims.play('walk_right', true);
-      this.lastFacingTexture = 'player_right';
+      this.lastFacingFrame = IDLE_RIGHT;
     }
 
     if (up) {
       body.setVelocityY(-MOVE_SPEED);
       if (!left && !right) {
         this.player.anims.play('walk_up', true);
-        this.lastFacingTexture = 'player_up';
+        this.lastFacingFrame = IDLE_UP;
       }
     } else if (down) {
       body.setVelocityY(MOVE_SPEED);
       if (!left && !right) {
         this.player.anims.play('walk_down', true);
-        this.lastFacingTexture = 'player_down';
+        this.lastFacingFrame = IDLE_DOWN;
       }
     }
 
     if (!left && !right && !up && !down) {
       this.player.anims.stop();
-      this.player.setTexture(this.lastFacingTexture);
+      this.player.setFrame(this.lastFacingFrame);
     }
 
     // Normalize diagonal movement
