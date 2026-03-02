@@ -44,6 +44,20 @@ export class BootScene extends Phaser.Scene {
     // Load background images
     this.load.image('hospital_bg', '/attached_assets/generated_images/Hospital_corridor_pixel_background_72c96c5f.png');
 
+    // Load character spritesheets — 32x32 frames, 3 cols x 4 rows
+    // Row order: down(0), left(1), right(2), up(3) — 3 frames per direction
+    const CHAR_FRAME = { frameWidth: 32, frameHeight: 32 };
+    this.load.spritesheet('player_sheet', '/attached_assets/generated_images/privacyquest/characters/player.png', CHAR_FRAME);
+    this.load.spritesheet('npc_receptionist_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_receptionist.png', CHAR_FRAME);
+    this.load.spritesheet('npc_nurse_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_nurse.png', CHAR_FRAME);
+    this.load.spritesheet('npc_doctor_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_doctor.png', CHAR_FRAME);
+    this.load.spritesheet('npc_it_tech_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_it_tech.png', CHAR_FRAME);
+    this.load.spritesheet('npc_officer_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_officer.png', CHAR_FRAME);
+    this.load.spritesheet('npc_boss_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_boss.png', CHAR_FRAME);
+    this.load.spritesheet('npc_staff_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_staff.png', CHAR_FRAME);
+    this.load.spritesheet('npc_patient_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_patient.png', CHAR_FRAME);
+    this.load.spritesheet('npc_visitor_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_visitor.png', CHAR_FRAME);
+
     // Load BreachDefense tower sprites
     this.load.image('tower_MFA', '/attached_assets/generated_images/mfa_tower_pixel_sprite.png');
     this.load.image('tower_PATCH', '/attached_assets/generated_images/patch_cannon_pixel_sprite.png');
@@ -72,26 +86,63 @@ export class BootScene extends Phaser.Scene {
   }
 
   create() {
-    // Generate player sprite texture programmatically (blue character, facing down)
+    // Spritesheet frame constants:
+    // Direction rows: down=0, left=1, right=2, up=3 (from CREDITS.md)
+    // Frame index = row * COLS + col, where COLS=3 (idle=0, walk-A=1, walk-B=2)
+    const COLS = 3;
+
+    // Idle frame indices per direction (first frame of each row)
+    // down=0, left=3, right=6, up=9
+    // (These are exported for use in ExplorationScene and HubWorldScene)
+
+    // Keep programmatic player textures as fallback — they're used if spritesheet fails
+    // and still referenced in BootScene internal methods below.
+    // Note: generatePlayerTexture() generates texture keys like 'player_down', 'player_up', etc.
+    // These fallback textures remain in the cache but are superseded by spritesheet frames.
     this.generatePlayerTexture();
     this.generateNPCTextures();
 
     // Generate all additional textures (objects, furniture, extra NPCs)
     generateAllTextures(this);
 
-    // Register global 4-direction walk animations (persist across all scenes)
-    const WALK_DIRS = ['down', 'up', 'left', 'right'] as const;
-    for (const dir of WALK_DIRS) {
-      if (!this.anims.exists(`walk_${dir}`)) {
-        this.anims.create({
-          key: `walk_${dir}`,
-          frames: [
-            { key: `player_${dir}` },
-            { key: `player_${dir}_walk` },
-          ],
-          frameRate: 7,
-          repeat: -1,
-        });
+    // Register global 4-direction walk animations for player (spritesheet-based, 3-frame cycle)
+    const WALK_DIRS = ['down', 'left', 'right', 'up'] as const;
+    for (let i = 0; i < WALK_DIRS.length; i++) {
+      const dir = WALK_DIRS[i];
+      const startFrame = i * COLS;
+      const animKey = `walk_${dir}`;
+      if (this.anims.exists(animKey)) this.anims.remove(animKey);
+      this.anims.create({
+        key: animKey,
+        frames: this.anims.generateFrameNumbers('player_sheet', {
+          start: startFrame, end: startFrame + COLS - 1,
+        }),
+        frameRate: 8,
+        repeat: -1,
+      });
+    }
+
+    // Register NPC walk animations for all 9 NPC types (4 directions x 9 types = 36 anims)
+    const NPC_TYPES = [
+      'receptionist', 'nurse', 'doctor', 'it_tech',
+      'officer', 'boss', 'staff', 'patient', 'visitor',
+    ] as const;
+    for (const type of NPC_TYPES) {
+      const sheetKey = `npc_${type}_sheet`;
+      for (let i = 0; i < WALK_DIRS.length; i++) {
+        const dir = WALK_DIRS[i];
+        const startFrame = i * COLS;
+        const animKey = `npc_${type}_walk_${dir}`;
+        if (!this.anims.exists(animKey)) {
+          this.anims.create({
+            key: animKey,
+            frames: this.anims.generateFrameNumbers(sheetKey, {
+              start: startFrame, end: startFrame + COLS - 1,
+            }),
+            frameRate: 8,
+            repeat: -1,
+          });
+        }
       }
     }
 
