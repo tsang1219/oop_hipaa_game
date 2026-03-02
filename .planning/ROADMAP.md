@@ -20,7 +20,7 @@
   5. Walk animations work in both ExplorationScene and HubWorldScene without duplicate registration.
 
 Plans:
-- [ ] 06-01-PLAN.md — Source 9 character spritesheets from pre-made sprite pack, select and customize for hospital roles, user approval checkpoint
+- [x] 06-01-PLAN.md — Source 9 character spritesheets from pre-made sprite pack, select and customize for hospital roles, user approval checkpoint
 - [ ] 06-02-PLAN.md — Load spritesheets in BootScene, register walk + idle animations, wire ExplorationScene and HubWorldScene
 
 ### Phase 7: NPC Portraits
@@ -88,7 +88,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 6. Character Sprites | 1/2 | In Progress|  | - |
+| 6. Character Sprites | v1.1 | 1/2 | In Progress | - |
 | 7. NPC Portraits | v1.1 | 0/2 | Not started | - |
 | 8. Furniture and Interactive Objects | v1.1 | 0/2 | Not started | - |
 | 9. Floor Tiles | v1.1 | 0/2 | Not started | - |

@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-01)
 ## Current Position
 
 Phase: 6 of 10 (Character Sprites)
-Plan: 0 of 2 in current phase
-Status: Ready to plan
-Last activity: 2026-03-01 — Roadmap created for v1.1 Sprite Overhaul
+Plan: 1 of 2 in current phase (06-01 complete)
+Status: In progress
+Last activity: 2026-03-01 — 06-01 Character Sprites asset preparation complete, user approved
 
-Progress: [░░░░░░░░░░] 0% (v1.1)
+Progress: [█░░░░░░░░░] 10% (v1.1)
 
 ## Accumulated Context
 
@@ -39,6 +39,7 @@ Progress: [░░░░░░░░░░] 0% (v1.1)
 - [v1.1]: FURN and ITEM requirements combined into Phase 8 — both integrate into ExplorationScene room layouts in a single pass
 - [Phase 06-character-sprites]: Programmatic PIL generation instead of sprite pack sourcing: Python/PIL creates CC0 sprites at exact 32px tile size, avoids network dependency; plan CONTEXT.md explicitly allows color-swap approach
 - [Phase 06-character-sprites]: Spritesheet format: 96x128px, 3 cols x 4 rows, 32x32 frames. Frame index = row*3+col. Direction order: down(0)/left(1)/right(2)/up(3)
+- [06-01]: 10 character PNGs approved — player + 9 NPC types. Load via Phaser spritesheet() with frameWidth:32, frameHeight:32. Ready for Plan 02 code integration.
 
 ### Pending Todos
 
@@ -53,5 +54,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-01
-Stopped at: Phase 6 context gathered
-Resume: Run `/gsd:plan-phase 6`
+Stopped at: Completed 06-01-PLAN.md (character spritesheets sourced and user-approved)
+Resume: Run `/gsd:execute-phase 6` to execute Plan 02 (code integration)
