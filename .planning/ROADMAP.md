@@ -11,17 +11,17 @@
 **Goal**: Player and all 8 NPCs move with AI-generated 4-direction spritesheets and proper walk cycle animations.
 **Depends on**: Phase 5
 **Requirements**: CHAR-01, CHAR-02, CHAR-03, CHAR-04
+**Plans:** 2 plans
 **Success Criteria** (what must be TRUE):
   1. Player character displays a distinct AI-generated pixel art sprite (not a colored rectangle) and animates through walk frames when moving in any direction.
   2. All 8 NPC types (Receptionist, Nurse, Doctor, IT Tech, Compliance Officer, General Staff, Patient, Visitor) display unique AI-generated sprites recognizable by their role outfit.
   3. Walk animations stop and return to idle when movement stops — no looping walk while standing still.
   4. NPCs display a subtle idle animation (breathing or blinking) when standing still.
   5. Walk animations work in both ExplorationScene and HubWorldScene without duplicate registration.
-**Plans**: TBD
 
 Plans:
-- [ ] 06-01: Source 9 character spritesheets from pre-made sprite pack (LPC/Kenney/itch.io), select and customize for hospital roles (player, nurse, doctor, etc.), place in `attached_assets/generated_images/privacyquest/characters/`
-- [ ] 06-02: Load character spritesheets in BootScene, register walk + idle animations, wire ExplorationScene and HubWorldScene to use new sprite keys
+- [ ] 06-01-PLAN.md — Source 9 character spritesheets from pre-made sprite pack, select and customize for hospital roles, user approval checkpoint
+- [ ] 06-02-PLAN.md — Load spritesheets in BootScene, register walk + idle animations, wire ExplorationScene and HubWorldScene
 
 ### Phase 7: NPC Portraits
 **Goal**: NPC dialogue screens show expressive AI-generated character portraits with multiple expression variants instead of placeholder SVG components.
@@ -88,9 +88,8 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 6. Character Sprites | v1.1 | 0/2 | Not started | - |
+| 6. Character Sprites | v1.1 | 0/2 | Planned | - |
 | 7. NPC Portraits | v1.1 | 0/2 | Not started | - |
 | 8. Furniture and Interactive Objects | v1.1 | 0/2 | Not started | - |
 | 9. Floor Tiles | v1.1 | 0/2 | Not started | - |
 | 10. Final Integration and Cleanup | v1.1 | 0/1 | Not started | - |
-
