@@ -11,7 +11,7 @@
 **Goal**: Player and all 8 NPCs move with AI-generated 4-direction spritesheets and proper walk cycle animations.
 **Depends on**: Phase 5
 **Requirements**: CHAR-01, CHAR-02, CHAR-03, CHAR-04
-**Plans:** 2 plans
+**Plans:** 1/2 plans executed
 **Success Criteria** (what must be TRUE):
   1. Player character displays a distinct AI-generated pixel art sprite (not a colored rectangle) and animates through walk frames when moving in any direction.
   2. All 8 NPC types (Receptionist, Nurse, Doctor, IT Tech, Compliance Officer, General Staff, Patient, Visitor) display unique AI-generated sprites recognizable by their role outfit.
@@ -88,7 +88,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 6. Character Sprites | v1.1 | 0/2 | Planned | - |
+| 6. Character Sprites | 1/2 | In Progress|  | - |
 | 7. NPC Portraits | v1.1 | 0/2 | Not started | - |
 | 8. Furniture and Interactive Objects | v1.1 | 0/2 | Not started | - |
 | 9. Floor Tiles | v1.1 | 0/2 | Not started | - |

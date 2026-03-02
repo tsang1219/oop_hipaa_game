@@ -9,8 +9,8 @@ Requirements for v1.1 Sprite Overhaul. Each maps to roadmap phases.
 
 ### Character Sprites
 
-- [ ] **CHAR-01**: Player character has an AI-generated 4-direction spritesheet (32x32, 3 frames per direction: idle + 2 walk frames) loaded in BootScene
-- [ ] **CHAR-02**: All 8 NPC types (Receptionist, Nurse, Doctor, IT Tech, Compliance Officer, General Staff, Patient, Visitor) have AI-generated 4-direction spritesheets matching the player format
+- [x] **CHAR-01**: Player character has an AI-generated 4-direction spritesheet (32x32, 3 frames per direction: idle + 2 walk frames) loaded in BootScene
+- [x] **CHAR-02**: All 8 NPC types (Receptionist, Nurse, Doctor, IT Tech, Compliance Officer, General Staff, Patient, Visitor) have AI-generated 4-direction spritesheets matching the player format
 - [ ] **CHAR-03**: Walk cycle animations are registered in BootScene and play during movement in ExplorationScene and HubWorldScene
 - [ ] **CHAR-04**: NPCs display subtle idle breathing/blinking animation when standing still
 
@@ -72,8 +72,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CHAR-01 | Phase 6 | Pending |
-| CHAR-02 | Phase 6 | Pending |
+| CHAR-01 | Phase 6 | Complete |
+| CHAR-02 | Phase 6 | Complete |
 | CHAR-03 | Phase 6 | Pending |
 | CHAR-04 | Phase 6 | Pending |
 | PORT-01 | Phase 7 | Pending |
