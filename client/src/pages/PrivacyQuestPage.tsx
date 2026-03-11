@@ -9,8 +9,6 @@ import ChoicePrompt from '@/components/ChoicePrompt';
 import { PatientStoryReveal } from '@/components/PatientStoryReveal';
 import EndScreen from '@/components/EndScreen';
 import HallwayHub from '@/components/HallwayHub';
-import KnowledgeTracker from '@/components/KnowledgeTracker';
-import ChecklistUI from '@/components/ChecklistUI';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { useToast } from '@/hooks/use-toast';
@@ -113,8 +111,6 @@ export default function PrivacyQuestPage() {
   const [muted, setMuted] = useState(() =>
     localStorage.getItem('sfx_muted') === 'true'
   );
-
-  const totalEducationalItems = rooms.reduce((sum, r) => sum + r.educationalItems.length, 0);
   const totalScenarios = rooms.reduce((sum, r) => sum + r.npcs.filter((n: any) => !n.isFinalBoss).length, 0);
   const currentRoom = rooms.find(r => r.id === currentRoomId) || null;
 
@@ -461,36 +457,19 @@ export default function PrivacyQuestPage() {
             mixBlendMode: 'multiply',
           }}
         />
+
+        {/* Room progress overlay — top-right of canvas */}
+        {currentRoom && (
+          <RoomProgressHUD
+            room={currentRoom as any}
+            completedNpcs={completedNPCs}
+            completedZones={completedZones}
+            collectedItems={collectedItems}
+          />
+        )}
       </div>
 
-      {/* HUD below canvas */}
-      <div className="flex items-center gap-6">
-        <KnowledgeTracker />
-        <ChecklistUI
-          educationalItemsCollected={collectedItems.size}
-          totalEducationalItems={totalEducationalItems}
-          scenariosCompleted={completedNPCs.size}
-          totalScenarios={totalScenarios}
-        />
-        <button
-          onClick={() => setMuted(m => !m)}
-          className="text-[10px] text-gray-300 hover:text-white transition-colors"
-          title={muted ? 'Unmute' : 'Mute'}
-          style={{ fontFamily: '"Press Start 2P", monospace' }}
-        >
-          {muted ? '\u{1F507}' : '\u{1F50A}'}
-        </button>
-      </div>
-
-      {currentRoom && (
-        <RoomProgressHUD
-          room={currentRoom as any}
-          completedNpcs={completedNPCs}
-          completedZones={completedZones}
-          collectedItems={collectedItems}
-        />
-      )}
-
+      {/* Control hints + mute */}
       <div className="flex items-center gap-2">
         <p className="text-[8px] text-gray-500" style={{ fontFamily: '"Press Start 2P"' }}>
           WASD or Arrow Keys to move &bull; SPACE to interact &bull; ESC to exit room
@@ -502,6 +481,14 @@ export default function PrivacyQuestPage() {
           title="Show controls"
         >
           ?
+        </button>
+        <button
+          onClick={() => setMuted(m => !m)}
+          className="text-[10px] text-gray-300 hover:text-white transition-colors"
+          title={muted ? 'Unmute' : 'Mute'}
+          style={{ fontFamily: '"Press Start 2P", monospace' }}
+        >
+          {muted ? '\u{1F507}' : '\u{1F50A}'}
         </button>
       </div>
 
