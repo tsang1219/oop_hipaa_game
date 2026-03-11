@@ -149,6 +149,18 @@ export class BootScene extends Phaser.Scene {
     // Generate particle texture for BreachDefense VFX
     this.generateParticleTexture();
 
+    // Verify critical programmatic textures were generated successfully
+    const criticalTextures = [
+      'player_down', 'player_up', 'player_left', 'player_right',
+      'npc_receptionist', 'npc_nurse', 'npc_doctor', 'npc_it_tech',
+      'npc_boss', 'npc_staff', 'npc_patient', 'npc_visitor', 'npc_officer',
+    ];
+    for (const key of criticalTextures) {
+      if (!this.textures.exists(key)) {
+        console.error(`[BootScene] Texture '${key}' failed to generate`);
+      }
+    }
+
     // Start the hub world
     this.scene.start('HubWorld');
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Boot');

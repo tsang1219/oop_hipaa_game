@@ -262,6 +262,19 @@ export class ExplorationScene extends Phaser.Scene {
     body.setOffset(4, 4);
     body.setCollideWorldBounds(true);
 
+    // Force-refresh all sprite textures on the next frame to prevent
+    // black squares caused by programmatic textures not being GPU-ready
+    // on the first render pass after scene creation.
+    this.time.delayedCall(0, () => {
+      this.player.setTexture('player_down');
+      for (const ia of this.interactables) {
+        if (ia.type === 'npc') {
+          const currentTex = ia.sprite.texture.key;
+          ia.sprite.setTexture(currentTex);
+        }
+      }
+    });
+
     this.physics.add.collider(this.player, this.walls);
 
     // Camera follow in rooms larger than viewport
