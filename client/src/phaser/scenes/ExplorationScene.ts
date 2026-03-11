@@ -32,6 +32,8 @@ export class ExplorationScene extends Phaser.Scene {
   private nearbyInteractable: InteractableData | null = null;
   private promptText!: Phaser.GameObjects.Text;
   private roomNameText!: Phaser.GameObjects.Text;
+  private playerShadow!: Phaser.GameObjects.Ellipse;
+  private playerLabel!: Phaser.GameObjects.Text;
 
   // Click-to-move pathfinding state
   private movePath: Position[] = [];
@@ -186,10 +188,38 @@ export class ExplorationScene extends Phaser.Scene {
     // ── NPCs ─────────────────────────────────────────────────────
     for (const npc of room.npcs) {
       const texKey = npcTextureKey(npc.id);
+      const completed = this.completedNPCs.has(npc.id);
+
+      // Drop shadow at feet level (behind the sprite)
+      const npcShadow = this.add.ellipse(
+        npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2 + TILE / 2 - 2,
+        20, 8,
+        0x000000, 0.3,
+      );
+      npcShadow.setDepth(24);
+      if (completed) npcShadow.setAlpha(0.15);
+
       const sprite = this.add.sprite(npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2, texKey, 0);
       sprite.setDepth(25);
-      const completed = this.completedNPCs.has(npc.id);
-      if (completed) sprite.setAlpha(0.5);
+      if (completed) {
+        sprite.setAlpha(0.4);
+        sprite.setTint(0x888888);
+      }
+
+      // Name label below sprite
+      const nameLabel = this.add.text(
+        npc.x * TILE + TILE / 2,
+        npc.y * TILE + TILE + 2,
+        npc.name,
+        {
+          fontFamily: '"Press Start 2P"',
+          fontSize: '5px',
+          color: '#ffffff',
+          stroke: '#000000',
+          strokeThickness: 1,
+        },
+      ).setOrigin(0.5, 0).setDepth(26);
+      if (completed) nameLabel.setAlpha(0.4);
 
       // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
       this.tweens.add({
@@ -261,6 +291,27 @@ export class ExplorationScene extends Phaser.Scene {
     body.setSize(24, 24);
     body.setOffset(4, 4);
     body.setCollideWorldBounds(true);
+
+    // Player drop shadow at feet level
+    this.playerShadow = this.add.ellipse(
+      this.player.x, this.player.y + TILE / 2 - 2,
+      20, 8,
+      0x000000, 0.3,
+    );
+    this.playerShadow.setDepth(29);
+
+    // "YOU" label above the player
+    this.playerLabel = this.add.text(
+      this.player.x, this.player.y - TILE / 2 - 4,
+      'YOU',
+      {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '6px',
+        color: '#4A90E2',
+        stroke: '#000000',
+        strokeThickness: 1,
+      },
+    ).setOrigin(0.5, 1).setDepth(31);
 
     // Force-refresh all sprite textures on the next frame to prevent
     // black squares caused by programmatic textures not being GPU-ready
@@ -401,6 +452,10 @@ export class ExplorationScene extends Phaser.Scene {
       this.tileX = Math.round((this.player.x - TILE / 2) / TILE);
       this.tileY = Math.round((this.player.y - TILE / 2) / TILE);
     }
+
+    // Update player shadow + label position to follow player
+    this.playerShadow.setPosition(this.player.x, this.player.y + TILE / 2 - 2);
+    this.playerLabel.setPosition(this.player.x, this.player.y - TILE / 2 - 4);
 
     // Proximity check
     this.checkProximity();
@@ -627,10 +682,11 @@ export class ExplorationScene extends Phaser.Scene {
     this.completedZones = new Set(zones);
     this.collectedItems = new Set(items);
 
-    // Update NPC sprite alphas
+    // Update NPC sprite visual state for completed NPCs
     for (const ia of this.interactables) {
       if (ia.type === 'npc' && this.completedNPCs.has(ia.id)) {
-        ia.sprite.setAlpha(0.5);
+        ia.sprite.setAlpha(0.4);
+        ia.sprite.setTint(0x888888);
       }
       if (ia.type === 'item' && this.collectedItems.has(ia.id)) {
         ia.sprite.setAlpha(0.4);
