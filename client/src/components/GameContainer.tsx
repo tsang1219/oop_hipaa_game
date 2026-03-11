@@ -3,8 +3,6 @@ import { Button } from '@/components/ui/button';
 import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import CharacterPortrait from './CharacterPortrait';
 import BattleEncounterScreen from './BattleEncounterScreen';
-import PrivacyMeter from './PrivacyMeter';
-import SceneCounter from './SceneCounter';
 import type { Scene, Choice } from '@shared/schema';
 import nurseNinaImg from '@assets/generated_images/Nurse_Nina_pixel_portrait_6f9bfea3.png';
 
@@ -52,7 +50,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
       onGameOver?.(0);
       return;
     }
-    
+
     setGamePhase('feedback');
   };
 
@@ -186,14 +184,8 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
   } : null;
 
   return (
-    <div className="relative min-h-screen bg-[#0f0f1e]">
-      {/* HUD overlay for privacy meter and scene counter */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-[#0f0f1e]/90 p-2 flex items-center justify-between">
-        <SceneCounter current={currentSceneIndex + 1} total={scenes.length} />
-        <PrivacyMeter privacyScore={privacyScore} />
-      </div>
-
-      {/* Battle Encounter Screen */}
+    <div className="fixed inset-0 z-40">
+      {/* Dialogue Overlay — room visible through transparent wrapper */}
       <BattleEncounterScreen
         npcId={npcId || currentScene.character.toLowerCase().replace(/\s+/g, '_')}
         npcName={npcName || currentScene.character}
@@ -204,6 +196,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
         onAdvance={gamePhase === 'dialogue' ? handleDialogueAdvance : gamePhase === 'feedback' ? handleNextScene : undefined}
         onDialogueComplete={handleDialogueComplete}
         phase={gamePhase}
+        privacyScore={privacyScore}
       />
     </div>
   );

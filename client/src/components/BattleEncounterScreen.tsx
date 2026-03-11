@@ -1,7 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import PlayerBackSprite from './PlayerBackSprite';
+import { Card } from '@/components/ui/card';
 import NPCSprite from './NPCSprite';
 
 interface BattleEncounterScreenProps {
@@ -14,6 +13,7 @@ interface BattleEncounterScreenProps {
   onAdvance?: () => void;
   onDialogueComplete?: () => void;
   phase: 'dialogue' | 'choices' | 'feedback';
+  privacyScore?: number;
 }
 
 export default function BattleEncounterScreen({
@@ -26,6 +26,7 @@ export default function BattleEncounterScreen({
   onAdvance,
   onDialogueComplete,
   phase,
+  privacyScore,
 }: BattleEncounterScreenProps) {
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -63,7 +64,7 @@ export default function BattleEncounterScreen({
           onAdvance?.();
         }
       }
-      
+
       if (phase === 'choices' && !isTyping) {
         const num = parseInt(e.key);
         if (num >= 1 && num <= choices.length) {
@@ -75,6 +76,20 @@ export default function BattleEncounterScreen({
     window.addEventListener('keydown', handleKeyPress);
     return () => window.removeEventListener('keydown', handleKeyPress);
   }, [isTyping, phase, dialogue, choices, onDialogueComplete, onAdvance, onChoiceSelect]);
+
+  const handleOverlayClick = (e: React.MouseEvent) => {
+    // Only handle clicks on the overlay background itself, not the panel
+    if (e.target === e.currentTarget) {
+      if (isTyping) {
+        setDisplayedText(dialogue);
+        setCurrentIndex(dialogue.length);
+        setIsTyping(false);
+        onDialogueComplete?.();
+      } else if (phase === 'dialogue') {
+        onAdvance?.();
+      }
+    }
+  };
 
   const handleDialogueClick = () => {
     if (isTyping) {
@@ -98,127 +113,105 @@ export default function BattleEncounterScreen({
   };
 
   return (
-    <div className="fixed inset-0 z-40 bg-[#0a0a1a] flex flex-col" data-testid="battle-encounter-screen">
-      {/* Battle Arena - Top section with sprites */}
-      <div className="flex-1 relative overflow-hidden">
-        {/* Background gradient for arena effect */}
-        <div 
-          className="absolute inset-0"
-          style={{
-            background: 'radial-gradient(ellipse at center bottom, #1a1a3a 0%, #0a0a1a 70%)',
-          }}
-        />
-        
-        {/* Arena floor lines for depth */}
-        <div className="absolute bottom-0 left-0 right-0 h-1/2">
-          <div 
-            className="w-full h-full"
-            style={{
-              background: 'repeating-linear-gradient(0deg, transparent 0px, transparent 20px, rgba(255,107,157,0.1) 20px, rgba(255,107,157,0.1) 21px)',
-              transform: 'perspective(200px) rotateX(60deg)',
-              transformOrigin: 'bottom',
-            }}
-          />
-        </div>
-
-        {/* NPC - Top Right (opponent position) */}
-        <div 
-          className="absolute top-8 right-8 md:top-12 md:right-16 animate-pulse"
-          style={{ animationDuration: '3s' }}
-          data-testid="npc-battle-sprite"
-        >
-          {/* NPC platform/shadow */}
-          <div 
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-32 h-6 bg-black/30 rounded-full blur-sm"
-          />
-          
-          {/* NPC Name plate */}
-          <div className="absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap">
-            <div className="bg-[#1a1a2e] border-2 border-[#FF6B9D] px-3 py-1 rounded">
-              <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-xs">
-                {npcName}
-              </span>
+    <div
+      className="fixed inset-0 z-40 flex flex-col justify-end bg-black/60"
+      onClick={handleOverlayClick}
+      data-testid="battle-encounter-screen"
+    >
+      {/* Bottom-anchored dialogue panel */}
+      <div
+        className="relative bg-[#1a1a2e] border-t-4 border-[#FF6B9D] max-h-[60vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Header: NPC portrait + name + optional privacy meter */}
+        <div className="flex items-center gap-3 px-4 pt-4 pb-2">
+          {/* NPC portrait */}
+          <div
+            className="flex-shrink-0 w-12 h-12 bg-[#16213e] border-2 border-[#FF6B9D] rounded flex items-center justify-center overflow-hidden"
+            data-testid="npc-battle-sprite"
+          >
+            <div className="w-10 h-10">
+              <NPCSprite npcId={npcId} direction="down" />
             </div>
           </div>
-          
-          {/* NPC Sprite - Larger, facing player - reusing NPCSprite component */}
-          <div className="relative w-24 h-24 md:w-32 md:h-32" style={{ transform: 'scale(3)', transformOrigin: 'center center' }}>
-            <NPCSprite npcId={npcId} direction="down" />
+
+          <div className="flex-1 min-w-0">
+            <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-sm">
+              {npcName}
+            </span>
           </div>
+
+          {/* Compact privacy meter in header */}
+          {privacyScore !== undefined && (
+            <div className="flex-shrink-0 w-32">
+              <div className="flex items-center gap-1">
+                <span className="font-['Press_Start_2P'] text-[8px] text-[#FF6B9D]">TRUST</span>
+                <div className="flex-1 h-3 bg-[#16213e] border border-[#FF6B9D] overflow-hidden">
+                  <div
+                    className={`h-full transition-all duration-500 ${
+                      privacyScore >= 70 ? 'bg-[#4CAF50]' :
+                      privacyScore >= 40 ? 'bg-[#FFA726]' :
+                      'bg-[#FF6B9D]'
+                    }`}
+                    style={{ width: `${Math.max(0, Math.min(100, privacyScore))}%` }}
+                  />
+                </div>
+                <span className="font-['Press_Start_2P'] text-[8px] text-white">
+                  {Math.round(privacyScore)}%
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Player - Bottom Left (from behind) */}
-        <div 
-          className="absolute bottom-16 left-8 md:bottom-24 md:left-16"
-          data-testid="player-battle-sprite"
-        >
-          {/* Player platform/shadow */}
-          <div 
-            className="absolute -bottom-4 left-1/2 -translate-x-1/2 w-24 h-4 bg-black/30 rounded-full blur-sm"
-          />
-          
-          {/* Player Sprite - From behind, facing NPC */}
-          <PlayerBackSprite characterType="blue" size={80} />
-        </div>
-
-        {/* VS Effect - Optional flair */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 opacity-20">
-          <span className="font-['Press_Start_2P'] text-4xl text-[#FF6B9D]">VS</span>
-        </div>
-      </div>
-
-      {/* Dialogue/Choice Box - Bottom section */}
-      <div className="relative">
+        {/* Dialogue text */}
         {phase === 'dialogue' && (
-          <Card 
-            className={`mx-4 mb-4 bg-[#1a1a2e] border-4 border-[#FF6B9D] shadow-lg cursor-pointer hover-elevate`}
+          <div
+            className="px-4 pb-4 cursor-pointer"
             onClick={handleDialogueClick}
             data-testid="container-battle-dialogue"
           >
-            <div className="p-6">
-              <div className="mb-2">
-                <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-sm">
-                  {npcName}
+            <div className="font-['Press_Start_2P'] text-white text-xs leading-relaxed min-h-[3rem]">
+              {displayedText}
+              {isTyping && <span className="animate-pulse">|</span>}
+            </div>
+            {!isTyping && (
+              <div className="mt-3 text-right">
+                <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-[10px] animate-pulse">
+                  SPACE / Click to continue ...
                 </span>
               </div>
-              <div className="font-['Press_Start_2P'] text-white text-xs leading-relaxed min-h-[4rem]">
-                {displayedText}
-                {isTyping && <span className="animate-pulse">▼</span>}
-              </div>
-              {!isTyping && (
-                <div className="mt-4 text-right">
-                  <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-xs animate-pulse">
-                    Press SPACE ▼
-                  </span>
-                </div>
-              )}
-            </div>
-          </Card>
+            )}
+          </div>
         )}
 
+        {/* Choices */}
         {phase === 'choices' && (
-          <div className="mx-4 mb-4 space-y-3">
+          <div className="px-4 pb-4">
             {/* Repeat dialogue context */}
-            <Card className="bg-[#1a1a2e] border-4 border-[#FF6B9D] p-4">
+            <div className="mb-3">
               <p className="font-['Press_Start_2P'] text-white text-xs leading-relaxed">
                 {dialogue}
               </p>
-            </Card>
-            
-            {/* Choice buttons in battle menu style */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+            </div>
+
+            {/* Choice buttons — single column, full width */}
+            <div className="flex flex-col gap-2">
               {choices.map((choice, idx) => (
                 <Button
                   key={choice.index}
                   onClick={() => onChoiceSelect?.(choice.index)}
-                  className="w-full bg-[#16213e] border-2 border-[#FF6B9D] hover:bg-[#1a1a3e] hover:border-[#ff8fb5] text-left p-4 h-auto"
+                  className="w-full bg-[#16213e] border-2 border-[#FF6B9D] hover:bg-[#1a1a3e] hover:border-[#ff8fb5] text-left p-3 h-auto"
                   data-testid={`choice-button-${idx + 1}`}
                 >
-                  <div className="flex items-start gap-3">
-                    <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-xs flex-shrink-0">
+                  <div className="flex items-start gap-2 w-full">
+                    <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-[10px] flex-shrink-0">
                       {idx + 1}.
                     </span>
-                    <span className="font-['Press_Start_2P'] text-white text-xs leading-relaxed text-left">
+                    <span
+                      className="font-['Press_Start_2P'] text-white text-[10px] leading-relaxed text-left"
+                      style={{ wordBreak: 'break-word', whiteSpace: 'normal' }}
+                    >
                       {choice.text}
                     </span>
                   </div>
@@ -228,18 +221,19 @@ export default function BattleEncounterScreen({
           </div>
         )}
 
+        {/* Feedback */}
         {phase === 'feedback' && feedback && (
-          <div className="mx-4 mb-4 space-y-3">
-            <Card className={`bg-[#1a1a2e] border-4 ${getFeedbackBorderColor()} p-4`}>
+          <div className="px-4 pb-4">
+            <Card className={`bg-[#1a1a2e] border-4 ${getFeedbackBorderColor()} p-4 mb-3`}>
               <div className="flex items-center gap-2 mb-2">
                 <span className={`font-['Press_Start_2P'] text-xs ${
                   feedback.type === 'correct' ? 'text-green-400' :
                   feedback.type === 'partial' ? 'text-yellow-400' :
                   'text-red-400'
                 }`}>
-                  {feedback.type === 'correct' ? '✓ CORRECT' :
+                  {feedback.type === 'correct' ? 'CORRECT' :
                    feedback.type === 'partial' ? '~ PARTIAL' :
-                   '✗ INCORRECT'}
+                   'INCORRECT'}
                 </span>
                 {feedback.scoreChange < 0 && (
                   <span className="font-['Press_Start_2P'] text-xs text-red-400">
@@ -251,14 +245,14 @@ export default function BattleEncounterScreen({
                 {feedback.text}
               </p>
             </Card>
-            
+
             <div className="text-center">
               <Button
                 onClick={onAdvance}
                 className="font-['Press_Start_2P'] text-xs bg-[#FF6B9D] hover:bg-[#ff8fb5] border-4 border-[#FF6B9D]"
                 data-testid="button-next-scene"
               >
-                CONTINUE →
+                CONTINUE
               </Button>
             </div>
           </div>
