@@ -15,6 +15,7 @@ import { MusicVolumeSlider } from '../components/MusicVolumeSlider';
 import { useNotification } from '../components/NotificationToast';
 import { GameBanner } from '../components/GameBanner';
 import { useToast } from '@/hooks/use-toast';
+import { ValidationOverlay } from '../dev/ValidationOverlay';
 import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
@@ -652,6 +653,9 @@ export default function PrivacyQuestPage() {
         </button>
         <MusicVolumeSlider />
       </div>
+
+      {/* Dev-only runtime validation checklist — hidden in production */}
+      <ValidationOverlay gameRef={gameRef} />
     </div>
   );
 }

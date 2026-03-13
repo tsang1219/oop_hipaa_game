@@ -317,16 +317,16 @@ export class ExplorationScene extends Phaser.Scene {
       },
     ).setOrigin(0.5, 1).setDepth(31);
 
-    // Force-refresh all sprite textures on the next frame to prevent
+    // Force-refresh all sprite textures after a short delay to prevent
     // black squares caused by programmatic textures not being GPU-ready
     // on the first render pass after scene creation.
-    this.time.delayedCall(0, () => {
-      this.player.setTexture('player_down');
+    // 100ms gives WebGL time to upload all procedural textures before display.
+    this.time.delayedCall(100, () => {
+      this.player.setTexture('player_sheet', 0);
       for (const ia of this.interactables) {
-        if (ia.type === 'npc') {
-          const currentTex = ia.sprite.texture.key;
-          ia.sprite.setTexture(currentTex);
-        }
+        const key = ia.sprite.texture.key;
+        const frame = ia.sprite.frame?.name ?? 0;
+        ia.sprite.setTexture(key, frame);
       }
     });
 
@@ -383,22 +383,28 @@ export class ExplorationScene extends Phaser.Scene {
       backgroundColor: '#1a1a2ecc', padding: { x: 8, y: 4 },
     }).setOrigin(0.5, 1).setDepth(50).setVisible(false).setScrollFactor(0);
 
-    // ── Background music — fade in ──────────────────────────────
-    const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-    this.bgMusic = this.sound.add('music_exploration', { loop: true, volume: 0 });
-    this.bgMusic.play();
-    this.tweens.add({
-      targets: this.bgMusic,
-      volume: this.musicBaseVolume * userVol,
-      duration: 800,
-      ease: 'Linear',
-    });
-
-    // ── Listen for React events ──────────────────────────────────
+    // ── Listen for React events — MUST be before music to survive any audio errors ──
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
+
+    // ── Background music — fade in ──────────────────────────────
+    // Wrapped in try-catch: if audio key is missing (e.g. decode race) it must
+    // NOT abort create() and prevent the EventBridge listeners above from working.
+    try {
+      const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+      this.bgMusic = this.sound.add('music_exploration', { loop: true, volume: 0 });
+      this.bgMusic.play();
+      this.tweens.add({
+        targets: this.bgMusic,
+        volume: this.musicBaseVolume * userVol,
+        duration: 800,
+        ease: 'Linear',
+      });
+    } catch (e) {
+      console.warn('[ExplorationScene] music_exploration not ready, skipping BGM:', e);
+    }
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
   }
@@ -694,11 +700,12 @@ export class ExplorationScene extends Phaser.Scene {
   // ── Resume after dialogue ──────────────────────────────────────
   private onDialogueComplete = () => {
     this.paused = false;
-    // Re-focus canvas so keyboard input works after React overlays stole focus.
-    // Small delay ensures React has unmounted the overlay DOM first.
-    this.time.delayedCall(50, () => {
-      this.game.canvas.focus();
-    });
+    // Re-focus the canvas so keyboard input works after React overlays stole focus.
+    // tabIndex ensures the canvas is focusable; double-attempt covers slow React unmounts.
+    const canvas = this.game.canvas;
+    if (canvas.tabIndex < 0) canvas.tabIndex = 0;
+    this.time.delayedCall(50, () => { canvas.focus(); });
+    this.time.delayedCall(300, () => { if (document.activeElement !== canvas) canvas.focus(); });
   };
 
   // ── Pause from modal (intro / help icon) ───────────────────────
