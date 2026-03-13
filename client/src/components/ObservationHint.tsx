@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import type { Gate } from '@shared/schema';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface ObservationHintProps {
   gate: Gate;
@@ -10,7 +11,10 @@ export default function ObservationHint({ gate, onAcknowledge }: ObservationHint
   const [visible, setVisible] = useState(false);
   
   useEffect(() => {
-    const showTimer = setTimeout(() => setVisible(true), 100);
+    const showTimer = setTimeout(() => {
+      setVisible(true);
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+    }, 100);
     return () => clearTimeout(showTimer);
   }, []);
 
@@ -27,7 +31,7 @@ export default function ObservationHint({ gate, onAcknowledge }: ObservationHint
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-end justify-center pb-8 bg-background/50 transition-opacity duration-300 ${
+      className={`absolute inset-0 z-50 flex items-end justify-center pb-8 bg-background/50 transition-opacity duration-300 ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
       onClick={onAcknowledge}

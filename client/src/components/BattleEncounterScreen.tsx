@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import NPCSprite from './NPCSprite';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface BattleEncounterScreenProps {
   npcId: string;
@@ -57,6 +58,24 @@ export default function BattleEncounterScreen({
   }, [currentIndex, dialogue, isTyping, onDialogueComplete]);
 
   useEffect(() => {
+    if (phase === 'choices') {
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+    }
+  }, [phase]);
+
+  useEffect(() => {
+    if (feedback) {
+      if (feedback.type === 'correct') {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_tower_place', volume: 0.55 });
+      } else if (feedback.type === 'incorrect') {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_breach_alert', volume: 0.45 });
+      } else {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+      }
+    }
+  }, [feedback]);
+
+  useEffect(() => {
     const handleKeyPress = (e: KeyboardEvent) => {
       if (e.key === ' ' || e.key === 'Spacebar') {
         e.preventDefault();
@@ -73,6 +92,7 @@ export default function BattleEncounterScreen({
       if (phase === 'choices' && !isTyping) {
         const num = parseInt(e.key);
         if (num >= 1 && num <= choices.length) {
+          eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
           onChoiceSelect?.(choices[num - 1].index);
         }
       }
@@ -119,7 +139,7 @@ export default function BattleEncounterScreen({
 
   return (
     <div
-      className={`fixed inset-0 z-40 flex flex-col justify-end transition-all duration-200 ${
+      className={`absolute inset-0 z-40 flex flex-col justify-end transition-all duration-200 ${
         isVisible ? 'bg-black/60' : 'bg-black/0'
       }`}
       onClick={handleOverlayClick}
@@ -209,7 +229,10 @@ export default function BattleEncounterScreen({
               {choices.map((choice, idx) => (
                 <Button
                   key={choice.index}
-                  onClick={() => onChoiceSelect?.(choice.index)}
+                  onClick={() => {
+                    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+                    onChoiceSelect?.(choice.index);
+                  }}
                   className="w-full bg-[#16213e] border-2 border-[#FF6B9D] hover:bg-[#1a1a3e] hover:border-[#ff8fb5] text-left p-3 h-auto"
                   data-testid={`choice-button-${idx + 1}`}
                 >

@@ -49,4 +49,5 @@ export const BRIDGE_EVENTS = {
   REACT_DISMISS_TUTORIAL: 'react:dismiss-tutorial',
   REACT_RESTART_BREACH: 'react:restart-breach',
   REACT_SET_MUSIC_VOLUME: 'react:set-music-volume',
+  REACT_PLAY_SFX: 'react:play-sfx',
 } as const;

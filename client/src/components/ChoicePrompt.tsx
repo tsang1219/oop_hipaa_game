@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import type { Gate } from '@shared/schema';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface ChoicePromptProps {
   gate: Gate;
@@ -14,7 +15,10 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
   const options = gate.choiceOptions || [];
 
   useEffect(() => {
-    const showTimer = setTimeout(() => setVisible(true), 100);
+    const showTimer = setTimeout(() => {
+      setVisible(true);
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+    }, 100);
     return () => clearTimeout(showTimer);
   }, []);
 
@@ -47,7 +51,7 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
 
   return (
     <div 
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-background/80 transition-opacity duration-300 ${
+      className={`absolute inset-0 z-50 flex items-center justify-center bg-background/80 transition-opacity duration-300 ${
         visible ? 'opacity-100' : 'opacity-0'
       }`}
       data-testid="choice-prompt-overlay"

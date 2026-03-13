@@ -56,7 +56,7 @@ export function GameBanner({ text, subtext, duration = 1200, onComplete, color =
   }, [phase, duration, onComplete]);
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-center justify-center pointer-events-none">
+    <div className="absolute inset-0 z-[150] flex items-center justify-center pointer-events-none">
       {/* Dim backdrop */}
       <div
         className={`absolute inset-0 transition-opacity duration-300 ${

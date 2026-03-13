@@ -398,6 +398,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
   }
@@ -483,6 +484,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Escape to exit room
     if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
+      this.sound.play('sfx_interact', { volume: 0.4 });
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, this.room.id);
     }
   }
@@ -495,6 +497,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     if (this.moveTimer) this.moveTimer.destroy();
     if (this.npcPulseTween) {
       this.npcPulseTween.stop();
@@ -505,6 +508,12 @@ export class ExplorationScene extends Phaser.Scene {
   private onMusicVolume = (vol: number) => {
     if (this.bgMusic) {
       (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.musicBaseVolume * vol;
+    }
+  };
+
+  private onPlaySfx = (data: { key: string; volume?: number }) => {
+    if (this.sound.get(data.key)) {
+      this.sound.play(data.key, { volume: data.volume ?? 0.5 });
     }
   };
 

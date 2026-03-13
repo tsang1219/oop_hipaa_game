@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface EducationalItemModalProps {
   title: string;
@@ -19,12 +20,15 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    requestAnimationFrame(() => setIsVisible(true));
+    requestAnimationFrame(() => {
+      setIsVisible(true);
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+    });
   }, []);
 
   return (
     <div
-      className={`fixed inset-0 flex items-center justify-center z-50 p-4 transition-all duration-200 ${
+      className={`absolute inset-0 flex items-center justify-center z-50 p-4 transition-all duration-200 ${
         isVisible ? 'bg-black/70' : 'bg-black/0'
       }`}
       onClick={onClose}
@@ -67,7 +71,10 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
 
         <div className="flex justify-center">
           <Button
-            onClick={onClose}
+            onClick={() => {
+              eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+              onClose();
+            }}
             variant="default"
             size="lg"
             className="min-w-[200px]"

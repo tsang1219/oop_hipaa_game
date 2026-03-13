@@ -350,6 +350,7 @@ export default function PrivacyQuestPage() {
       const isComplete = checkRoomCompletion(room);
       if (isComplete && !completedRooms.includes(currentRoomId!)) {
         setCompletedRooms(prev => [...prev, currentRoomId!]);
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
         // Show room cleared banner before story reveal or hub return
         setRoomClearedBanner({ roomName: room.name });
         return;
@@ -529,32 +530,104 @@ export default function PrivacyQuestPage() {
             collectedItems={collectedItems}
           />
         )}
-      </div>
 
-      {/* Floating score delta indicator */}
-      {scoreDelta && (
-        <div
-          key={scoreDelta.key}
-          className="pointer-events-none"
-          style={{
-            position: 'absolute',
-            top: '-8px',
-            left: '50%',
-            fontFamily: '"Press Start 2P", monospace',
-            fontSize: '14px',
-            fontWeight: 'bold',
-            color: scoreDelta.value > 0 ? '#44ff44' : '#ff4444',
-            textShadow: scoreDelta.value > 0
-              ? '0 0 8px rgba(68, 255, 68, 0.6), 0 0 16px rgba(68, 255, 68, 0.3)'
-              : '0 0 8px rgba(255, 68, 68, 0.6), 0 0 16px rgba(255, 68, 68, 0.3)',
-            animation: 'score-float-up 0.9s ease-out forwards',
-            transform: 'translateX(-50%)',
-            zIndex: 30,
-          }}
-        >
-          {scoreDelta.value > 0 ? `+${scoreDelta.value}` : scoreDelta.value}
-        </div>
-      )}
+        {/* Floating score delta indicator — anchored inside canvas */}
+        {scoreDelta && (
+          <div
+            key={scoreDelta.key}
+            className="pointer-events-none absolute"
+            style={{
+              top: '8px',
+              left: '50%',
+              fontFamily: '"Press Start 2P", monospace',
+              fontSize: '14px',
+              fontWeight: 'bold',
+              color: scoreDelta.value > 0 ? '#44ff44' : '#ff4444',
+              textShadow: scoreDelta.value > 0
+                ? '0 0 8px rgba(68, 255, 68, 0.6), 0 0 16px rgba(68, 255, 68, 0.3)'
+                : '0 0 8px rgba(255, 68, 68, 0.6), 0 0 16px rgba(255, 68, 68, 0.3)',
+              animation: 'score-float-up 0.9s ease-out forwards',
+              transform: 'translateX(-50%)',
+              zIndex: 30,
+            }}
+          >
+            {scoreDelta.value > 0 ? `+${scoreDelta.value}` : scoreDelta.value}
+          </div>
+        )}
+
+        {/* ── React overlays — confined to canvas bounds ── */}
+
+        {/* Dialogue overlay */}
+        {pageMode === 'dialogue' && currentSceneId && dialogueScenes.length > 0 && (
+          <GameContainer
+            scenes={dialogueScenes}
+            onComplete={handleDialogueComplete}
+            onGameOver={handleGameOver}
+            npcId={currentNPCId || undefined}
+            npcName={npc?.name}
+            initialPrivacyScore={privacyScore}
+            onPrivacyScoreChange={handlePrivacyScoreChange}
+          />
+        )}
+
+        {/* Educational item modal */}
+        {selectedItem && (
+          <EducationalItemModal
+            title={selectedItem.title}
+            fact={selectedItem.fact}
+            type={selectedItem.type}
+            onClose={() => {
+              setSelectedItem(null);
+              eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+            }}
+          />
+        )}
+
+        {/* Room cleared banner */}
+        {roomClearedBanner && (
+          <GameBanner
+            text="Room Cleared!"
+            subtext={roomClearedBanner.roomName}
+            onComplete={handleRoomClearedComplete}
+            color="blue"
+          />
+        )}
+
+        {/* Observation gate hint */}
+        {activeObservationGate && (
+          <ObservationHint
+            gate={activeObservationGate}
+            onAcknowledge={() => {
+              resolveGate(activeObservationGate.id, activeObservationGate.targetId);
+              setActiveObservationGate(null);
+              eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+            }}
+          />
+        )}
+
+        {/* Choice gate prompt */}
+        {activeChoiceGate && (
+          <ChoicePrompt
+            gate={activeChoiceGate}
+            onChoice={(unlockedId) => {
+              resolveGate(activeChoiceGate.id, unlockedId);
+              setActiveChoiceGate(null);
+              eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+            }}
+          />
+        )}
+
+        {/* Intro modal — shown on first visit, re-openable via help icon */}
+        {showIntroModal && (
+          <TutorialModal
+            title="Welcome to HIPAA General"
+            description={"You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys — Move\nSPACE — Talk to people and interact\nESC — Exit the room"}
+            onAcknowledge={handleDismissIntroModal}
+            type="info"
+            ctaText="Start exploring →"
+          />
+        )}
+      </div>
 
       {/* Control hints + mute */}
       <div className="flex items-center gap-2">
@@ -575,85 +648,10 @@ export default function PrivacyQuestPage() {
           title={muted ? 'Unmute' : 'Mute'}
           style={{ fontFamily: '"Press Start 2P", monospace' }}
         >
-          {muted ? '\u{1F507}' : '\u{1F50A}'}
+          {muted ? '🔇' : '🔊'}
         </button>
         <MusicVolumeSlider />
       </div>
-
-      {/* ── React overlays ── */}
-
-      {/* Dialogue overlay */}
-      {pageMode === 'dialogue' && currentSceneId && dialogueScenes.length > 0 && (
-        <div className="fixed inset-0 z-40">
-          <GameContainer
-            scenes={dialogueScenes}
-            onComplete={handleDialogueComplete}
-            onGameOver={handleGameOver}
-            npcId={currentNPCId || undefined}
-            npcName={npc?.name}
-            initialPrivacyScore={privacyScore}
-            onPrivacyScoreChange={handlePrivacyScoreChange}
-          />
-        </div>
-      )}
-
-      {/* Educational item modal */}
-      {selectedItem && (
-        <EducationalItemModal
-          title={selectedItem.title}
-          fact={selectedItem.fact}
-          type={selectedItem.type}
-          onClose={() => {
-            setSelectedItem(null);
-            eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
-          }}
-        />
-      )}
-
-      {/* Room cleared banner */}
-      {roomClearedBanner && (
-        <GameBanner
-          text="Room Cleared!"
-          subtext={roomClearedBanner.roomName}
-          onComplete={handleRoomClearedComplete}
-          color="blue"
-        />
-      )}
-
-      {/* Observation gate hint */}
-      {activeObservationGate && (
-        <ObservationHint
-          gate={activeObservationGate}
-          onAcknowledge={() => {
-            resolveGate(activeObservationGate.id, activeObservationGate.targetId);
-            setActiveObservationGate(null);
-            eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
-          }}
-        />
-      )}
-
-      {/* Choice gate prompt */}
-      {activeChoiceGate && (
-        <ChoicePrompt
-          gate={activeChoiceGate}
-          onChoice={(unlockedId) => {
-            resolveGate(activeChoiceGate.id, unlockedId);
-            setActiveChoiceGate(null);
-            eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
-          }}
-        />
-      )}
-
-      {/* Intro modal — shown on first visit, re-openable via help icon */}
-      {showIntroModal && (
-        <TutorialModal
-          title="Welcome to HIPAA General"
-          description={"You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys — Move\nSPACE — Talk to people and interact\nESC — Exit the room"}
-          onAcknowledge={handleDismissIntroModal}
-          type="info"
-          ctaText="Start exploring →"
-        />
-      )}
     </div>
   );
 }

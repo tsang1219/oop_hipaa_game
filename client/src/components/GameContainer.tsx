@@ -184,7 +184,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
   } : null;
 
   return (
-    <div className="fixed inset-0 z-40">
+    <>
       {/* Dialogue Overlay — room visible through transparent wrapper */}
       <BattleEncounterScreen
         npcId={npcId || currentScene.character.toLowerCase().replace(/\s+/g, '_')}
@@ -198,6 +198,6 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
         phase={gamePhase}
         privacyScore={privacyScore}
       />
-    </div>
+    </>
   );
 }
