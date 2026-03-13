@@ -317,34 +317,6 @@ export class ExplorationScene extends Phaser.Scene {
       },
     ).setOrigin(0.5, 1).setDepth(31);
 
-    // Multi-stage texture refresh to fix intermittent black-square sprites.
-    // Cause: WebGL batches texture uploads lazily — the GPU driver may not
-    // finish binding a spritesheet texture before the first render frame.
-    // Strategy: re-apply textures immediately after the first browser paint
-    // (via rAF) and again at 250 ms + 700 ms to cover slow GPU contexts.
-    const flushSprites = () => {
-      if (!this.scene.isActive('Exploration')) return;
-      this.player.setTexture('player_sheet', this.lastFacingFrame);
-      for (const ia of this.interactables) {
-        if (!ia.sprite.active) continue;
-        ia.sprite.setTexture(ia.sprite.texture.key, ia.sprite.frame?.name ?? 0);
-      }
-      // Force the WebGL pipeline to submit pending draw calls now.
-      try {
-        const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
-        if ((renderer as unknown as { gl?: WebGLRenderingContext }).gl) {
-          (renderer as unknown as { flush?(): void }).flush?.();
-        }
-      } catch (_) {/* non-WebGL or destroyed renderer — safe to ignore */}
-    };
-
-    // Pass 1 — after the very next browser paint (≈ 1 frame)
-    requestAnimationFrame(() => requestAnimationFrame(flushSprites));
-    // Pass 2 — 250 ms
-    this.time.delayedCall(250, flushSprites);
-    // Pass 3 — 700 ms (covers very slow GPU / iframe sandboxed contexts)
-    this.time.delayedCall(700, flushSprites);
-
     this.physics.add.collider(this.player, this.walls);
 
     // Camera follow in rooms larger than viewport
@@ -420,16 +392,6 @@ export class ExplorationScene extends Phaser.Scene {
     } catch (e) {
       console.warn('[ExplorationScene] music_exploration not ready, skipping BGM:', e);
     }
-
-    // Flush the WebGL render pipeline once, immediately after create() finishes.
-    // This forces any pending texture uploads (generateTexture + spritesheet binds)
-    // to be committed to the GPU before the first frame is drawn, preventing the
-    // "black square" artefact on the initial render.
-    try {
-      const renderer = this.game.renderer as Phaser.Renderer.WebGL.WebGLRenderer;
-      const gl = (renderer as unknown as { gl?: WebGLRenderingContext }).gl;
-      if (gl) { gl.flush(); }
-    } catch (_) { /* non-WebGL context */ }
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
   }

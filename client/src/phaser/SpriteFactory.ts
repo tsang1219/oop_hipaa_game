@@ -12,51 +12,94 @@ export function generateAllTextures(scene: Phaser.Scene) {
   generateFurnitureTextures(scene);
 }
 
-// ── NPC sprite colors ────────────────────────────────────────────────
-const NPC_STYLES: Record<string, { shirt: number; hair: number; shoes: number }> = {
-  npc_receptionist: { shirt: 0x2ecc71, hair: 0x654321, shoes: 0xffffff },
-  npc_nurse:        { shirt: 0x3498db, hair: 0x8b4513, shoes: 0xffffff },
-  npc_doctor:       { shirt: 0xffffff, hair: 0x2c3e50, shoes: 0x333333 },
-  npc_it_tech:      { shirt: 0x34495e, hair: 0x2c3e50, shoes: 0x333333 },
-  npc_boss:         { shirt: 0x8e44ad, hair: 0x1a1a2e, shoes: 0x222222 },
-  npc_staff:        { shirt: 0xe67e22, hair: 0x654321, shoes: 0x8b4513 },
-  npc_patient:      { shirt: 0x95a5a6, hair: 0xd4a574, shoes: 0xbdc3c7 },
-  npc_visitor:      { shirt: 0xf39c12, hair: 0x7f3c10, shoes: 0x5d4037 },
-  npc_officer:      { shirt: 0x2c3e50, hair: 0x1a1a1a, shoes: 0x111111 },
+// ── NPC sprite style definitions (matches NPCSprite.tsx SVG art) ─────
+interface NpcStyle {
+  shirt: number; hair: number; pants: number; shoes: number;
+  coat?: number; tie?: number;
+}
+const NPC_STYLES: Record<string, NpcStyle> = {
+  npc_receptionist: { shirt: 0xe8f4f8, hair: 0xff6b9d, pants: 0x333333, shoes: 0x000000 },
+  npc_nurse:        { shirt: 0x4a90e2, hair: 0x8b4513, pants: 0x2c5aa0, shoes: 0xffffff },
+  npc_doctor:       { shirt: 0x4a90e2, hair: 0x4a4a4a, pants: 0x333333, shoes: 0x000000, coat: 0xffffff },
+  npc_it_tech:      { shirt: 0x5c946e, hair: 0x654321, pants: 0x4169e1, shoes: 0x8b4513 },
+  npc_boss:         { shirt: 0x1a1a1a, hair: 0x2c2c2c, pants: 0x2c2c2c, shoes: 0x000000, tie: 0xdc143c },
+  npc_staff:        { shirt: 0x9b59b6, hair: 0xffd700, pants: 0x555555, shoes: 0x000000 },
+  npc_patient:      { shirt: 0x95a5a6, hair: 0xd4a574, pants: 0x95a5a6, shoes: 0xbdc3c7 },
+  npc_visitor:      { shirt: 0xf39c12, hair: 0x7f3c10, pants: 0x333333, shoes: 0x5d4037 },
+  npc_officer:      { shirt: 0x2c3e50, hair: 0x1a1a1a, pants: 0x1a1a1a, shoes: 0x111111 },
 };
 
 function generateNPCTextures(scene: Phaser.Scene) {
   for (const [key, style] of Object.entries(NPC_STYLES)) {
     if (scene.textures.exists(key)) continue;
     const g = scene.add.graphics();
-    drawCharacter(g, style.shirt, style.hair, style.shoes);
+    drawCharacter(g, style);
     g.generateTexture(key, TILE, TILE);
     g.destroy();
   }
 }
 
-function drawCharacter(g: Phaser.GameObjects.Graphics, shirtColor: number, hairColor: number, shoeColor: number) {
-  // Body
-  g.fillStyle(shirtColor);
-  g.fillRect(10, 14, 12, 10);
-  // Head
-  g.fillStyle(0xfdbcb4);
-  g.fillRect(12, 6, 8, 8);
+/**
+ * Draw a pixel-art character onto a Graphics object.
+ * Coordinates match NPCSprite.tsx SVG viewBox (32×32).
+ * Background is transparent (Graphics default).
+ */
+function drawCharacter(g: Phaser.GameObjects.Graphics, style: NpcStyle) {
+  const SKIN = 0xfdbcb4;
+
   // Hair
-  g.fillStyle(hairColor);
-  g.fillRect(11, 4, 10, 4);
+  g.fillStyle(style.hair);
+  g.fillRect(11, 5, 10, 4);
+  g.fillRect(10, 7, 2, 4);
+  g.fillRect(20, 7, 2, 4);
+
+  // Head
+  g.fillStyle(SKIN);
+  g.fillRect(12, 6, 8, 8);
+
   // Eyes
   g.fillStyle(0x000000);
-  g.fillRect(14, 9, 2, 2);
-  g.fillRect(18, 9, 2, 2);
+  g.fillRect(14, 10, 2, 2);
+  g.fillRect(18, 10, 2, 2);
+
+  // Coat / outer layer (doctor only)
+  if (style.coat !== undefined) {
+    g.fillStyle(style.coat);
+    g.fillRect(10, 14, 12, 10);
+    g.fillRect(7, 15, 3, 7);
+    g.fillRect(22, 15, 3, 7);
+    // Inner shirt strip
+    g.fillStyle(style.shirt);
+    g.fillRect(11, 15, 10, 8);
+  } else {
+    // Shirt body
+    g.fillStyle(style.shirt);
+    g.fillRect(11, 14, 10, 10);
+    // Arms
+    g.fillRect(8, 15, 3, 6);
+    g.fillRect(21, 15, 3, 6);
+    // Hands
+    g.fillStyle(SKIN);
+    g.fillRect(8, 21, 3, 2);
+    g.fillRect(21, 21, 3, 2);
+    // Tie for boss
+    if (style.tie !== undefined) {
+      g.fillStyle(0xffffff);
+      g.fillRect(14, 15, 4, 8);
+      g.fillStyle(style.tie);
+      g.fillRect(15, 15, 2, 6);
+    }
+  }
+
   // Pants
-  g.fillStyle(0x2c3e50);
-  g.fillRect(10, 24, 5, 4);
-  g.fillRect(17, 24, 5, 4);
+  g.fillStyle(style.pants);
+  g.fillRect(12, 24, 4, 6);
+  g.fillRect(16, 24, 4, 6);
+
   // Shoes
-  g.fillStyle(shoeColor);
-  g.fillRect(10, 28, 5, 2);
-  g.fillRect(17, 28, 5, 2);
+  g.fillStyle(style.shoes);
+  g.fillRect(11, 30, 5, 2);
+  g.fillRect(16, 30, 5, 2);
 }
 
 // ── Object textures (poster, manual, computer, whiteboard) ───────────
@@ -306,26 +349,28 @@ export function furnitureTextureKey(obstacleType?: string): string {
 }
 
 /**
- * Map an NPC id to the spritesheet texture key.
- * Returns the key used in this.load.spritesheet() — frame 0 is idle-down pose.
+ * Map an NPC id to its programmatically-generated texture key.
+ * These textures are created by generateNPCTextures() in SpriteFactory and are
+ * guaranteed to be available without any file loading, eliminating the black-box
+ * artefact that occurred when PNG spritesheet uploads were deferred.
  */
 export function npcTextureKey(npcId: string): string {
   const map: Record<string, string> = {
-    riley: 'npc_receptionist_sheet',
-    nervous_patient: 'npc_patient_sheet',
-    chatty_visitor: 'npc_visitor_sheet',
-    dr_martinez: 'npc_doctor_sheet',
-    officer: 'npc_officer_sheet',
-    nurse_chen: 'npc_nurse_sheet',
-    it_tech: 'npc_it_tech_sheet',
-    dr_patel: 'npc_doctor_sheet',
-    pharmacist: 'npc_staff_sheet',
-    intern: 'npc_staff_sheet',
-    lab_tech: 'npc_it_tech_sheet',
-    admin: 'npc_boss_sheet',
-    final_boss_1: 'npc_boss_sheet',
+    riley: 'npc_receptionist',
+    nervous_patient: 'npc_patient',
+    chatty_visitor: 'npc_visitor',
+    dr_martinez: 'npc_doctor',
+    officer: 'npc_officer',
+    nurse_chen: 'npc_nurse',
+    it_tech: 'npc_it_tech',
+    dr_patel: 'npc_doctor',
+    pharmacist: 'npc_staff',
+    intern: 'npc_staff',
+    lab_tech: 'npc_it_tech',
+    admin: 'npc_boss',
+    final_boss_1: 'npc_boss',
   };
-  return map[npcId] || 'npc_staff_sheet';
+  return map[npcId] || 'npc_staff';
 }
 
 /**
