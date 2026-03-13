@@ -52,8 +52,10 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
       }`}
       data-testid="choice-prompt-overlay"
     >
-      <div 
-        className="bg-card border-4 border-primary p-6 max-w-md mx-4"
+      <div
+        className={`bg-card border-4 border-primary p-6 max-w-md mx-4 transform transition-all duration-300 ease-out ${
+          visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
+        }`}
         style={{ fontFamily: "'Press Start 2P', cursive" }}
       >
         <p 

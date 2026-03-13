@@ -11,6 +11,9 @@ import EndScreen from '@/components/EndScreen';
 import HallwayHub from '@/components/HallwayHub';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
+import { MusicVolumeSlider } from '../components/MusicVolumeSlider';
+import { useNotification } from '../components/NotificationToast';
+import { GameBanner } from '../components/GameBanner';
 import { useToast } from '@/hooks/use-toast';
 import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
@@ -43,8 +46,10 @@ const scenes = (gameDataJson as any).scenes as Scene[];
 
 export default function PrivacyQuestPage() {
   const { toast } = useToast();
+  const { notify } = useNotification();
   const [, navigate] = useLocation();
   const gameRef = useRef<Phaser.Game | null>(null);
+  const sceneStartedForRoom = useRef<string | null>(null);
 
   // ── State ────────────────────────────────────────────────────
   const [pageMode, setPageMode] = useState<PageMode>('hub');
@@ -90,6 +95,9 @@ export default function PrivacyQuestPage() {
   const [activeObservationGate, setActiveObservationGate] = useState<Gate | null>(null);
   const [activeChoiceGate, setActiveChoiceGate] = useState<Gate | null>(null);
 
+  // Room cleared banner
+  const [roomClearedBanner, setRoomClearedBanner] = useState<{ roomName: string } | null>(null);
+
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(() => {
     if (!currentRoomId) return new Set();
@@ -101,6 +109,11 @@ export default function PrivacyQuestPage() {
     const s = localStorage.getItem(`unlockedNpcs_${currentRoomId}`);
     return s ? new Set(JSON.parse(s)) : new Set();
   });
+
+  // Score delta floating indicator
+  const prevPrivacyScoreRef = useRef(privacyScore);
+  const [scoreDelta, setScoreDelta] = useState<{ value: number; key: number } | null>(null);
+  const scoreDeltaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Intro modal — shown once (gated by localStorage flag)
   const [showIntroModal, setShowIntroModal] = useState(() => {
@@ -122,6 +135,20 @@ export default function PrivacyQuestPage() {
   useEffect(() => { localStorage.setItem('completedZones', JSON.stringify(Array.from(completedZones))); }, [completedZones]);
   useEffect(() => { localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(collectedItems))); }, [collectedItems]);
   useEffect(() => { localStorage.setItem('current-privacy-score', privacyScore.toString()); }, [privacyScore]);
+
+  // ── Score delta floating indicator ──────────────────────────
+  useEffect(() => {
+    if (privacyScore !== prevPrivacyScoreRef.current) {
+      const delta = privacyScore - prevPrivacyScoreRef.current;
+      prevPrivacyScoreRef.current = privacyScore;
+      setScoreDelta({ value: delta, key: Date.now() });
+
+      if (scoreDeltaTimer.current) clearTimeout(scoreDeltaTimer.current);
+      scoreDeltaTimer.current = setTimeout(() => {
+        setScoreDelta(null);
+      }, 900);
+    }
+  }, [privacyScore]);
 
   // ── Load gate state when room changes ────────────────────────
   useEffect(() => {
@@ -180,9 +207,20 @@ export default function PrivacyQuestPage() {
     setPageMode('exploration');
   }, []);
 
-  // ── Start Phaser exploration scene when entering exploration ──
+  // ── Start Phaser exploration scene when entering a NEW room ──
   useEffect(() => {
-    if (pageMode !== 'exploration' || !currentRoomId) return;
+    if (pageMode !== 'exploration' || !currentRoomId) {
+      // Leaving exploration (hub, gameover, win) — clear the started flag
+      // but NOT when entering dialogue (scene stays running behind overlay)
+      if (pageMode !== 'dialogue') {
+        sceneStartedForRoom.current = null;
+      }
+      return;
+    }
+    // Scene already running for this room — don't restart
+    if (sceneStartedForRoom.current === currentRoomId) return;
+    sceneStartedForRoom.current = currentRoomId;
+
     const room = rooms.find(r => r.id === currentRoomId);
     if (!room) return;
 
@@ -205,6 +243,19 @@ export default function PrivacyQuestPage() {
     }, 100);
     return () => clearTimeout(timer);
   }, [pageMode, currentRoomId, showIntroModal]);
+
+  // ── Sync completion state to running Phaser scene ───────────
+  useEffect(() => {
+    if (!sceneStartedForRoom.current) return;
+    const scene = gameRef.current?.scene.getScene('Exploration') as any;
+    if (scene?.updateCompletionState) {
+      scene.updateCompletionState(
+        Array.from(completedNPCs),
+        Array.from(completedZones),
+        Array.from(collectedItems),
+      );
+    }
+  }, [completedNPCs, completedZones, collectedItems]);
 
   // ── EventBridge listeners ────────────────────────────────────
   useEffect(() => {
@@ -261,6 +312,7 @@ export default function PrivacyQuestPage() {
         const newItems = new Set(collectedItems);
         newItems.add(data.itemId);
         setCollectedItems(newItems);
+        notify(data.title, { label: 'HIPAA FACT LEARNED', type: 'discovery' });
       }
     };
 
@@ -298,18 +350,28 @@ export default function PrivacyQuestPage() {
       const isComplete = checkRoomCompletion(room);
       if (isComplete && !completedRooms.includes(currentRoomId!)) {
         setCompletedRooms(prev => [...prev, currentRoomId!]);
-        if (room.patientStory && !collectedStories.includes(currentRoomId!)) {
-          setCollectedStories(prev => [...prev, currentRoomId!]);
-          setCurrentStoryRoom(room);
-          setIsNewStory(true);
-          setShowStoryModal(true);
-          return;
-        }
+        // Show room cleared banner before story reveal or hub return
+        setRoomClearedBanner({ roomName: room.name });
+        return;
       }
     }
     setCurrentRoomId(null);
     setPageMode('hub');
-  }, [currentRoomId, completedRooms, collectedStories, completedNPCs, completedZones, collectedItems]);
+  }, [currentRoomId, completedRooms, completedNPCs, completedZones, collectedItems]);
+
+  const handleRoomClearedComplete = useCallback(() => {
+    setRoomClearedBanner(null);
+    const room = rooms.find(r => r.id === currentRoomId);
+    if (room?.patientStory && !collectedStories.includes(currentRoomId!)) {
+      setCollectedStories(prev => [...prev, currentRoomId!]);
+      setCurrentStoryRoom(room);
+      setIsNewStory(true);
+      setShowStoryModal(true);
+      return;
+    }
+    setCurrentRoomId(null);
+    setPageMode('hub');
+  }, [currentRoomId, collectedStories]);
 
   // ── Dialogue complete ────────────────────────────────────────
   const handleDialogueComplete = useCallback(() => {
@@ -469,6 +531,31 @@ export default function PrivacyQuestPage() {
         )}
       </div>
 
+      {/* Floating score delta indicator */}
+      {scoreDelta && (
+        <div
+          key={scoreDelta.key}
+          className="pointer-events-none"
+          style={{
+            position: 'absolute',
+            top: '-8px',
+            left: '50%',
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '14px',
+            fontWeight: 'bold',
+            color: scoreDelta.value > 0 ? '#44ff44' : '#ff4444',
+            textShadow: scoreDelta.value > 0
+              ? '0 0 8px rgba(68, 255, 68, 0.6), 0 0 16px rgba(68, 255, 68, 0.3)'
+              : '0 0 8px rgba(255, 68, 68, 0.6), 0 0 16px rgba(255, 68, 68, 0.3)',
+            animation: 'score-float-up 0.9s ease-out forwards',
+            transform: 'translateX(-50%)',
+            zIndex: 30,
+          }}
+        >
+          {scoreDelta.value > 0 ? `+${scoreDelta.value}` : scoreDelta.value}
+        </div>
+      )}
+
       {/* Control hints + mute */}
       <div className="flex items-center gap-2">
         <p className="text-[8px] text-gray-500" style={{ fontFamily: '"Press Start 2P"' }}>
@@ -490,6 +577,7 @@ export default function PrivacyQuestPage() {
         >
           {muted ? '\u{1F507}' : '\u{1F50A}'}
         </button>
+        <MusicVolumeSlider />
       </div>
 
       {/* ── React overlays ── */}
@@ -519,6 +607,16 @@ export default function PrivacyQuestPage() {
             setSelectedItem(null);
             eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
           }}
+        />
+      )}
+
+      {/* Room cleared banner */}
+      {roomClearedBanner && (
+        <GameBanner
+          text="Room Cleared!"
+          subtext={roomClearedBanner.roomName}
+          onComplete={handleRoomClearedComplete}
+          color="blue"
         />
       )}
 

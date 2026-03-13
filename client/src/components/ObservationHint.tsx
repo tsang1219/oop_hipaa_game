@@ -33,8 +33,10 @@ export default function ObservationHint({ gate, onAcknowledge }: ObservationHint
       onClick={onAcknowledge}
       data-testid="observation-hint-overlay"
     >
-      <div 
-        className="bg-card border-4 border-primary p-4 max-w-lg mx-4 animate-bounce-once"
+      <div
+        className={`bg-card border-4 border-primary p-4 max-w-lg mx-4 transform transition-all duration-300 ease-out ${
+          visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
+        }`}
         style={{ fontFamily: "'Press Start 2P', cursive" }}
       >
         <div className="flex items-start gap-3">

@@ -84,6 +84,10 @@ export class BreachDefenseScene extends Phaser.Scene {
   private shownWaveStartBanners = new Set<number>();
   private waveKillCount = 0;
 
+  // Background music
+  private bgMusic?: Phaser.Sound.BaseSound;
+  private readonly musicBaseVolume = 0.35;
+
   // State broadcast throttle
   private lastBroadcast = 0;
 
@@ -223,6 +227,19 @@ export class BreachDefenseScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_START_BREACH, this.onStartGame, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL, this.onDismissTutorial, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_RESTART_BREACH, this.onRestart, this);
+
+    // Background music — fade in
+    const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+    this.bgMusic = this.sound.add('music_breach', { loop: true, volume: 0 });
+    this.bgMusic.play();
+    this.tweens.add({
+      targets: this.bgMusic,
+      volume: this.musicBaseVolume * userVol,
+      duration: 800,
+      ease: 'Linear',
+    });
+
+    eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
 
     // Emit ready
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'BreachDefense');
@@ -755,10 +772,11 @@ export class BreachDefenseScene extends Phaser.Scene {
     for (const e of deadEnemies) {
       this.sound.play('sfx_enemy_death', { volume: 0.6 });
 
-      const label = this.add.text(e.sprite.x, e.sprite.y - 20, `${e.type} blocked!`, {
+      const threatName = THREATS[e.type]?.name || e.type;
+      const label = this.add.text(e.sprite.x, e.sprite.y - 20, threatName, {
         fontFamily: '"Press Start 2P"',
         fontSize: '7px',
-        color: '#ffff44',
+        color: '#44ff44',
         stroke: '#000000',
         strokeThickness: 2,
       }).setDepth(30).setOrigin(0.5);
@@ -796,7 +814,18 @@ export class BreachDefenseScene extends Phaser.Scene {
     }
   }
 
+  private onMusicVolume = (vol: number) => {
+    if (this.bgMusic) {
+      (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.musicBaseVolume * vol;
+    }
+  };
+
   shutdown() {
+    if (this.bgMusic) {
+      this.bgMusic.stop();
+      this.bgMusic = undefined;
+    }
+    eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SELECT_TOWER_TYPE, this.onSelectTowerType, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_START_BREACH, this.onStartGame, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL, this.onDismissTutorial, this);

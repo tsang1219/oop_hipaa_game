@@ -63,6 +63,10 @@ export class ExplorationScene extends Phaser.Scene {
   private npcPulseTween: Phaser.Tweens.Tween | null = null;
   private npcPulseTarget: InteractableData | null = null;
 
+  // Background music
+  private bgMusic?: Phaser.Sound.BaseSound;
+  private readonly musicBaseVolume = 0.25;
+
   constructor() {
     super({ key: 'Exploration' });
   }
@@ -379,9 +383,21 @@ export class ExplorationScene extends Phaser.Scene {
       backgroundColor: '#1a1a2ecc', padding: { x: 8, y: 4 },
     }).setOrigin(0.5, 1).setDepth(50).setVisible(false).setScrollFactor(0);
 
+    // ── Background music — fade in ──────────────────────────────
+    const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+    this.bgMusic = this.sound.add('music_exploration', { loop: true, volume: 0 });
+    this.bgMusic.play();
+    this.tweens.add({
+      targets: this.bgMusic,
+      volume: this.musicBaseVolume * userVol,
+      duration: 800,
+      ease: 'Linear',
+    });
+
     // ── Listen for React events ──────────────────────────────────
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
   }
@@ -472,14 +488,25 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   shutdown() {
+    if (this.bgMusic) {
+      this.bgMusic.stop();
+      this.bgMusic = undefined;
+    }
     eventBridge.off(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     if (this.moveTimer) this.moveTimer.destroy();
     if (this.npcPulseTween) {
       this.npcPulseTween.stop();
       this.npcPulseTween = null;
     }
   }
+
+  private onMusicVolume = (vol: number) => {
+    if (this.bgMusic) {
+      (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.musicBaseVolume * vol;
+    }
+  };
 
   // ── Pathfinding (BFS on tile grid) ─────────────────────────────
   private findPath(start: Position, goal: Position): Position[] {
@@ -658,6 +685,11 @@ export class ExplorationScene extends Phaser.Scene {
   // ── Resume after dialogue ──────────────────────────────────────
   private onDialogueComplete = () => {
     this.paused = false;
+    // Re-focus canvas so keyboard input works after React overlays stole focus.
+    // Small delay ensures React has unmounted the overlay DOM first.
+    this.time.delayedCall(50, () => {
+      this.game.canvas.focus();
+    });
   };
 
   // ── Pause from modal (intro / help icon) ───────────────────────

@@ -28,6 +28,11 @@ export default function BattleEncounterScreen({
   phase,
   privacyScore,
 }: BattleEncounterScreenProps) {
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    requestAnimationFrame(() => setIsVisible(true));
+  }, []);
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
@@ -114,13 +119,17 @@ export default function BattleEncounterScreen({
 
   return (
     <div
-      className="fixed inset-0 z-40 flex flex-col justify-end bg-black/60"
+      className={`fixed inset-0 z-40 flex flex-col justify-end transition-all duration-200 ${
+        isVisible ? 'bg-black/60' : 'bg-black/0'
+      }`}
       onClick={handleOverlayClick}
       data-testid="battle-encounter-screen"
     >
       {/* Bottom-anchored dialogue panel */}
       <div
-        className="relative bg-[#1a1a2e] border-t-4 border-[#FF6B9D] max-h-[60vh] overflow-y-auto"
+        className={`relative bg-[#1a1a2e] border-t-4 border-[#FF6B9D] max-h-[60vh] overflow-y-auto transform transition-all duration-300 ease-out ${
+          isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header: NPC portrait + name + optional privacy meter */}

@@ -48,4 +48,5 @@ export const BRIDGE_EVENTS = {
   REACT_SELECT_TOWER_TYPE: 'react:select-tower-type',
   REACT_DISMISS_TUTORIAL: 'react:dismiss-tutorial',
   REACT_RESTART_BREACH: 'react:restart-breach',
+  REACT_SET_MUSIC_VOLUME: 'react:set-music-volume',
 } as const;

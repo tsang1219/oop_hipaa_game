@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { CheckCircle, Lightbulb, ArrowRight } from 'lucide-react';
 import { TUTORIAL_CONTENT } from '../../game/breach-defense/tutorialContent';
@@ -11,14 +11,23 @@ interface RecapModalProps {
 }
 
 export function RecapModal({ concept, onContinue, endMessage, stats }: RecapModalProps) {
+  const [isVisible, setIsVisible] = useState(false);
   const recap = TUTORIAL_CONTENT.recaps[concept as keyof typeof TUTORIAL_CONTENT.recaps];
+
+  useEffect(() => {
+    requestAnimationFrame(() => setIsVisible(true));
+  }, []);
 
   // Nothing to show at all — safety fallback
   if (!recap && !endMessage) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-xl w-full">
+    <div className={`fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-200 ${
+      isVisible ? 'bg-black/80' : 'bg-black/0'
+    }`}>
+      <div className={`bg-white border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-xl w-full transform transition-all duration-300 ease-out ${
+        isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
+      }`}>
         {recap ? (
           <div className="bg-[#2ECC71] border-b-4 border-black p-4 flex items-center gap-3">
             <CheckCircle className="w-8 h-8 text-white" />

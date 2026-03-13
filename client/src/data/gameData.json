@@ -8,25 +8,25 @@
         {
           "text": "Sure, I'll give you full access to the EHR right now.",
           "score": -2,
-          "feedback": "Incorrect. This violates the Minimum Necessary Rule. Access should be limited to only what's needed for the specific task.",
+          "feedback": "Incorrect. Even though HIPAA's Minimum Necessary rule doesn't apply to treatment disclosures, your facility's access controls should still limit EHR access to what's appropriate for a nurse's role. Full access to everything isn't proper role-based access.",
           "nextSceneId": "scene2"
         },
         {
-          "text": "Let's confirm if it's needed for treatment before accessing any records.",
+          "text": "Let's confirm it's needed for treatment and that your role grants the right access level.",
           "score": 3,
-          "feedback": "Correct! HIPAA allows sharing PHI for treatment purposes, but it's important to verify the scope of access needed and ensure it's relevant to your duties.",
+          "feedback": "Correct! Fun fact: HIPAA's Minimum Necessary rule actually has a treatment exception — providers treating a patient can access what they need without the usual restrictions. But your facility's role-based access controls still determine what any individual user can see.",
           "nextSceneId": "scene2"
         },
         {
           "text": "You can look up anything you need — it's all internal staff.",
           "score": -3,
-          "feedback": "Incorrect. Even internal access must follow HIPAA rules. Access must be limited to job role and the Minimum Necessary standard.",
+          "feedback": "Incorrect. Being internal staff doesn't grant blanket access. Your facility's access controls should limit what each role can see, and accessing records outside your job duties is a violation regardless of your employment status.",
           "nextSceneId": "scene2"
         },
         {
           "text": "Check with your supervisor about the scope of your role first.",
           "score": 1,
-          "feedback": "Partial credit. While verifying role scope is good practice, HIPAA does permit treatment-related access. The key is ensuring it's limited to what's necessary.",
+          "feedback": "Partial credit. Good instinct to verify, but HIPAA does permit treatment-related access — the Minimum Necessary rule has a treatment exception. The real question is whether her role-based access is set up correctly for tomorrow's rounds.",
           "nextSceneId": "scene2"
         }
       ]
@@ -39,25 +39,25 @@
         {
           "text": "Give them a full update — they're family and deserve to know.",
           "score": -3,
-          "feedback": "Incorrect. HIPAA requires patient authorization before disclosing PHI to family members, unless the patient has agreed or it's an emergency situation.",
+          "feedback": "Incorrect. Being family doesn't automatically grant access to PHI. You need to verify the patient has agreed to share information with this person, or that an exception applies (like an emergency).",
           "nextSceneId": "scene3"
         },
         {
-          "text": "Confirm the patient has authorized you to speak with this family member first.",
+          "text": "Confirm the patient has agreed to share information with this family member first.",
           "score": 3,
-          "feedback": "Correct! Before sharing any PHI with family members, you must verify that the patient has authorized this disclosure or that an exception applies.",
+          "feedback": "Correct! Under HIPAA, you can share PHI with family members involved in care if: (1) the patient agrees, (2) the patient had the chance to object and didn't, or (3) you use professional judgment that it's in their best interest. Verify before sharing.",
           "nextSceneId": "scene3"
         },
         {
           "text": "Tell them general information only, nothing specific.",
           "score": 1,
-          "feedback": "Partial credit. Even general information can be PHI. You still need patient authorization or a valid exception before any disclosure.",
+          "feedback": "Partial credit. Even general information can be PHI. You still need to verify the patient has agreed to share information with this person before disclosing anything.",
           "nextSceneId": "scene3"
         },
         {
           "text": "Hang up immediately — you can't talk to anyone about patients.",
           "score": -1,
-          "feedback": "Not quite. While protecting PHI is important, HIPAA does allow disclosure to family members involved in care with proper authorization. Don't be rude — verify authorization instead.",
+          "feedback": "Not quite. While protecting PHI is important, HIPAA does allow sharing with family members involved in care — with the patient's agreement or when it's in their best interest. Don't be rude — verify the patient's wishes instead.",
           "nextSceneId": "scene3"
         }
       ]
@@ -68,27 +68,27 @@
       "dialogue": "A colleague from another department wants to review patient charts for a quality improvement study. How should I handle this request?",
       "choices": [
         {
-          "text": "Share the charts — quality improvement benefits everyone.",
+          "text": "Share the full charts — quality improvement benefits everyone.",
           "score": -2,
-          "feedback": "Incorrect. Quality improvement activities require proper authorization and must follow the Minimum Necessary Rule. Verify the request is legitimate first.",
+          "feedback": "Incorrect. While quality improvement is a permitted healthcare operation (no patient authorization needed), you still must apply the Minimum Necessary Rule. Share only the specific data elements needed for the study, not full charts.",
           "nextSceneId": "scene4"
         },
         {
-          "text": "Verify they have proper authorization and need only the minimum necessary PHI.",
+          "text": "Verify the study is legitimate and share only the minimum necessary data elements.",
           "score": 3,
-          "feedback": "Correct! Quality improvement is a permitted use under HIPAA, but it must follow proper procedures including authorization and the Minimum Necessary Rule.",
+          "feedback": "Correct! Quality improvement falls under 'healthcare operations' — one of HIPAA's TPO exceptions, so patient authorization isn't needed. But you MUST apply the Minimum Necessary Rule: share only the specific data elements the study requires, not full charts.",
           "nextSceneId": "scene4"
         },
         {
           "text": "Refuse — they're not on your team.",
           "score": 0,
-          "feedback": "Not quite. HIPAA does permit sharing PHI for healthcare operations like quality improvement, but proper authorization and minimum necessary standards must be followed.",
+          "feedback": "Not quite. Quality improvement is a permitted healthcare operation under HIPAA, even across departments. Patient authorization isn't required. But you should verify the request is legitimate and apply the Minimum Necessary Rule.",
           "nextSceneId": "scene4"
         },
         {
           "text": "Give them access after they sign a confidentiality agreement.",
           "score": 1,
-          "feedback": "Partial credit. A confidentiality agreement is good, but you also need to verify proper authorization and ensure only minimum necessary information is shared.",
+          "feedback": "Partial credit. Confidentiality agreements are good practice, but the real HIPAA requirement here is the Minimum Necessary Rule. Quality improvement doesn't need patient authorization (it's a healthcare operation), but you must limit the data shared to what the study actually needs.",
           "nextSceneId": "scene4"
         }
       ]
@@ -257,19 +257,19 @@
       "dialogue": "I'm discussing a patient's case with a colleague in the hallway. We're keeping our voices down, so it should be okay, right?",
       "choices": [
         {
-          "text": "No — hallway conversations risk incidental disclosure. Use private areas.",
+          "text": "It's allowed if you take precautions — but a private area is always better.",
           "score": 3,
-          "feedback": "Correct! Even quiet conversations in hallways violate HIPAA's reasonable safeguards requirement. Use private offices, conference rooms, or designated areas for PHI discussions."
+          "feedback": "Correct! HHS says healthcare providers CAN have conversations in hallways and at nurse stations — but you must take reasonable precautions: lower your voice, avoid full patient names when possible, and move away from bystanders. A private room is ideal, but HIPAA doesn't ban hallway conversations outright."
         },
         {
-          "text": "Yes, as long as you're quiet, hallway discussions are fine.",
+          "text": "Yes, as long as you're quiet, hallway discussions are always fine.",
           "score": -2,
-          "feedback": "Incorrect. Volume doesn't eliminate the risk. HIPAA requires reasonable efforts to prevent incidental disclosures, which means avoiding public areas for PHI discussions."
+          "feedback": "Not quite. Keeping your voice down is a good precaution, but 'always fine' is too casual. You still need to be aware of who's nearby and avoid detailed discussions when bystanders could overhear. Reasonable safeguards means thinking about the situation, not just the volume."
         },
         {
-          "text": "It's fine — you're both doctors treating the same patient.",
+          "text": "No — hallway conversations about patients are never allowed under HIPAA.",
           "score": -1,
-          "feedback": "Partial truth. While discussing patient care between authorized providers is allowed, HIPAA still requires reasonable safeguards against incidental disclosure. Find a private location."
+          "feedback": "Too strict. HHS has explicitly said providers may discuss patient care in hallways and at nurse stations with reasonable precautions. HIPAA doesn't expect silence — it expects reasonable safeguards like lowering your voice and being aware of your surroundings."
         }
       ],
       "isEnd": true
@@ -362,14 +362,14 @@
       "dialogue": "You find a sticky note on a desk with a login username and password written on it. The credentials provide access to the patient database system.",
       "choices": [
         {
-          "text": "This is a HIPAA Security Rule violation — passwords must not be shared or written down.",
+          "text": "This undermines HIPAA security — credentials must be safeguarded, not left on sticky notes.",
           "score": 3,
-          "feedback": "Correct! Written passwords violate HIPAA's Security Rule. Each user must have unique credentials that aren't shared, and passwords must be stored securely."
+          "feedback": "Correct! HIPAA's Security Rule requires unique user identification and proper access controls. Written passwords undermine these safeguards — anyone who sees this note can access PHI under someone else's identity, defeating audit trail requirements. Remove the note and report it."
         },
         {
           "text": "This is fine — it's just for convenience and the desk is in a secure area.",
           "score": -3,
-          "feedback": "Incorrect. Written passwords create security risks regardless of location. HIPAA requires safeguarding authentication credentials. This must be reported and corrected."
+          "feedback": "Incorrect. Written passwords undermine HIPAA's access control and audit requirements. If someone uses these credentials, their actions are logged under the wrong user — destroying accountability. Location doesn't matter. This must be reported and corrected."
         }
       ],
       "isEnd": true
@@ -396,8 +396,8 @@
         },
         {
           "text": "Change the subject: 'Hey, did you see that email about parking?'",
-          "score": -5,
-          "feedback": "Passive avoidance doesn't address the violation. You need to actively shut down inappropriate PHI discussions in public spaces."
+          "score": 2,
+          "feedback": "Redirecting does stop the immediate disclosure, and some training programs teach this approach. But it doesn't address the underlying behavior. Cathy doesn't learn that what she's doing is wrong, so she'll do it again. A direct but polite correction is more effective."
         }
       ],
       "isEnd": true
@@ -413,9 +413,9 @@
           "feedback": "You just violated privacy by assuming authorization. That patient might be in the hospital BECAUSE of this 'husband.' Domestic violence, estranged relationships, and legal separations exist. Always verify before sharing."
         },
         {
-          "text": "I cannot confirm or deny any patient information without authorization.",
-          "score": 5,
-          "feedback": "Technically correct but needlessly robotic. You CAN share if the person is on the authorized contact list. Check first, then share if authorized."
+          "text": "I cannot confirm or deny any patient information without verification.",
+          "score": 10,
+          "feedback": "Good response! This protects the patient until you can verify. The next step is to check if this person is listed as someone the patient wants to receive information. You're not being unhelpful — you're being careful first."
         },
         {
           "text": "Let me verify you're on his authorized contact list first.",
@@ -618,14 +618,14 @@
           "feedback": "Wrong. Police badge doesn't bypass HIPAA. You need: (1) Patient consent, (2) A valid warrant or court order, OR (3) A specific legal exception like mandatory abuse reporting. 'Active investigation' isn't a magic phrase."
         },
         {
-          "text": "I can confirm if they're here, but I need a warrant or patient consent for medical records.",
+          "text": "I can confirm if they're here, but I need a court order or patient consent for medical records.",
           "score": 15,
-          "feedback": "Correct! Law enforcement requests require proper legal process. You can confirm presence in some circumstances, but medical records require a warrant, court order, or patient authorization. Don't be intimidated by badges."
+          "feedback": "Correct! You may confirm a patient's presence through facility directory information — unless the patient has opted out. But medical records require a court order, subpoena, patient consent, or other specific legal exception. Law enforcement has multiple pathways under HIPAA, but 'active investigation' alone isn't one of them."
         },
         {
           "text": "I can't help you at all. Come back with a lawyer.",
           "score": -5,
-          "feedback": "Too rigid. HIPAA does allow some law enforcement disclosures with proper legal process. You can work with officers who follow the rules—just don't hand over records without proper authorization."
+          "feedback": "Too rigid. HIPAA actually lists several circumstances where you CAN disclose to law enforcement: court orders, subpoenas, identification purposes, crime on premises, and more. Work with officers who follow proper channels — just don't hand over records on demand."
         }
       ],
       "isEnd": true
@@ -636,19 +636,19 @@
       "dialogue": "Please, my mother was just brought in by ambulance. Nobody will tell me anything! Is she okay? What happened? I'm her daughter—I have a right to know!",
       "choices": [
         {
-          "text": "Let me check if your mother has you listed as an authorized contact.",
+          "text": "Let me check if your mother has listed you as someone we can share information with.",
           "score": 15,
-          "feedback": "Correct! Even for worried family members, you need to verify authorization. The patient may have restricted information sharing for personal reasons. Check the authorization list, then share appropriately."
+          "feedback": "Correct! Even for worried family members, verify the patient's wishes first. If the patient is conscious, ask if they want information shared. If incapacitated, use professional judgment about the patient's best interest. Never assume."
         },
         {
           "text": "She's stable. The doctors are running tests now.",
           "score": -10,
-          "feedback": "Wrong. You just assumed authorization without checking. What if the patient is fleeing domestic abuse and doesn't want family to know where she is? Always verify before sharing."
+          "feedback": "Wrong. You just assumed it was okay to share without checking the patient's wishes. What if the patient is fleeing domestic abuse and doesn't want family to know where she is? Always verify before sharing."
         },
         {
           "text": "I can't tell you anything. HIPAA prevents all family communication.",
           "score": -5,
-          "feedback": "Too rigid and incorrect. HIPAA allows sharing with family members involved in care—but you need to verify authorization first. Don't use HIPAA as an excuse to be unhelpful."
+          "feedback": "Too rigid and incorrect. HIPAA allows sharing with family members involved in care — with patient agreement, or using professional judgment if the patient is incapacitated. Don't use HIPAA as an excuse to be unhelpful."
         }
       ],
       "isEnd": true
@@ -922,17 +922,17 @@
     {
       "id": "breach_response",
       "character": "Observation",
-      "dialogue": "You're reading the Breach Response Playbook. It outlines what happens when PHI is improperly accessed or disclosed. The first 72 hours are critical.",
+      "dialogue": "You're reading the Breach Response Playbook. It outlines what happens when PHI is improperly accessed or disclosed. Speed matters—but so does process.",
       "choices": [
         {
           "text": "Got it—document everything, notify the Privacy Officer immediately, don't try to fix it alone.",
           "score": 15,
-          "feedback": "Correct! Breach response requires: (1) Immediate documentation, (2) Privacy Officer notification, (3) Risk assessment, (4) Possible patient notification, (5) Possible HHS reporting. The cover-up is always worse than the breach."
+          "feedback": "Correct! Breach response requires: (1) Immediate documentation, (2) Privacy Officer notification, (3) Risk assessment, (4) Patient notification within 60 days of discovery, (5) HHS reporting (immediately if 500+ people affected, annually for smaller breaches). The cover-up is always worse than the breach."
         },
         {
           "text": "Seems like a lot of paperwork. I'd probably just try to fix it quietly first.",
           "score": -15,
-          "feedback": "Wrong! 'Fixing it quietly' is how small mistakes become reportable breaches with massive fines. The process exists for a reason. Follow it. Every time. No exceptions."
+          "feedback": "Wrong! 'Fixing it quietly' is how small mistakes become reportable breaches with massive fines. HIPAA requires patient notification within 60 days and HHS reporting. The process exists for a reason. Follow it. Every time. No exceptions."
         }
       ],
       "isEnd": true
@@ -997,6 +997,80 @@
           "text": "It's just a phone in the break room. Staff are trustworthy.",
           "score": -10,
           "feedback": "Wrong! 'Trust' doesn't replace security controls. Break rooms aren't secure areas. Anyone could see or photograph that screen. Mobile devices with PHI need the same protection as workstations."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "npp_notice",
+      "character": "Observation",
+      "dialogue": "You're reading the Notice of Privacy Practices posted in the reception area. It's dense, but it's one of the most important documents in the building — every patient has a right to receive this.",
+      "choices": [
+        {
+          "text": "This tells patients how their PHI will be used and what rights they have.",
+          "score": 15,
+          "feedback": "Correct! The Notice of Privacy Practices must explain: how PHI may be used and disclosed, patient rights (access, amendment, complaints), the facility's duties to protect PHI, and who to contact with questions. Patients must receive it at their first service encounter, and it must be posted in the facility."
+        },
+        {
+          "text": "This is just a legal formality — patients don't actually need to read it.",
+          "score": -10,
+          "feedback": "Wrong! The NPP isn't just paperwork. HIPAA requires covered entities to provide it, make a good faith effort to get written acknowledgment, and post it prominently. It's how patients learn their rights. If they don't know their rights, they can't exercise them."
+        },
+        {
+          "text": "Patients only need this if they specifically request it.",
+          "score": -5,
+          "feedback": "Incorrect. HIPAA requires providers to give the NPP to every patient at their first service encounter — proactively, not on request. It must also be posted in the facility and available on the website if the entity has one."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "social_media_slip",
+      "character": "Coworker with Phone",
+      "dialogue": "Check out this selfie I took during the code blue! You can kind of see the patient in the background but their face is mostly blocked by the crash cart. I'm going to post it — my followers love hospital drama. It's fine, right?",
+      "choices": [
+        {
+          "text": "Don't post that. Any photo that could identify a patient or their treatment is a HIPAA violation.",
+          "score": 15,
+          "feedback": "Correct! Photos taken in clinical areas that show patients — even partially — are PHI. 'Mostly blocked' isn't good enough. Room numbers, wristbands, equipment, or even context clues could identify the patient. Social media is the fastest way to turn a moment into a lawsuit."
+        },
+        {
+          "text": "It's probably fine if you can't see their face clearly.",
+          "score": -15,
+          "feedback": "Wrong! HIPAA doesn't require a clear face shot to count as a violation. Room numbers visible on doors, patient wristbands, unique medical equipment, even the timing of a public code blue — all of these can identify a patient. This photo should never have been taken, let alone posted."
+        },
+        {
+          "text": "Just crop out the patient and you should be okay.",
+          "score": -5,
+          "feedback": "Better instinct, but still wrong. The photo was taken in a clinical area during active patient care without consent. Even cropped, metadata, background details, or context could identify the patient. The real rule: never photograph in clinical areas without explicit authorization."
+        },
+        {
+          "text": "You should delete that photo entirely and never take pictures in patient care areas.",
+          "score": 10,
+          "feedback": "Strong response! Taking photos in clinical areas is a policy violation at most facilities precisely because of HIPAA risks. The safest approach: no photos in patient care areas, period. Save the selfies for the parking lot."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "vendor_baa",
+      "character": "Observation",
+      "dialogue": "You notice a stack of unsigned vendor agreements on the IT manager's desk. The top one is from CloudMed Analytics — they process billing data for the hospital, which means they handle PHI. The agreement section labeled 'Business Associate Agreement' is blank.",
+      "choices": [
+        {
+          "text": "This is a problem — any vendor handling PHI needs a signed BAA before they touch patient data.",
+          "score": 15,
+          "feedback": "Correct! A Business Associate Agreement is a HIPAA requirement whenever a third party creates, receives, maintains, or transmits PHI on your behalf. No signed BAA = no access to PHI. The BAA must specify: what PHI they can access, how they must protect it, breach notification requirements, and what happens when the contract ends. Without it, YOUR organization is liable for THEIR violations."
+        },
+        {
+          "text": "Vendor agreements are an IT department issue, not a HIPAA concern.",
+          "score": -10,
+          "feedback": "Wrong! BAAs aren't just contracts — they're a HIPAA requirement. If a vendor handles PHI without a signed BAA and causes a breach, your organization is on the hook. Every workforce member should know: if a vendor touches patient data, there must be a BAA in place."
+        },
+        {
+          "text": "A regular contract should be enough — a special 'BAA' isn't necessary.",
+          "score": -10,
+          "feedback": "Incorrect. Regular contracts don't include the specific HIPAA protections a BAA requires: PHI safeguarding obligations, breach notification timelines, restrictions on PHI use, and return or destruction of PHI when the relationship ends. A BAA is legally distinct and specifically required by HIPAA."
         }
       ],
       "isEnd": true

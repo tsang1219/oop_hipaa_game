@@ -419,3 +419,27 @@
     image-rendering: -webkit-optimize-contrast;
   }
 }
+
+/* ── Game state change animations ─────────────────────────────── */
+
+/* Health bar throb when HP is critically low */
+@keyframes hp-throb {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+
+/* Floating score delta indicator (PrivacyQuest) */
+@keyframes score-float-up {
+  0% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  70% {
+    opacity: 0.8;
+    transform: translateY(-20px);
+  }
+  100% {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+}

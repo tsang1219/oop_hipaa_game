@@ -3,13 +3,16 @@ import { useLocation } from 'wouter';
 import * as Tooltip from '@radix-ui/react-tooltip';
 import { PhaserGame } from '../phaser/PhaserGame';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
-import { TOWERS, WAVES } from '../game/breach-defense/constants';
+import { TOWERS, THREATS, WAVES } from '../game/breach-defense/constants';
 import { TUTORIAL_CONTENT } from '../game/breach-defense/tutorialContent';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { RecapModal } from '../components/breach-defense/RecapModal';
 import { CodexModal } from '../components/breach-defense/CodexModal';
+import { MusicVolumeSlider } from '../components/MusicVolumeSlider';
 import { WaveIntroBanner } from '../components/breach-defense/WaveIntroBanner';
 import { ThreatStrip } from '../components/breach-defense/ThreatStrip';
+import { useNotification } from '../components/NotificationToast';
+import { GameBanner } from '../components/GameBanner';
 import { Shield, BookOpen, ArrowLeft, Heart, DollarSign, Layers } from 'lucide-react';
 
 type TowerType = keyof typeof TOWERS;
@@ -19,6 +22,7 @@ type PageState = 'START' | 'TUTORIAL' | 'PLAYING' | 'PAUSED' | 'GAMEOVER' | 'VIC
 export default function BreachDefensePage() {
   const [, navigate] = useLocation();
   const gameRef = useRef<Phaser.Game | null>(null);
+  const { notify } = useNotification();
 
   // Game state synced from Phaser
   const [pageState, setPageState] = useState<PageState>('START');
@@ -26,6 +30,11 @@ export default function BreachDefensePage() {
   const [budget, setBudget] = useState(150);
   const [wave, setWave] = useState(1);
   const [selectedTower, setSelectedTower] = useState<TowerType | null>(null);
+
+  // Animation state for budget flash
+  const prevBudgetRef = useRef(budget);
+  const [budgetFlash, setBudgetFlash] = useState<'spend' | 'gain' | null>(null);
+  const budgetFlashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   // Tutorial state
   const [currentTutorial, setCurrentTutorial] = useState<string | null>(null);
@@ -61,6 +70,20 @@ export default function BreachDefensePage() {
   // Wave end data for RecapModal
   const [waveEndMessage, setWaveEndMessage] = useState<string | undefined>(undefined);
   const [waveEndStats, setWaveEndStats] = useState<{ threatsStop: number; threatsTotal: number; towersActive: number } | undefined>(undefined);
+
+  // Wave cleared celebration banner
+  const [waveClearedBanner, setWaveClearedBanner] = useState<{ wave: number } | null>(null);
+  const [pendingRecap, setPendingRecap] = useState<{
+    concept: string;
+    endMessage?: string;
+    stats?: { threatsStop: number; threatsTotal: number; towersActive: number };
+  } | null>(null);
+
+  // Track newly unlocked towers for glow effect
+  const [newlyUnlockedTowers, setNewlyUnlockedTowers] = useState<Set<string>>(new Set());
+
+  // Track previous threats for discovery notifications
+  const prevSeenThreatsRef = useRef<string[]>([]);
 
   // Mute toggle
   const [muted, setMuted] = useState(() =>
@@ -132,10 +155,13 @@ export default function BreachDefensePage() {
       endMessage?: string;
       stats?: { threatsStop: number; threatsTotal: number; towersActive: number };
     }) => {
-      setShowRecap(true);
-      setRecapConcept(data.concept);
-      setWaveEndMessage(data.endMessage);
-      setWaveEndStats(data.stats);
+      // Show celebration banner first, then recap after it finishes
+      setWaveClearedBanner({ wave: data.wave });
+      setPendingRecap({
+        concept: data.concept,
+        endMessage: data.endMessage,
+        stats: data.stats,
+      });
       setCurrentWaveThreats([]); // Clear threat strip between waves
     };
 
@@ -195,6 +221,53 @@ export default function BreachDefensePage() {
     }
   }, [wave]);
 
+  // ── Budget flash animation ────────────────────────────────────
+  useEffect(() => {
+    if (budget !== prevBudgetRef.current) {
+      const direction = budget > prevBudgetRef.current ? 'gain' : 'spend';
+      prevBudgetRef.current = budget;
+      setBudgetFlash(direction);
+
+      if (budgetFlashTimer.current) clearTimeout(budgetFlashTimer.current);
+      budgetFlashTimer.current = setTimeout(() => {
+        setBudgetFlash(null);
+      }, 400);
+    }
+  }, [budget]);
+
+  // ── Threat discovery notifications ────────────────────────────
+  useEffect(() => {
+    const newThreats = seenThreats.filter(t => !prevSeenThreatsRef.current.includes(t));
+    prevSeenThreatsRef.current = seenThreats;
+    newThreats.forEach(threatKey => {
+      const threat = THREATS[threatKey as keyof typeof THREATS];
+      if (threat) {
+        notify(`${threat.name} — logged in Codex`, { label: 'THREAT DETECTED', type: 'discovery' });
+      }
+    });
+  }, [seenThreats, notify]);
+
+  // ── Tower unlock notifications ──────────────────────────────────
+  useEffect(() => {
+    if (wave <= 1) return;
+    const newUnlocks = Object.entries(TOWERS)
+      .filter(([_, t]) => t.unlockWave === wave)
+      .map(([id]) => id);
+    if (newUnlocks.length > 0) {
+      setNewlyUnlockedTowers(prev => {
+        const newSet = new Set(prev);
+        newUnlocks.forEach(id => newSet.add(id));
+        return newSet;
+      });
+      newUnlocks.forEach(id => {
+        const tower = TOWERS[id as keyof typeof TOWERS];
+        if (tower) {
+          notify(`${tower.name} is now available!`, { label: 'NEW DEFENSE', type: 'unlock' });
+        }
+      });
+    }
+  }, [wave, notify]);
+
   // Mute toggle — apply to Phaser + persist
   useEffect(() => {
     if (gameRef.current?.sound) {
@@ -241,6 +314,17 @@ export default function BreachDefensePage() {
     setShowWaveBanner(false);
   }, []);
 
+  const handleWaveClearedComplete = useCallback(() => {
+    setWaveClearedBanner(null);
+    if (pendingRecap) {
+      setShowRecap(true);
+      setRecapConcept(pendingRecap.concept);
+      setWaveEndMessage(pendingRecap.endMessage);
+      setWaveEndStats(pendingRecap.stats);
+      setPendingRecap(null);
+    }
+  }, [pendingRecap]);
+
   const handleRestart = useCallback(() => {
     setPageState('START');
     setSecurityScore(100);
@@ -258,6 +342,10 @@ export default function BreachDefensePage() {
     setCurrentWaveSuggestedTowers([]);
     setWaveEndMessage(undefined);
     setWaveEndStats(undefined);
+    setWaveClearedBanner(null);
+    setPendingRecap(null);
+    setNewlyUnlockedTowers(new Set());
+    prevSeenThreatsRef.current = [];
     eventBridge.emit(BRIDGE_EVENTS.REACT_RESTART_BREACH);
   }, []);
 
@@ -312,12 +400,14 @@ export default function BreachDefensePage() {
 
       {/* HUD bar */}
       <div className="flex gap-6 items-center p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[640px] justify-between px-4">
-        <div className="flex items-center gap-2">
-          <Heart className="w-4 h-4 text-red-400" />
+        <div className={`flex items-center gap-2 ${securityScore <= 25 ? 'animate-[hp-throb_0.8s_ease-in-out_infinite]' : ''}`}>
+          <Heart className={`w-4 h-4 text-red-400 ${securityScore <= 25 ? 'animate-ping' : ''}`}
+            style={securityScore <= 25 ? { animationDuration: '1.2s' } : undefined}
+          />
           <span className="text-[10px] text-red-400">
             {securityScore}%
           </span>
-          <div className="w-24 h-2 bg-gray-700 rounded overflow-hidden ml-1">
+          <div className={`w-24 h-2 bg-gray-700 rounded overflow-hidden ml-1 ${securityScore <= 25 ? 'shadow-[0_0_8px_rgba(255,68,68,0.6)]' : ''}`}>
             <div
               className="h-full transition-all duration-300 rounded"
               style={{
@@ -328,8 +418,30 @@ export default function BreachDefensePage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <DollarSign className="w-4 h-4 text-green-400" />
-          <span className="text-[10px] text-green-400">${budget}</span>
+          <DollarSign className={`w-4 h-4 transition-colors duration-150 ${
+            budgetFlash === 'spend' ? 'text-red-400' : budgetFlash === 'gain' ? 'text-emerald-300' : 'text-green-400'
+          }`} />
+          <span
+            className={`text-[10px] transition-all duration-150 ${
+              budgetFlash === 'spend'
+                ? 'text-red-400'
+                : budgetFlash === 'gain'
+                ? 'text-emerald-300'
+                : 'text-green-400'
+            }`}
+            style={{
+              display: 'inline-block',
+              transform: budgetFlash === 'gain' ? 'scale(1.25)' : budgetFlash === 'spend' ? 'scale(1.1)' : 'scale(1)',
+              textShadow: budgetFlash === 'gain'
+                ? '0 0 8px rgba(52, 211, 153, 0.8)'
+                : budgetFlash === 'spend'
+                ? '0 0 6px rgba(248, 113, 113, 0.6)'
+                : 'none',
+              transition: 'transform 0.15s ease-out, color 0.15s ease-out, text-shadow 0.15s ease-out',
+            }}
+          >
+            ${budget}
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <Layers className="w-4 h-4 text-blue-400" />
@@ -349,6 +461,7 @@ export default function BreachDefensePage() {
         >
           {muted ? '\u{1F507}' : '\u{1F50A}'}
         </button>
+        <MusicVolumeSlider />
       </div>
 
       {/* Tower selection panel */}
@@ -360,6 +473,7 @@ export default function BreachDefensePage() {
             const isSelected = selectedTower === id;
             const disabled = locked || tooExpensive || pageState !== 'PLAYING';
             const isSuggested = currentWaveSuggestedTowers.includes(id);
+            const isNewlyUnlocked = newlyUnlockedTowers.has(id);
 
             return (
               <Tooltip.Root key={id}>
@@ -373,6 +487,7 @@ export default function BreachDefensePage() {
                         : isSuggested && !locked
                           ? 'border-yellow-400 animate-pulse shadow-[0_0_8px_rgba(255,200,0,0.4)]'
                           : 'border-gray-600 hover:border-gray-400'
+                    } ${isNewlyUnlocked && !locked ? 'ring-2 ring-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.5)]' : ''
                     } ${locked ? 'opacity-25 cursor-not-allowed' : tooExpensive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
                   >
                     {isSuggested && !locked && (
@@ -453,6 +568,16 @@ export default function BreachDefensePage() {
           description={getTutorialContent()!.description}
           onAcknowledge={handleDismissTutorial}
           type={currentTutorial.startsWith('wave_') ? 'threat' : 'info'}
+        />
+      )}
+
+      {/* ── WAVE CLEARED BANNER ───────────────────────────────── */}
+      {waveClearedBanner && (
+        <GameBanner
+          text={`Wave ${waveClearedBanner.wave} Cleared!`}
+          subtext="Defenses held strong"
+          onComplete={handleWaveClearedComplete}
+          color="green"
         />
       )}
 

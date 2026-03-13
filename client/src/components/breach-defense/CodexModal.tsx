@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { X, Shield, AlertTriangle, ChevronRight } from 'lucide-react';
 import { TUTORIAL_CONTENT } from '../../game/breach-defense/tutorialContent';
@@ -12,7 +12,12 @@ interface CodexModalProps {
 }
 
 export function CodexModal({ onClose, seenThreats, seenTowers }: CodexModalProps) {
+  const [isVisible, setIsVisible] = useState(false);
   const [activeTab, setActiveTab] = useState<'threats' | 'towers'>('threats');
+
+  useEffect(() => {
+    requestAnimationFrame(() => setIsVisible(true));
+  }, []);
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
 
   const threatEntries = Object.entries(TUTORIAL_CONTENT.codex.threats);
@@ -114,8 +119,12 @@ export function CodexModal({ onClose, seenThreats, seenTowers }: CodexModalProps
   };
 
   return (
-    <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      <div className="bg-white border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-3xl w-full max-h-[80vh] flex flex-col">
+    <div className={`fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-200 ${
+      isVisible ? 'bg-black/80' : 'bg-black/0'
+    }`}>
+      <div className={`bg-white border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-3xl w-full max-h-[80vh] flex flex-col transform transition-all duration-300 ease-out ${
+        isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
+      }`}>
         <div className="bg-[#3498DB] border-b-4 border-black p-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <Shield className="w-8 h-8 text-white" />

@@ -21,6 +21,8 @@ export class HubWorldScene extends Phaser.Scene {
   private nearDoor: 'privacy-quest' | 'breach-defense' | null = null;
   private promptText!: Phaser.GameObjects.Text;
   private titleText!: Phaser.GameObjects.Text;
+  private bgMusic?: Phaser.Sound.BaseSound;
+  private readonly musicBaseVolume = 0.3;
   // Idle frame index per direction: down=0, left=3, right=6, up=9 (row*3+0)
   private lastFacingFrame = 0;
 
@@ -140,8 +142,34 @@ export class HubWorldScene extends Phaser.Scene {
     this.promptText.setVisible(false);
     this.promptText.setDepth(10);
 
+    // Background music — fade in
+    const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+    this.bgMusic = this.sound.add('music_hub', { loop: true, volume: 0 });
+    this.bgMusic.play();
+    this.tweens.add({
+      targets: this.bgMusic,
+      volume: this.musicBaseVolume * userVol,
+      duration: 800,
+      ease: 'Linear',
+    });
+
+    eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'HubWorld');
   }
+
+  shutdown() {
+    if (this.bgMusic) {
+      this.bgMusic.stop();
+      this.bgMusic = undefined;
+    }
+    eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
+  }
+
+  private onMusicVolume = (vol: number) => {
+    if (this.bgMusic) {
+      (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.musicBaseVolume * vol;
+    }
+  };
 
   update() {
     // Idle frame indices per direction: down=0, left=3, right=6, up=9 (row*3+0)

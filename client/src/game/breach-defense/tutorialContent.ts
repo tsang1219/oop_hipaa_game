@@ -28,7 +28,7 @@ export const TUTORIAL_CONTENT = {
     },
     7: {
       title: "Lesson 4: Physical Security",
-      description: "SCENARIO: A laptop was left unlocked while someone grabbed coffee. Now it's missing...\n\nTHE REALITY: In 2016, an unencrypted iPhone without a password was lost, exposing 400 patients' data and resulting in a $650,000 fine. Lost and stolen devices are one of the leading causes of healthcare data breaches.\n\nWHAT TO LEARN: Physical security is cyber security. Lock your screen every time you step away. Enable encryption on all devices. Never leave devices unattended in public.\n\nBEST DEFENSE: Encryption Vault makes stolen devices useless without the encryption key. Even if a thief gets the hardware, encrypted data is unreadable."
+      description: "SCENARIO: A laptop was left unlocked while someone grabbed coffee. Now it's missing...\n\nTHE REALITY: In 2016, Catholic Health Care Services paid $650,000 after a stolen, unencrypted iPhone with no password exposed nursing home patient data. The phone had zero security — no encryption, no passcode. Lost and stolen devices are one of the leading causes of healthcare data breaches.\n\nWHAT TO LEARN: Physical security is cyber security. Lock your screen every time you step away. Enable encryption on all devices. Never leave devices unattended in public.\n\nBEST DEFENSE: Encryption Vault makes stolen devices useless without the encryption key. Even if a thief gets the hardware, encrypted data is unreadable."
     },
     9: {
       title: "Lesson 5: Defense in Depth",
@@ -59,7 +59,7 @@ export const TUTORIAL_CONTENT = {
       INSIDER: {
         name: "Insider Threat",
         description: "Someone with legitimate access misusing their privileges.",
-        realWorld: "70% of healthcare breaches involve insiders. UCLA Health 2015: Employee viewed records of celebrities and other patients.",
+        realWorld: "70% of healthcare breaches involve insiders. UCLA Health System paid $865K after employees repeatedly snooped on celebrity patient records (2005-2008).",
         counters: "Access Control (strong), Training Beacon (prevents manipulation)"
       },
       ZERODAY: {
@@ -77,7 +77,7 @@ export const TUTORIAL_CONTENT = {
       DEVICETHIEF: {
         name: "Device Thief",
         description: "Very fast. Targets unattended devices.",
-        realWorld: "2016: Lost iPhone with 400 patient records resulted in $650,000 HIPAA fine.",
+        realWorld: "Catholic Health Care Services 2016: A stolen, unencrypted iPhone with no password exposed nursing home patient data — $650,000 settlement.",
         counters: "Encryption Vault (strong—makes stolen data unreadable)"
       },
       SOCIAL: {
@@ -116,7 +116,7 @@ export const TUTORIAL_CONTENT = {
         name: "Encryption Vault",
         description: "Scrambles data so only authorized users can read it.",
         howItWorks: "Even if attackers steal files, they're useless without the encryption key.",
-        realWorld: "HIPAA requires encryption for patient data at rest and in transit.",
+        realWorld: "HIPAA lists encryption as 'addressable' — meaning implement it or justify an alternative. In practice, everyone encrypts because there's no good alternative.",
         strongAgainst: "Device Thief, data exfiltration",
         weakAgainst: "Ransomware (encrypts your encrypted files)"
       },

@@ -83,6 +83,11 @@ export class BootScene extends Phaser.Scene {
     this.load.audio('sfx_enemy_death', '/attached_assets/audio/sfx_enemy_death.ogg');
     this.load.audio('sfx_breach_alert','/attached_assets/audio/sfx_breach_alert.ogg');
     this.load.audio('sfx_wave_start',  '/attached_assets/audio/sfx_wave_start.ogg');
+
+    // Load background music — loaded once here, available to all scenes globally
+    this.load.audio('music_hub',         '/attached_assets/audio/music_hub.ogg');
+    this.load.audio('music_exploration', '/attached_assets/audio/music_exploration.ogg');
+    this.load.audio('music_breach',      '/attached_assets/audio/music_breach.ogg');
   }
 
   create() {
