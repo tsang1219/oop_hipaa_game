@@ -228,16 +228,27 @@ export class BreachDefenseScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL, this.onDismissTutorial, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_RESTART_BREACH, this.onRestart, this);
 
-    // Background music — fade in
+    // Sync mute state from localStorage before any audio plays
+    if (localStorage.getItem('sfx_muted') === 'true') {
+      this.sound.mute = true;
+    }
+
+    // Background music — fade in gently after a beat
     const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-    this.bgMusic = this.sound.add('music_breach', { loop: true, volume: 0 });
-    this.bgMusic.play();
-    this.tweens.add({
-      targets: this.bgMusic,
-      volume: this.musicBaseVolume * userVol,
-      duration: 800,
-      ease: 'Linear',
-    });
+    const targetVol = this.musicBaseVolume * userVol;
+    if (userVol > 0) {
+      this.bgMusic = this.sound.add('music_breach', { loop: true, volume: 0 });
+      const playMusic = () => {
+        if (!this.bgMusic || !this.scene.isActive()) return;
+        this.bgMusic.play();
+        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1500, ease: 'Sine.easeIn' });
+      };
+      if (this.sound.locked) {
+        this.sound.once('unlocked', playMusic);
+      } else {
+        this.time.delayedCall(300, playMusic);
+      }
+    }
 
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
 

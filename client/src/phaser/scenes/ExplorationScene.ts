@@ -376,19 +376,28 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
 
-    // ── Background music — fade in ──────────────────────────────
-    // Wrapped in try-catch: if audio key is missing (e.g. decode race) it must
-    // NOT abort create() and prevent the EventBridge listeners above from working.
+    // Sync mute state from localStorage before any audio plays
+    if (localStorage.getItem('sfx_muted') === 'true') {
+      this.sound.mute = true;
+    }
+
+    // ── Background music — fade in gently after a beat ────────
     try {
       const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-      this.bgMusic = this.sound.add('music_exploration', { loop: true, volume: 0 });
-      this.bgMusic.play();
-      this.tweens.add({
-        targets: this.bgMusic,
-        volume: this.musicBaseVolume * userVol,
-        duration: 800,
-        ease: 'Linear',
-      });
+      const targetVol = this.musicBaseVolume * userVol;
+      if (userVol > 0) {
+        this.bgMusic = this.sound.add('music_exploration', { loop: true, volume: 0 });
+        const playMusic = () => {
+          if (!this.bgMusic || !this.scene.isActive()) return;
+          this.bgMusic.play();
+          this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1500, ease: 'Sine.easeIn' });
+        };
+        if (this.sound.locked) {
+          this.sound.once('unlocked', playMusic);
+        } else {
+          this.time.delayedCall(300, playMusic);
+        }
+      }
     } catch (e) {
       console.warn('[ExplorationScene] music_exploration not ready, skipping BGM:', e);
     }
