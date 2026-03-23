@@ -41,53 +41,56 @@ export class BootScene extends Phaser.Scene {
       loadingText.destroy();
     });
 
+    // Use Vite's base URL so assets resolve correctly on GitHub Pages
+    const base = import.meta.env.BASE_URL;
+
     // Load background images
-    this.load.image('hospital_bg', '/attached_assets/generated_images/Hospital_corridor_pixel_background_72c96c5f.png');
+    this.load.image('hospital_bg', `${base}attached_assets/generated_images/Hospital_corridor_pixel_background_72c96c5f.png`);
 
     // Load character spritesheets — 32x32 frames, 3 cols x 4 rows
     // Row order: down(0), left(1), right(2), up(3) — 3 frames per direction
     const CHAR_FRAME = { frameWidth: 32, frameHeight: 32 };
-    this.load.spritesheet('player_sheet', '/attached_assets/generated_images/privacyquest/characters/player.png', CHAR_FRAME);
-    this.load.spritesheet('npc_receptionist_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_receptionist.png', CHAR_FRAME);
-    this.load.spritesheet('npc_nurse_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_nurse.png', CHAR_FRAME);
-    this.load.spritesheet('npc_doctor_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_doctor.png', CHAR_FRAME);
-    this.load.spritesheet('npc_it_tech_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_it_tech.png', CHAR_FRAME);
-    this.load.spritesheet('npc_officer_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_officer.png', CHAR_FRAME);
-    this.load.spritesheet('npc_boss_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_boss.png', CHAR_FRAME);
-    this.load.spritesheet('npc_staff_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_staff.png', CHAR_FRAME);
-    this.load.spritesheet('npc_patient_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_patient.png', CHAR_FRAME);
-    this.load.spritesheet('npc_visitor_sheet', '/attached_assets/generated_images/privacyquest/characters/npc_visitor.png', CHAR_FRAME);
+    this.load.spritesheet('player_sheet', `${base}attached_assets/generated_images/privacyquest/characters/player.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_receptionist_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_receptionist.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_nurse_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_nurse.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_doctor_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_doctor.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_it_tech_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_it_tech.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_officer_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_officer.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_boss_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_boss.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_staff_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_staff.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_patient_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_patient.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_visitor_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_visitor.png`, CHAR_FRAME);
 
     // Load BreachDefense tower sprites
-    this.load.image('tower_MFA', '/attached_assets/generated_images/mfa_tower_pixel_sprite.png');
-    this.load.image('tower_PATCH', '/attached_assets/generated_images/patch_cannon_pixel_sprite.png');
-    this.load.image('tower_FIREWALL', '/attached_assets/generated_images/firewall_tower_pixel_sprite.png');
-    this.load.image('tower_ENCRYPTION', '/attached_assets/generated_images/encryption_tower_pixel_sprite.png');
-    this.load.image('tower_TRAINING', '/attached_assets/generated_images/training_beacon_tower_sprite.png');
-    this.load.image('tower_ACCESS', '/attached_assets/generated_images/access_control_gate_sprite.png');
+    this.load.image('tower_MFA', `${base}attached_assets/generated_images/mfa_tower_pixel_sprite.png`);
+    this.load.image('tower_PATCH', `${base}attached_assets/generated_images/patch_cannon_pixel_sprite.png`);
+    this.load.image('tower_FIREWALL', `${base}attached_assets/generated_images/firewall_tower_pixel_sprite.png`);
+    this.load.image('tower_ENCRYPTION', `${base}attached_assets/generated_images/encryption_tower_pixel_sprite.png`);
+    this.load.image('tower_TRAINING', `${base}attached_assets/generated_images/training_beacon_tower_sprite.png`);
+    this.load.image('tower_ACCESS', `${base}attached_assets/generated_images/access_control_gate_sprite.png`);
 
     // Load BreachDefense threat sprites
-    this.load.image('threat_PHISHING', '/attached_assets/generated_images/phishing_threat_pixel_sprite.png');
-    this.load.image('threat_CREDENTIAL', '/attached_assets/generated_images/credential_harvester_enemy_sprite.png');
-    this.load.image('threat_RANSOMWARE', '/attached_assets/generated_images/ransomware_threat_pixel_sprite.png');
-    this.load.image('threat_INSIDER', '/attached_assets/generated_images/insider_threat_pixel_sprite.png');
-    this.load.image('threat_ZERODAY', '/attached_assets/generated_images/zero-day_exploit_enemy_sprite.png');
-    this.load.image('threat_BRUTEFORCE', '/attached_assets/generated_images/brute_force_bot_enemy_sprite.png');
-    this.load.image('threat_DEVICETHIEF', '/attached_assets/generated_images/device_thief_enemy_sprite.png');
-    this.load.image('threat_SOCIAL', '/attached_assets/generated_images/social_engineer_enemy_sprite.png');
+    this.load.image('threat_PHISHING', `${base}attached_assets/generated_images/phishing_threat_pixel_sprite.png`);
+    this.load.image('threat_CREDENTIAL', `${base}attached_assets/generated_images/credential_harvester_enemy_sprite.png`);
+    this.load.image('threat_RANSOMWARE', `${base}attached_assets/generated_images/ransomware_threat_pixel_sprite.png`);
+    this.load.image('threat_INSIDER', `${base}attached_assets/generated_images/insider_threat_pixel_sprite.png`);
+    this.load.image('threat_ZERODAY', `${base}attached_assets/generated_images/zero-day_exploit_enemy_sprite.png`);
+    this.load.image('threat_BRUTEFORCE', `${base}attached_assets/generated_images/brute_force_bot_enemy_sprite.png`);
+    this.load.image('threat_DEVICETHIEF', `${base}attached_assets/generated_images/device_thief_enemy_sprite.png`);
+    this.load.image('threat_SOCIAL', `${base}attached_assets/generated_images/social_engineer_enemy_sprite.png`);
 
     // Load SFX — loaded once here, available to all scenes globally
-    this.load.audio('sfx_footstep',    '/attached_assets/audio/sfx_footstep.ogg');
-    this.load.audio('sfx_interact',    '/attached_assets/audio/sfx_interact.ogg');
-    this.load.audio('sfx_tower_place', '/attached_assets/audio/sfx_tower_place.ogg');
-    this.load.audio('sfx_enemy_death', '/attached_assets/audio/sfx_enemy_death.ogg');
-    this.load.audio('sfx_breach_alert','/attached_assets/audio/sfx_breach_alert.ogg');
-    this.load.audio('sfx_wave_start',  '/attached_assets/audio/sfx_wave_start.ogg');
+    this.load.audio('sfx_footstep',    `${base}attached_assets/audio/sfx_footstep.ogg`);
+    this.load.audio('sfx_interact',    `${base}attached_assets/audio/sfx_interact.ogg`);
+    this.load.audio('sfx_tower_place', `${base}attached_assets/audio/sfx_tower_place.ogg`);
+    this.load.audio('sfx_enemy_death', `${base}attached_assets/audio/sfx_enemy_death.ogg`);
+    this.load.audio('sfx_breach_alert',`${base}attached_assets/audio/sfx_breach_alert.ogg`);
+    this.load.audio('sfx_wave_start',  `${base}attached_assets/audio/sfx_wave_start.ogg`);
 
     // Load background music — loaded once here, available to all scenes globally
-    this.load.audio('music_hub',         '/attached_assets/audio/music_hub.ogg');
-    this.load.audio('music_exploration', '/attached_assets/audio/music_exploration.ogg');
-    this.load.audio('music_breach',      '/attached_assets/audio/music_breach.ogg');
+    this.load.audio('music_hub',         `${base}attached_assets/audio/music_hub.ogg`);
+    this.load.audio('music_exploration', `${base}attached_assets/audio/music_exploration.ogg`);
+    this.load.audio('music_breach',      `${base}attached_assets/audio/music_breach.ogg`);
   }
 
   create() {
