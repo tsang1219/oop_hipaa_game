@@ -106,13 +106,31 @@ export class ExplorationScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, w, h);
     this.physics.world.setBounds(0, 0, w, h);
 
-    // ── Floor ────────────────────────────────────────────────────
+    // ── Floor — beveled hospital tiles with subtle color variation ──
     const floor = this.add.graphics();
+    const tileShades = [0xd4c9a8, 0xd0c5a4, 0xccc0a0, 0xd8cdb0];
+    const highlightColor = 0xe2d8bc; // lighter edge (top/left)
+    const shadowColor = 0xb8ad94;    // darker edge (bottom/right)
     for (let y = 0; y < room.height; y++) {
       for (let x = 0; x < room.width; x++) {
-        const shade = (x + y) % 2 === 0 ? 0xd4c5a9 : 0xcabc9e;
+        const shadeIdx = ((x % 2) + (y % 2) * 2) % tileShades.length;
+        const shade = tileShades[shadeIdx];
+        const px = x * TILE;
+        const py = y * TILE;
+
+        // Fill tile base
         floor.fillStyle(shade, 1);
-        floor.fillRect(x * TILE, y * TILE, TILE, TILE);
+        floor.fillRect(px, py, TILE, TILE);
+
+        // 1px highlight on top and left edges (beveled look)
+        floor.fillStyle(highlightColor, 0.5);
+        floor.fillRect(px, py, TILE, 1);       // top edge
+        floor.fillRect(px, py, 1, TILE);        // left edge
+
+        // 1px shadow on bottom and right edges
+        floor.fillStyle(shadowColor, 0.5);
+        floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom edge
+        floor.fillRect(px + TILE - 1, py, 1, TILE);  // right edge
       }
     }
 
@@ -127,11 +145,28 @@ export class ExplorationScene extends Phaser.Scene {
       const obsType = (obs as any).type as string | undefined;
 
       if (obsType === 'wall') {
-        // Draw wall tiles
+        // Draw wall tiles with depth (highlight top, shadow base)
+        const wallG = this.add.graphics();
         for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
           for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
-            this.add.rectangle(wx * TILE + TILE / 2, wy * TILE + TILE / 2, TILE, TILE, 0x5d4e37)
-              .setStrokeStyle(1, 0x4a3f2e);
+            const wpx = wx * TILE;
+            const wpy = wy * TILE;
+
+            // Main wall fill
+            wallG.fillStyle(0x5d4e37, 1);
+            wallG.fillRect(wpx, wpy, TILE, TILE);
+
+            // 1px border
+            wallG.lineStyle(1, 0x4a3f2e, 1);
+            wallG.strokeRect(wpx, wpy, TILE, TILE);
+
+            // 1px highlight strip at top edge
+            wallG.fillStyle(0x7a6b52, 0.7);
+            wallG.fillRect(wpx, wpy, TILE, 1);
+
+            // 2px darker shadow strip at bottom edge (wall meets floor)
+            wallG.fillStyle(0x3a3124, 0.8);
+            wallG.fillRect(wpx, wpy + TILE - 2, TILE, 2);
           }
         }
       } else {
@@ -217,10 +252,10 @@ export class ExplorationScene extends Phaser.Scene {
         npc.name,
         {
           fontFamily: '"Press Start 2P"',
-          fontSize: '5px',
+          fontSize: '9px',
           color: '#ffffff',
           stroke: '#000000',
-          strokeThickness: 1,
+          strokeThickness: 2,
         },
       ).setOrigin(0.5, 0).setDepth(26);
       if (completed) nameLabel.setAlpha(0.4);
@@ -237,15 +272,15 @@ export class ExplorationScene extends Phaser.Scene {
 
       // Completed checkmark
       if (completed) {
-        this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 4, '\u2713', {
-          fontSize: '14px', color: '#2ecc71', fontStyle: 'bold',
+        this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 6, '\u2713', {
+          fontSize: '16px', color: '#2ecc71', fontStyle: 'bold',
         }).setOrigin(0.5).setDepth(35);
       }
 
       // Boss indicator
       if (npc.isFinalBoss && !completed) {
-        const bossText = this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 8, 'BOSS', {
-          fontFamily: '"Press Start 2P"', fontSize: '6px', color: '#e74c3c',
+        const bossText = this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 10, 'BOSS', {
+          fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#e74c3c',
         }).setOrigin(0.5).setDepth(35);
         this.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
       }
@@ -310,10 +345,10 @@ export class ExplorationScene extends Phaser.Scene {
       'YOU',
       {
         fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
+        fontSize: '8px',
         color: '#4A90E2',
         stroke: '#000000',
-        strokeThickness: 1,
+        strokeThickness: 2,
       },
     ).setOrigin(0.5, 1).setDepth(31);
 
@@ -361,13 +396,13 @@ export class ExplorationScene extends Phaser.Scene {
 
     // ── HUD ──────────────────────────────────────────────────────
     this.roomNameText = this.add.text(w / 2, 8, room.name.toUpperCase(), {
-      fontFamily: '"Press Start 2P"', fontSize: '10px', color: '#ffffff',
-      backgroundColor: '#1a1a2ecc', padding: { x: 8, y: 4 },
+      fontFamily: '"Press Start 2P"', fontSize: '12px', color: '#ffffff',
+      backgroundColor: '#1a1a2ecc', padding: { x: 10, y: 6 },
     }).setOrigin(0.5, 0).setDepth(50).setScrollFactor(0);
 
     this.promptText = this.add.text(w / 2, h - 12, '', {
-      fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#ffffff',
-      backgroundColor: '#1a1a2ecc', padding: { x: 8, y: 4 },
+      fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#ffffff',
+      backgroundColor: '#1a1a2ecc', padding: { x: 10, y: 6 },
     }).setOrigin(0.5, 1).setDepth(50).setVisible(false).setScrollFactor(0);
 
     // ── Listen for React events — MUST be before music to survive any audio errors ──

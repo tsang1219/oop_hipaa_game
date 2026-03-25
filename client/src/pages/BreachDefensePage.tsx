@@ -276,6 +276,19 @@ export default function BreachDefensePage() {
     localStorage.setItem('sfx_muted', String(muted));
   }, [muted]);
 
+  // ── QA auto-start via ?qa-start URL param ──────────────────────
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('qa-start')) {
+      // Auto-start the game for Playwright screenshot capture
+      const timer = setTimeout(() => {
+        setPageState('PLAYING');
+        eventBridge.emit(BRIDGE_EVENTS.REACT_START_BREACH);
+      }, 500);
+      return () => clearTimeout(timer);
+    }
+  }, []);
+
   // ── Handlers ───────────────────────────────────────────────────
 
   const handleStart = useCallback(() => {
@@ -381,7 +394,7 @@ export default function BreachDefensePage() {
 
       {/* Phaser canvas */}
       <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <PhaserGame ref={gameRef} width={640} height={480} />
+        <PhaserGame ref={gameRef} width={960} height={720} />
         {showWaveBanner && waveBannerData && (
           <WaveIntroBanner
             wave={waveBannerData.wave}
@@ -399,7 +412,7 @@ export default function BreachDefensePage() {
       <ThreatStrip threats={currentWaveThreats} />
 
       {/* HUD bar */}
-      <div className="flex gap-6 items-center p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[640px] justify-between px-4">
+      <div className="flex gap-6 items-center p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[960px] justify-between px-4">
         <div className={`flex items-center gap-2 ${securityScore <= 25 ? 'animate-[hp-throb_0.8s_ease-in-out_infinite]' : ''}`}>
           <Heart className={`w-4 h-4 text-red-400 ${securityScore <= 25 ? 'animate-ping' : ''}`}
             style={securityScore <= 25 ? { animationDuration: '1.2s' } : undefined}
@@ -466,7 +479,7 @@ export default function BreachDefensePage() {
 
       {/* Tower selection panel */}
       <Tooltip.Provider delayDuration={200}>
-        <div className="flex gap-1 p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[640px] justify-center flex-wrap">
+        <div className="flex gap-1 p-2 bg-[#2a2a3e] border-2 border-[#FF6B9D] rounded w-[960px] justify-center flex-wrap">
           {Object.entries(TOWERS).map(([id, tower]) => {
             const locked = wave < tower.unlockWave;
             const tooExpensive = budget < tower.cost;
@@ -525,7 +538,7 @@ export default function BreachDefensePage() {
       </Tooltip.Provider>
 
       {/* Controls hint + back button */}
-      <div className="flex items-center gap-4 w-[640px] justify-between">
+      <div className="flex items-center gap-4 w-[960px] justify-between">
         <button
           onClick={handleBackToHub}
           className="flex items-center gap-1 text-[8px] text-gray-500 hover:text-gray-300 transition-colors"

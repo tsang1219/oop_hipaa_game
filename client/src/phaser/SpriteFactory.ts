@@ -349,28 +349,27 @@ export function furnitureTextureKey(obstacleType?: string): string {
 }
 
 /**
- * Map an NPC id to its programmatically-generated texture key.
- * These textures are created by generateNPCTextures() in SpriteFactory and are
- * guaranteed to be available without any file loading, eliminating the black-box
- * artefact that occurred when PNG spritesheet uploads were deferred.
+ * Map an NPC id to its PNG spritesheet texture key.
+ * These spritesheets are loaded in BootScene (e.g. npc_receptionist_sheet).
+ * The programmatic textures from generateNPCTextures() remain as fallback.
  */
 export function npcTextureKey(npcId: string): string {
   const map: Record<string, string> = {
-    riley: 'npc_receptionist',
-    nervous_patient: 'npc_patient',
-    chatty_visitor: 'npc_visitor',
-    dr_martinez: 'npc_doctor',
-    officer: 'npc_officer',
-    nurse_chen: 'npc_nurse',
-    it_tech: 'npc_it_tech',
-    dr_patel: 'npc_doctor',
-    pharmacist: 'npc_staff',
-    intern: 'npc_staff',
-    lab_tech: 'npc_it_tech',
-    admin: 'npc_boss',
-    final_boss_1: 'npc_boss',
+    riley: 'npc_receptionist_sheet',
+    nervous_patient: 'npc_patient_sheet',
+    chatty_visitor: 'npc_visitor_sheet',
+    dr_martinez: 'npc_doctor_sheet',
+    officer: 'npc_officer_sheet',
+    nurse_chen: 'npc_nurse_sheet',
+    it_tech: 'npc_it_tech_sheet',
+    dr_patel: 'npc_doctor_sheet',
+    pharmacist: 'npc_staff_sheet',
+    intern: 'npc_staff_sheet',
+    lab_tech: 'npc_it_tech_sheet',
+    admin: 'npc_boss_sheet',
+    final_boss_1: 'npc_boss_sheet',
   };
-  return map[npcId] || 'npc_staff';
+  return map[npcId] || 'npc_staff_sheet';
 }
 
 /**

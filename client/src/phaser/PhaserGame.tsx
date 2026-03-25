@@ -10,7 +10,7 @@ interface PhaserGameProps {
 }
 
 export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
-  ({ width = 640, height = 480, onSceneReady }, ref) => {
+  ({ width = 960, height = 720, onSceneReady }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
 

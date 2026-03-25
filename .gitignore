@@ -7,3 +7,6 @@ vite.config.ts.*
 .env
 .claude/
 .planning/DEBUG_LOG.md
+test-results/
+playwright-report/
+screenshots/*.png

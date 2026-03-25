@@ -123,34 +123,88 @@ export class BreachDefenseScene extends Phaser.Scene {
     const pathSet = new Set<string>();
     PATHS[0].forEach(p => pathSet.add(`${p.x},${p.y}`));
 
-    for (let y = 0; y < GRID_ROWS; y++) {
-      for (let x = 0; x < GRID_COLS; x++) {
-        const isPath = pathSet.has(`${x},${y}`);
-        const shade = isPath
-          ? ((x + y) % 2 === 0 ? 0x4a3f6b : 0x3d3460)
-          : ((x + y) % 2 === 0 ? 0x2a2a3e : 0x24243a);
-        this.add.rectangle(
-          x * CELL_SIZE + CELL_SIZE / 2,
-          y * CELL_SIZE + CELL_SIZE / 2,
-          CELL_SIZE, CELL_SIZE, shade
-        ).setStrokeStyle(1, 0x1a1a2e);
-      }
-    }
-
-    // Path direction arrows (small dots along the path)
+    // Build a direction map for path cells so we can draw directional indicators
+    const pathDirMap = new Map<string, { dx: number; dy: number }>();
     for (let i = 0; i < PATHS[0].length - 1; i++) {
       const curr = PATHS[0][i];
       const next = PATHS[0][i + 1];
-      const cx = curr.x * CELL_SIZE + CELL_SIZE / 2;
-      const cy = curr.y * CELL_SIZE + CELL_SIZE / 2;
-      const dx = next.x - curr.x;
-      const dy = next.y - curr.y;
-      // Small arrow indicator offset toward next cell
-      this.add.circle(cx + dx * 12, cy + dy * 12, 3, 0x6b5b95, 0.5).setDepth(1);
+      pathDirMap.set(`${curr.x},${curr.y}`, { dx: next.x - curr.x, dy: next.y - curr.y });
     }
 
-    // Bottom dark area (below the grid)
-    this.add.rectangle(320, 384 + 48, 640, 96, 0x111122);
+    const gridGfx = this.add.graphics().setDepth(0);
+
+    for (let y = 0; y < GRID_ROWS; y++) {
+      for (let x = 0; x < GRID_COLS; x++) {
+        const isPath = pathSet.has(`${x},${y}`);
+        const cx = x * CELL_SIZE + CELL_SIZE / 2;
+        const cy = y * CELL_SIZE + CELL_SIZE / 2;
+
+        // Cell fill: brighter tech-themed colors
+        let shade: number;
+        if (isPath) {
+          shade = (x + y) % 2 === 0 ? 0x3d2d5e : 0x352855;
+        } else {
+          shade = (x + y) % 2 === 0 ? 0x2a2d4e : 0x252845;
+        }
+
+        gridGfx.fillStyle(shade, 1);
+        gridGfx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+
+        // 1px grid lines between cells
+        gridGfx.lineStyle(1, 0x3a3d6e, 0.6);
+        gridGfx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
+
+        // Path cells get extra visual treatment
+        if (isPath) {
+          // Subtle inner border to highlight the path lane
+          gridGfx.lineStyle(1, 0x6b5b95, 0.3);
+          gridGfx.strokeRect(x * CELL_SIZE + 3, y * CELL_SIZE + 3, CELL_SIZE - 6, CELL_SIZE - 6);
+
+          // Directional dot: larger and brighter so the path route is obvious
+          const dir = pathDirMap.get(`${x},${y}`);
+          if (dir) {
+            gridGfx.fillStyle(0x9b8bbf, 0.7);
+            gridGfx.fillCircle(cx + dir.dx * 14, cy + dir.dy * 14, 4);
+            // Secondary smaller dot closer to center for a "trail" feel
+            gridGfx.fillStyle(0x7b6b9f, 0.45);
+            gridGfx.fillCircle(cx + dir.dx * 4, cy + dir.dy * 4, 3);
+          } else {
+            // Last path cell: draw a target-like indicator
+            gridGfx.fillStyle(0xbb4444, 0.6);
+            gridGfx.fillCircle(cx, cy, 5);
+            gridGfx.fillStyle(0xff6666, 0.4);
+            gridGfx.fillCircle(cx, cy, 2);
+          }
+        } else {
+          // Non-path cells: faint corner dots for a digital grid feel
+          gridGfx.fillStyle(0x4a4d7e, 0.25);
+          gridGfx.fillCircle(x * CELL_SIZE + 2, y * CELL_SIZE + 2, 1);
+        }
+      }
+    }
+
+    // ── Bottom area below grid: subtle gradient pattern ──────
+    const bottomY = GRID_ROWS * CELL_SIZE;
+    const bottomH = 96;
+    const bottomGfx = this.add.graphics().setDepth(0);
+    // Draw a series of horizontal bands to simulate a gradient
+    const bands = 12;
+    for (let i = 0; i < bands; i++) {
+      const t = i / bands;
+      // Blend from 0x1a1d3e (top) to 0x0d0f1e (bottom)
+      const r = Math.round(0x1a + (0x0d - 0x1a) * t);
+      const g = Math.round(0x1d + (0x0f - 0x1d) * t);
+      const b = Math.round(0x3e + (0x1e - 0x3e) * t);
+      const color = (r << 16) | (g << 8) | b;
+      const bandH = bottomH / bands;
+      bottomGfx.fillStyle(color, 1);
+      bottomGfx.fillRect(0, bottomY + i * bandH, GRID_COLS * CELL_SIZE, bandH + 1);
+    }
+    // Faint horizontal scan lines for a monitor/terminal aesthetic
+    for (let sy = bottomY; sy < bottomY + bottomH; sy += 4) {
+      bottomGfx.fillStyle(0xffffff, 0.015);
+      bottomGfx.fillRect(0, sy, GRID_COLS * CELL_SIZE, 1);
+    }
 
     // ── Hover indicator ────────────────────────────────────────
     this.hoverRect = this.add.rectangle(0, 0, CELL_SIZE - 2, CELL_SIZE - 2)

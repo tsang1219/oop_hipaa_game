@@ -38,7 +38,7 @@ export default function HubWorldPage() {
   return (
     <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4">
       <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <PhaserGame ref={gameRef} width={640} height={480} />
+        <PhaserGame ref={gameRef} width={960} height={720} />
 
         {/* CRT scanline overlay */}
         <div

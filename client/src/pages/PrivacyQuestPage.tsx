@@ -116,8 +116,9 @@ export default function PrivacyQuestPage() {
   const [scoreDelta, setScoreDelta] = useState<{ value: number; key: number } | null>(null);
   const scoreDeltaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Intro modal — shown once (gated by localStorage flag)
+  // Intro modal — shown once (gated by localStorage flag), skipped in QA mode
   const [showIntroModal, setShowIntroModal] = useState(() => {
+    if (new URLSearchParams(window.location.search).has('qa-room')) return false;
     return !localStorage.getItem('pq:onboarding:seen');
   });
 
@@ -201,6 +202,16 @@ export default function PrivacyQuestPage() {
       if (currentRoomId) localStorage.setItem(`unlockedNpcs_${currentRoomId}`, JSON.stringify(Array.from(newUnlocked)));
     }
   }, [resolvedGates, unlockedNpcs, currentRoomId]);
+
+  // ── QA auto-navigation via ?qa-room=roomId URL param ────────
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const qaRoom = params.get('qa-room');
+    if (qaRoom && rooms.some(r => r.id === qaRoom)) {
+      setCurrentRoomId(qaRoom);
+      setPageMode('exploration');
+    }
+  }, []);
 
   // ── Room selection from HallwayHub ───────────────────────────
   const handleSelectRoom = useCallback((roomId: string) => {
@@ -511,7 +522,7 @@ export default function PrivacyQuestPage() {
     <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4">
       {/* Phaser canvas */}
       <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <PhaserGame ref={gameRef} width={640} height={480} />
+        <PhaserGame ref={gameRef} width={960} height={720} />
 
         {/* CRT scanline overlay */}
         <div
