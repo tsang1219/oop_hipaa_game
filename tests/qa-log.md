@@ -48,6 +48,25 @@ Average score progression: 4.1 → 5.0 → 5.5 → 6.4 → 6.8 → 7.3 → 7.7
 - "AWAITING AUTHORIZATION..." with blinking cursor
 - Start screen: "SECURITY BRIEFING" label, corner brackets, shield glow, gradient bg
 
+## Iteration 7: HallwayHub Final Polish
+- Room cards: color-coded top border tabs (rose/green/gray by status)
+- Available room icons glow with rose drop-shadow
+- Patient Stories: gradient background, filled heart icon
+- Legend: refined styling matching room grid
+- Flavor text: opacity hierarchy
+
+## Iteration 8: All Scenes at 8/10
+- Reduced breach start overlay from 90% to 70% opacity
+- Added backdrop-blur for frosted-glass quality
+- Grid effects now visible through start modal
+
+## Iteration 9: Room Personality + NPC Indicators
+- Speech bubble indicators floating above uncompleted NPCs
+- Room-specific floor palettes (ER=clinical blue, Lab=green, IT=grey, Break=warm)
+- Each room has its own mood through color theming
+
+## Final Score: 8.0/10 average (up from 4.1)
+
 ## Files Modified Across All Iterations
 - `playwright.config.ts` (new)
 - `tests/visual-qa.spec.ts` (new)
