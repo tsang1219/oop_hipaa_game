@@ -123,10 +123,10 @@ export default function HallwayHub({
             {getTrustStatus()} — {privacyScore}/100
           </div>
         </div>
-        <p className="text-xs text-muted-foreground mb-1">
+        <p className="text-xs text-muted-foreground mb-1 opacity-80">
           Your first day as Privacy Guardian. Something feels off...
         </p>
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-muted-foreground opacity-70">
           Move through each area and build a culture of protection.
         </p>
       </div>
@@ -186,10 +186,10 @@ export default function HallwayHub({
                 relative p-4 transition-all duration-200 text-center
                 ${status !== 'locked' ? 'transition-transform duration-150 hover:scale-[1.02]' : ''}
                 ${status === 'locked'
-                  ? 'bg-[#16213e]/50 border-2 border-muted cursor-not-allowed opacity-60'
+                  ? 'bg-[#16213e]/50 border-2 border-muted border-t-2 border-t-gray-600 cursor-not-allowed opacity-60'
                   : status === 'cleared'
-                    ? 'bg-[#16213e] border-2 border-green-500 hover-elevate cursor-pointer'
-                    : 'bg-[#16213e] border-2 border-[#e8618c] hover-elevate cursor-pointer'
+                    ? 'bg-[#16213e] border-2 border-green-500 border-t-2 border-t-green-500 hover-elevate cursor-pointer'
+                    : 'bg-[#16213e] border-2 border-[#e8618c] border-t-2 border-t-[#e8618c] hover-elevate cursor-pointer'
                 }
               `}
               data-testid={`button-room-${room.id}`}
@@ -216,6 +216,7 @@ export default function HallwayHub({
                         ? 'text-green-500'
                         : 'text-[#e8618c]'
                   }`}
+                  style={status === 'available' ? { filter: 'drop-shadow(0 0 4px rgba(232,97,140,0.3))' } : undefined}
                 />
               </div>
 
@@ -245,9 +246,9 @@ export default function HallwayHub({
         })}
       </div>
 
-      <div className="bg-[#1a1a2e] border-4 border-[#e8618c] p-4 mb-6">
+      <div className="bg-gradient-to-r from-[#e8618c]/10 to-transparent border-4 border-[#e8618c] p-4 mb-6">
         <h3 className="text-sm font-bold text-[#e8618c] mb-3 flex items-center gap-2">
-          <Heart className="w-4 h-4" />
+          <Heart className="w-4 h-4 fill-[#e8618c]" />
           PATIENT STORIES EARNED
         </h3>
 
@@ -287,21 +288,26 @@ export default function HallwayHub({
       </div>
 
       <div className="text-center">
-        <div className="inline-block bg-[#1a1a2e] border-2 border-[#e8618c] p-4">
+        <div
+          className="inline-block border-2 border-[#e8618c]/60 p-4 rounded"
+          style={{
+            background: 'radial-gradient(ellipse at center, rgba(40,40,70,0.8) 0%, rgba(26,26,46,0.9) 100%)',
+          }}
+        >
           <p className="text-xs text-foreground mb-2">
             <strong>Mission Progress:</strong> {completedRooms.length} / {rooms.length} areas secured
           </p>
-          <div className="flex gap-4 justify-center text-[10px]">
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border border-muted bg-muted/20"></div>
+          <div className="flex gap-6 justify-center text-[10px]">
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 border border-gray-600 border-t-2 border-t-gray-600 bg-muted/20"></div>
               <span className="text-muted-foreground">Locked</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border border-[#e8618c] bg-[#e8618c]/20 animate-pulse"></div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 border border-[#e8618c] border-t-2 border-t-[#e8618c] bg-[#e8618c]/20 animate-pulse"></div>
               <span className="text-muted-foreground">Available</span>
             </div>
-            <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border border-green-500 bg-green-500/20"></div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-3 h-3 border border-green-500 border-t-2 border-t-green-500 bg-green-500/20"></div>
               <span className="text-muted-foreground">Cleared</span>
             </div>
           </div>

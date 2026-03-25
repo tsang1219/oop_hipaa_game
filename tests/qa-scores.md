@@ -125,3 +125,24 @@
 | **CONSISTENCY** | **7** | +1 | Both games now at 8, shared cyan accent (grid) + rose accent (UI), matching vignette treatment |
 
 **Average: 7.7/10 (+0.4)**
+
+## Iteration 7 (post-fix) — 2026-03-25T03:30:00Z
+
+| Scene | Score | Delta | Notes |
+|-------|-------|-------|-------|
+| hub-world | 8 | 0 | Locked |
+| privacy-hub | 8 | +1 | Color-coded card tabs, icon glow, gradient patient stories, legend refinement |
+| privacy-reception | 8 | 0 | Locked |
+| privacy-er | 8 | 0 | Locked |
+| privacy-lab | 8 | 0 | Locked |
+| privacy-records_room | 8 | 0 | Locked |
+| privacy-it_office | 8 | 0 | Locked |
+| privacy-break_room | 8 | 0 | Locked |
+| breach-start | 7 | 0 | Needs more to reach 8 — could use subtle animation on background grid |
+| breach-playing | 8 | 0 | Locked |
+| **CONSISTENCY** | **8** | +1 | All scenes now at 8 except breach-start. Shared accents, matching vignettes, cohesive feel. |
+
+**Average: 7.9/10 (+0.2)**
+
+### Remaining to reach 8+ everywhere:
+- breach-start at 7 — the start modal overlay dims the grid too much, losing the nice effects behind it
