@@ -133,6 +133,13 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     const gridGfx = this.add.graphics().setDepth(0);
 
+    // Simple seeded random for deterministic circuit-trace placement
+    const seededRand = (x: number, y: number): number => {
+      let h = (x * 374761393 + y * 668265263 + 1274126177) | 0;
+      h = ((h ^ (h >> 13)) * 1274126177) | 0;
+      return (h >>> 0) / 4294967296;
+    };
+
     for (let y = 0; y < GRID_ROWS; y++) {
       for (let x = 0; x < GRID_COLS; x++) {
         const isPath = pathSet.has(`${x},${y}`);
@@ -179,37 +186,112 @@ export class BreachDefenseScene extends Phaser.Scene {
           // Non-path cells: faint corner dots for a digital grid feel
           gridGfx.fillStyle(0x4a4d7e, 0.25);
           gridGfx.fillCircle(x * CELL_SIZE + 2, y * CELL_SIZE + 2, 1);
+
+          // Circuit-trace decoration on ~30% of empty cells
+          const rVal = seededRand(x, y);
+          if (rVal < 0.3) {
+            const cellLeft = x * CELL_SIZE;
+            const cellTop = y * CELL_SIZE;
+            gridGfx.lineStyle(1, 0x3a4d6e, 0.3);
+            if (rVal < 0.15) {
+              // Horizontal trace with dot at end
+              const traceY = cellTop + 20 + Math.floor(seededRand(x + 7, y + 3) * 24);
+              const startX = cellLeft + 8;
+              const traceLen = 18 + Math.floor(seededRand(x + 13, y + 5) * 20);
+              gridGfx.beginPath();
+              gridGfx.moveTo(startX, traceY);
+              gridGfx.lineTo(startX + traceLen, traceY);
+              gridGfx.strokePath();
+              gridGfx.fillStyle(0x4a6d8e, 0.35);
+              gridGfx.fillCircle(startX + traceLen, traceY, 1.5);
+            } else {
+              // Vertical trace with dot at end
+              const traceX = cellLeft + 20 + Math.floor(seededRand(x + 11, y + 7) * 24);
+              const startY = cellTop + 8;
+              const traceLen = 18 + Math.floor(seededRand(x + 17, y + 9) * 20);
+              gridGfx.beginPath();
+              gridGfx.moveTo(traceX, startY);
+              gridGfx.lineTo(traceX, startY + traceLen);
+              gridGfx.strokePath();
+              gridGfx.fillStyle(0x4a6d8e, 0.35);
+              gridGfx.fillCircle(traceX, startY + traceLen, 1.5);
+            }
+          }
         }
       }
     }
 
-    // ── Bottom area below grid: subtle gradient pattern ──────
+    // ── Header bar: network defense grid label ───────────────
+    const headerGfx = this.add.graphics().setDepth(8);
+    headerGfx.fillStyle(0x0e1020, 0.85);
+    headerGfx.fillRect(0, 0, GRID_COLS * CELL_SIZE, 20);
+    // Thin bottom border on the header
+    headerGfx.lineStyle(1, 0x3a5d8e, 0.6);
+    headerGfx.beginPath();
+    headerGfx.moveTo(0, 20);
+    headerGfx.lineTo(GRID_COLS * CELL_SIZE, 20);
+    headerGfx.strokePath();
+
+    this.add.text(GRID_COLS * CELL_SIZE / 2, 10, 'NETWORK DEFENSE GRID', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '7px',
+      color: '#00d4aa',
+      align: 'center'
+    }).setOrigin(0.5, 0.5).setDepth(9);
+
+    // Column labels (A-J) just below the header bar
+    const colLabels = 'ABCDEFGHIJ';
+    for (let c = 0; c < GRID_COLS; c++) {
+      this.add.text(c * CELL_SIZE + CELL_SIZE / 2, 26, colLabels[c], {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '5px',
+        color: '#556688',
+        align: 'center'
+      }).setOrigin(0.5, 0.5).setDepth(9).setAlpha(0.6);
+    }
+
+    // Row labels (1-6) along the left edge
+    for (let r = 0; r < GRID_ROWS; r++) {
+      this.add.text(4, r * CELL_SIZE + CELL_SIZE / 2, `${r + 1}`, {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '5px',
+        color: '#556688',
+        align: 'left'
+      }).setOrigin(0, 0.5).setDepth(1).setAlpha(0.6);
+    }
+
+    // ── Bottom area: terminal status panel ───────────────────
     const bottomY = GRID_ROWS * CELL_SIZE;
     const bottomH = 96;
     const bottomGfx = this.add.graphics().setDepth(0);
-    // Draw a series of horizontal bands to simulate a gradient
-    const bands = 12;
-    for (let i = 0; i < bands; i++) {
-      const t = i / bands;
-      // Blend from 0x1a1d3e (top) to 0x0d0f1e (bottom)
-      const r = Math.round(0x1a + (0x0d - 0x1a) * t);
-      const g = Math.round(0x1d + (0x0f - 0x1d) * t);
-      const b = Math.round(0x3e + (0x1e - 0x3e) * t);
-      const color = (r << 16) | (g << 8) | b;
-      const bandH = bottomH / bands;
-      bottomGfx.fillStyle(color, 1);
-      bottomGfx.fillRect(0, bottomY + i * bandH, GRID_COLS * CELL_SIZE, bandH + 1);
-    }
-    // Faint horizontal scan lines for a monitor/terminal aesthetic
-    for (let sy = bottomY; sy < bottomY + bottomH; sy += 4) {
-      bottomGfx.fillStyle(0xffffff, 0.015);
+    // Dark background fill
+    bottomGfx.fillStyle(0x141628, 1);
+    bottomGfx.fillRect(0, bottomY, GRID_COLS * CELL_SIZE, bottomH);
+    // Thin bright separator line at the top
+    bottomGfx.lineStyle(1, 0x3a5d8e, 0.8);
+    bottomGfx.beginPath();
+    bottomGfx.moveTo(0, bottomY);
+    bottomGfx.lineTo(GRID_COLS * CELL_SIZE, bottomY);
+    bottomGfx.strokePath();
+    // Faint scan lines for terminal aesthetic
+    for (let sy = bottomY + 2; sy < bottomY + bottomH; sy += 4) {
+      bottomGfx.fillStyle(0xffffff, 0.012);
       bottomGfx.fillRect(0, sy, GRID_COLS * CELL_SIZE, 1);
     }
 
+    // Terminal status text lines
+    const statusFont = { fontFamily: '"Press Start 2P"', fontSize: '6px', color: '#2a8a5a' };
+    this.add.text(10, bottomY + 14, 'SYSTEM: Network monitoring active', statusFont)
+      .setDepth(1).setAlpha(0.4);
+    this.add.text(10, bottomY + 32, 'STATUS: Awaiting deployment', statusFont)
+      .setDepth(1).setAlpha(0.4);
+    this.add.text(10, bottomY + 50, 'THREATS: Scanning...', statusFont)
+      .setDepth(1).setAlpha(0.4);
+
     // ── Hover indicator ────────────────────────────────────────
     this.hoverRect = this.add.rectangle(0, 0, CELL_SIZE - 2, CELL_SIZE - 2)
-      .setStrokeStyle(2, 0xffffff, 0.5)
-      .setFillStyle(0xffffff, 0.08)
+      .setStrokeStyle(2, 0x5588cc, 0.3)
+      .setFillStyle(0x5588cc, 0.06)
       .setVisible(false)
       .setDepth(5);
 
@@ -259,8 +341,8 @@ export class BreachDefenseScene extends Phaser.Scene {
           stats.range * CELL_SIZE
         );
       } else {
-        this.hoverRect.setStrokeStyle(2, 0xffffff, 0.5);
-        this.hoverRect.setFillStyle(0xffffff, 0.08);
+        this.hoverRect.setStrokeStyle(2, 0x5588cc, 0.3);
+        this.hoverRect.setFillStyle(0x5588cc, 0.06);
       }
     });
 

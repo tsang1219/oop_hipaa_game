@@ -65,3 +65,27 @@
 2. BreachDefense waiting room chairs still flat blue squares (not using improved SpriteFactory)
 3. Waiting chairs in hub world still flat blue — need to pick up the improved chair texture
 4. Player character needs more detail (currently basic programmatic sprite)
+
+## Iteration 4 (post-fix) — 2026-03-25T02:00:00Z
+
+| Scene | Score | Delta | Notes |
+|-------|-------|-------|-------|
+| hub-world | 7 | 0 | Unchanged this iter |
+| privacy-hub | 7 | +1 | Trust meter dark-themed, softer rose borders, room card shadows + hover scale, radial gradient bg |
+| privacy-reception | 7 | 0 | Unchanged |
+| privacy-er | 7 | 0 | Unchanged |
+| privacy-lab | 7 | 0 | Unchanged |
+| privacy-records_room | 7 | 0 | Unchanged |
+| privacy-it_office | 7 | 0 | Unchanged |
+| privacy-break_room | 7 | 0 | Unchanged |
+| breach-start | 6 | +1 | Grid header + status panel visible behind modal, tower buttons have color indicators |
+| breach-playing | 7 | +1 | "NETWORK DEFENSE GRID" header, column/row labels, circuit traces, terminal status panel, tower color indicators, larger HUD text |
+| **CONSISTENCY** | **6** | +2 | Shared rose accent (#e8618c) across both games, matching font approach, both now have dark themed UIs. Gap narrowing. |
+
+**Average: 6.8/10 (+0.4)**
+
+### Key issues for next iteration:
+1. Hub world waiting chairs still flat blue squares
+2. All scenes at 7 — need ambient detail, lighting effects, particle touches to reach 8+
+3. Player sprite in exploration rooms is basic programmatic (blue shirt rectangle)
+4. BreachDefense grid still feels empty when no towers/enemies present

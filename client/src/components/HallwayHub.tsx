@@ -1,9 +1,9 @@
-import { 
-  Building2, 
-  FileText, 
-  Ambulance, 
-  Microscope, 
-  Coffee, 
+import {
+  Building2,
+  FileText,
+  Ambulance,
+  Microscope,
+  Coffee,
   Monitor,
   Lock,
   CheckCircle2,
@@ -69,10 +69,10 @@ const ROOM_POSITIONS: Record<string, { gridArea: string; order: number }> = {
   lab: { gridArea: 'lab', order: 6 },
 };
 
-export default function HallwayHub({ 
-  rooms, 
-  onSelectRoom, 
-  completedRooms, 
+export default function HallwayHub({
+  rooms,
+  onSelectRoom,
+  completedRooms,
   collectedStories,
   onViewStory,
   privacyScore = 100
@@ -106,12 +106,12 @@ export default function HallwayHub({
   return (
     <div className="w-full max-w-4xl mx-auto px-4">
       <div className="text-center mb-6">
-        <h2 className="text-xl font-bold text-primary mb-2" data-testid="text-hub-title">
+        <h2 className="text-xl font-bold text-[#e8618c] mb-2" data-testid="text-hub-title">
           HALLWAY HUB
         </h2>
-        <div className="mb-4 p-4 bg-card border-2 border-game-border rounded">
-          <div className="text-xs text-muted-foreground mb-2">COMMUNITY TRUST METER</div>
-          <div className="w-full bg-slate-200 dark:bg-slate-700 rounded h-3 overflow-hidden mb-2">
+        <div className="mb-4 p-4 bg-[#16213e] border-2 border-[#e8618c]/40 rounded">
+          <div className="text-xs text-slate-400 mb-2">COMMUNITY TRUST METER</div>
+          <div className="w-full bg-slate-700 rounded h-3 overflow-hidden mb-2">
             <div
               className={`h-full transition-all duration-300 ${
                 privacyScore >= 70 ? 'bg-green-500' : privacyScore >= 40 ? 'bg-yellow-500' : 'bg-red-500'
@@ -119,7 +119,7 @@ export default function HallwayHub({
               style={{ width: `${privacyScore}%` }}
             />
           </div>
-          <div className="text-xs font-['Press_Start_2P'] text-foreground">
+          <div className="text-xs font-['Press_Start_2P'] text-slate-200">
             {getTrustStatus()} — {privacyScore}/100
           </div>
         </div>
@@ -131,8 +131,8 @@ export default function HallwayHub({
         </p>
       </div>
 
-      <div 
-        className="relative bg-[#1a1a2e] border-4 border-primary p-6 mb-6"
+      <div
+        className="relative border-4 border-[#e8618c] p-6 mb-6"
         style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(3, 1fr)',
@@ -143,15 +143,16 @@ export default function HallwayHub({
             "reception er lab"
           `,
           gap: '12px',
+          background: 'radial-gradient(ellipse at center, rgba(40,40,70,1) 0%, rgba(26,26,46,1) 100%)',
         }}
       >
-        <div 
+        <div
           style={{ gridArea: 'hub' }}
-          className="flex items-center justify-center bg-[#16213e] border-2 border-primary/50 p-4"
+          className="flex items-center justify-center bg-[#16213e] border-2 border-[#e8618c]/50 p-4"
         >
           <div className="text-center">
             <div className="text-2xl mb-1">🏥</div>
-            <span className="text-xs text-primary font-bold">HALLWAY</span>
+            <span className="text-xs text-[#e8618c] font-bold">HALLWAY</span>
           </div>
         </div>
 
@@ -160,11 +161,19 @@ export default function HallwayHub({
           const RoomIcon = ROOM_ICONS[room.id] || Building2;
           const position = ROOM_POSITIONS[room.id];
           const isHovered = hoveredRoom === room.id;
-          
+
+          const shadowStyle = status === 'cleared'
+            ? '0 2px 8px rgba(34,197,94,0.2)'
+            : isHovered && status === 'available'
+              ? '0 4px 16px rgba(232,97,140,0.25)'
+              : status === 'available'
+                ? '0 2px 8px rgba(232,97,140,0.15)'
+                : 'none';
+
           return (
             <button
               key={room.id}
-              style={{ gridArea: position?.gridArea }}
+              style={{ gridArea: position?.gridArea, boxShadow: shadowStyle }}
               onClick={() => {
                 if (status !== 'locked') {
                   onSelectRoom(room.id);
@@ -175,11 +184,12 @@ export default function HallwayHub({
               disabled={status === 'locked'}
               className={`
                 relative p-4 transition-all duration-200 text-center
-                ${status === 'locked' 
-                  ? 'bg-[#16213e]/50 border-2 border-muted cursor-not-allowed opacity-60' 
+                ${status !== 'locked' ? 'transition-transform duration-150 hover:scale-[1.02]' : ''}
+                ${status === 'locked'
+                  ? 'bg-[#16213e]/50 border-2 border-muted cursor-not-allowed opacity-60'
                   : status === 'cleared'
                     ? 'bg-[#16213e] border-2 border-green-500 hover-elevate cursor-pointer'
-                    : 'bg-[#16213e] border-2 border-primary hover-elevate cursor-pointer'
+                    : 'bg-[#16213e] border-2 border-[#e8618c] hover-elevate cursor-pointer'
                 }
               `}
               data-testid={`button-room-${room.id}`}
@@ -190,31 +200,31 @@ export default function HallwayHub({
                   <Lock className="w-4 h-4 text-muted-foreground" />
                 </div>
               )}
-              
+
               {status === 'cleared' && (
                 <div className="absolute top-1 right-1">
                   <CheckCircle2 className="w-4 h-4 text-green-500" data-testid={`icon-completed-${room.id}`} />
                 </div>
               )}
-              
+
               <div className="mb-2 flex justify-center">
-                <RoomIcon 
+                <RoomIcon
                   className={`w-8 h-8 ${
-                    status === 'locked' 
-                      ? 'text-muted-foreground' 
-                      : status === 'cleared' 
-                        ? 'text-green-500' 
-                        : 'text-primary'
-                  }`} 
+                    status === 'locked'
+                      ? 'text-muted-foreground'
+                      : status === 'cleared'
+                        ? 'text-green-500'
+                        : 'text-[#e8618c]'
+                  }`}
                 />
               </div>
-              
+
               <h3 className={`text-xs font-bold mb-1 ${
                 status === 'locked' ? 'text-muted-foreground' : 'text-foreground'
               }`}>
                 {room.name}
               </h3>
-              
+
               {room.subtitle && (
                 <p className={`text-[10px] italic ${
                   status === 'locked' ? 'text-muted-foreground/50' : 'text-muted-foreground'
@@ -224,7 +234,7 @@ export default function HallwayHub({
               )}
 
               {isHovered && status !== 'locked' && room.description && (
-                <div className="absolute z-20 left-1/2 -translate-x-1/2 top-full mt-2 w-48 p-2 bg-background border-2 border-primary text-left">
+                <div className="absolute z-20 left-1/2 -translate-x-1/2 top-full mt-2 w-48 p-2 bg-background border-2 border-[#e8618c] text-left">
                   <p className="text-[10px] text-foreground">
                     {room.description}
                   </p>
@@ -235,12 +245,12 @@ export default function HallwayHub({
         })}
       </div>
 
-      <div className="bg-[#1a1a2e] border-4 border-primary p-4 mb-6">
-        <h3 className="text-sm font-bold text-primary mb-3 flex items-center gap-2">
+      <div className="bg-[#1a1a2e] border-4 border-[#e8618c] p-4 mb-6">
+        <h3 className="text-sm font-bold text-[#e8618c] mb-3 flex items-center gap-2">
           <Heart className="w-4 h-4" />
           PATIENT STORIES EARNED
         </h3>
-        
+
         {collectedStories.length === 0 ? (
           <p className="text-xs text-muted-foreground italic text-center py-4">
             Clear rooms to collect patient stories—lives you've protected.
@@ -250,9 +260,9 @@ export default function HallwayHub({
             {collectedStories.map((roomId) => {
               const room = rooms.find(r => r.id === roomId);
               if (!room?.patientStory) return null;
-              
+
               const StoryIcon = STORY_ICONS[room.patientStory.icon] || Heart;
-              
+
               return (
                 <button
                   key={roomId}
@@ -277,7 +287,7 @@ export default function HallwayHub({
       </div>
 
       <div className="text-center">
-        <div className="inline-block bg-[#1a1a2e] border-2 border-primary p-4">
+        <div className="inline-block bg-[#1a1a2e] border-2 border-[#e8618c] p-4">
           <p className="text-xs text-foreground mb-2">
             <strong>Mission Progress:</strong> {completedRooms.length} / {rooms.length} areas secured
           </p>
@@ -287,7 +297,7 @@ export default function HallwayHub({
               <span className="text-muted-foreground">Locked</span>
             </div>
             <div className="flex items-center gap-1">
-              <div className="w-3 h-3 border border-primary bg-primary/20 animate-pulse"></div>
+              <div className="w-3 h-3 border border-[#e8618c] bg-[#e8618c]/20 animate-pulse"></div>
               <span className="text-muted-foreground">Available</span>
             </div>
             <div className="flex items-center gap-1">
