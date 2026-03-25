@@ -41,3 +41,27 @@
 2. Sprites are 32px = tiny on the bigger canvas, need scaling
 3. Furniture still flat colored rectangles (chairs, desks, tables)
 4. Hub world room is small, doesn't use the space
+
+## Iteration 2+3 (post-fix) — 2026-03-25T01:00:00Z
+
+| Scene | Score | Delta | Notes |
+|-------|-------|-------|-------|
+| hub-world | 7 | +3 | Reception desk with computer/papers, bulletin boards with pinned notes, potted plants with layered foliage, brick mortar walls, beveled floor tiles. Significant upgrade. |
+| privacy-hub | 6 | 0 | Unchanged React UI |
+| privacy-reception | 7 | +2 | NPCs now have chibi shading with eye sparkle, shirts have highlights/shadows. Chairs have seat/backrest/legs. Computer has green glow. Desks have drawers with handles. Player now renders as proper character. |
+| privacy-er | 7 | +2 | Police Officer, Doctor, Family Member all visually distinct. Beds have pillows/blankets. Tables have legs. |
+| privacy-lab | 7 | +2 | Similar improvements to all sprites |
+| privacy-records_room | 7 | +2 | Same level of improvement |
+| privacy-it_office | 7 | +2 | Same |
+| privacy-break_room | 7 | +2 | Same |
+| breach-start | 5 | 0 | Unchanged |
+| breach-playing | 6 | 0 | Grid improvements from iter 1 holding |
+| **CONSISTENCY** | **4** | 0 | PrivacyQuest improved significantly, BreachDefense less so. Gap widening. |
+
+**Average: 6.4/10 (+1.4)**
+
+### Key issues for next iteration:
+1. Cross-game consistency — PrivacyQuest is pulling ahead, BreachDefense needs matching polish
+2. BreachDefense waiting room chairs still flat blue squares (not using improved SpriteFactory)
+3. Waiting chairs in hub world still flat blue — need to pick up the improved chair texture
+4. Player character needs more detail (currently basic programmatic sprite)

@@ -102,6 +102,24 @@ export class ExplorationScene extends Phaser.Scene {
     // Generate extra textures if not already done (idempotent)
     generateAllTextures(this);
 
+    // Ensure player_down texture exists (fallback if BootScene hasn't generated it yet)
+    if (!this.textures.exists('player_down')) {
+      const g = this.add.graphics();
+      const SKIN = 0xfdbcb4;
+      // Head
+      g.fillStyle(0x8b4513); g.fillRect(11, 4, 10, 5); // hair
+      g.fillStyle(SKIN); g.fillRect(12, 6, 8, 8); // face
+      g.fillStyle(0x000000); g.fillRect(14, 10, 2, 2); g.fillRect(18, 10, 2, 2); // eyes
+      // Body
+      g.fillStyle(0x4a90e2); g.fillRect(11, 14, 10, 10); // shirt
+      g.fillRect(8, 15, 3, 6); g.fillRect(21, 15, 3, 6); // arms
+      g.fillStyle(SKIN); g.fillRect(8, 21, 3, 2); g.fillRect(21, 21, 3, 2); // hands
+      g.fillStyle(0x333333); g.fillRect(11, 24, 4, 4); g.fillRect(17, 24, 4, 4); // pants
+      g.fillStyle(0x8b4513); g.fillRect(11, 28, 4, 2); g.fillRect(17, 28, 4, 2); // shoes
+      g.generateTexture('player_down', TILE, TILE);
+      g.destroy();
+    }
+
     // Resize camera/world to match room dimensions
     this.cameras.main.setBounds(0, 0, w, h);
     this.physics.world.setBounds(0, 0, w, h);
@@ -309,11 +327,11 @@ export class ExplorationScene extends Phaser.Scene {
     // PLAYER_IDLE_FRAMES: down=0, left=3, right=6, up=9 (row * 3 + 0)
     this.tileX = room.spawnPoint.x;
     this.tileY = room.spawnPoint.y;
+    // Use programmatic player texture — spritesheet has timing issues in QA/fast scene starts
     this.player = this.physics.add.sprite(
       this.tileX * TILE + TILE / 2,
       this.tileY * TILE + TILE / 2,
-      'player_sheet',
-      0, // frame 0 = idle facing down
+      'player_down',
     );
     this.player.setDepth(30);
 

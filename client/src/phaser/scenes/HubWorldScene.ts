@@ -31,14 +31,36 @@ export class HubWorldScene extends Phaser.Scene {
   }
 
   create() {
-    // Floor
+    // Floor — polished hospital linoleum with beveled tiles
     const floorGraphics = this.add.graphics();
-    floorGraphics.fillStyle(0xd4c5a9, 1); // Warm tile floor
+    const floorShades = [0xd4c5a9, 0xcabc9e, 0xd0c0a0, 0xc8b896];
     for (let y = 0; y < ROWS; y++) {
       for (let x = 0; x < COLS; x++) {
-        const shade = (x + y) % 2 === 0 ? 0xd4c5a9 : 0xcabc9e;
-        floorGraphics.fillStyle(shade, 1);
-        floorGraphics.fillRect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE);
+        const tx = x * TILE_SIZE;
+        const ty = y * TILE_SIZE;
+        // Pick shade from a pseudo-random but deterministic pattern
+        const shadeIdx = ((x * 3 + y * 7) % 4);
+        const baseColor = floorShades[shadeIdx];
+
+        // Fill base tile
+        floorGraphics.fillStyle(baseColor, 1);
+        floorGraphics.fillRect(tx, ty, TILE_SIZE, TILE_SIZE);
+
+        // Beveled edges — lighter top/left highlight
+        floorGraphics.fillStyle(0xdfd3be, 0.6);
+        floorGraphics.fillRect(tx, ty, TILE_SIZE, 1); // top edge
+        floorGraphics.fillRect(tx, ty, 1, TILE_SIZE); // left edge
+
+        // Beveled edges — darker bottom/right shadow
+        floorGraphics.fillStyle(0xb0a48a, 0.6);
+        floorGraphics.fillRect(tx, ty + TILE_SIZE - 1, TILE_SIZE, 1); // bottom edge
+        floorGraphics.fillRect(tx + TILE_SIZE - 1, ty, 1, TILE_SIZE); // right edge
+
+        // Subtle specular highlight on some tiles for polish effect
+        if ((x + y) % 5 === 0) {
+          floorGraphics.fillStyle(0xffffff, 0.06);
+          floorGraphics.fillRect(tx + 4, ty + 4, 12, 8);
+        }
       }
     }
 
@@ -271,33 +293,84 @@ export class HubWorldScene extends Phaser.Scene {
   }
 
   private createWalls() {
+    const wallGfx = this.add.graphics();
+
+    const drawWallTile = (tx: number, ty: number, isTop: boolean, isBottom: boolean, isLeft: boolean, isRight: boolean) => {
+      const wx = tx * TILE_SIZE;
+      const wy = ty * TILE_SIZE;
+
+      // Base wall color with subtle variation
+      const shade = (tx + ty) % 2 === 0 ? 0x5d4e37 : 0x605139;
+      wallGfx.fillStyle(shade, 1);
+      wallGfx.fillRect(wx, wy, TILE_SIZE, TILE_SIZE);
+
+      // Mortar lines between bricks — horizontal
+      wallGfx.fillStyle(0x4a3f2e, 0.5);
+      wallGfx.fillRect(wx, wy + Math.floor(TILE_SIZE / 2), TILE_SIZE, 1);
+
+      // Mortar lines — vertical offset pattern (brick stagger)
+      const vOffset = ty % 2 === 0 ? 0 : Math.floor(TILE_SIZE / 2);
+      wallGfx.fillRect(wx + vOffset, wy, 1, TILE_SIZE);
+      if (vOffset === 0) {
+        wallGfx.fillRect(wx + TILE_SIZE - 1, wy, 1, TILE_SIZE);
+      }
+
+      // 1px highlight at wall top edge (where wall meets ceiling/void)
+      if (isTop || ty === 0) {
+        wallGfx.fillStyle(0x7a6b52, 0.8);
+        wallGfx.fillRect(wx, wy, TILE_SIZE, 1);
+      }
+
+      // 2px darker shadow at wall base (where wall meets floor)
+      if (isBottom || ty === ROWS - 1) {
+        wallGfx.fillStyle(0x2a2218, 0.8);
+        wallGfx.fillRect(wx, wy + TILE_SIZE - 2, TILE_SIZE, 2);
+      }
+
+      // Interior-facing shadow for left/right walls
+      if (isLeft) {
+        wallGfx.fillStyle(0x2a2218, 0.6);
+        wallGfx.fillRect(wx + TILE_SIZE - 2, wy, 2, TILE_SIZE);
+      }
+      if (isRight) {
+        wallGfx.fillStyle(0x2a2218, 0.6);
+        wallGfx.fillRect(wx, wy, 2, TILE_SIZE);
+      }
+
+      // Physics wall body
+      const wall = this.add.rectangle(wx + 16, wy + 16, TILE_SIZE, TILE_SIZE);
+      wall.setVisible(false);
+      this.walls.add(wall);
+    };
+
     // Top wall
     for (let x = 0; x < COLS; x++) {
-      const wall = this.add.rectangle(x * TILE_SIZE + 16, 16, TILE_SIZE, TILE_SIZE, 0x5d4e37);
-      wall.setStrokeStyle(1, 0x4a3f2e);
-      this.walls.add(wall);
+      drawWallTile(x, 0, true, true, false, false);
     }
-
     // Bottom wall
     for (let x = 0; x < COLS; x++) {
-      const wall = this.add.rectangle(x * TILE_SIZE + 16, (ROWS - 1) * TILE_SIZE + 16, TILE_SIZE, TILE_SIZE, 0x5d4e37);
-      wall.setStrokeStyle(1, 0x4a3f2e);
-      this.walls.add(wall);
+      drawWallTile(x, ROWS - 1, true, true, false, false);
     }
-
-    // Left wall (skip top/bottom, already covered)
+    // Left wall
     for (let y = 1; y < ROWS - 1; y++) {
-      const wall = this.add.rectangle(16, y * TILE_SIZE + 16, TILE_SIZE, TILE_SIZE, 0x5d4e37);
-      wall.setStrokeStyle(1, 0x4a3f2e);
-      this.walls.add(wall);
+      drawWallTile(0, y, false, false, true, false);
     }
-
     // Right wall
     for (let y = 1; y < ROWS - 1; y++) {
-      const wall = this.add.rectangle((COLS - 1) * TILE_SIZE + 16, y * TILE_SIZE + 16, TILE_SIZE, TILE_SIZE, 0x5d4e37);
-      wall.setStrokeStyle(1, 0x4a3f2e);
-      this.walls.add(wall);
+      drawWallTile(COLS - 1, y, false, false, false, true);
     }
+
+    // Floor shadow strip along interior base of walls (ambient occlusion effect)
+    const shadowGfx = this.add.graphics();
+    shadowGfx.fillStyle(0x000000, 0.08);
+    // Along top wall interior
+    shadowGfx.fillRect(TILE_SIZE, TILE_SIZE, (COLS - 2) * TILE_SIZE, 3);
+    // Along bottom wall interior
+    shadowGfx.fillRect(TILE_SIZE, (ROWS - 2) * TILE_SIZE + TILE_SIZE - 3, (COLS - 2) * TILE_SIZE, 3);
+    // Along left wall interior
+    shadowGfx.fillRect(TILE_SIZE, TILE_SIZE, 3, (ROWS - 2) * TILE_SIZE);
+    // Along right wall interior
+    shadowGfx.fillRect((COLS - 1) * TILE_SIZE - 3, TILE_SIZE, 3, (ROWS - 2) * TILE_SIZE);
   }
 
   private createDoor(tileX: number, tileY: number, label: string, color: number, description: string) {
@@ -305,36 +378,137 @@ export class HubWorldScene extends Phaser.Scene {
     const y = tileY * TILE_SIZE;
     const doorWidth = 3 * TILE_SIZE;
     const doorHeight = 3 * TILE_SIZE;
+    const cx = x + doorWidth / 2;
+    const cy = y + doorHeight / 2;
+    const gfx = this.add.graphics();
 
-    // Door frame
-    const frame = this.add.rectangle(
-      x + doorWidth / 2, y + doorHeight / 2,
-      doorWidth + 8, doorHeight + 8,
-      0x333333
-    );
-    frame.setStrokeStyle(3, 0x000000);
+    // Drop shadow behind entire door area
+    gfx.fillStyle(0x000000, 0.25);
+    gfx.fillRect(x - 2 + 3, y - 2 + 3, doorWidth + 12, doorHeight + 12);
 
-    // Door surface
-    const door = this.add.rectangle(
-      x + doorWidth / 2, y + doorHeight / 2,
-      doorWidth, doorHeight,
-      color
-    );
-    door.setStrokeStyle(2, 0x000000);
+    // Outer door frame — thick decorative trim
+    gfx.fillStyle(0x444444, 1);
+    gfx.fillRect(x - 6, y - 6, doorWidth + 12, doorHeight + 12);
+    // Frame highlight (top/left)
+    gfx.fillStyle(0x666666, 1);
+    gfx.fillRect(x - 6, y - 6, doorWidth + 12, 2);
+    gfx.fillRect(x - 6, y - 6, 2, doorHeight + 12);
+    // Frame shadow (bottom/right)
+    gfx.fillStyle(0x222222, 1);
+    gfx.fillRect(x - 6, y + doorHeight + 4, doorWidth + 12, 2);
+    gfx.fillRect(x + doorWidth + 4, y - 6, 2, doorHeight + 12);
 
-    // Door handle
-    this.add.circle(x + doorWidth - 8, y + doorHeight / 2, 4, 0xffd700);
+    // Inner frame — recessed border
+    gfx.fillStyle(0x555555, 1);
+    gfx.fillRect(x - 2, y - 2, doorWidth + 4, doorHeight + 4);
 
-    // Label
-    this.add.text(x + doorWidth / 2, y + doorHeight / 2 - 10, label, {
+    // Door surface with gradient-like bands for depth
+    const r = (color >> 16) & 0xff;
+    const g = (color >> 8) & 0xff;
+    const b = color & 0xff;
+    // Slightly darker top band
+    const darker = ((Math.max(0, r - 25) << 16) | (Math.max(0, g - 25) << 8) | Math.max(0, b - 25));
+    const lighter = ((Math.min(255, r + 20) << 16) | (Math.min(255, g + 20) << 8) | Math.min(255, b + 20));
+
+    gfx.fillStyle(color, 1);
+    gfx.fillRect(x, y, doorWidth, doorHeight);
+
+    // Top highlight strip
+    gfx.fillStyle(lighter, 0.5);
+    gfx.fillRect(x, y, doorWidth, 4);
+    // Bottom shadow strip
+    gfx.fillStyle(darker, 0.6);
+    gfx.fillRect(x, y + doorHeight - 4, doorWidth, 4);
+    // Left highlight
+    gfx.fillStyle(lighter, 0.3);
+    gfx.fillRect(x, y, 2, doorHeight);
+    // Right shadow
+    gfx.fillStyle(darker, 0.4);
+    gfx.fillRect(x + doorWidth - 2, y, 2, doorHeight);
+
+    // Panel insets on door surface (decorative rectangles like real doors)
+    gfx.fillStyle(darker, 0.3);
+    gfx.fillRect(x + 8, y + 8, doorWidth - 16, Math.floor(doorHeight * 0.35));
+    gfx.fillRect(x + 8, y + doorHeight - 8 - Math.floor(doorHeight * 0.35), doorWidth - 16, Math.floor(doorHeight * 0.35));
+    // Panel inset highlights
+    gfx.fillStyle(lighter, 0.2);
+    gfx.fillRect(x + 8, y + 8, doorWidth - 16, 1);
+    gfx.fillRect(x + 8, y + doorHeight - 8 - Math.floor(doorHeight * 0.35), doorWidth - 16, 1);
+
+    // Door handle — metallic look
+    gfx.fillStyle(0xdaa520, 1);
+    gfx.fillCircle(x + doorWidth - 12, cy, 5);
+    gfx.fillStyle(0xffd700, 1);
+    gfx.fillCircle(x + doorWidth - 13, cy - 1, 3);
+    gfx.fillStyle(0xffecb3, 0.8);
+    gfx.fillCircle(x + doorWidth - 14, cy - 2, 1);
+
+    // Floor threshold / mat below door
+    gfx.fillStyle(0x6d5d3a, 1);
+    gfx.fillRect(x - 2, y + doorHeight + 6, doorWidth + 4, 6);
+    gfx.fillStyle(0x7d6d4a, 0.8);
+    gfx.fillRect(x - 2, y + doorHeight + 6, doorWidth + 4, 1);
+    gfx.fillStyle(0x4d3d2a, 0.6);
+    gfx.fillRect(x - 2, y + doorHeight + 11, doorWidth + 4, 1);
+
+    // Sign background with glow effect
+    const signW = doorWidth - 8;
+    const signH = 28;
+    const signX = cx - signW / 2;
+    const signY = cy - 18;
+
+    // Glow layers (outer to inner)
+    gfx.fillStyle(color, 0.15);
+    gfx.fillRect(signX - 4, signY - 4, signW + 8, signH + 8);
+    gfx.fillStyle(color, 0.1);
+    gfx.fillRect(signX - 6, signY - 6, signW + 12, signH + 12);
+
+    // Sign plate
+    gfx.fillStyle(0x1a1a2e, 0.85);
+    gfx.fillRect(signX, signY, signW, signH);
+    // Sign border highlight
+    gfx.fillStyle(0xffffff, 0.2);
+    gfx.fillRect(signX, signY, signW, 1);
+    gfx.fillRect(signX, signY, 1, signH);
+    gfx.fillStyle(0x000000, 0.3);
+    gfx.fillRect(signX, signY + signH - 1, signW, 1);
+    gfx.fillRect(signX + signW - 1, signY, 1, signH);
+
+    // Label text — drop shadow then white text
+    const shadowLabel = this.add.text(cx + 1, cy - 9, label, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: '#000000',
+      align: 'center',
+    }).setOrigin(0.5).setAlpha(0.5);
+
+    const labelText = this.add.text(cx, cy - 10, label, {
       fontFamily: '"Press Start 2P"',
       fontSize: '8px',
       color: '#ffffff',
       align: 'center',
     }).setOrigin(0.5);
 
-    // Description below door
-    this.add.text(x + doorWidth / 2, y + doorHeight + 12, description, {
+    // Subtle pulse glow on the sign label
+    this.tweens.add({
+      targets: labelText,
+      alpha: { from: 1.0, to: 0.7 },
+      duration: 1500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    // Description below door (with drop shadow)
+    this.add.text(x + doorWidth / 2 + 1, y + doorHeight + 20, description, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '5px',
+      color: '#222222',
+      align: 'center',
+      lineSpacing: 4,
+    }).setOrigin(0.5, 0).setAlpha(0.4);
+
+    this.add.text(x + doorWidth / 2, y + doorHeight + 19, description, {
       fontFamily: '"Press Start 2P"',
       fontSize: '5px',
       color: '#444444',
@@ -343,18 +517,81 @@ export class HubWorldScene extends Phaser.Scene {
     }).setOrigin(0.5, 0);
 
     // Add door as wall (player walks up to it, doesn't walk through)
-    const wallBlock = this.add.rectangle(x + doorWidth / 2, y + doorHeight / 2, doorWidth, doorHeight);
+    const wallBlock = this.add.rectangle(cx, cy, doorWidth, doorHeight);
     wallBlock.setVisible(false);
     this.walls.add(wallBlock);
   }
 
   private createFurniture() {
-    // Reception desk (center)
+    const gfx = this.add.graphics();
+
+    // Reception desk (center) — detailed hospital front desk
     const deskX = 8 * TILE_SIZE;
     const deskY = 8 * TILE_SIZE;
-    const desk = this.add.rectangle(deskX + TILE_SIZE * 2, deskY + TILE_SIZE / 2, TILE_SIZE * 4, TILE_SIZE, 0x8b6f47);
-    desk.setStrokeStyle(2, 0x5d4e37);
-    this.walls.add(desk);
+    const deskW = TILE_SIZE * 4;
+    const deskH = TILE_SIZE;
+    const deskCx = deskX + TILE_SIZE * 2;
+    const deskCy = deskY + TILE_SIZE / 2;
+
+    // Desk shadow on floor
+    gfx.fillStyle(0x000000, 0.1);
+    gfx.fillRect(deskX + 3, deskY + 3, deskW, deskH);
+
+    // Desk body — wood grain effect
+    gfx.fillStyle(0x8b6f47, 1);
+    gfx.fillRect(deskX, deskY, deskW, deskH);
+
+    // Wood grain lines
+    gfx.fillStyle(0x7a6039, 0.3);
+    for (let i = 0; i < 5; i++) {
+      gfx.fillRect(deskX + 2, deskY + 3 + i * 6, deskW - 4, 1);
+    }
+
+    // Desk top edge highlight
+    gfx.fillStyle(0xa88860, 0.8);
+    gfx.fillRect(deskX, deskY, deskW, 2);
+    // Desk left edge highlight
+    gfx.fillStyle(0x9a7a50, 0.5);
+    gfx.fillRect(deskX, deskY, 2, deskH);
+    // Desk bottom/right shadow
+    gfx.fillStyle(0x5d4e37, 0.8);
+    gfx.fillRect(deskX, deskY + deskH - 2, deskW, 2);
+    gfx.fillRect(deskX + deskW - 2, deskY, 2, deskH);
+
+    // Front panel detail (facing player)
+    gfx.fillStyle(0x7a6039, 0.5);
+    gfx.fillRect(deskX + 4, deskY + deskH - 8, deskW - 8, 6);
+
+    // Desktop items — small computer monitor
+    gfx.fillStyle(0x333333, 1);
+    gfx.fillRect(deskX + 10, deskY - 10, 20, 14);
+    gfx.fillStyle(0x4488aa, 1);
+    gfx.fillRect(deskX + 12, deskY - 8, 16, 10);
+    // Monitor stand
+    gfx.fillStyle(0x444444, 1);
+    gfx.fillRect(deskX + 17, deskY + 4, 6, 3);
+
+    // Desktop items — small stack of papers
+    gfx.fillStyle(0xf5f5f0, 1);
+    gfx.fillRect(deskX + deskW - 28, deskY - 4, 14, 10);
+    gfx.fillStyle(0xe8e8e0, 1);
+    gfx.fillRect(deskX + deskW - 27, deskY - 3, 14, 10);
+    // Lines on paper
+    gfx.fillStyle(0xcccccc, 0.5);
+    gfx.fillRect(deskX + deskW - 25, deskY, 8, 1);
+    gfx.fillRect(deskX + deskW - 25, deskY + 3, 8, 1);
+
+    // "RECEPTION" label on desk front
+    this.add.text(deskCx, deskCy + 2, 'RECEPTION', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '5px',
+      color: '#c8b896',
+    }).setOrigin(0.5);
+
+    // Desk physics body
+    const deskBody = this.add.rectangle(deskCx, deskCy, deskW, deskH);
+    deskBody.setVisible(false);
+    this.walls.add(deskBody);
 
     // Potted plants
     this.createPlant(2, 7);
@@ -362,41 +599,149 @@ export class HubWorldScene extends Phaser.Scene {
     this.createPlant(2, 12);
     this.createPlant(17, 12);
 
-    // Waiting chairs (bottom area)
+    // Waiting chairs (bottom area) — with cushion detail
+    const drawChair = (cx: number, cy: number) => {
+      // Chair shadow
+      gfx.fillStyle(0x000000, 0.08);
+      gfx.fillRect(cx - 13, cy - 11, TILE_SIZE - 4, TILE_SIZE - 4);
+
+      // Chair frame
+      gfx.fillStyle(0x2980b9, 1);
+      gfx.fillRect(cx - 14, cy - 14, TILE_SIZE - 4, TILE_SIZE - 4);
+
+      // Cushion — lighter blue center
+      gfx.fillStyle(0x5dade2, 1);
+      gfx.fillRect(cx - 10, cy - 10, TILE_SIZE - 12, TILE_SIZE - 12);
+
+      // Cushion highlight
+      gfx.fillStyle(0x85c1e9, 0.5);
+      gfx.fillRect(cx - 10, cy - 10, TILE_SIZE - 12, 2);
+      gfx.fillRect(cx - 10, cy - 10, 2, TILE_SIZE - 12);
+
+      // Cushion shadow
+      gfx.fillStyle(0x2471a3, 0.4);
+      gfx.fillRect(cx - 10, cy + TILE_SIZE - 26, TILE_SIZE - 12, 2);
+
+      // Chair legs (small dots at corners)
+      gfx.fillStyle(0x1a5276, 1);
+      gfx.fillRect(cx - 14, cy - 14, 3, 3);
+      gfx.fillRect(cx + 9, cy - 14, 3, 3);
+      gfx.fillRect(cx - 14, cy + 9, 3, 3);
+      gfx.fillRect(cx + 9, cy + 9, 3, 3);
+
+      // Physics body
+      const chairBody = this.add.rectangle(cx, cy, TILE_SIZE - 4, TILE_SIZE - 4);
+      chairBody.setVisible(false);
+      this.walls.add(chairBody);
+    };
+
     for (let i = 0; i < 3; i++) {
-      const chair = this.add.rectangle(
-        (5 + i * 2) * TILE_SIZE + 16, 12 * TILE_SIZE + 16,
-        TILE_SIZE - 4, TILE_SIZE - 4, 0x3498db
-      );
-      chair.setStrokeStyle(1, 0x2980b9);
-      this.walls.add(chair);
+      drawChair((5 + i * 2) * TILE_SIZE + 16, 12 * TILE_SIZE + 16);
     }
     for (let i = 0; i < 3; i++) {
-      const chair = this.add.rectangle(
-        (12 + i * 2) * TILE_SIZE + 16, 12 * TILE_SIZE + 16,
-        TILE_SIZE - 4, TILE_SIZE - 4, 0x3498db
-      );
-      chair.setStrokeStyle(1, 0x2980b9);
-      this.walls.add(chair);
+      drawChair((12 + i * 2) * TILE_SIZE + 16, 12 * TILE_SIZE + 16);
     }
 
-    // Info board (left wall)
-    this.add.rectangle(1.5 * TILE_SIZE, 5 * TILE_SIZE, TILE_SIZE - 4, TILE_SIZE * 2, 0xecf0f1).setStrokeStyle(2, 0xbdc3c7);
+    // Info board (left wall) — cork board with pins
+    const drawInfoBoard = (bx: number, by: number) => {
+      // Board shadow
+      gfx.fillStyle(0x000000, 0.15);
+      gfx.fillRect(bx - 13, by - TILE_SIZE + 3, TILE_SIZE - 2, TILE_SIZE * 2 + 2);
 
-    // Info board (right wall)
-    this.add.rectangle((COLS - 1.5) * TILE_SIZE, 5 * TILE_SIZE, TILE_SIZE - 4, TILE_SIZE * 2, 0xecf0f1).setStrokeStyle(2, 0xbdc3c7);
+      // Board backing
+      gfx.fillStyle(0xd4a574, 1);
+      gfx.fillRect(bx - 14, by - TILE_SIZE, TILE_SIZE - 4, TILE_SIZE * 2);
+
+      // Cork texture
+      gfx.fillStyle(0xc49a6c, 0.4);
+      gfx.fillRect(bx - 10, by - TILE_SIZE + 4, 8, 8);
+      gfx.fillRect(bx - 4, by - 4, 6, 10);
+      gfx.fillRect(bx - 12, by + 8, 10, 6);
+
+      // White paper notes pinned
+      gfx.fillStyle(0xf8f8f0, 1);
+      gfx.fillRect(bx - 10, by - TILE_SIZE + 6, 12, 10);
+      gfx.fillStyle(0xf0f0e8, 1);
+      gfx.fillRect(bx - 8, by + 4, 10, 8);
+      gfx.fillStyle(0xfff8e0, 1);
+      gfx.fillRect(bx - 11, by - 8, 11, 9);
+
+      // Colored pins
+      gfx.fillStyle(0xe74c3c, 1);
+      gfx.fillCircle(bx - 4, by - TILE_SIZE + 6, 2);
+      gfx.fillStyle(0x2ecc71, 1);
+      gfx.fillCircle(bx - 3, by + 4, 2);
+      gfx.fillStyle(0xf1c40f, 1);
+      gfx.fillCircle(bx - 5, by - 8, 2);
+
+      // Frame border
+      gfx.fillStyle(0x8b7355, 1);
+      gfx.fillRect(bx - 14, by - TILE_SIZE, TILE_SIZE - 4, 2);
+      gfx.fillRect(bx - 14, by + TILE_SIZE - 2, TILE_SIZE - 4, 2);
+      gfx.fillRect(bx - 14, by - TILE_SIZE, 2, TILE_SIZE * 2);
+      gfx.fillRect(bx + TILE_SIZE - 18, by - TILE_SIZE, 2, TILE_SIZE * 2);
+    };
+
+    drawInfoBoard(Math.floor(1.5 * TILE_SIZE), 5 * TILE_SIZE);
+    drawInfoBoard(Math.floor((COLS - 1.5) * TILE_SIZE), 5 * TILE_SIZE);
   }
 
   private createPlant(tileX: number, tileY: number) {
     const x = tileX * TILE_SIZE + 16;
     const y = tileY * TILE_SIZE + 16;
+    const gfx = this.add.graphics();
 
-    // Pot
-    this.add.rectangle(x, y + 6, 16, 12, 0xb5651d).setStrokeStyle(1, 0x8b4513);
-    // Foliage
-    this.add.circle(x, y - 4, 10, 0x27ae60);
-    this.add.circle(x - 6, y, 7, 0x2ecc71);
-    this.add.circle(x + 6, y, 7, 0x2ecc71);
+    // Shadow on floor
+    gfx.fillStyle(0x000000, 0.08);
+    gfx.fillEllipse(x + 2, y + 13, 18, 6);
+
+    // Pot — terracotta with shading
+    // Pot base (wider)
+    gfx.fillStyle(0x9e4a1c, 1);
+    gfx.fillRect(x - 9, y + 8, 18, 4);
+    // Pot body
+    gfx.fillStyle(0xb5651d, 1);
+    gfx.fillRect(x - 8, y + 1, 16, 10);
+    // Pot rim (top lip)
+    gfx.fillStyle(0xc47a3a, 1);
+    gfx.fillRect(x - 9, y - 1, 18, 3);
+    // Pot highlight (left side)
+    gfx.fillStyle(0xd4894a, 0.5);
+    gfx.fillRect(x - 8, y + 1, 3, 8);
+    // Pot shadow (right side)
+    gfx.fillStyle(0x8b4513, 0.5);
+    gfx.fillRect(x + 5, y + 1, 3, 8);
+    // Soil visible at top
+    gfx.fillStyle(0x5a3a1a, 1);
+    gfx.fillRect(x - 6, y, 12, 2);
+
+    // Stem
+    gfx.fillStyle(0x1e8449, 1);
+    gfx.fillRect(x - 1, y - 8, 2, 9);
+
+    // Foliage — multiple shades for depth
+    // Back leaves (darker)
+    gfx.fillStyle(0x1e8449, 1);
+    gfx.fillCircle(x - 2, y - 7, 8);
+    gfx.fillCircle(x + 2, y - 6, 7);
+
+    // Mid leaves (medium green)
+    gfx.fillStyle(0x27ae60, 1);
+    gfx.fillCircle(x, y - 9, 7);
+    gfx.fillCircle(x - 6, y - 3, 6);
+    gfx.fillCircle(x + 6, y - 3, 6);
+
+    // Front leaves (bright green highlights)
+    gfx.fillStyle(0x2ecc71, 1);
+    gfx.fillCircle(x - 3, y - 10, 4);
+    gfx.fillCircle(x + 4, y - 8, 4);
+    gfx.fillCircle(x - 5, y - 5, 3);
+    gfx.fillCircle(x + 5, y - 5, 3);
+
+    // Leaf highlights (lightest)
+    gfx.fillStyle(0x58d68d, 0.6);
+    gfx.fillCircle(x - 1, y - 12, 3);
+    gfx.fillCircle(x + 3, y - 10, 2);
 
     // Add as obstacle
     const plantBlock = this.add.rectangle(x, y, TILE_SIZE - 4, TILE_SIZE - 4);
