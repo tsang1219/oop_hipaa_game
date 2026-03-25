@@ -202,11 +202,38 @@ export class ExplorationScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, w, h);
     this.physics.world.setBounds(0, 0, w, h);
 
-    // ── Floor — beveled hospital tiles with subtle color variation ──
+    // ── Floor — beveled hospital tiles with room-specific color variation ──
     const floor = this.add.graphics();
-    const tileShades = [0xd4c9a8, 0xd0c5a4, 0xccc0a0, 0xd8cdb0];
-    const highlightColor = 0xe2d8bc; // lighter edge (top/left)
-    const shadowColor = 0xb8ad94;    // darker edge (bottom/right)
+    const roomId = room.id.toLowerCase();
+    let tileShades: number[];
+    let highlightColor: number;
+    let shadowColor: number;
+    if (roomId.includes('er') || roomId.includes('emergency')) {
+      // Sterile/clinical blue tint
+      tileShades = [0xccd4d8, 0xc8d0d4, 0xc4ccd0, 0xd0d8dc];
+      highlightColor = 0xdce4e8;
+      shadowColor = 0xb0b8bc;
+    } else if (roomId.includes('lab')) {
+      // Scientific green tint
+      tileShades = [0xc8d4c8, 0xc4d0c4, 0xc0ccc0, 0xccd8cc];
+      highlightColor = 0xd8e4d8;
+      shadowColor = 0xacb8ac;
+    } else if (roomId.includes('it') || roomId.includes('server')) {
+      // Tech blue-grey tint
+      tileShades = [0xc8ccd4, 0xc4c8d0, 0xc0c4cc, 0xccd0d8];
+      highlightColor = 0xd8dce4;
+      shadowColor = 0xacb0b8;
+    } else if (roomId.includes('break')) {
+      // Cozy warm tint
+      tileShades = [0xd8ccb4, 0xd4c8b0, 0xd0c4ac, 0xdcd0b8];
+      highlightColor = 0xe8dcc4;
+      shadowColor = 0xbcb098;
+    } else {
+      // Default beige (reception, records, etc.)
+      tileShades = [0xd4c9a8, 0xd0c5a4, 0xccc0a0, 0xd8cdb0];
+      highlightColor = 0xe2d8bc;
+      shadowColor = 0xb8ad94;
+    }
     for (let y = 0; y < room.height; y++) {
       for (let x = 0; x < room.width; x++) {
         const shadeIdx = ((x % 2) + (y % 2) * 2) % tileShades.length;
@@ -395,6 +422,38 @@ export class ExplorationScene extends Phaser.Scene {
           fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#e74c3c',
         }).setOrigin(0.5).setDepth(35);
         this.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
+      }
+
+      // Speech bubble indicator for uncompleted NPCs — "talk to me!" cue
+      if (!completed) {
+        const bubbleTexKey = '_npc_speech_bubble';
+        if (!this.textures.exists(bubbleTexKey)) {
+          const bg = this.add.graphics();
+          // White rounded rectangle body (10x8)
+          bg.fillStyle(0xffffff, 1);
+          bg.fillRoundedRect(0, 0, 10, 8, 2);
+          // Tiny triangular tail pointing down
+          bg.fillStyle(0xffffff, 1);
+          bg.fillTriangle(3, 8, 7, 8, 5, 11);
+          // Subtle border
+          bg.lineStyle(1, 0x888888, 0.5);
+          bg.strokeRoundedRect(0, 0, 10, 8, 2);
+          bg.generateTexture(bubbleTexKey, 10, 12);
+          bg.destroy();
+        }
+        const bubbleX = npc.x * TILE + TILE / 2;
+        const bubbleY = npc.y * TILE + TILE / 2 - 20;
+        const bubble = this.add.image(bubbleX, bubbleY, bubbleTexKey);
+        bubble.setAlpha(0.8);
+        bubble.setDepth(27);
+        this.tweens.add({
+          targets: bubble,
+          y: bubbleY - 3,
+          duration: 1500,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
       }
 
       this.interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
