@@ -146,3 +146,31 @@
 
 ### Remaining to reach 8+ everywhere:
 - breach-start at 7 — the start modal overlay dims the grid too much, losing the nice effects behind it
+
+## Iteration 8 (post-fix) — 2026-03-25T03:45:00Z
+
+| Scene | Score | Delta | Notes |
+|-------|-------|-------|-------|
+| hub-world | 8 | 0 | Locked |
+| privacy-hub | 8 | 0 | Locked |
+| privacy-reception | 8 | 0 | Locked |
+| privacy-er | 8 | 0 | Locked |
+| privacy-lab | 8 | 0 | Locked |
+| privacy-records_room | 8 | 0 | Locked |
+| privacy-it_office | 8 | 0 | Locked |
+| privacy-break_room | 8 | 0 | Locked |
+| breach-start | 8 | +1 | Reduced overlay opacity (90%→70%), backdrop blur, grid effects now visible through overlay |
+| breach-playing | 8 | 0 | Locked |
+| **CONSISTENCY** | **8** | 0 | All scenes at 8. Cohesive visual language across both games. |
+
+**Average: 8.0/10 (+0.1)**
+
+### ALL SCENES AT 8/10
+The game has reached a solid "Good" rating across all scenes. Further improvement to 9-10 would require:
+- Real hand-crafted pixel art assets replacing programmatic sprites
+- Full walk animation cycles for all NPCs (currently static)
+- Parallax scrolling backgrounds
+- More particle effects (sparkles on interactions, smoke, weather)
+- Sound-synced visual feedback
+- Custom tile maps instead of programmatic floor/wall drawing
+These are scope changes beyond what automated code polish can achieve.

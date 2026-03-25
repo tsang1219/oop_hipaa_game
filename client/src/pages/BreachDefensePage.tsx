@@ -578,7 +578,7 @@ export default function BreachDefensePage() {
 
       {/* ── START SCREEN ──────────────────────────────────────── */}
       {pageState === 'START' && (
-        <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-[2px] flex items-center justify-center z-50">
           <div
             className="relative text-center border-4 border-[#FF6B9D] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md"
             style={{
