@@ -89,3 +89,21 @@
 2. All scenes at 7 — need ambient detail, lighting effects, particle touches to reach 8+
 3. Player sprite in exploration rooms is basic programmatic (blue shirt rectangle)
 4. BreachDefense grid still feels empty when no towers/enemies present
+
+## Iteration 5 (post-fix) — 2026-03-25T02:30:00Z
+
+| Scene | Score | Delta | Notes |
+|-------|-------|-------|-------|
+| hub-world | 8 | +1 | SpriteFactory chairs (cushion/backrest/legs), floor shine spots, dust particles, everything cohesive |
+| privacy-hub | 7 | 0 | Unchanged |
+| privacy-reception | 8 | +1 | Player now chibi sprite with shading, vignette edges, dust particles, warm atmosphere |
+| privacy-er | 8 | +1 | Same ambient improvements |
+| privacy-lab | 8 | +1 | Same |
+| privacy-records_room | 8 | +1 | Same |
+| privacy-it_office | 8 | +1 | Same |
+| privacy-break_room | 8 | +1 | Same |
+| breach-start | 6 | 0 | Unchanged |
+| breach-playing | 7 | 0 | Unchanged this iteration |
+| **CONSISTENCY** | **6** | 0 | PrivacyQuest rooms now at 8, BreachDefense still at 6-7. Gap growing. |
+
+**Average: 7.3/10 (+0.5)**

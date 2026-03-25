@@ -186,6 +186,34 @@ export class HubWorldScene extends Phaser.Scene {
       }
     }
 
+    // Ambient dust particles — very subtle floating motes
+    const dustEmitter = this.add.particles(0, 0, 'particle_circle', {
+      x: { min: TILE_SIZE, max: (COLS - 1) * TILE_SIZE },
+      y: { min: TILE_SIZE, max: (ROWS - 1) * TILE_SIZE },
+      speedY: { min: -15, max: -5 },
+      speedX: { min: -3, max: 3 },
+      alpha: { start: 0.15, end: 0.05 },
+      scale: { start: 0.3, end: 0.1 },
+      lifespan: { min: 4000, max: 7000 },
+      frequency: 650,
+      tint: 0xd4c5a9,
+    });
+    dustEmitter.setDepth(5);
+
+    // Subtle floor shine — tiny specular highlights on scattered tiles
+    const shineGfx = this.add.graphics().setDepth(1);
+    for (let y = 1; y < ROWS - 1; y++) {
+      for (let x = 1; x < COLS - 1; x++) {
+        // Place a shine on roughly every 7th-8th tile using deterministic hash
+        if (((x * 13 + y * 29) % 7) === 0) {
+          const sx = x * TILE_SIZE + 10 + ((x * 7 + y * 3) % 12);
+          const sy = y * TILE_SIZE + 8 + ((x * 5 + y * 11) % 14);
+          shineGfx.fillStyle(0xffffff, 0.06 + ((x + y) % 3) * 0.01);
+          shineGfx.fillRect(sx, sy, 2, 2);
+        }
+      }
+    }
+
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'HubWorld');
   }
@@ -599,47 +627,23 @@ export class HubWorldScene extends Phaser.Scene {
     this.createPlant(2, 12);
     this.createPlant(17, 12);
 
-    // Waiting chairs (bottom area) — with cushion detail
-    const drawChair = (cx: number, cy: number) => {
-      // Chair shadow
-      gfx.fillStyle(0x000000, 0.08);
-      gfx.fillRect(cx - 13, cy - 11, TILE_SIZE - 4, TILE_SIZE - 4);
+    // Waiting chairs (bottom area) — using SpriteFactory furn_chair texture
+    const placeChair = (tx: number, ty: number) => {
+      const cx = tx * TILE_SIZE;
+      const cy = ty * TILE_SIZE;
+      this.add.sprite(cx, cy, 'furn_chair').setOrigin(0, 0).setDepth(10);
 
-      // Chair frame
-      gfx.fillStyle(0x2980b9, 1);
-      gfx.fillRect(cx - 14, cy - 14, TILE_SIZE - 4, TILE_SIZE - 4);
-
-      // Cushion — lighter blue center
-      gfx.fillStyle(0x5dade2, 1);
-      gfx.fillRect(cx - 10, cy - 10, TILE_SIZE - 12, TILE_SIZE - 12);
-
-      // Cushion highlight
-      gfx.fillStyle(0x85c1e9, 0.5);
-      gfx.fillRect(cx - 10, cy - 10, TILE_SIZE - 12, 2);
-      gfx.fillRect(cx - 10, cy - 10, 2, TILE_SIZE - 12);
-
-      // Cushion shadow
-      gfx.fillStyle(0x2471a3, 0.4);
-      gfx.fillRect(cx - 10, cy + TILE_SIZE - 26, TILE_SIZE - 12, 2);
-
-      // Chair legs (small dots at corners)
-      gfx.fillStyle(0x1a5276, 1);
-      gfx.fillRect(cx - 14, cy - 14, 3, 3);
-      gfx.fillRect(cx + 9, cy - 14, 3, 3);
-      gfx.fillRect(cx - 14, cy + 9, 3, 3);
-      gfx.fillRect(cx + 9, cy + 9, 3, 3);
-
-      // Physics body
-      const chairBody = this.add.rectangle(cx, cy, TILE_SIZE - 4, TILE_SIZE - 4);
+      // Physics body (centered on tile)
+      const chairBody = this.add.rectangle(cx + 16, cy + 16, TILE_SIZE - 4, TILE_SIZE - 4);
       chairBody.setVisible(false);
       this.walls.add(chairBody);
     };
 
     for (let i = 0; i < 3; i++) {
-      drawChair((5 + i * 2) * TILE_SIZE + 16, 12 * TILE_SIZE + 16);
+      placeChair(5 + i * 2, 12);
     }
     for (let i = 0; i < 3; i++) {
-      drawChair((12 + i * 2) * TILE_SIZE + 16, 12 * TILE_SIZE + 16);
+      placeChair(12 + i * 2, 12);
     }
 
     // Info board (left wall) — cork board with pins

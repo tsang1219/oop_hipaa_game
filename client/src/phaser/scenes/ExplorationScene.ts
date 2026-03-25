@@ -103,19 +103,97 @@ export class ExplorationScene extends Phaser.Scene {
     generateAllTextures(this);
 
     // Ensure player_down texture exists (fallback if BootScene hasn't generated it yet)
+    // Matches SpriteFactory drawCharacter() chibi style — blue shirt, brown hair "new employee"
     if (!this.textures.exists('player_down')) {
       const g = this.add.graphics();
       const SKIN = 0xfdbcb4;
-      // Head
-      g.fillStyle(0x8b4513); g.fillRect(11, 4, 10, 5); // hair
-      g.fillStyle(SKIN); g.fillRect(12, 6, 8, 8); // face
-      g.fillStyle(0x000000); g.fillRect(14, 10, 2, 2); g.fillRect(18, 10, 2, 2); // eyes
-      // Body
-      g.fillStyle(0x4a90e2); g.fillRect(11, 14, 10, 10); // shirt
-      g.fillRect(8, 15, 3, 6); g.fillRect(21, 15, 3, 6); // arms
-      g.fillStyle(SKIN); g.fillRect(8, 21, 3, 2); g.fillRect(21, 21, 3, 2); // hands
-      g.fillStyle(0x333333); g.fillRect(11, 24, 4, 4); g.fillRect(17, 24, 4, 4); // pants
-      g.fillStyle(0x8b4513); g.fillRect(11, 28, 4, 2); g.fillRect(17, 28, 4, 2); // shoes
+      const SKIN_SHADOW = 0xdba49c;  // darken(SKIN, 30)
+      const SKIN_HIGHLIGHT = 0xffd0ce; // lighten(SKIN, 20)
+      const HAIR = 0x8b4513;
+      const HAIR_LIGHT = 0xa85d2c;   // lighten(HAIR, 25)
+      const HAIR_DARK = 0x6a2400;    // darken(HAIR, 35)
+      const SHIRT = 0x4a90e2;
+      const SHIRT_LIGHT = 0x6daaf7;  // lighten(SHIRT, 25)
+      const SHIRT_DARK = 0x2a70c2;   // darken(SHIRT, 30)
+
+      // Hair (chibi head — slightly larger)
+      g.fillStyle(HAIR);
+      g.fillRect(10, 3, 12, 5);   // top hair mass
+      g.fillRect(9, 5, 2, 5);     // left sideburns
+      g.fillRect(21, 5, 2, 5);    // right sideburns
+      // Hair highlight (top-left)
+      g.fillStyle(HAIR_LIGHT);
+      g.fillRect(11, 3, 3, 1);
+      g.fillRect(10, 4, 1, 2);
+      // Hair shadow (bottom-right)
+      g.fillStyle(HAIR_DARK);
+      g.fillRect(21, 4, 1, 4);
+      g.fillRect(18, 7, 4, 1);
+
+      // Head (larger chibi face)
+      g.fillStyle(SKIN);
+      g.fillRect(11, 5, 10, 9);
+      // Face highlight (left edge)
+      g.fillStyle(SKIN_HIGHLIGHT);
+      g.fillRect(11, 6, 1, 7);
+      // Face shadow (right edge + chin)
+      g.fillStyle(SKIN_SHADOW);
+      g.fillRect(20, 6, 1, 7);
+      g.fillRect(12, 13, 8, 1);
+
+      // Eyes with white sparkle
+      g.fillStyle(0x000000);
+      g.fillRect(13, 9, 2, 2);    // left eye
+      g.fillRect(17, 9, 2, 2);    // right eye
+      g.fillStyle(0xffffff);
+      g.fillRect(13, 9, 1, 1);    // left sparkle
+      g.fillRect(17, 9, 1, 1);    // right sparkle
+
+      // Mouth
+      g.fillStyle(0xd4937a);       // darken(SKIN, 45)
+      g.fillRect(15, 12, 2, 1);
+
+      // Neck
+      g.fillStyle(SKIN);
+      g.fillRect(14, 14, 4, 1);
+      g.fillStyle(SKIN_SHADOW);
+      g.fillRect(17, 14, 1, 1);
+
+      // Shirt body
+      g.fillStyle(SHIRT);
+      g.fillRect(10, 15, 12, 9);
+      // Shirt highlight (left edge)
+      g.fillStyle(SHIRT_LIGHT);
+      g.fillRect(10, 15, 1, 8);
+      // Shirt shadow (right edge + bottom)
+      g.fillStyle(SHIRT_DARK);
+      g.fillRect(21, 15, 1, 9);
+      g.fillRect(11, 23, 10, 1);
+      // Arms / sleeves
+      g.fillStyle(SHIRT);
+      g.fillRect(7, 16, 3, 6);
+      g.fillRect(22, 16, 3, 6);
+      g.fillStyle(SHIRT_DARK);
+      g.fillRect(9, 16, 1, 6);
+      g.fillRect(24, 16, 1, 6);
+      // Hands
+      g.fillStyle(SKIN);
+      g.fillRect(7, 22, 3, 2);
+      g.fillRect(22, 22, 3, 2);
+
+      // Pants
+      g.fillStyle(0x333333);
+      g.fillRect(11, 24, 4, 4);
+      g.fillRect(17, 24, 4, 4);
+
+      // Two-toned shoes
+      g.fillStyle(0x5d4037);        // shoe base (dark brown)
+      g.fillRect(11, 28, 4, 2);
+      g.fillRect(17, 28, 4, 2);
+      g.fillStyle(0x8d6e63);        // shoe highlight (lighter brown)
+      g.fillRect(11, 28, 4, 1);
+      g.fillRect(17, 28, 4, 1);
+
       g.generateTexture('player_down', TILE, TILE);
       g.destroy();
     }
@@ -150,6 +228,22 @@ export class ExplorationScene extends Phaser.Scene {
         floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom edge
         floor.fillRect(px + TILE - 1, py, 1, TILE);  // right edge
       }
+    }
+
+    // ── Ambient dust particles — subtle floating motes ──────────
+    if (this.textures.exists('particle_circle')) {
+      this.add.particles(0, 0, 'particle_circle', {
+        x: { min: 0, max: w },
+        y: { min: 0, max: h },
+        speed: { min: 5, max: 15 },
+        angle: { min: 260, max: 280 },   // drift gently upward
+        scale: { min: 0.3, max: 0.6 },
+        alpha: { start: 0.1, end: 0.25, ease: 'Sine.easeInOut' },
+        tint: 0xd4c9a8,                  // warm tone matching floor
+        lifespan: { min: 4000, max: 8000 },
+        frequency: 500,
+        depth: 5,                         // above floor, below furniture
+      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
     }
 
     // ── Obstacles / Walls ────────────────────────────────────────
@@ -422,6 +516,25 @@ export class ExplorationScene extends Phaser.Scene {
       fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#ffffff',
       backgroundColor: '#1a1a2ecc', padding: { x: 10, y: 6 },
     }).setOrigin(0.5, 1).setDepth(50).setVisible(false).setScrollFactor(0);
+
+    // ── Vignette overlay — subtle edge darkening to draw eye to center ──
+    const camW = this.cameras.main.width;
+    const camH = this.cameras.main.height;
+    const vignette = this.add.graphics();
+    // Outer ring: 16px border at 15% opacity
+    vignette.fillStyle(0x000000, 0.15);
+    vignette.fillRect(0, 0, camW, 16);               // top
+    vignette.fillRect(0, camH - 16, camW, 16);       // bottom
+    vignette.fillRect(0, 16, 16, camH - 32);         // left
+    vignette.fillRect(camW - 16, 16, 16, camH - 32); // right
+    // Inner ring: next 16px at 8% opacity
+    vignette.fillStyle(0x000000, 0.08);
+    vignette.fillRect(16, 16, camW - 32, 16);               // top inner
+    vignette.fillRect(16, camH - 32, camW - 32, 16);        // bottom inner
+    vignette.fillRect(16, 32, 16, camH - 64);               // left inner
+    vignette.fillRect(camW - 32, 32, 16, camH - 64);        // right inner
+    vignette.setDepth(50);
+    vignette.setScrollFactor(0);
 
     // ── Listen for React events — MUST be before music to survive any audio errors ──
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
