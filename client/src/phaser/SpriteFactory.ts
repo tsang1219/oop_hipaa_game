@@ -355,21 +355,21 @@ export function furnitureTextureKey(obstacleType?: string): string {
  */
 export function npcTextureKey(npcId: string): string {
   const map: Record<string, string> = {
-    riley: 'npc_receptionist_sheet',
-    nervous_patient: 'npc_patient_sheet',
-    chatty_visitor: 'npc_visitor_sheet',
-    dr_martinez: 'npc_doctor_sheet',
-    officer: 'npc_officer_sheet',
-    nurse_chen: 'npc_nurse_sheet',
-    it_tech: 'npc_it_tech_sheet',
-    dr_patel: 'npc_doctor_sheet',
-    pharmacist: 'npc_staff_sheet',
-    intern: 'npc_staff_sheet',
-    lab_tech: 'npc_it_tech_sheet',
-    admin: 'npc_boss_sheet',
-    final_boss_1: 'npc_boss_sheet',
+    riley: 'npc_receptionist',
+    nervous_patient: 'npc_patient',
+    chatty_visitor: 'npc_visitor',
+    dr_martinez: 'npc_doctor',
+    officer: 'npc_officer',
+    nurse_chen: 'npc_nurse',
+    it_tech: 'npc_it_tech',
+    dr_patel: 'npc_doctor',
+    pharmacist: 'npc_staff',
+    intern: 'npc_staff',
+    lab_tech: 'npc_it_tech',
+    admin: 'npc_boss',
+    final_boss_1: 'npc_boss',
   };
-  return map[npcId] || 'npc_staff_sheet';
+  return map[npcId] || 'npc_staff';
 }
 
 /**

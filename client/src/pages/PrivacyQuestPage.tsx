@@ -208,8 +208,12 @@ export default function PrivacyQuestPage() {
     const params = new URLSearchParams(window.location.search);
     const qaRoom = params.get('qa-room');
     if (qaRoom && rooms.some(r => r.id === qaRoom)) {
-      setCurrentRoomId(qaRoom);
-      setPageMode('exploration');
+      // Wait for Phaser to finish booting and loading all assets before entering room
+      const timer = setTimeout(() => {
+        setCurrentRoomId(qaRoom);
+        setPageMode('exploration');
+      }, 2000);
+      return () => clearTimeout(timer);
     }
   }, []);
 

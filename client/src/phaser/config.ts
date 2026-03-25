@@ -12,8 +12,8 @@ export function createGameConfig(options: {
   return {
     type: Phaser.AUTO,
     parent: options.parent,
-    width: options.width,
-    height: options.height,
+    width: 640,
+    height: 480,
     pixelArt: true,
     roundPixels: true,
     antialias: false,
