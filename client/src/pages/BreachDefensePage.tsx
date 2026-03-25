@@ -396,6 +396,15 @@ export default function BreachDefensePage() {
           0%, 100% { box-shadow: 0 0 8px rgba(255, 200, 0, 0.3); border-color: #facc15; }
           50% { box-shadow: 0 0 16px rgba(255, 200, 0, 0.6); border-color: #fde047; }
         }
+        @keyframes gradient-shift {
+          0% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+          100% { background-position: 0% 50%; }
+        }
+        @keyframes shield-glow {
+          0%, 100% { filter: drop-shadow(0 0 6px rgba(232,97,140,0.3)); }
+          50% { filter: drop-shadow(0 0 14px rgba(232,97,140,0.7)); }
+        }
       `}</style>
 
       {/* Phaser canvas */}
@@ -570,8 +579,25 @@ export default function BreachDefensePage() {
       {/* ── START SCREEN ──────────────────────────────────────── */}
       {pageState === 'START' && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
-          <div className="text-center border-4 border-[#FF6B9D] bg-[#1a1a2e] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md">
-            <Shield className="w-16 h-16 text-[#FF6B9D] mx-auto mb-4" />
+          <div
+            className="relative text-center border-4 border-[#FF6B9D] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md"
+            style={{
+              background: 'linear-gradient(135deg, #1a1a2e 0%, #1e2240 50%, #1a1a2e 100%)',
+              backgroundSize: '200% 200%',
+              animation: 'gradient-shift 8s ease infinite',
+            }}
+          >
+            {/* Corner brackets */}
+            <div className="absolute top-2 left-2 w-4 h-4 border-t-2 border-l-2 border-[#00d4aa]" />
+            <div className="absolute top-2 right-2 w-4 h-4 border-t-2 border-r-2 border-[#00d4aa]" />
+            <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#00d4aa]" />
+            <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#00d4aa]" />
+
+            <p className="text-[7px] text-[#00d4aa] tracking-[4px] opacity-60 mb-2">SECURITY BRIEFING</p>
+            <Shield
+              className="w-16 h-16 text-[#FF6B9D] mx-auto mb-4"
+              style={{ animation: 'shield-glow 3s ease-in-out infinite' }}
+            />
             <h1 className="text-xl font-bold text-[#FF6B9D] mb-3">BREACH DEFENSE</h1>
             <p className="text-[9px] text-gray-400 mb-6 leading-relaxed">
               Defend the hospital network from cyber threats using real security tools.
@@ -579,7 +605,7 @@ export default function BreachDefensePage() {
             </p>
             <button
               onClick={handleStart}
-              className="bg-[#2ECC71] hover:bg-[#27AE60] text-black font-bold px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-sm"
+              className="bg-[#2ECC71] hover:bg-[#27AE60] hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] text-black font-bold px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-sm transition-shadow duration-300"
             >
               Start Mission
             </button>

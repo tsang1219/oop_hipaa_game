@@ -84,6 +84,12 @@ export class BreachDefenseScene extends Phaser.Scene {
   private shownWaveStartBanners = new Set<number>();
   private waveKillCount = 0;
 
+  // Ambient decorations
+  private scanLine?: Phaser.GameObjects.Rectangle;
+  private headerText?: Phaser.GameObjects.Text;
+  private statusText?: Phaser.GameObjects.Text;
+  private statusCursor?: Phaser.GameObjects.Text;
+
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.35;
@@ -232,12 +238,22 @@ export class BreachDefenseScene extends Phaser.Scene {
     headerGfx.lineTo(GRID_COLS * CELL_SIZE, 20);
     headerGfx.strokePath();
 
-    this.add.text(GRID_COLS * CELL_SIZE / 2, 10, 'NETWORK DEFENSE GRID', {
+    this.headerText = this.add.text(GRID_COLS * CELL_SIZE / 2, 10, 'NETWORK DEFENSE GRID', {
       fontFamily: '"Press Start 2P"',
       fontSize: '7px',
       color: '#00d4aa',
       align: 'center'
     }).setOrigin(0.5, 0.5).setDepth(9);
+
+    // Pulse tween on header — subtle alpha oscillation like an active monitor
+    this.tweens.add({
+      targets: this.headerText,
+      alpha: 0.7,
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
 
     // Column labels (A-J) just below the header bar
     const colLabels = 'ABCDEFGHIJ';
@@ -283,10 +299,90 @@ export class BreachDefenseScene extends Phaser.Scene {
     const statusFont = { fontFamily: '"Press Start 2P"', fontSize: '6px', color: '#2a8a5a' };
     this.add.text(10, bottomY + 14, 'SYSTEM: Network monitoring active', statusFont)
       .setDepth(1).setAlpha(0.4);
-    this.add.text(10, bottomY + 32, 'STATUS: Awaiting deployment', statusFont)
+    this.statusText = this.add.text(10, bottomY + 32, 'AWAITING AUTHORIZATION...', statusFont)
       .setDepth(1).setAlpha(0.4);
     this.add.text(10, bottomY + 50, 'THREATS: Scanning...', statusFont)
       .setDepth(1).setAlpha(0.4);
+
+    // Blinking cursor after the authorization text
+    const cursorX = this.statusText.x + this.statusText.width + 4;
+    this.statusCursor = this.add.text(cursorX, bottomY + 32, '_', statusFont)
+      .setDepth(1).setAlpha(0.4);
+    this.tweens.add({
+      targets: this.statusCursor,
+      alpha: 0,
+      duration: 500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Stepped'
+    });
+
+    // ── Vignette overlay — subtle edge darkening for cinematic framing ──
+    const camW = this.cameras.main.width;
+    const camH = this.cameras.main.height;
+    const vignette = this.add.graphics();
+    // Outer ring: 16px border at 20% opacity
+    vignette.fillStyle(0x000000, 0.2);
+    vignette.fillRect(0, 0, camW, 16);               // top
+    vignette.fillRect(0, camH - 16, camW, 16);       // bottom
+    vignette.fillRect(0, 16, 16, camH - 32);         // left
+    vignette.fillRect(camW - 16, 16, 16, camH - 32); // right
+    // Inner ring: next 16px at 10% opacity
+    vignette.fillStyle(0x000000, 0.1);
+    vignette.fillRect(16, 16, camW - 32, 16);               // top inner
+    vignette.fillRect(16, camH - 32, camW - 32, 16);        // bottom inner
+    vignette.fillRect(16, 32, 16, camH - 64);               // left inner
+    vignette.fillRect(camW - 32, 32, 16, camH - 64);        // right inner
+    vignette.setDepth(50);
+    vignette.setScrollFactor(0);
+
+    // ── Animated scan line — faint horizontal sweep like a network monitor ──
+    const gridWidth = GRID_COLS * CELL_SIZE;
+    const scanTop = 20;
+    const scanBottom = GRID_ROWS * CELL_SIZE;
+    this.scanLine = this.add.rectangle(gridWidth / 2, scanTop, gridWidth, 2, 0x00d4aa, 0.15)
+      .setDepth(7);
+    this.tweens.add({
+      targets: this.scanLine,
+      y: scanBottom,
+      duration: 4000,
+      repeat: -1,
+      ease: 'Linear',
+      onRepeat: () => {
+        if (this.scanLine) this.scanLine.y = scanTop;
+      }
+    });
+
+    // ── Corner bracket decorations on the grid frame ──
+    const gridRight = GRID_COLS * CELL_SIZE;
+    const gridBottom = GRID_ROWS * CELL_SIZE;
+    const bracketGfx = this.add.graphics().setDepth(8);
+    const bracketLen = 12;
+    bracketGfx.lineStyle(1, 0x00d4aa, 0.4);
+    // Top-left bracket
+    bracketGfx.beginPath();
+    bracketGfx.moveTo(0, bracketLen);
+    bracketGfx.lineTo(0, 0);
+    bracketGfx.lineTo(bracketLen, 0);
+    bracketGfx.strokePath();
+    // Top-right bracket
+    bracketGfx.beginPath();
+    bracketGfx.moveTo(gridRight - bracketLen, 0);
+    bracketGfx.lineTo(gridRight, 0);
+    bracketGfx.lineTo(gridRight, bracketLen);
+    bracketGfx.strokePath();
+    // Bottom-left bracket
+    bracketGfx.beginPath();
+    bracketGfx.moveTo(0, gridBottom - bracketLen);
+    bracketGfx.lineTo(0, gridBottom);
+    bracketGfx.lineTo(bracketLen, gridBottom);
+    bracketGfx.strokePath();
+    // Bottom-right bracket
+    bracketGfx.beginPath();
+    bracketGfx.moveTo(gridRight - bracketLen, gridBottom);
+    bracketGfx.lineTo(gridRight, gridBottom);
+    bracketGfx.lineTo(gridRight, gridBottom - bracketLen);
+    bracketGfx.strokePath();
 
     // ── Hover indicator ────────────────────────────────────────
     this.hoverRect = this.add.rectangle(0, 0, CELL_SIZE - 2, CELL_SIZE - 2)
@@ -400,6 +496,14 @@ export class BreachDefenseScene extends Phaser.Scene {
 
   private onStartGame() {
     this.gameState = 'PLAYING';
+    // Update terminal status now that authorization is granted
+    if (this.statusText) {
+      this.statusText.setText('STATUS: Defenses deployed');
+    }
+    if (this.statusCursor) {
+      this.tweens.killTweensOf(this.statusCursor);
+      this.statusCursor.setAlpha(0);
+    }
     // Emit wave start banner for wave 1
     if (!this.shownWaveStartBanners.has(1)) {
       this.shownWaveStartBanners.add(1);
@@ -461,6 +565,21 @@ export class BreachDefenseScene extends Phaser.Scene {
     this.shownWaveStartBanners = new Set();
     this.waveKillCount = 0;
     this.gameState = 'WAITING';
+    // Reset terminal status text for waiting state
+    if (this.statusText) {
+      this.statusText.setText('AWAITING AUTHORIZATION...');
+    }
+    if (this.statusCursor) {
+      this.statusCursor.setAlpha(0.4);
+      this.tweens.add({
+        targets: this.statusCursor,
+        alpha: 0,
+        duration: 500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Stepped'
+      });
+    }
     this.broadcastState();
   }
 

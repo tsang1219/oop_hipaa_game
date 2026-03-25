@@ -107,3 +107,21 @@
 | **CONSISTENCY** | **6** | 0 | PrivacyQuest rooms now at 8, BreachDefense still at 6-7. Gap growing. |
 
 **Average: 7.3/10 (+0.5)**
+
+## Iteration 6 (post-fix) — 2026-03-25T03:00:00Z
+
+| Scene | Score | Delta | Notes |
+|-------|-------|-------|-------|
+| hub-world | 8 | 0 | Unchanged |
+| privacy-hub | 7 | 0 | Unchanged |
+| privacy-reception | 8 | 0 | Unchanged |
+| privacy-er | 8 | 0 | Unchanged |
+| privacy-lab | 8 | 0 | Unchanged |
+| privacy-records_room | 8 | 0 | Unchanged |
+| privacy-it_office | 8 | 0 | Unchanged |
+| privacy-break_room | 8 | 0 | Unchanged |
+| breach-start | 7 | +1 | "SECURITY BRIEFING" label, corner brackets, shield glow, gradient bg, personality |
+| breach-playing | 8 | +1 | Scan line sweep, vignette, corner brackets, "AWAITING AUTHORIZATION..." terminal, header pulse |
+| **CONSISTENCY** | **7** | +1 | Both games now at 8, shared cyan accent (grid) + rose accent (UI), matching vignette treatment |
+
+**Average: 7.7/10 (+0.4)**
