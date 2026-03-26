@@ -249,6 +249,30 @@ export class BreachDefenseScene extends Phaser.Scene {
       }
     }
 
+    // Grid intersection nodes (circuit board feel)
+    for (let y = 0; y <= GRID_ROWS; y++) {
+      for (let x = 0; x <= GRID_COLS; x++) {
+        gridGfx.fillStyle(0x4a5d7e, 0.3);
+        gridGfx.fillCircle(x * CELL_SIZE, y * CELL_SIZE, 2);
+      }
+    }
+
+    // Path glow strip — a bright line along the path centerline
+    const pathGlow = this.add.graphics().setDepth(1);
+    pathGlow.lineStyle(2, 0x7b5baf, 0.15);
+    pathGlow.beginPath();
+    for (let i = 0; i < PATHS[0].length; i++) {
+      const p = PATHS[0][i];
+      const pcx = p.x * CELL_SIZE + CELL_SIZE / 2;
+      const pcy = p.y * CELL_SIZE + CELL_SIZE / 2;
+      if (i === 0) {
+        pathGlow.moveTo(pcx, pcy);
+      } else {
+        pathGlow.lineTo(pcx, pcy);
+      }
+    }
+    pathGlow.strokePath();
+
     // Path entry portal glow (where enemies spawn)
     const pathStart = PATHS[0][0];
     const startX = (pathStart.x - 1) * CELL_SIZE + CELL_SIZE / 2;
@@ -348,6 +372,18 @@ export class BreachDefenseScene extends Phaser.Scene {
       bottomGfx.fillStyle(0xffffff, 0.012);
       bottomGfx.fillRect(0, sy, GRID_COLS * CELL_SIZE, 1);
     }
+
+    // Terminal cursor blink indicator
+    const cursor = this.add.rectangle(
+      10, bottomY + bottomH - 12, 6, 8, 0x2a8a5a, 0.6
+    ).setDepth(9);
+    this.tweens.add({
+      targets: cursor,
+      alpha: { from: 0.6, to: 0 },
+      duration: 600,
+      yoyo: true,
+      repeat: -1,
+    });
 
     // Terminal status text lines
     const statusFont = { fontFamily: '"Press Start 2P"', fontSize: '6px', color: '#2a8a5a' };

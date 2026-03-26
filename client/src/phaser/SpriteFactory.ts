@@ -242,6 +242,16 @@ function drawCharacter(g: Phaser.GameObjects.Graphics, style: NpcStyle) {
   g.fillStyle(darken(style.shoes, 50));
   g.fillRect(10, 31, 6, 1);
   g.fillRect(16, 31, 6, 1);
+
+  // ID badge (small rectangle on chest — universal hospital detail)
+  g.fillStyle(0xffffff);
+  g.fillRect(11, 17, 3, 4);
+  // Badge clip
+  g.fillStyle(0xcccccc);
+  g.fillRect(12, 16, 1, 1);
+  // Badge photo (tiny colored square)
+  g.fillStyle(0x8899aa);
+  g.fillRect(11, 18, 2, 2);
 }
 
 // ── Object textures (poster, manual, computer, whiteboard) ───────────
@@ -802,46 +812,114 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
 
   if (!scene.textures.exists('furn_plant')) {
     const g = scene.add.graphics();
-    const pot = 0xb5651d;
-    const potDark = darken(pot, 35);
-    const potLight = lighten(pot, 25);
-    // Pot body (slightly tapered)
+    // Pot
+    const pot = 0xc0613a;
+    g.fillStyle(darken(pot, 20));
+    g.fillRect(11, 20, 10, 10);
     g.fillStyle(pot);
-    g.fillRect(9, 20, 14, 9);
+    g.fillRect(12, 20, 8, 9);
+    // Pot highlight
+    g.fillStyle(lighten(pot, 25));
+    g.fillRect(12, 20, 1, 8);
     // Pot rim
-    g.fillStyle(potLight);
-    g.fillRect(8, 19, 16, 2);
-    // Pot highlight (left)
-    g.fillStyle(potLight);
-    g.fillRect(9, 21, 1, 8);
-    // Pot shadow (right)
-    g.fillStyle(potDark);
-    g.fillRect(22, 21, 1, 8);
-    g.fillRect(10, 28, 12, 1);
-    // Pot stripe decoration
-    g.fillStyle(darken(pot, 15));
-    g.fillRect(10, 24, 12, 1);
-    // Soil visible at top
-    g.fillStyle(0x5d4037);
-    g.fillRect(10, 20, 12, 2);
-    // Main foliage (darker base)
-    g.fillStyle(0x1e8449);
-    g.fillCircle(16, 13, 8);
-    // Foliage highlight clusters
-    g.fillStyle(0x27ae60);
-    g.fillCircle(13, 11, 5);
-    g.fillCircle(19, 11, 5);
-    // Bright highlights
-    g.fillStyle(0x2ecc71);
-    g.fillCircle(11, 15, 4);
-    g.fillCircle(21, 15, 4);
-    g.fillCircle(16, 9, 4);
-    // Top leaf highlight
-    g.fillStyle(0x58d68d);
-    g.fillRect(14, 6, 2, 2);
-    g.fillRect(10, 10, 1, 2);
-    g.fillRect(21, 10, 1, 2);
+    g.fillStyle(lighten(pot, 15));
+    g.fillRect(10, 19, 12, 2);
+    // Soil
+    g.fillStyle(0x3e2723);
+    g.fillRect(13, 20, 6, 2);
+    // Plant stems
+    g.fillStyle(0x2e7d32);
+    g.fillRect(15, 10, 2, 10);
+    g.fillRect(13, 12, 2, 8);
+    g.fillRect(17, 13, 2, 7);
+    // Leaves (various greens for depth)
+    g.fillStyle(0x4caf50);
+    g.fillRect(10, 7, 5, 4);
+    g.fillRect(17, 6, 5, 4);
+    g.fillRect(12, 4, 8, 4);
+    g.fillStyle(0x66bb6a);
+    g.fillRect(11, 5, 3, 3);
+    g.fillRect(18, 7, 3, 2);
+    g.fillStyle(0x388e3c);
+    g.fillRect(14, 3, 4, 3);
+    g.fillRect(10, 8, 2, 2);
+    g.fillRect(20, 8, 2, 2);
+    // Leaf highlights
+    g.fillStyle(0x81c784);
+    g.fillRect(12, 4, 2, 1);
+    g.fillRect(18, 6, 2, 1);
     g.generateTexture('furn_plant', TILE, TILE);
+    g.destroy();
+  }
+
+  if (!scene.textures.exists('furn_clock')) {
+    const g = scene.add.graphics();
+    // Clock frame (circular approximation)
+    g.fillStyle(0x333333);
+    g.fillRect(9, 5, 14, 14);
+    // Clock face
+    g.fillStyle(0xffffff);
+    g.fillRect(10, 6, 12, 12);
+    // Face shadow
+    g.fillStyle(0xeeeeee);
+    g.fillRect(10, 14, 12, 4);
+    // Hour marks
+    g.fillStyle(0x333333);
+    g.fillRect(15, 7, 2, 2);  // 12
+    g.fillRect(15, 15, 2, 2); // 6
+    g.fillRect(11, 11, 2, 2); // 9
+    g.fillRect(19, 11, 2, 2); // 3
+    // Hour hand
+    g.fillStyle(0x000000);
+    g.fillRect(16, 9, 1, 4);
+    // Minute hand
+    g.fillRect(16, 12, 4, 1);
+    // Center dot
+    g.fillStyle(0xe74c3c);
+    g.fillRect(15, 11, 2, 2);
+    // Frame highlight
+    g.fillStyle(0x555555);
+    g.fillRect(9, 5, 14, 1);
+    g.fillRect(9, 5, 1, 14);
+    // Frame shadow
+    g.fillStyle(0x222222);
+    g.fillRect(9, 18, 14, 1);
+    g.fillRect(22, 6, 1, 12);
+    g.generateTexture('furn_clock', TILE, TILE);
+    g.destroy();
+  }
+
+  if (!scene.textures.exists('furn_water_cooler')) {
+    const g = scene.add.graphics();
+    // Base cabinet
+    g.fillStyle(0xeeeeee);
+    g.fillRect(10, 18, 12, 10);
+    g.fillStyle(0xdddddd);
+    g.fillRect(21, 18, 1, 10);
+    g.fillRect(11, 27, 10, 1);
+    // Dispenser body
+    g.fillStyle(0xf5f5f5);
+    g.fillRect(11, 8, 10, 10);
+    g.fillStyle(lighten(0xf5f5f5, 5));
+    g.fillRect(11, 8, 10, 1);
+    g.fillRect(11, 8, 1, 10);
+    // Water bottle (blue tint)
+    g.fillStyle(0x64b5f6);
+    g.fillRect(13, 1, 6, 8);
+    g.fillStyle(0x90caf9);
+    g.fillRect(13, 1, 2, 7);
+    // Bottle cap
+    g.fillStyle(0x1565c0);
+    g.fillRect(14, 0, 4, 2);
+    // Spigots
+    g.fillStyle(0xe53935);
+    g.fillRect(12, 13, 3, 2);
+    g.fillStyle(0x1e88e5);
+    g.fillRect(17, 13, 3, 2);
+    // Drip tray
+    g.fillStyle(0xbdbdbd);
+    g.fillRect(11, 16, 10, 2);
+    g.generateTexture('furn_water_cooler', TILE, TILE);
     g.destroy();
   }
 }
@@ -861,6 +939,8 @@ export function furnitureTextureKey(obstacleType?: string): string {
     chair: 'furn_chair',
     chairs: 'furn_chair',
     plant: 'furn_plant',
+    clock: 'furn_clock',
+    water_cooler: 'furn_water_cooler',
     nurse_station: 'furn_counter',
     patient_bay: 'furn_bed',
   };
