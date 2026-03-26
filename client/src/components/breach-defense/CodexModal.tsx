@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { X, Shield, AlertTriangle, ChevronRight } from 'lucide-react';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { TUTORIAL_CONTENT } from '../../game/breach-defense/tutorialContent';
 import { ASSETS } from '../../game/breach-defense/assets';
 import { TOWERS, THREATS } from '../../game/breach-defense/constants';
@@ -18,6 +19,11 @@ export function CodexModal({ onClose, seenThreats, seenTowers }: CodexModalProps
   useEffect(() => {
     requestAnimationFrame(() => setIsVisible(true));
   }, []);
+
+  useEffect(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+  }, []);
+
   const [selectedEntry, setSelectedEntry] = useState<string | null>(null);
 
   const threatEntries = Object.entries(TUTORIAL_CONTENT.codex.threats);

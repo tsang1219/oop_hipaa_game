@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { PatientStory } from '@shared/schema';
 import { Heart, Shield, Lock, FileText, Server, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface PatientStoryRevealProps {
   story: PatientStory;
@@ -26,6 +27,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
   const IconComponent = iconMap[story.icon] || Heart;
 
   useEffect(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
     const timer = setTimeout(() => setPhase('title'), 500);
     return () => clearTimeout(timer);
   }, []);

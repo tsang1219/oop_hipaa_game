@@ -82,6 +82,12 @@ export default function BreachDefensePage() {
   // Track newly unlocked towers for glow effect
   const [newlyUnlockedTowers, setNewlyUnlockedTowers] = useState<Set<string>>(new Set());
 
+  // Staged reveal for end screens (GAMEOVER / VICTORY)
+  const [endShowTitle, setEndShowTitle] = useState(false);
+  const [endShowStats, setEndShowStats] = useState(false);
+  const [endShowMessage, setEndShowMessage] = useState(false);
+  const [endShowButtons, setEndShowButtons] = useState(false);
+
   // Track previous threats for discovery notifications
   const prevSeenThreatsRef = useRef<string[]>([]);
 
@@ -205,6 +211,25 @@ export default function BreachDefensePage() {
       eventBridge.off(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, onTutorialTrigger);
     };
   }, []);
+
+  // Staged reveal cascade for end screens
+  useEffect(() => {
+    if (pageState === 'GAMEOVER' || pageState === 'VICTORY') {
+      setEndShowTitle(false);
+      setEndShowStats(false);
+      setEndShowMessage(false);
+      setEndShowButtons(false);
+
+      const sfxKey = pageState === 'VICTORY' ? 'sfx_wave_start' : 'sfx_interact';
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: sfxKey, volume: 0.6 });
+
+      const t1 = setTimeout(() => setEndShowTitle(true), 200);
+      const t2 = setTimeout(() => setEndShowStats(true), 600);
+      const t3 = setTimeout(() => setEndShowMessage(true), 1000);
+      const t4 = setTimeout(() => setEndShowButtons(true), 1400);
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    }
+  }, [pageState]);
 
   // Track seen threats from wave data
   useEffect(() => {
@@ -662,34 +687,58 @@ export default function BreachDefensePage() {
       {pageState === 'GAMEOVER' && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
           <div className="text-center border-4 border-red-500 bg-[#1a1a2e] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md">
-            <h1 className="text-xl font-bold text-red-400 mb-3">NETWORK BREACHED</h1>
-            <p className="text-[9px] text-gray-400 mb-4 leading-relaxed">
-              The attackers got through. Patient data has been compromised.
-            </p>
-            <div className="bg-[#2a2a3e] border-2 border-gray-600 p-3 rounded mb-4">
-              <p className="text-[8px] text-gray-300">
-                Waves Survived: <span className="text-yellow-400">{endStats.wavesCompleted}</span>
-              </p>
-              <p className="text-[8px] text-gray-300">
-                Towers Placed: <span className="text-blue-400">{endStats.towersPlaced}</span>
+            <div style={{
+              opacity: endShowTitle ? 1 : 0,
+              transform: endShowTitle ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <h1 className="text-xl font-bold text-red-400 mb-3">NETWORK BREACHED</h1>
+              <p className="text-[9px] text-gray-400 mb-4 leading-relaxed">
+                The attackers got through. Patient data has been compromised.
               </p>
             </div>
-            <p className="text-[8px] text-[#FF6B9D] mb-6 leading-relaxed">
-              No security is perfect. You delayed the inevitable. In real healthcare, that delay saves lives.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={handleRestart}
-                className="bg-[#FF6B9D] hover:bg-[#FF5A8A] text-white font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
-              >
-                Try Again
-              </button>
-              <button
-                onClick={handleBackToHub}
-                className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
-              >
-                Hub World
-              </button>
+            <div style={{
+              opacity: endShowStats ? 1 : 0,
+              transform: endShowStats ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <div className="bg-[#2a2a3e] border-2 border-gray-600 p-3 rounded mb-4">
+                <p className="text-[8px] text-gray-300">
+                  Waves Survived: <span className="text-yellow-400">{endStats.wavesCompleted}</span>
+                </p>
+                <p className="text-[8px] text-gray-300">
+                  Towers Placed: <span className="text-blue-400">{endStats.towersPlaced}</span>
+                </p>
+              </div>
+            </div>
+            <div style={{
+              opacity: endShowMessage ? 1 : 0,
+              transform: endShowMessage ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <p className="text-[8px] text-[#FF6B9D] mb-6 leading-relaxed">
+                No security is perfect. You delayed the inevitable. In real healthcare, that delay saves lives.
+              </p>
+            </div>
+            <div style={{
+              opacity: endShowButtons ? 1 : 0,
+              transform: endShowButtons ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={handleRestart}
+                  className="bg-[#FF6B9D] hover:bg-[#FF5A8A] text-white font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
+                >
+                  Try Again
+                </button>
+                <button
+                  onClick={handleBackToHub}
+                  className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
+                >
+                  Hub World
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -699,35 +748,59 @@ export default function BreachDefensePage() {
       {pageState === 'VICTORY' && (
         <div className="fixed inset-0 bg-black/90 flex items-center justify-center z-50">
           <div className="text-center border-4 border-[#2ECC71] bg-[#1a1a2e] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md">
-            <h1 className="text-xl font-bold text-[#2ECC71] mb-3">NETWORK SECURED</h1>
-            <p className="text-[9px] text-gray-400 mb-4 leading-relaxed">
-              You defended the hospital network through all 10 waves.
-              Patient data remains protected.
-            </p>
-            <div className="bg-[#2a2a3e] border-2 border-gray-600 p-3 rounded mb-4">
-              <p className="text-[8px] text-gray-300">
-                Security Score: <span className="text-green-400">{securityScore}%</span>
-              </p>
-              <p className="text-[8px] text-gray-300">
-                Towers Placed: <span className="text-blue-400">{endStats.towersPlaced}</span>
+            <div style={{
+              opacity: endShowTitle ? 1 : 0,
+              transform: endShowTitle ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <h1 className="text-xl font-bold text-[#2ECC71] mb-3">NETWORK SECURED</h1>
+              <p className="text-[9px] text-gray-400 mb-4 leading-relaxed">
+                You defended the hospital network through all 10 waves.
+                Patient data remains protected.
               </p>
             </div>
-            <p className="text-[8px] text-[#FF6B9D] mb-6 leading-relaxed">
-              You ARE the security. Those "annoying" IT policies protect real patients whose data you're responsible for.
-            </p>
-            <div className="flex gap-3 justify-center">
-              <button
-                onClick={handleRestart}
-                className="bg-[#2ECC71] hover:bg-[#27AE60] text-black font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
-              >
-                Play Again
-              </button>
-              <button
-                onClick={handleBackToHub}
-                className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
-              >
-                Hub World
-              </button>
+            <div style={{
+              opacity: endShowStats ? 1 : 0,
+              transform: endShowStats ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <div className="bg-[#2a2a3e] border-2 border-gray-600 p-3 rounded mb-4">
+                <p className="text-[8px] text-gray-300">
+                  Security Score: <span className="text-green-400">{securityScore}%</span>
+                </p>
+                <p className="text-[8px] text-gray-300">
+                  Towers Placed: <span className="text-blue-400">{endStats.towersPlaced}</span>
+                </p>
+              </div>
+            </div>
+            <div style={{
+              opacity: endShowMessage ? 1 : 0,
+              transform: endShowMessage ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <p className="text-[8px] text-[#FF6B9D] mb-6 leading-relaxed">
+                You ARE the security. Those "annoying" IT policies protect real patients whose data you're responsible for.
+              </p>
+            </div>
+            <div style={{
+              opacity: endShowButtons ? 1 : 0,
+              transform: endShowButtons ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'all 400ms ease-out'
+            }}>
+              <div className="flex gap-3 justify-center">
+                <button
+                  onClick={handleRestart}
+                  className="bg-[#2ECC71] hover:bg-[#27AE60] text-black font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
+                >
+                  Play Again
+                </button>
+                <button
+                  onClick={handleBackToHub}
+                  className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
+                >
+                  Hub World
+                </button>
+              </div>
             </div>
           </div>
         </div>

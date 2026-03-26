@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { CheckCircle, Lightbulb, ArrowRight } from 'lucide-react';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { TUTORIAL_CONTENT } from '../../game/breach-defense/tutorialContent';
 
 interface RecapModalProps {
@@ -16,6 +17,10 @@ export function RecapModal({ concept, onContinue, endMessage, stats }: RecapModa
 
   useEffect(() => {
     requestAnimationFrame(() => setIsVisible(true));
+  }, []);
+
+  useEffect(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
   }, []);
 
   // Nothing to show at all — safety fallback
