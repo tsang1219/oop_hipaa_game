@@ -613,7 +613,7 @@ export default function PrivacyQuestPage() {
                 ? '0 0 8px rgba(68, 255, 68, 0.6), 0 0 16px rgba(68, 255, 68, 0.3)'
                 : '0 0 8px rgba(255, 68, 68, 0.6), 0 0 16px rgba(255, 68, 68, 0.3)',
               animation: 'score-float-up 0.9s ease-out forwards',
-              transform: 'translateX(-50%)',
+              transform: `translateX(-50%) ${scoreDelta.value > 0 ? 'scale(1.2)' : 'scale(1.1)'}`,
               zIndex: 30,
             }}
           >

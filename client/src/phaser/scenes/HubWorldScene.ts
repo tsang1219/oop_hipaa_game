@@ -78,6 +78,16 @@ export class HubWorldScene extends Phaser.Scene {
     });
     this.titleText.setOrigin(0.5);
 
+    // Subtle breathing animation on the title
+    this.tweens.add({
+      targets: this.titleText,
+      alpha: { from: 1, to: 0.85 },
+      duration: 3000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
     // Subtitle
     this.add.text(COLS * TILE_SIZE / 2, 62, 'Choose your training module', {
       fontFamily: '"Press Start 2P"',

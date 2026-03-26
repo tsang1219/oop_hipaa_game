@@ -554,6 +554,9 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     // Emit ready
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'BreachDefense');
+
+    // Scene entrance fade-in (matching Hub and Exploration)
+    this.cameras.main.fadeIn(400, 0, 0, 0);
   }
 
   // ── Event handlers ─────────────────────────────────────────────
@@ -1115,6 +1118,16 @@ export class BreachDefenseScene extends Phaser.Scene {
               if (confettiEmitter && confettiEmitter.active) confettiEmitter.destroy();
             });
           }
+
+          // Second round of confetti after a beat — extended celebration
+          this.time.delayedCall(1500, () => {
+            for (let i = 0; i < 3; i++) {
+              const rx = Math.random() * GRID_COLS * CELL_SIZE;
+              const ry = Math.random() * GRID_ROWS * CELL_SIZE * 0.5;
+              const colors = [0xffd700, 0x44ff44, 0x00d4aa, 0xff6b9d];
+              this.spawnDeathParticles(rx, ry, colors[i % colors.length]);
+            }
+          });
 
           // "NETWORK SECURED!" dramatic text
           const victoryText = this.add.text(
