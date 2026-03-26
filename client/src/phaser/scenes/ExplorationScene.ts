@@ -363,6 +363,9 @@ export class ExplorationScene extends Phaser.Scene {
       const texKey = objectTextureKey(item.type);
       const sprite = this.add.sprite(item.x * TILE + TILE / 2, item.y * TILE + TILE / 2, texKey);
       sprite.setAlpha(collected ? 0.4 : 1);
+      if (collected) {
+        sprite.setTint(0x888888);
+      }
       sprite.setDepth(10);
       if (!collected) {
         this.tweens.add({
@@ -421,6 +424,17 @@ export class ExplorationScene extends Phaser.Scene {
           repeat: -1,
           ease: 'Sine.easeInOut'
         });
+      }
+
+      // Completed zone checkmark
+      if (this.completedZones.has(zone.id)) {
+        this.add.text(sprite.x, sprite.y - 16, '\u2713', {
+          fontFamily: '"Press Start 2P"',
+          fontSize: '7px',
+          color: '#44ff44',
+          stroke: '#000000',
+          strokeThickness: 2,
+        }).setOrigin(0.5).setDepth(sprite.depth + 1);
       }
 
       this.interactables.push({ type: 'zone', id: zone.id, data: zone, sprite });

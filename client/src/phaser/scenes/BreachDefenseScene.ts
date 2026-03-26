@@ -1571,6 +1571,29 @@ export class BreachDefenseScene extends Phaser.Scene {
     if (this.waveCounterText) {
       this.waveCounterText.setText(`WAVE ${this.wave}/${WAVES.length}`);
     }
+
+    // Dynamic header color based on threat level
+    if (this.headerText) {
+      if (this.securityScore <= 25) {
+        this.headerText.setColor('#ff4444'); // Critical
+      } else if (this.securityScore <= 50) {
+        this.headerText.setColor('#ffaa44'); // Warning
+      } else {
+        this.headerText.setColor('#00d4aa'); // Normal
+      }
+    }
+
+    // Dynamic status text reflecting current game state
+    if (this.statusText) {
+      if (this.enemies.length > 0) {
+        this.statusText.setText(`ACTIVE THREATS: ${this.enemies.length}`);
+        this.statusText.setColor('#ff8844');
+      } else {
+        this.statusText.setText('MONITORING...');
+        this.statusText.setColor('#2a8a5a');
+      }
+    }
+
     if (time - this.lastBroadcast > 200) {
       this.broadcastState();
       this.lastBroadcast = time;
