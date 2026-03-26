@@ -63,6 +63,9 @@ export class ExplorationScene extends Phaser.Scene {
   private npcPulseTween: Phaser.Tweens.Tween | null = null;
   private npcPulseTarget: InteractableData | null = null;
 
+  // Dialogue dim overlay — anticipation beat before dialogue opens
+  private dialogueDimOverlay?: Phaser.GameObjects.Rectangle;
+
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.25;
@@ -897,6 +900,23 @@ export class ExplorationScene extends Phaser.Scene {
     this.paused = true;
     this.movePath = [];
 
+    // Dim screen for dialogue entrance — anticipation beat
+    const dimOverlay = this.add.rectangle(
+      this.cameras.main.centerX, this.cameras.main.centerY,
+      this.cameras.main.width, this.cameras.main.height,
+      0x000000, 0
+    ).setDepth(100).setScrollFactor(0);
+
+    this.tweens.add({
+      targets: dimOverlay,
+      fillAlpha: 0.25,
+      duration: 200,
+      ease: 'Sine.easeIn'
+    });
+
+    // Store reference so we can fade it out when dialogue completes
+    this.dialogueDimOverlay = dimOverlay;
+
     if (ia.type === 'npc') {
       const npc = ia.data as NPC;
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_INTERACT_NPC, {
@@ -920,12 +940,47 @@ export class ExplorationScene extends Phaser.Scene {
         fact: item.fact,
         type: item.type,
       });
+
+      // Item collection sparkle — warm gold camera flash
+      this.cameras.main.flash(200, 255, 255, 150, false);
+
+      // Sparkle particles at the item's position
+      if (this.textures.exists('particle_circle')) {
+        const emitter = this.add.particles(ia.sprite.x, ia.sprite.y, 'particle_circle', {
+          speed: { min: 30, max: 80 },
+          angle: { min: 0, max: 360 },
+          scale: { start: 0.6, end: 0 },
+          alpha: { start: 1, end: 0 },
+          tint: [0xffd700, 0xffa500, 0xffec8b],
+          lifespan: 500,
+          quantity: 8,
+          depth: 99,
+          emitting: false,
+        } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
+        emitter.explode(8);
+        this.time.delayedCall(600, () => emitter.destroy());
+      }
     }
   }
 
   // ── Resume after dialogue ──────────────────────────────────────
   private onDialogueComplete = () => {
     this.paused = false;
+
+    // Fade out dialogue dim overlay
+    if (this.dialogueDimOverlay) {
+      this.tweens.add({
+        targets: this.dialogueDimOverlay,
+        fillAlpha: 0,
+        duration: 300,
+        ease: 'Sine.easeOut',
+        onComplete: () => {
+          this.dialogueDimOverlay?.destroy();
+          this.dialogueDimOverlay = undefined;
+        }
+      });
+    }
+
     // Re-focus the canvas so keyboard input works after React overlays stole focus.
     // tabIndex ensures the canvas is focusable; double-attempt covers slow React unmounts.
     const canvas = this.game.canvas;

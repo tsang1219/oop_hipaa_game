@@ -367,6 +367,11 @@ export default function PrivacyQuestPage() {
       if (isComplete && !completedRooms.includes(currentRoomId!)) {
         setCompletedRooms(prev => [...prev, currentRoomId!]);
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
+
+        // Room completion celebration — notify + camera flash
+        notify(`Room Complete: ${room.name}`, { label: 'ALL CLEAR', type: 'success' });
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.7 });
+
         // Show room cleared banner before story reveal or hub return
         setRoomClearedBanner({ roomName: room.name });
         return;
@@ -394,8 +399,17 @@ export default function PrivacyQuestPage() {
   const handleDialogueComplete = useCallback(() => {
     if (currentNPCId) {
       const newCompleted = new Set(completedNPCs);
+      const isFirstCompletion = !newCompleted.has(currentNPCId);
       newCompleted.add(currentNPCId);
       setCompletedNPCs(newCompleted);
+
+      // Celebration for completing an NPC dialogue for the first time
+      if (isFirstCompletion) {
+        const npcData = currentRoom?.npcs.find((n: any) => n.id === currentNPCId);
+        const npcName = npcData?.name || 'NPC';
+        notify(`Scenario complete: ${npcName}`, { label: 'SCENARIO CLEARED', type: 'success' });
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
+      }
 
       // Win condition check
       if (currentSceneId === 'final_boss_1' && newCompleted.size === totalScenarios + 1) {
@@ -414,7 +428,7 @@ export default function PrivacyQuestPage() {
 
     // Resume Phaser scene
     eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
-  }, [currentNPCId, currentSceneId, completedNPCs, totalScenarios]);
+  }, [currentNPCId, currentSceneId, completedNPCs, totalScenarios, currentRoom, notify]);
 
   const handleGameOver = useCallback((finalScore: number) => {
     setFinalPrivacyScore(finalScore);

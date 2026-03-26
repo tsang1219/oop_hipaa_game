@@ -619,6 +619,45 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     this.sound.play('sfx_tower_place', { volume: 0.5 });
 
+    // ── Tower placement visual burst ──
+    const towerColor = parseInt(stats.color.replace('#', ''), 16);
+    // Particle burst at placement point
+    const placeEmitter = this.add.particles(px, py, 'particle_circle', {
+      speed: { min: 30, max: 80 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.8, end: 0 },
+      alpha: { start: 1, end: 0 },
+      lifespan: 250,
+      tint: towerColor,
+      frequency: -1
+    });
+    placeEmitter.setDepth(18);
+    placeEmitter.explode(8);
+    this.time.delayedCall(350, () => {
+      if (placeEmitter && placeEmitter.active) placeEmitter.destroy();
+    });
+
+    // Scale pulse on the newly placed tower sprite
+    this.tweens.add({
+      targets: sprite,
+      scale: [0.5, 1.15, 0.95, 1.0],
+      duration: 350,
+      ease: 'Back.easeOut'
+    });
+
+    // Brief glow ring that scales up and fades out
+    const glowRing = this.add.circle(px, py, 8, towerColor, 0.4)
+      .setStrokeStyle(2, towerColor, 0.6)
+      .setDepth(9);
+    this.tweens.add({
+      targets: glowRing,
+      scale: 3,
+      alpha: 0,
+      duration: 400,
+      ease: 'Quad.easeOut',
+      onComplete: () => glowRing.destroy()
+    });
+
     // If this is the first tower and wave hasn't started, start spawning
     if (this.towers.length === 1 && !this.waveState.active && this.gameState === 'PLAYING') {
       this.waveState.active = true;
@@ -789,6 +828,48 @@ export class BreachDefenseScene extends Phaser.Scene {
           });
           this.waveKillCount = 0;
 
+          // ── Wave complete celebration effects ──
+          this.cameras.main.flash(400, 100, 255, 100, false);
+          this.cameras.main.shake(200, 0.008);
+
+          const clearedText = this.add.text(
+            GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
+            `WAVE ${this.wave} CLEARED!`,
+            { fontFamily: '"Press Start 2P"', fontSize: '14px', color: '#44ff44', stroke: '#000000', strokeThickness: 3 }
+          ).setOrigin(0.5).setDepth(50).setAlpha(0);
+
+          this.tweens.add({
+            targets: clearedText,
+            alpha: 1, scale: { from: 0.3, to: 1.2 },
+            duration: 400, ease: 'Back.easeOut',
+            onComplete: () => {
+              this.tweens.add({
+                targets: clearedText,
+                alpha: 0, y: clearedText.y - 40,
+                duration: 600, delay: 800, ease: 'Quad.easeIn',
+                onComplete: () => clearedText.destroy()
+              });
+            }
+          });
+
+          // Celebration particles at center of grid
+          const celebCenterX = GRID_COLS * CELL_SIZE / 2;
+          const celebCenterY = GRID_ROWS * CELL_SIZE / 2;
+          const celebEmitter = this.add.particles(celebCenterX, celebCenterY, 'particle_circle', {
+            speed: { min: 40, max: 110 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 1.2, end: 0 },
+            alpha: { start: 1, end: 0 },
+            lifespan: 400,
+            tint: 0x44ff44,
+            frequency: -1
+          });
+          celebEmitter.setDepth(18);
+          celebEmitter.explode(20);
+          this.time.delayedCall(500, () => {
+            if (celebEmitter && celebEmitter.active) celebEmitter.destroy();
+          });
+
           this.wave++;
 
           // Grant stipend
@@ -837,6 +918,53 @@ export class BreachDefenseScene extends Phaser.Scene {
         } else {
           // Victory!
           this.gameState = 'VICTORY';
+
+          // ── Victory celebration effects ──
+          this.cameras.main.flash(800, 255, 215, 0, false);
+          this.cameras.main.shake(400, 0.012);
+
+          // Confetti-like particle bursts at random positions
+          const confettiColors = [0xffd700, 0x44ff44, 0x00d4aa, 0xffffff];
+          for (let i = 0; i < 5; i++) {
+            const cx = Phaser.Math.Between(CELL_SIZE * 2, (GRID_COLS - 2) * CELL_SIZE);
+            const cy = Phaser.Math.Between(CELL_SIZE * 2, (GRID_ROWS - 2) * CELL_SIZE);
+            const confettiEmitter = this.add.particles(cx, cy, 'particle_circle', {
+              speed: { min: 50, max: 140 },
+              angle: { min: 0, max: 360 },
+              scale: { start: 1.0, end: 0 },
+              alpha: { start: 1, end: 0 },
+              lifespan: 600,
+              tint: confettiColors[i % confettiColors.length],
+              frequency: -1
+            });
+            confettiEmitter.setDepth(18);
+            confettiEmitter.explode(12);
+            this.time.delayedCall(700, () => {
+              if (confettiEmitter && confettiEmitter.active) confettiEmitter.destroy();
+            });
+          }
+
+          // "NETWORK SECURED!" dramatic text
+          const victoryText = this.add.text(
+            GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
+            'NETWORK SECURED!',
+            { fontFamily: '"Press Start 2P"', fontSize: '18px', color: '#ffd700', stroke: '#000000', strokeThickness: 4 }
+          ).setOrigin(0.5).setDepth(50).setAlpha(0);
+
+          this.tweens.add({
+            targets: victoryText,
+            alpha: 1, scale: { from: 0.2, to: 1.3 },
+            duration: 500, ease: 'Back.easeOut',
+            onComplete: () => {
+              this.tweens.add({
+                targets: victoryText,
+                alpha: 0, y: victoryText.y - 50,
+                duration: 800, delay: 1200, ease: 'Quad.easeIn',
+                onComplete: () => victoryText.destroy()
+              });
+            }
+          });
+
           eventBridge.emit(BRIDGE_EVENTS.BREACH_VICTORY, {
             securityScore: this.securityScore,
             wavesCompleted: this.wave,
@@ -917,6 +1045,20 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.securityScore = Math.max(0, this.securityScore - breaching.length * 20);
       this.sound.play('sfx_breach_alert', { volume: 0.85 });
 
+      // ── Breach alert screen edge pulse ──
+      const borderFlash = this.add.rectangle(
+        GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
+        GRID_COLS * CELL_SIZE, GRID_ROWS * CELL_SIZE
+      ).setStrokeStyle(4, 0xff0000, 0.8).setFillStyle(0xff0000, 0.1).setDepth(40);
+
+      this.tweens.add({
+        targets: borderFlash,
+        alpha: 0, duration: 400, ease: 'Quad.easeOut',
+        onComplete: () => borderFlash.destroy()
+      });
+
+      this.cameras.main.shake(150, 0.005);
+
       for (const enemy of breaching) {
         enemy.sprite.destroy();
         enemy.hpBarBg.destroy();
@@ -926,6 +1068,49 @@ export class BreachDefenseScene extends Phaser.Scene {
 
       if (this.securityScore <= 0) {
         this.gameState = 'GAMEOVER';
+
+        // ── Game over effects ──
+        this.cameras.main.flash(600, 255, 50, 50, false);
+        this.cameras.main.shake(500, 0.015);
+
+        // "SYSTEM COMPROMISED" text with red glitch-like entrance
+        const gameOverText = this.add.text(
+          GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
+          'SYSTEM COMPROMISED',
+          { fontFamily: '"Press Start 2P"', fontSize: '14px', color: '#ff3333', stroke: '#000000', strokeThickness: 4 }
+        ).setOrigin(0.5).setDepth(50).setAlpha(0);
+
+        // Glitch effect: rapid x-offset jitter then settle
+        this.tweens.add({
+          targets: gameOverText,
+          alpha: 1,
+          duration: 100,
+          onComplete: () => {
+            // Jitter phase
+            let jitterCount = 0;
+            const jitterEvent = this.time.addEvent({
+              delay: 50,
+              repeat: 7,
+              callback: () => {
+                jitterCount++;
+                gameOverText.x = GRID_COLS * CELL_SIZE / 2 + Phaser.Math.Between(-8, 8);
+                gameOverText.y = GRID_ROWS * CELL_SIZE / 2 + Phaser.Math.Between(-3, 3);
+              }
+            });
+            this.time.delayedCall(400, () => {
+              jitterEvent.destroy();
+              gameOverText.setPosition(GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2);
+              // Fade out after settling
+              this.tweens.add({
+                targets: gameOverText,
+                alpha: 0,
+                duration: 800, delay: 1000, ease: 'Quad.easeIn',
+                onComplete: () => gameOverText.destroy()
+              });
+            });
+          }
+        });
+
         eventBridge.emit(BRIDGE_EVENTS.BREACH_GAME_OVER, {
           wavesCompleted: this.wave - 1,
           towersPlaced: this.towers.length
