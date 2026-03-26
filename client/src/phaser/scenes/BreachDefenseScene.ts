@@ -890,8 +890,13 @@ export class BreachDefenseScene extends Phaser.Scene {
     const px = startX * CELL_SIZE + CELL_SIZE / 2;
     const py = startY * CELL_SIZE + CELL_SIZE / 2;
 
+    // Size scales with HP — tougher enemies are larger
+    const baseSize = 48;
+    const sizeBonus = Math.min(12, Math.floor(scaledHp / 30)); // up to +12px for high HP
+    const enemySize = baseSize + sizeBonus;
+
     const sprite = this.add.sprite(px, py, `threat_${type}`)
-      .setDisplaySize(48, 48)
+      .setDisplaySize(enemySize, enemySize)
       .setDepth(15);
 
     // Dramatic entrance animation — spawn from nothing
@@ -899,8 +904,8 @@ export class BreachDefenseScene extends Phaser.Scene {
     this.tweens.add({
       targets: sprite,
       alpha: 1,
-      scaleX: 48 / sprite.width,
-      scaleY: 48 / sprite.height,
+      scaleX: enemySize / sprite.width,
+      scaleY: enemySize / sprite.height,
       duration: 300,
       ease: 'Back.easeOut'
     });

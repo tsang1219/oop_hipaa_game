@@ -72,6 +72,14 @@ export class HubWorldScene extends Phaser.Scene {
       }
     }
 
+    // Decorative floor details
+    const floorDeco = this.add.graphics();
+    // Center diamond pattern (lobby focal point)
+    floorDeco.fillStyle(0xc0a080, 0.1);
+    floorDeco.fillRect(9 * TILE_SIZE, 9 * TILE_SIZE, 2 * TILE_SIZE, 2 * TILE_SIZE);
+    floorDeco.lineStyle(1, 0xdaa520, 0.15);
+    floorDeco.strokeRect(9 * TILE_SIZE + 2, 9 * TILE_SIZE + 2, 2 * TILE_SIZE - 4, 2 * TILE_SIZE - 4);
+
     // Walls (top, left, right, bottom perimeter)
     this.walls = this.physics.add.staticGroup();
     this.createWalls();

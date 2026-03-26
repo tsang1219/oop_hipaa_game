@@ -34,6 +34,7 @@ export class ExplorationScene extends Phaser.Scene {
   private roomNameText!: Phaser.GameObjects.Text;
   private playerShadow!: Phaser.GameObjects.Ellipse;
   private playerLabel!: Phaser.GameObjects.Text;
+  private interactionIndicator?: Phaser.GameObjects.Arc;
 
   // Click-to-move pathfinding state
   private movePath: Position[] = [];
@@ -834,6 +835,11 @@ export class ExplorationScene extends Phaser.Scene {
       },
     ).setOrigin(0.5, 1).setDepth(31);
 
+    // Interaction radius indicator — subtle gold ring shown when near interactables
+    this.interactionIndicator = this.add.circle(0, 0, TILE * 1.5, 0xffffff, 0)
+      .setStrokeStyle(1, 0xffd700, 0)
+      .setDepth(2);
+
     this.physics.add.collider(this.player, this.walls);
 
     // Camera follow in rooms larger than viewport
@@ -1116,6 +1122,16 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Proximity check
     this.checkProximity();
+
+    // Update interaction radius indicator
+    if (this.interactionIndicator) {
+      if (this.nearbyInteractable) {
+        this.interactionIndicator.setPosition(this.player.x, this.player.y);
+        this.interactionIndicator.setStrokeStyle(1, 0xffd700, 0.2);
+      } else {
+        this.interactionIndicator.setStrokeStyle(1, 0xffd700, 0);
+      }
+    }
 
     // Interact key
     if (Phaser.Input.Keyboard.JustDown(this.interactKey) && this.nearbyInteractable) {
