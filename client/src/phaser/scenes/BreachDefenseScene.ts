@@ -1462,6 +1462,14 @@ export class BreachDefenseScene extends Phaser.Scene {
       e.hpBarFill.destroy();
       const dyingSprite = e.sprite;
       this.spawnDeathParticles(dyingSprite.x, dyingSprite.y, THREAT_COLORS[e.type]);
+
+      // Extra effects for high-HP threats (mini-bosses)
+      if (e.maxHp >= 100) {
+        this.cameras.main.shake(120, 0.006);
+        // Extra particle burst
+        this.spawnDeathParticles(e.sprite.x, e.sprite.y, 0xffd700);
+      }
+
       this.tweens.add({
         targets: dyingSprite,
         alpha: 0,

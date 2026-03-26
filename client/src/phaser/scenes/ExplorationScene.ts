@@ -590,6 +590,16 @@ export class ExplorationScene extends Phaser.Scene {
       this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
 
+    // Cinematic settle — slight zoom then normalize
+    this.cameras.main.setZoom(1.05);
+    this.tweens.add({
+      targets: this.cameras.main,
+      zoom: 1,
+      duration: 800,
+      ease: 'Sine.easeOut',
+      delay: 300
+    });
+
     // ── Exit door glow at spawn point ──────────────────────────
     const exitX = room.spawnPoint.x * TILE + TILE / 2;
     const exitY = room.spawnPoint.y * TILE + TILE / 2;
@@ -1036,6 +1046,10 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     if (closest) {
+      // Play subtle proximity cue when approaching an interactable
+      if (closest !== this.nearbyInteractable && closest) {
+        this.sound.play('sfx_interact', { volume: 0.15 });
+      }
       this.nearbyInteractable = closest;
       const label = closest.type === 'npc'
         ? `[SPACE] Talk to ${(closest.data as NPC).name}`
