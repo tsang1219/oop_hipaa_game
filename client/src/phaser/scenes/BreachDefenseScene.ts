@@ -369,6 +369,17 @@ export class BreachDefenseScene extends Phaser.Scene {
       align: 'center'
     }).setOrigin(0.5, 0.5).setDepth(9);
 
+    // Status LED indicators in header
+    const ledG = this.add.graphics().setDepth(9);
+    // Green status LED (left of header)
+    ledG.fillStyle(0x00ff00, 0.6);
+    ledG.fillCircle(20, 10, 3);
+    ledG.fillStyle(0x00ff00, 0.2);
+    ledG.fillCircle(20, 10, 5);
+    // Red status LED (right of header)
+    ledG.fillStyle(0xff4444, 0.4);
+    ledG.fillCircle(GRID_COLS * CELL_SIZE - 20, 10, 3);
+
     // Pulse tween on header — subtle alpha oscillation like an active monitor
     this.tweens.add({
       targets: this.headerText,

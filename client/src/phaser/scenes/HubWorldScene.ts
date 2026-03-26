@@ -273,9 +273,9 @@ export class HubWorldScene extends Phaser.Scene {
     this.promptText = this.add.text(COLS * TILE_SIZE / 2, ROWS * TILE_SIZE - 20, '', {
       fontFamily: '"Press Start 2P"',
       fontSize: '8px',
-      color: '#ffffff',
+      color: '#ffd700',
       backgroundColor: '#1a1a2e',
-      padding: { x: 8, y: 4 },
+      padding: { x: 12, y: 6 },
     });
     this.promptText.setOrigin(0.5);
     this.promptText.setVisible(false);

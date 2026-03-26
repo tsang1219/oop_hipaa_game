@@ -923,13 +923,15 @@ export class ExplorationScene extends Phaser.Scene {
 
     // ── HUD ──────────────────────────────────────────────────────
     this.roomNameText = this.add.text(w / 2, 8, room.name.toUpperCase(), {
-      fontFamily: '"Press Start 2P"', fontSize: '12px', color: '#ffffff',
+      fontFamily: '"Press Start 2P"', fontSize: '12px', color: '#ffd700',
       backgroundColor: '#1a1a2ecc', padding: { x: 10, y: 6 },
+      stroke: '#000000', strokeThickness: 1,
     }).setOrigin(0.5, 0).setDepth(50).setScrollFactor(0);
 
     this.promptText = this.add.text(w / 2, h - 12, '', {
-      fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#ffffff',
-      backgroundColor: '#1a1a2ecc', padding: { x: 10, y: 6 },
+      fontFamily: '"Press Start 2P"', fontSize: '8px', color: '#ffd700',
+      backgroundColor: '#1a1a2e', padding: { x: 12, y: 6 },
+      stroke: '#000000', strokeThickness: 1,
     }).setOrigin(0.5, 1).setDepth(50).setVisible(false).setScrollFactor(0);
 
     // ── Vignette overlay — subtle edge darkening to draw eye to center ──
