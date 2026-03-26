@@ -73,6 +73,8 @@ export default function BattleEncounterScreen({
       } else {
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
       }
+      // Emit answer feedback to Phaser for camera flash
+      eventBridge.emit('react:answer-feedback', { type: feedback.type });
       setFeedbackFlash(feedback.type);
       setTimeout(() => setFeedbackFlash(null), 400);
     }

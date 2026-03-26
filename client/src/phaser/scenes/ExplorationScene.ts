@@ -590,6 +590,22 @@ export class ExplorationScene extends Phaser.Scene {
       this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     }
 
+    // ── Exit door glow at spawn point ──────────────────────────
+    const exitX = room.spawnPoint.x * TILE + TILE / 2;
+    const exitY = room.spawnPoint.y * TILE + TILE / 2;
+    const exitGlow = this.add.circle(exitX, exitY, 16, 0x2ecc71, 0)
+      .setStrokeStyle(1.5, 0x2ecc71, 0)
+      .setDepth(0);
+    this.tweens.add({
+      targets: exitGlow,
+      strokeAlpha: { from: 0, to: 0.4 },
+      scale: { from: 0.8, to: 1.3 },
+      duration: 1200,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
     // ── Input ────────────────────────────────────────────────────
     this.cursors = this.input.keyboard!.createCursorKeys();
     this.wasd = {

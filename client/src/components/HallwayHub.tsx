@@ -132,6 +132,22 @@ export default function HallwayHub({
         </p>
       </div>
 
+      {/* Overall progress bar */}
+      <div className="mb-4 px-2">
+        <div className="flex items-center justify-between mb-1">
+          <span className="font-['Press_Start_2P'] text-[8px] text-muted-foreground">PROGRESS</span>
+          <span className="font-['Press_Start_2P'] text-[8px] text-primary">
+            {completedRooms.length}/{rooms.length}
+          </span>
+        </div>
+        <div className="h-2 bg-muted rounded-full overflow-hidden">
+          <div
+            className="h-full bg-primary rounded-full transition-all duration-500 ease-out"
+            style={{ width: `${(completedRooms.length / rooms.length) * 100}%` }}
+          />
+        </div>
+      </div>
+
       <div
         className="relative border-4 border-[#e8618c] p-6 mb-6"
         style={{

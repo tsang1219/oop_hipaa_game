@@ -245,6 +245,38 @@ export class BreachDefenseScene extends Phaser.Scene {
       }
     }
 
+    // Path entry portal glow (where enemies spawn)
+    const pathStart = PATHS[0][0];
+    const startX = (pathStart.x - 1) * CELL_SIZE + CELL_SIZE / 2;
+    const startY = pathStart.y * CELL_SIZE + CELL_SIZE / 2;
+    const entryGlow = this.add.circle(startX, startY, 20, 0x9b59b6, 0)
+      .setStrokeStyle(2, 0x9b59b6, 0.4)
+      .setDepth(2);
+    this.tweens.add({
+      targets: entryGlow,
+      scale: { from: 0.6, to: 1.4 },
+      strokeAlpha: { from: 0.5, to: 0 },
+      duration: 1500,
+      repeat: -1,
+      ease: 'Sine.easeOut'
+    });
+
+    // Path exit portal glow (breach point — red/danger)
+    const pathEnd = PATHS[0][PATHS[0].length - 1];
+    const endX = pathEnd.x * CELL_SIZE + CELL_SIZE / 2;
+    const endY = pathEnd.y * CELL_SIZE + CELL_SIZE / 2;
+    const exitGlow = this.add.circle(endX, endY, 20, 0xff4444, 0)
+      .setStrokeStyle(2, 0xff4444, 0.4)
+      .setDepth(2);
+    this.tweens.add({
+      targets: exitGlow,
+      scale: { from: 0.6, to: 1.4 },
+      strokeAlpha: { from: 0.5, to: 0 },
+      duration: 1500,
+      repeat: -1,
+      ease: 'Sine.easeOut'
+    });
+
     // ── Header bar: network defense grid label ───────────────
     const headerGfx = this.add.graphics().setDepth(8);
     headerGfx.fillStyle(0x0e1020, 0.85);
