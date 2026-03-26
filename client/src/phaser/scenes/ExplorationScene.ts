@@ -373,6 +373,22 @@ export class ExplorationScene extends Phaser.Scene {
           repeat: -1,
           ease: 'Sine.easeInOut',
         });
+
+        // Golden glow ring for uncollected items
+        if (!this.collectedItems.has(item.id)) {
+          const itemGlow = this.add.circle(sprite.x, sprite.y, 14, 0xffd700, 0)
+            .setStrokeStyle(1, 0xffd700, 0)
+            .setDepth(sprite.depth - 1);
+          this.tweens.add({
+            targets: itemGlow,
+            strokeAlpha: { from: 0, to: 0.5 },
+            scale: { from: 0.7, to: 1.2 },
+            duration: 1000,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut'
+          });
+        }
       }
       this.interactables.push({ type: 'item', id: item.id, data: item, sprite });
     }

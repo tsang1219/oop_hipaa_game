@@ -26,6 +26,7 @@ export class HubWorldScene extends Phaser.Scene {
   // Idle frame index per direction: down=0, left=3, right=6, up=9 (row*3+0)
   private lastFacingFrame = 0;
   private transitioning = false;
+  private lastFootstepTime = 0;
 
   constructor() {
     super({ key: 'HubWorld' });
@@ -294,6 +295,32 @@ export class HubWorldScene extends Phaser.Scene {
     // Normalize diagonal movement
     if ((left || right) && (up || down)) {
       body.velocity.normalize().scale(MOVE_SPEED);
+    }
+
+    // Footstep sound + dust puff
+    const isMoving = left || right || up || down;
+    if (isMoving && this.time.now - this.lastFootstepTime > 350) {
+      this.sound.play('sfx_footstep', { volume: 0.25 });
+      this.lastFootstepTime = this.time.now;
+
+      // Footstep dust puff
+      if (this.textures.exists('particle_circle')) {
+        const dustEmitter = this.add.particles(
+          this.player.x + 16, this.player.y + 28, 'particle_circle', {
+          speed: { min: 5, max: 15 },
+          angle: { min: 220, max: 320 },
+          scale: { start: 0.3, end: 0 },
+          alpha: { start: 0.2, end: 0 },
+          lifespan: 300,
+          tint: 0xccbb99,
+          frequency: -1,
+        });
+        dustEmitter.setDepth(1);
+        dustEmitter.explode(2);
+        this.time.delayedCall(400, () => {
+          if (dustEmitter && dustEmitter.active) dustEmitter.destroy();
+        });
+      }
     }
 
     // Check door proximity

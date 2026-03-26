@@ -377,6 +377,7 @@ export default function BreachDefensePage() {
     const newType = selectedTower === type ? null : type;
     setSelectedTower(newType);
     eventBridge.emit(BRIDGE_EVENTS.REACT_SELECT_TOWER_TYPE, { type: newType });
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
   }, [selectedTower]);
 
   const handleDismissTutorial = useCallback(() => {
@@ -591,7 +592,8 @@ export default function BreachDefensePage() {
                   <button
                     onClick={() => !disabled && handleSelectTower(id as TowerType)}
                     disabled={disabled}
-                    className={`relative p-1.5 border-2 rounded text-center w-[100px] transition-all ${
+                    style={{ transition: 'transform 0.15s ease-out, border-color 0.2s, box-shadow 0.2s, opacity 0.2s', transform: isSelected ? 'scale(1.08)' : 'scale(1)' }}
+                    className={`relative p-1.5 border-2 rounded text-center w-[100px] ${
                       isSelected
                         ? 'border-yellow-400 bg-yellow-900/30 shadow-[0_0_12px_rgba(255,200,0,0.5)] animate-[selected-pulse_1.5s_ease-in-out_infinite]'
                         : isSuggested && !locked
