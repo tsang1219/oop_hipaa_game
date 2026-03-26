@@ -116,7 +116,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
 
     return (
       <div className="max-w-2xl mx-auto p-4 md:p-8">
-        <div className="bg-card border-4 border-game-border p-8 text-center" style={{ boxShadow: 'var(--shadow)' }}>
+        <div className="bg-card border-4 border-game-border p-8 text-center" style={{ boxShadow: 'var(--shadow), 0 0 20px rgba(0, 0, 0, 0.5)', border: '2px solid rgba(255, 107, 157, 0.3)', borderRadius: '4px', overflow: 'hidden' }}>
           <h1 className="text-xl md:text-2xl font-bold text-foreground mb-6" data-testid="text-game-complete">
             TRAINING COMPLETE
           </h1>
@@ -184,7 +184,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
   } : null;
 
   return (
-    <>
+    <div style={{ border: '2px solid rgba(255, 107, 157, 0.3)', boxShadow: '0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.1)', borderRadius: '4px', overflow: 'hidden' }}>
       {/* Dialogue Overlay — room visible through transparent wrapper */}
       <BattleEncounterScreen
         npcId={npcId || currentScene.character.toLowerCase().replace(/\s+/g, '_')}
@@ -198,6 +198,6 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
         phase={gamePhase}
         privacyScore={privacyScore}
       />
-    </>
+    </div>
   );
 }

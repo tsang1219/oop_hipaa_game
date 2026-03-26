@@ -32,8 +32,43 @@ export function MusicVolumeSlider() {
         onChange={handleChange}
         className="w-16 h-1 accent-[#ff6b9d] cursor-pointer"
         title={`Music: ${volume}%`}
-        style={{ verticalAlign: 'middle' }}
+        style={{
+          verticalAlign: 'middle',
+          background: `linear-gradient(90deg, #ff6b9d ${volume}%, #1e1e30 ${volume}%)`,
+          borderRadius: '2px',
+          WebkitAppearance: 'none',
+          appearance: 'none',
+        }}
       />
+      <style>{`
+        input[type="range"]::-webkit-slider-thumb {
+          -webkit-appearance: none;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #ff6b9d;
+          box-shadow: 0 0 6px rgba(255, 107, 157, 0.6), 0 0 2px rgba(255, 107, 157, 0.3);
+          cursor: pointer;
+        }
+        input[type="range"]::-moz-range-thumb {
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: #ff6b9d;
+          box-shadow: 0 0 6px rgba(255, 107, 157, 0.6), 0 0 2px rgba(255, 107, 157, 0.3);
+          border: none;
+          cursor: pointer;
+        }
+        input[type="range"]::-webkit-slider-runnable-track {
+          height: 4px;
+          border-radius: 2px;
+        }
+        input[type="range"]::-moz-range-track {
+          height: 4px;
+          border-radius: 2px;
+          background: #1e1e30;
+        }
+      `}</style>
     </div>
   );
 }
