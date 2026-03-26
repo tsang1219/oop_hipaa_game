@@ -949,6 +949,16 @@ export class ExplorationScene extends Phaser.Scene {
       stroke: '#000000', strokeThickness: 1,
     }).setOrigin(0.5, 1).setDepth(50).setVisible(false).setScrollFactor(0);
 
+    // Prompt text gentle bob
+    this.tweens.add({
+      targets: this.promptText,
+      y: this.promptText.y - 3,
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
     // ── Vignette overlay — subtle edge darkening to draw eye to center ──
     const camW = this.cameras.main.width;
     const camH = this.cameras.main.height;

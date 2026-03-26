@@ -1316,6 +1316,22 @@ export class BreachDefenseScene extends Phaser.Scene {
             }
           });
 
+          // Golden victory screen tint
+          const victoryTint = this.add.rectangle(
+            GRID_COLS * CELL_SIZE / 2, (GRID_ROWS * CELL_SIZE + 96) / 2,
+            GRID_COLS * CELL_SIZE, GRID_ROWS * CELL_SIZE + 96,
+            0xffd700, 0
+          ).setDepth(40);
+          this.tweens.add({
+            targets: victoryTint,
+            fillAlpha: 0.05,
+            duration: 1000,
+            delay: 500,
+            yoyo: true,
+            repeat: 1,
+            onComplete: () => victoryTint.destroy()
+          });
+
           // "NETWORK SECURED!" dramatic text
           const victoryText = this.add.text(
             GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,

@@ -729,6 +729,17 @@ export class HubWorldScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
+    // Subtle door label breathe
+    this.tweens.add({
+      targets: [labelText, shadowLabel],
+      scaleX: { from: 1, to: 1.03 },
+      scaleY: { from: 1, to: 1.03 },
+      duration: 2500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
     // Description below door (with drop shadow)
     this.add.text(x + doorWidth / 2 + 1, y + doorHeight + 20, description, {
       fontFamily: '"Press Start 2P"',
