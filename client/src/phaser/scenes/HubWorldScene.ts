@@ -14,6 +14,7 @@ const MOVE_SPEED = 120; // pixels per second
  */
 export class HubWorldScene extends Phaser.Scene {
   private player!: Phaser.GameObjects.Sprite;
+  private playerShadow?: Phaser.GameObjects.Ellipse;
   private cursors!: Phaser.Types.Input.Keyboard.CursorKeys;
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
@@ -241,6 +242,12 @@ export class HubWorldScene extends Phaser.Scene {
     );
     this.player.setOrigin(0, 0);
 
+    // Player shadow
+    this.playerShadow = this.add.ellipse(
+      this.player.x + 16, this.player.y + 28,
+      24, 10, 0x000000, 0.15
+    ).setDepth(0);
+
     // Idle breathing tween for player
     this.tweens.add({
       targets: this.player,
@@ -353,6 +360,11 @@ export class HubWorldScene extends Phaser.Scene {
   };
 
   update() {
+    // Track player shadow
+    if (this.playerShadow) {
+      this.playerShadow.setPosition(this.player.x + 16, this.player.y + 28);
+    }
+
     // Idle frame indices per direction: down=0, left=3, right=6, up=9 (row*3+0)
     const IDLE_DOWN = 0; const IDLE_LEFT = 3; const IDLE_RIGHT = 6; const IDLE_UP = 9;
 

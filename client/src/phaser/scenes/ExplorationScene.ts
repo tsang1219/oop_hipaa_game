@@ -581,6 +581,16 @@ export class ExplorationScene extends Phaser.Scene {
           ease: 'Sine.easeInOut',
         });
 
+        // Item shimmer (alpha pulse)
+        this.tweens.add({
+          targets: sprite,
+          alpha: { from: 1, to: 0.7 },
+          duration: 800,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+
         // Golden glow ring for uncollected items
         if (!this.collectedItems.has(item.id)) {
           const itemGlow = this.add.circle(sprite.x, sprite.y, 14, 0xffd700, 0)

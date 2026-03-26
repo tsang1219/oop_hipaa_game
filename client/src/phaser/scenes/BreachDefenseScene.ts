@@ -253,6 +253,17 @@ export class BreachDefenseScene extends Phaser.Scene {
               gridGfx.fillCircle(traceX, startY + traceLen, 1.5);
             }
           }
+
+          // Data center rack indicator on ~15% of non-path cells
+          if (rVal >= 0.3 && rVal < 0.45) {
+            gridGfx.fillStyle(0x2a3d5e, 0.2);
+            gridGfx.fillRect(x * CELL_SIZE + 16, y * CELL_SIZE + 8, 32, 48);
+            gridGfx.fillStyle(0x3a5d8e, 0.15);
+            // Server LEDs
+            for (let led = 0; led < 3; led++) {
+              gridGfx.fillRect(x * CELL_SIZE + 20, y * CELL_SIZE + 14 + led * 12, 4, 2);
+            }
+          }
         }
       }
     }
