@@ -30,6 +30,7 @@ export default function BattleEncounterScreen({
   privacyScore,
 }: BattleEncounterScreenProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const [feedbackFlash, setFeedbackFlash] = useState<'correct' | 'incorrect' | 'partial' | null>(null);
 
   useEffect(() => {
     requestAnimationFrame(() => setIsVisible(true));
@@ -72,6 +73,8 @@ export default function BattleEncounterScreen({
       } else {
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
       }
+      setFeedbackFlash(feedback.type);
+      setTimeout(() => setFeedbackFlash(null), 400);
     }
   }, [feedback]);
 
@@ -138,6 +141,13 @@ export default function BattleEncounterScreen({
   };
 
   return (
+    <>
+    <style>{`
+      @keyframes feedback-flash {
+        0% { opacity: 1; }
+        100% { opacity: 0; }
+      }
+    `}</style>
     <div
       className={`absolute inset-0 z-40 flex flex-col justify-end transition-all duration-200 ${
         isVisible ? 'bg-black/60' : 'bg-black/0'
@@ -145,6 +155,19 @@ export default function BattleEncounterScreen({
       onClick={handleOverlayClick}
       data-testid="battle-encounter-screen"
     >
+      {/* Feedback flash overlay */}
+      {feedbackFlash && (
+        <div
+          className="absolute inset-0 pointer-events-none z-50 transition-opacity duration-400"
+          style={{
+            backgroundColor: feedbackFlash === 'correct' ? 'rgba(68, 255, 68, 0.15)'
+              : feedbackFlash === 'incorrect' ? 'rgba(255, 68, 68, 0.15)'
+              : 'rgba(255, 200, 68, 0.12)',
+            animation: 'feedback-flash 0.4s ease-out forwards',
+          }}
+        />
+      )}
+
       {/* Bottom-anchored dialogue panel */}
       <div
         className={`relative bg-[#1a1a2e] border-t-4 border-[#FF6B9D] max-h-[60vh] overflow-y-auto transform transition-all duration-300 ease-out ${
@@ -256,7 +279,15 @@ export default function BattleEncounterScreen({
         {/* Feedback */}
         {phase === 'feedback' && feedback && (
           <div className="px-4 pb-4">
-            <Card className={`bg-[#1a1a2e] border-4 ${getFeedbackBorderColor()} p-4 mb-3`}>
+            <Card
+              className={`bg-[#1a1a2e] border-4 ${getFeedbackBorderColor()} p-4 mb-3`}
+              style={{
+                boxShadow: feedback.type === 'correct' ? '0 0 20px rgba(68, 255, 68, 0.4)'
+                  : feedback.type === 'incorrect' ? '0 0 20px rgba(255, 68, 68, 0.4)'
+                  : '0 0 20px rgba(255, 200, 68, 0.3)',
+                transition: 'box-shadow 300ms ease-out'
+              }}
+            >
               <div className="flex items-center gap-2 mb-2">
                 <span className={`font-['Press_Start_2P'] text-xs ${
                   feedback.type === 'correct' ? 'text-green-400' :
@@ -291,5 +322,6 @@ export default function BattleEncounterScreen({
         )}
       </div>
     </div>
+    </>
   );
 }
