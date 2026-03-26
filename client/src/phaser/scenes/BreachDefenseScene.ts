@@ -18,6 +18,7 @@ interface EnemyData {
   sprite: Phaser.GameObjects.Sprite;
   hpBarBg: Phaser.GameObjects.Rectangle;
   hpBarFill: Phaser.GameObjects.Rectangle;
+  hpBarBorder: Phaser.GameObjects.Rectangle;
   flashUntil: number;
   strongFlashUntil: number;
   strongFlashColor: number;
@@ -195,6 +196,10 @@ export class BreachDefenseScene extends Phaser.Scene {
           gridGfx.lineStyle(1, 0x6b5b95, 0.3);
           gridGfx.strokeRect(x * CELL_SIZE + 3, y * CELL_SIZE + 3, CELL_SIZE - 6, CELL_SIZE - 6);
 
+          // Path channel glow — lighter center strip
+          gridGfx.fillStyle(0x5b4b7e, 0.15);
+          gridGfx.fillRect(cx - 20, cy - 20, 40, 40);
+
           // Directional dot: larger and brighter so the path route is obvious
           const dir = pathDirMap.get(`${x},${y}`);
           if (dir) {
@@ -211,9 +216,12 @@ export class BreachDefenseScene extends Phaser.Scene {
             gridGfx.fillCircle(cx, cy, 2);
           }
         } else {
-          // Non-path cells: faint corner dots for a digital grid feel
-          gridGfx.fillStyle(0x4a4d7e, 0.25);
-          gridGfx.fillCircle(x * CELL_SIZE + 2, y * CELL_SIZE + 2, 1);
+          // Non-path cells: PCB pad corners for a circuit board feel
+          gridGfx.fillStyle(0x4a5d7e, 0.2);
+          gridGfx.fillRect(x * CELL_SIZE, y * CELL_SIZE, 3, 3);
+          gridGfx.fillRect(x * CELL_SIZE + CELL_SIZE - 3, y * CELL_SIZE, 3, 3);
+          gridGfx.fillRect(x * CELL_SIZE, y * CELL_SIZE + CELL_SIZE - 3, 3, 3);
+          gridGfx.fillRect(x * CELL_SIZE + CELL_SIZE - 3, y * CELL_SIZE + CELL_SIZE - 3, 3, 3);
 
           // Circuit-trace decoration on ~30% of empty cells
           const rVal = seededRand(x, y);
@@ -399,6 +407,19 @@ export class BreachDefenseScene extends Phaser.Scene {
       .setDepth(1).setAlpha(0.4);
     this.add.text(10, bottomY + 50, 'THREATS: Scanning...', statusFont)
       .setDepth(1).setAlpha(0.4);
+
+    // System info decoration
+    this.add.text(10, bottomY + bottomH - 18, '> SYS: HIPAA_SEC v4.2.1', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '5px',
+      color: '#334455',
+    }).setDepth(9);
+
+    this.add.text(10, bottomY + bottomH - 10, '> NET: 10.0.0.1/24 ACTIVE', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '5px',
+      color: '#334455',
+    }).setDepth(9);
 
     // Wave counter — top-right of bottom panel
     this.waveCounterText = this.add.text(
@@ -655,6 +676,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       e.sprite.destroy();
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();
+      e.hpBarBorder.destroy();
     });
     this.towers.forEach(t => t.sprite.destroy());
     this.projectiles.forEach(p => p.graphics.destroy());
@@ -881,13 +903,19 @@ export class BreachDefenseScene extends Phaser.Scene {
     const hpBarFill = this.add.rectangle(px, py - 30, 40, 5, 0x44ff44)
       .setDepth(17);
 
+    // HP bar border for definition
+    const hpBarBorder = this.add.rectangle(px, py - 30, 42, 7, 0x000000, 0)
+      .setStrokeStyle(1, 0x555555, 0.5)
+      .setDepth(16);
+
     // Subtle spawn sound
     this.sound.play('sfx_interact', { volume: 0.15 });
 
     // HP bars fade in after a brief delay
     hpBarBg.setAlpha(0);
     hpBarFill.setAlpha(0);
-    this.tweens.add({ targets: [hpBarBg, hpBarFill], alpha: 1, duration: 200, delay: 200 });
+    hpBarBorder.setAlpha(0);
+    this.tweens.add({ targets: [hpBarBg, hpBarFill, hpBarBorder], alpha: 1, duration: 200, delay: 200 });
 
     const enemy: EnemyData = {
       id: Phaser.Math.RND.uuid(),
@@ -900,6 +928,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       sprite,
       hpBarBg,
       hpBarFill,
+      hpBarBorder,
       flashUntil: 0,
       strongFlashUntil: 0,
       strongFlashColor: 0
@@ -1268,6 +1297,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       }
       enemy.hpBarBg.setPosition(px, py - 30);
       enemy.hpBarFill.setPosition(px, py - 30);
+      enemy.hpBarBorder.setPosition(px, py - 30);
 
       // Update HP bar width
       const hpRatio = Math.max(0, enemy.hp / enemy.maxHp);
@@ -1324,6 +1354,7 @@ export class BreachDefenseScene extends Phaser.Scene {
         enemy.sprite.destroy();
         enemy.hpBarBg.destroy();
         enemy.hpBarFill.destroy();
+        enemy.hpBarBorder.destroy();
       }
       this.enemies = this.enemies.filter(e => !breaching.includes(e));
 
@@ -1621,6 +1652,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();
+      e.hpBarBorder.destroy();
       const dyingSprite = e.sprite;
       this.spawnDeathParticles(dyingSprite.x, dyingSprite.y, THREAT_COLORS[e.type]);
 

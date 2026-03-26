@@ -76,6 +76,20 @@ export class HubWorldScene extends Phaser.Scene {
     this.walls = this.physics.add.staticGroup();
     this.createWalls();
 
+    // Enhanced wall visual — hospital wall panels (wainscoting overlay)
+    const wallDeco = this.add.graphics();
+    // Top wall — wainscoting tint
+    wallDeco.fillStyle(0x8a7b6a, 0.5);
+    wallDeco.fillRect(0, 0, COLS * TILE_SIZE, 2 * TILE_SIZE);
+    // Wall panel divider lines (vertical)
+    wallDeco.fillStyle(0x7a6b5a, 0.3);
+    for (let wx = 0; wx < COLS; wx++) {
+      wallDeco.fillRect(wx * TILE_SIZE * 2, 0, 1, 2 * TILE_SIZE);
+    }
+    // Wall highlight strip (bottom edge of top wall, where it meets floor)
+    wallDeco.fillStyle(0x9a8b7a, 0.4);
+    wallDeco.fillRect(0, 2 * TILE_SIZE - 2, COLS * TILE_SIZE, 2);
+
     // Title
     this.titleText = this.add.text(COLS * TILE_SIZE / 2, 44, 'HIPAA TRAINING CENTER', {
       fontFamily: '"Press Start 2P"',
@@ -109,6 +123,22 @@ export class HubWorldScene extends Phaser.Scene {
 
     // Decorative elements
     this.createFurniture();
+
+    // Central carpet runner — lobby rug
+    const carpetG = this.add.graphics();
+    const carpetY = 7 * TILE_SIZE;
+    const carpetX = 6 * TILE_SIZE;
+    const carpetW = 8 * TILE_SIZE;
+    const carpetH = 4 * TILE_SIZE;
+    // Carpet body (dark red/maroon)
+    carpetG.fillStyle(0x8b2252, 0.15);
+    carpetG.fillRect(carpetX, carpetY, carpetW, carpetH);
+    // Carpet border
+    carpetG.lineStyle(1, 0x8b2252, 0.25);
+    carpetG.strokeRect(carpetX + 2, carpetY + 2, carpetW - 4, carpetH - 4);
+    // Inner border (gold trim)
+    carpetG.lineStyle(1, 0xdaa520, 0.2);
+    carpetG.strokeRect(carpetX + 4, carpetY + 4, carpetW - 8, carpetH - 8);
 
     // Receptionist NPC near center — frame 0 = idle facing down
     const npc = this.add.sprite(10 * TILE_SIZE, 8 * TILE_SIZE, 'npc_receptionist_sheet', 0);
@@ -546,6 +576,31 @@ export class HubWorldScene extends Phaser.Scene {
     gfx.fillStyle(lighter, 0.2);
     gfx.fillRect(x + 8, y + 8, doorWidth - 16, 1);
     gfx.fillRect(x + 8, y + doorHeight - 8 - Math.floor(doorHeight * 0.35), doorWidth - 16, 1);
+
+    // Door window — frosted glass panel in upper portion
+    const winX = x + 14;
+    const winY = y + 10;
+    const winW = doorWidth - 28;
+    const winH = Math.floor(doorHeight * 0.28);
+    // Glass base (light translucent)
+    gfx.fillStyle(0xc8dde8, 0.35);
+    gfx.fillRect(winX, winY, winW, winH);
+    // Glass highlight (top-left shimmer)
+    gfx.fillStyle(0xffffff, 0.18);
+    gfx.fillRect(winX + 1, winY + 1, Math.floor(winW * 0.6), 2);
+    gfx.fillRect(winX + 1, winY + 1, 2, Math.floor(winH * 0.5));
+    // Glass shadow (bottom-right edge)
+    gfx.fillStyle(0x000000, 0.12);
+    gfx.fillRect(winX, winY + winH - 1, winW, 1);
+    gfx.fillRect(winX + winW - 1, winY, 1, winH);
+    // Mullion (cross bar divider)
+    gfx.fillStyle(0x555555, 0.5);
+    gfx.fillRect(winX + Math.floor(winW / 2), winY, 1, winH);
+    gfx.fillRect(winX, winY + Math.floor(winH / 2), winW, 1);
+
+    // Door frame highlight — bright edge along top of frame
+    gfx.fillStyle(0x888888, 0.4);
+    gfx.fillRect(x - 6, y - 7, doorWidth + 12, 1);
 
     // Door handle — metallic look
     gfx.fillStyle(0xdaa520, 1);
