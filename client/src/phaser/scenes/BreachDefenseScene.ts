@@ -454,6 +454,13 @@ export class BreachDefenseScene extends Phaser.Scene {
           gridY * CELL_SIZE + CELL_SIZE / 2,
           stats.range * CELL_SIZE
         );
+        // Outer soft glow ring for depth
+        this.rangeGraphics.lineStyle(2, color, 0.1);
+        this.rangeGraphics.strokeCircle(
+          gridX * CELL_SIZE + CELL_SIZE / 2,
+          gridY * CELL_SIZE + CELL_SIZE / 2,
+          stats.range * CELL_SIZE + 8
+        );
       } else {
         this.hoverRect.setStrokeStyle(2, 0x5588cc, 0.3);
         this.hoverRect.setFillStyle(0x5588cc, 0.06);
@@ -1063,6 +1070,21 @@ export class BreachDefenseScene extends Phaser.Scene {
       const px = ex * CELL_SIZE + CELL_SIZE / 2;
       const py = ey * CELL_SIZE + CELL_SIZE / 2;
       enemy.sprite.setPosition(px, py);
+      // Trail ghost for moving enemies (every ~200ms)
+      if (Math.random() < 0.08) { // ~8% chance per frame ≈ every 200ms at 60fps
+        const ghost = this.add.sprite(enemy.sprite.x, enemy.sprite.y, enemy.sprite.texture.key)
+          .setDisplaySize(48, 48)
+          .setAlpha(0.3)
+          .setTint(THREAT_COLORS[enemy.type] || 0xffffff)
+          .setDepth(14);
+        this.tweens.add({
+          targets: ghost,
+          alpha: 0,
+          scale: ghost.scaleX * 0.7,
+          duration: 400,
+          onComplete: () => ghost.destroy()
+        });
+      }
       enemy.hpBarBg.setPosition(px, py - 30);
       enemy.hpBarFill.setPosition(px, py - 30);
 

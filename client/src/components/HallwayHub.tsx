@@ -16,6 +16,7 @@ import {
 } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { useState } from 'react';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface PatientStory {
   title: string;
@@ -162,10 +163,14 @@ export default function HallwayHub({
           const position = ROOM_POSITIONS[room.id];
           const isHovered = hoveredRoom === room.id;
 
-          const shadowStyle = status === 'cleared'
-            ? '0 2px 8px rgba(34,197,94,0.2)'
-            : isHovered && status === 'available'
-              ? '0 4px 16px rgba(232,97,140,0.25)'
+          const shadowStyle = isHovered
+            ? status === 'cleared'
+              ? '0 0 20px rgba(100, 255, 100, 0.3)'
+              : status === 'locked'
+                ? '0 0 20px rgba(255, 100, 100, 0.2)'
+                : '0 0 20px rgba(100, 200, 255, 0.3)'
+            : status === 'cleared'
+              ? '0 2px 8px rgba(34,197,94,0.2)'
               : status === 'available'
                 ? '0 2px 8px rgba(232,97,140,0.15)'
                 : 'none';
@@ -173,9 +178,15 @@ export default function HallwayHub({
           return (
             <button
               key={room.id}
-              style={{ gridArea: position?.gridArea, boxShadow: shadowStyle }}
+              style={{
+                gridArea: position?.gridArea,
+                boxShadow: shadowStyle,
+                transform: isHovered && status !== 'locked' ? 'scale(1.03)' : 'scale(1)',
+                transition: 'all 200ms ease-out',
+              }}
               onClick={() => {
                 if (status !== 'locked') {
+                  eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
                   onSelectRoom(room.id);
                 }
               }}
@@ -183,8 +194,7 @@ export default function HallwayHub({
               onMouseLeave={() => setHoveredRoom(null)}
               disabled={status === 'locked'}
               className={`
-                relative p-4 transition-all duration-200 text-center
-                ${status !== 'locked' ? 'transition-transform duration-150 hover:scale-[1.02]' : ''}
+                relative p-4 text-center
                 ${status === 'locked'
                   ? 'bg-[#16213e]/50 border-2 border-muted border-t-2 border-t-gray-600 cursor-not-allowed opacity-60'
                   : status === 'cleared'

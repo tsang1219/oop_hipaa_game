@@ -670,6 +670,9 @@ export class ExplorationScene extends Phaser.Scene {
       console.warn('[ExplorationScene] music_exploration not ready, skipping BGM:', e);
     }
 
+    // Room entrance — fade in from black
+    this.cameras.main.fadeIn(500, 0, 0, 0);
+
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
   }
 
