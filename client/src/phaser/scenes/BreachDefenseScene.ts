@@ -680,6 +680,29 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     // Scene entrance fade-in (matching Hub and Exploration)
     this.cameras.main.fadeIn(400, 0, 0, 0);
+
+    // "System Online" startup text
+    const startupText = this.add.text(
+      GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
+      'SYSTEM ONLINE',
+      { fontFamily: '"Press Start 2P"', fontSize: '10px', color: '#00d4aa', stroke: '#000000', strokeThickness: 2 }
+    ).setOrigin(0.5).setDepth(50).setAlpha(0);
+
+    this.tweens.add({
+      targets: startupText,
+      alpha: { from: 0, to: 0.8 },
+      duration: 400,
+      delay: 200,
+      onComplete: () => {
+        this.tweens.add({
+          targets: startupText,
+          alpha: 0,
+          duration: 600,
+          delay: 800,
+          onComplete: () => startupText.destroy()
+        });
+      }
+    });
   }
 
   // ── Event handlers ─────────────────────────────────────────────

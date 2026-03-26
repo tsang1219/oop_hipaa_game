@@ -545,6 +545,11 @@ export class ExplorationScene extends Phaser.Scene {
           // Drop shadow beneath furniture
           this.add.ellipse(ox + TILE / 2, oy + TILE / 2 + 12, TILE - 4, 8, 0x000000, 0.12);
           this.add.sprite(ox + TILE / 2, oy + TILE / 2, texKey);
+          // Subtle furniture base highlight
+          this.add.rectangle(ox + TILE / 2, oy + TILE / 2, TILE - 2, TILE - 2)
+            .setStrokeStyle(1, 0x000000, 0.08)
+            .setFillStyle(0x000000, 0)
+            .setDepth(1);
         } else {
           // Drop shadow beneath large furniture
           this.add.ellipse(ox + ow / 2, oy + oh / 2 + oh / 3, ow - 4, oh / 3, 0x000000, 0.1);

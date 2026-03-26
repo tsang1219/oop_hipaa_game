@@ -183,6 +183,11 @@ export class HubWorldScene extends Phaser.Scene {
     );
 
     // Receptionist NPC near center — frame 0 = idle facing down
+    // NPC shadow
+    this.add.ellipse(
+      10 * TILE_SIZE + 16, 8 * TILE_SIZE + 28,
+      24, 10, 0x000000, 0.15
+    ).setDepth(0);
     const npc = this.add.sprite(10 * TILE_SIZE, 8 * TILE_SIZE, 'npc_receptionist_sheet', 0);
     npc.setOrigin(0, 0);
 
@@ -232,6 +237,11 @@ export class HubWorldScene extends Phaser.Scene {
       },
       repeat: fullText.length - 1
     });
+
+    // Spawn point indicator (subtle X mark)
+    const spawnMarker = this.add.graphics();
+    spawnMarker.fillStyle(0xffffff, 0.04);
+    spawnMarker.fillCircle(10 * TILE_SIZE + 16, 11 * TILE_SIZE + 16, 20);
 
     // Player — frame 0 = idle facing down
     this.player = this.physics.add.sprite(
