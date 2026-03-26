@@ -98,6 +98,9 @@ export class BreachDefenseScene extends Phaser.Scene {
   // Danger vignette for low security score
   private dangerVignette?: Phaser.GameObjects.Graphics;
 
+  // Wave counter text
+  private waveCounterText?: Phaser.GameObjects.Text;
+
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.35;
@@ -136,6 +139,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.killStreakText = undefined;
     }
     this.lastBroadcast = 0;
+    this.waveCounterText = undefined;
     if (this.dangerVignette) {
       this.dangerVignette.destroy();
       this.dangerVignette = undefined;
@@ -353,6 +357,13 @@ export class BreachDefenseScene extends Phaser.Scene {
       .setDepth(1).setAlpha(0.4);
     this.add.text(10, bottomY + 50, 'THREATS: Scanning...', statusFont)
       .setDepth(1).setAlpha(0.4);
+
+    // Wave counter — top-right of bottom panel
+    this.waveCounterText = this.add.text(
+      GRID_COLS * CELL_SIZE - 10, bottomY + 10,
+      `WAVE ${this.wave}/${WAVES.length}`,
+      { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#00d4aa' }
+    ).setOrigin(1, 0).setDepth(9);
 
     // Blinking cursor after the authorization text
     const cursorX = this.statusText.x + this.statusText.width + 4;
@@ -1542,6 +1553,9 @@ export class BreachDefenseScene extends Phaser.Scene {
     }
 
     // ── Phase 7: Broadcast state (throttled) ───────────────────
+    if (this.waveCounterText) {
+      this.waveCounterText.setText(`WAVE ${this.wave}/${WAVES.length}`);
+    }
     if (time - this.lastBroadcast > 200) {
       this.broadcastState();
       this.lastBroadcast = time;

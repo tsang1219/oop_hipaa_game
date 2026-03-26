@@ -97,6 +97,11 @@ export default function BreachDefensePage() {
   const [endShowMessage, setEndShowMessage] = useState(false);
   const [endShowButtons, setEndShowButtons] = useState(false);
 
+  // Staged reveal for start screen
+  const [startShowTitle, setStartShowTitle] = useState(false);
+  const [startShowDesc, setStartShowDesc] = useState(false);
+  const [startShowButton, setStartShowButton] = useState(false);
+
   // Track previous threats for discovery notifications
   const prevSeenThreatsRef = useRef<string[]>([]);
 
@@ -237,6 +242,22 @@ export default function BreachDefensePage() {
       const t3 = setTimeout(() => setEndShowMessage(true), 1000);
       const t4 = setTimeout(() => setEndShowButtons(true), 1400);
       return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
+    }
+  }, [pageState]);
+
+  // Staged reveal cascade for start screen
+  useEffect(() => {
+    if (pageState === 'START') {
+      setStartShowTitle(false);
+      setStartShowDesc(false);
+      setStartShowButton(false);
+
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+
+      const t1 = setTimeout(() => setStartShowTitle(true), 200);
+      const t2 = setTimeout(() => setStartShowDesc(true), 600);
+      const t3 = setTimeout(() => setStartShowButton(true), 1000);
+      return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
     }
   }, [pageState]);
 
@@ -654,26 +675,44 @@ export default function BreachDefensePage() {
             <div className="absolute bottom-2 left-2 w-4 h-4 border-b-2 border-l-2 border-[#00d4aa]" />
             <div className="absolute bottom-2 right-2 w-4 h-4 border-b-2 border-r-2 border-[#00d4aa]" />
 
-            <p className="text-[7px] text-[#00d4aa] tracking-[4px] opacity-60 mb-2">SECURITY BRIEFING</p>
-            <Shield
-              className="w-16 h-16 text-[#FF6B9D] mx-auto mb-4"
-              style={{ animation: 'shield-glow 3s ease-in-out infinite' }}
-            />
-            <h1 className="text-xl font-bold text-[#FF6B9D] mb-3">BREACH DEFENSE</h1>
-            <p className="text-[9px] text-gray-400 mb-6 leading-relaxed">
-              Defend the hospital network from cyber threats using real security tools.
-              Every tower represents a real HIPAA security measure.
-            </p>
-            <button
-              onClick={handleStart}
-              className="bg-[#2ECC71] hover:bg-[#27AE60] hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] text-black font-bold px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-sm transition-shadow duration-300"
-            >
-              Start Mission
-            </button>
-            <div className="mt-4">
-              <button onClick={handleBackToHub} className="text-[8px] text-gray-500 hover:text-gray-300 underline">
+            <div style={{
+              opacity: startShowTitle ? 1 : 0,
+              transform: startShowTitle ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'opacity 0.4s ease, transform 0.4s ease',
+            }}>
+              <p className="text-[7px] text-[#00d4aa] tracking-[4px] opacity-60 mb-2">SECURITY BRIEFING</p>
+              <Shield
+                className="w-16 h-16 text-[#FF6B9D] mx-auto mb-4"
+                style={{ animation: 'shield-glow 3s ease-in-out infinite' }}
+              />
+              <h1 className="text-xl font-bold text-[#FF6B9D] mb-3">BREACH DEFENSE</h1>
+            </div>
+            <div style={{
+              opacity: startShowDesc ? 1 : 0,
+              transform: startShowDesc ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'opacity 0.4s ease, transform 0.4s ease',
+            }}>
+              <p className="text-[9px] text-gray-400 mb-6 leading-relaxed">
+                Defend the hospital network from cyber threats using real security tools.
+                Every tower represents a real HIPAA security measure.
+              </p>
+            </div>
+            <div style={{
+              opacity: startShowButton ? 1 : 0,
+              transform: startShowButton ? 'translateY(0)' : 'translateY(15px)',
+              transition: 'opacity 0.4s ease, transform 0.4s ease',
+            }}>
+              <button
+                onClick={handleStart}
+                className="bg-[#2ECC71] hover:bg-[#27AE60] hover:shadow-[0_0_20px_rgba(34,197,94,0.4)] text-black font-bold px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-sm transition-shadow duration-300"
+              >
+                Start Mission
+              </button>
+              <div className="mt-4">
+                <button onClick={handleBackToHub} className="text-[8px] text-gray-500 hover:text-gray-300 underline">
                 Back to Hub World
               </button>
+              </div>
             </div>
           </div>
         </div>

@@ -458,9 +458,13 @@ export class ExplorationScene extends Phaser.Scene {
 
       // Completed checkmark
       if (completed) {
-        this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 6, '\u2713', {
-          fontSize: '16px', color: '#2ecc71', fontStyle: 'bold',
-        }).setOrigin(0.5).setDepth(35);
+        const checkmark = this.add.text(sprite.x, sprite.y - 20, '\u2713', {
+          fontFamily: '"Press Start 2P"',
+          fontSize: '8px',
+          color: '#44ff44',
+          stroke: '#000000',
+          strokeThickness: 2,
+        }).setOrigin(0.5).setDepth(sprite.depth + 1);
       }
 
       // Boss indicator
