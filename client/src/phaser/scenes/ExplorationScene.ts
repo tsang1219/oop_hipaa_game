@@ -276,6 +276,48 @@ export class ExplorationScene extends Phaser.Scene {
         floor.fillStyle(shadowColor, 0.3);
         floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout
         floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout
+
+        // Room-specific floor pattern detail
+        if (roomId.includes('er') || roomId.includes('emergency')) {
+          // ER: Non-slip diamond pattern
+          if ((x + y) % 3 === 0) {
+            floor.fillStyle(0xffffff, 0.04);
+            floor.fillRect(px + 12, py + 8, 8, 1);
+            floor.fillRect(px + 15, py + 5, 1, 8);
+          }
+        } else if (roomId.includes('lab')) {
+          // Lab: Dotted grid pattern (clean room feel)
+          floor.fillStyle(0xffffff, 0.05);
+          floor.fillRect(px + 8, py + 8, 1, 1);
+          floor.fillRect(px + 16, py + 16, 1, 1);
+          floor.fillRect(px + 24, py + 8, 1, 1);
+          floor.fillRect(px + 8, py + 24, 1, 1);
+        } else if (roomId.includes('break')) {
+          // Break room: Warm parquet-style alternating planks
+          if (x % 2 === 0) {
+            floor.fillStyle(highlightColor, 0.1);
+            floor.fillRect(px + 2, py + 2, 12, 28);
+          } else {
+            floor.fillStyle(shadowColor, 0.08);
+            floor.fillRect(px + 16, py + 2, 12, 28);
+          }
+        } else if (roomId.includes('it') || roomId.includes('server')) {
+          // Server room: Raised floor panels with ventilation holes
+          if ((x + y) % 4 === 0) {
+            floor.fillStyle(0x000000, 0.06);
+            for (let vy = 0; vy < 3; vy++) {
+              floor.fillRect(px + 10, py + 8 + vy * 8, 12, 2);
+            }
+          }
+        } else if (roomId.includes('records')) {
+          // Records room: Carpet-like texture (denser pattern)
+          if ((x + y) % 2 === 0) {
+            floor.fillStyle(0x000000, 0.03);
+            floor.fillRect(px + 4, py + 4, 2, 2);
+            floor.fillRect(px + 20, py + 20, 2, 2);
+            floor.fillRect(px + 12, py + 12, 2, 2);
+          }
+        }
       }
     }
 
@@ -414,6 +456,23 @@ export class ExplorationScene extends Phaser.Scene {
       if (obsType === 'wall') {
         // Draw wall tiles with depth (highlight top, shadow base)
         const wallG = this.add.graphics();
+
+        // Room-specific wall colors
+        let wallBase1: number, wallBase2: number, wallHighlight: number, wallShadow: number, wallMortar: number;
+        if (roomId.includes('er') || roomId.includes('emergency')) {
+          wallBase1 = 0x5c6570; wallBase2 = 0x566068;
+          wallHighlight = 0x7a858e; wallShadow = 0x3a4448; wallMortar = 0x4a5560;
+        } else if (roomId.includes('lab')) {
+          wallBase1 = 0x606860; wallBase2 = 0x5a6258;
+          wallHighlight = 0x7e867e; wallShadow = 0x3e4640; wallMortar = 0x4e564e;
+        } else if (roomId.includes('it') || roomId.includes('server')) {
+          wallBase1 = 0x4a5060; wallBase2 = 0x444a58;
+          wallHighlight = 0x687080; wallShadow = 0x2e3440; wallMortar = 0x3e4450;
+        } else {
+          wallBase1 = 0x5d4e37; wallBase2 = 0x574930;
+          wallHighlight = 0x7a6b52; wallShadow = 0x3a3124; wallMortar = 0x4a3f2e;
+        }
+
         for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
           for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
             const wpx = wx * TILE;
@@ -421,42 +480,45 @@ export class ExplorationScene extends Phaser.Scene {
 
             // Main wall fill — use two alternating shades for brick-like pattern
             const isEvenTile = (wx + wy) % 2 === 0;
-            const wallBase = isEvenTile ? 0x5d4e37 : 0x574930;
+            const wallBase = isEvenTile ? wallBase1 : wallBase2;
             wallG.fillStyle(wallBase, 1);
             wallG.fillRect(wpx, wpy, TILE, TILE);
 
             // Horizontal mortar line at 1/3 and 2/3 height
-            wallG.fillStyle(0x4a3f2e, 0.6);
+            wallG.fillStyle(wallMortar, 0.6);
             wallG.fillRect(wpx, wpy + 10, TILE, 1);
             wallG.fillRect(wpx, wpy + 21, TILE, 1);
 
             // Vertical mortar offset (brick bond pattern)
             const vOffset = wy % 2 === 0 ? 16 : 0;
-            wallG.fillStyle(0x4a3f2e, 0.5);
+            wallG.fillStyle(wallMortar, 0.5);
             wallG.fillRect(wpx + vOffset, wpy, 1, TILE);
 
             // Top highlight
-            wallG.fillStyle(0x7a6b52, 0.6);
+            wallG.fillStyle(wallHighlight, 0.6);
             wallG.fillRect(wpx, wpy, TILE, 1);
             wallG.fillRect(wpx, wpy, 1, TILE); // left highlight
 
             // Bottom shadow (wall meets floor)
-            wallG.fillStyle(0x3a3124, 0.8);
+            wallG.fillStyle(wallShadow, 0.8);
             wallG.fillRect(wpx, wpy + TILE - 2, TILE, 2);
             wallG.fillRect(wpx + TILE - 1, wpy, 1, TILE); // right shadow
 
             // Subtle surface texture — tiny noise dots
             if ((wx * 3 + wy * 5) % 4 === 0) {
-              wallG.fillStyle(0x6a5b44, 0.3);
+              const textureTint = Phaser.Display.Color.IntegerToColor(wallHighlight).lighten(10).color;
+              wallG.fillStyle(textureTint, 0.3);
               wallG.fillRect(wpx + 8, wpy + 6, 2, 1);
               wallG.fillRect(wpx + 20, wpy + 14, 2, 1);
             }
 
             // Wainscoting/molding on top of walls (crown molding effect)
             if (wy === obs.y) {
-              wallG.fillStyle(0x8a7b64, 0.7);
+              const moldingBase = Phaser.Display.Color.IntegerToColor(wallHighlight).lighten(15).color;
+              const moldingTop = Phaser.Display.Color.IntegerToColor(wallHighlight).lighten(25).color;
+              wallG.fillStyle(moldingBase, 0.7);
               wallG.fillRect(wpx, wpy, TILE, 3);
-              wallG.fillStyle(0x9a8b74, 0.5);
+              wallG.fillStyle(moldingTop, 0.5);
               wallG.fillRect(wpx, wpy, TILE, 1);
             }
           }
