@@ -783,6 +783,11 @@ export class BreachDefenseScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
+    // Tower status ring (always-visible range indicator)
+    const statusRing = this.add.circle(px, py, stats.range * CELL_SIZE * 0.3, 0x000000, 0)
+      .setStrokeStyle(1, towerColor, 0.12)
+      .setDepth(8);
+
     // Brief glow ring that scales up and fades out
     const glowRing = this.add.circle(px, py, 8, towerColor, 0.4)
       .setStrokeStyle(2, towerColor, 0.6)

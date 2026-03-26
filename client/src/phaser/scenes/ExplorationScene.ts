@@ -649,15 +649,19 @@ export class ExplorationScene extends Phaser.Scene {
         const bubbleTexKey = '_npc_speech_bubble';
         if (!this.textures.exists(bubbleTexKey)) {
           const bg = this.add.graphics();
-          // White rounded rectangle body (10x8)
-          bg.fillStyle(0xffffff, 1);
+          // Dark rounded rectangle body for high contrast (10x8)
+          bg.fillStyle(0x333333, 0.9);
           bg.fillRoundedRect(0, 0, 10, 8, 2);
           // Tiny triangular tail pointing down
-          bg.fillStyle(0xffffff, 1);
+          bg.fillStyle(0x333333, 0.9);
           bg.fillTriangle(3, 8, 7, 8, 5, 11);
-          // Subtle border
-          bg.lineStyle(1, 0x888888, 0.5);
+          // Subtle light border for definition
+          bg.lineStyle(1, 0x555555, 0.6);
           bg.strokeRoundedRect(0, 0, 10, 8, 2);
+          // Inner dot detail (white exclamation hint)
+          bg.fillStyle(0xffffff, 0.9);
+          bg.fillRect(4, 2, 2, 3);
+          bg.fillRect(4, 6, 2, 1);
           bg.generateTexture(bubbleTexKey, 10, 12);
           bg.destroy();
         }

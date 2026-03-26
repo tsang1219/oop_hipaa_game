@@ -824,6 +824,32 @@ export class HubWorldScene extends Phaser.Scene {
     // Clock center dot
     gfx.fillStyle(0x333333, 1);
     gfx.fillCircle(clockX, clockY, 1.5);
+
+    // Wall poster - "HIPAA Compliance" informational poster on back wall
+    const posterG = this.add.graphics();
+    // Poster background
+    posterG.fillStyle(0xfff8dc, 0.8);
+    posterG.fillRect(8 * TILE_SIZE + 4, 2 * TILE_SIZE + 4, TILE_SIZE * 2 - 8, TILE_SIZE - 8);
+    // Poster border
+    posterG.lineStyle(1, 0xdaa520, 0.6);
+    posterG.strokeRect(8 * TILE_SIZE + 4, 2 * TILE_SIZE + 4, TILE_SIZE * 2 - 8, TILE_SIZE - 8);
+    // Poster title bar
+    posterG.fillStyle(0x4a90e2, 0.7);
+    posterG.fillRect(8 * TILE_SIZE + 6, 2 * TILE_SIZE + 6, TILE_SIZE * 2 - 12, 6);
+    // Poster text lines
+    posterG.fillStyle(0x666666, 0.4);
+    posterG.fillRect(8 * TILE_SIZE + 6, 2 * TILE_SIZE + 14, TILE_SIZE - 8, 2);
+    posterG.fillRect(8 * TILE_SIZE + 6, 2 * TILE_SIZE + 18, TILE_SIZE + 4, 2);
+
+    // Emergency exit sign
+    const exitSignG = this.add.graphics();
+    exitSignG.fillStyle(0x2ecc71, 0.7);
+    exitSignG.fillRect(17 * TILE_SIZE, 1 * TILE_SIZE + 8, TILE_SIZE + 16, 10);
+    const exitText = this.add.text(17 * TILE_SIZE + (TILE_SIZE + 16) / 2, 1 * TILE_SIZE + 13, 'EXIT', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '5px',
+      color: '#ffffff',
+    }).setOrigin(0.5);
   }
 
   private createPlant(tileX: number, tileY: number) {
