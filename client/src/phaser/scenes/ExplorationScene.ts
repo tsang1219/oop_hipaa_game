@@ -1024,6 +1024,18 @@ export class ExplorationScene extends Phaser.Scene {
       }
     ).setOrigin(0.5).setDepth(100).setScrollFactor(0).setAlpha(0);
 
+    // Color banner based on room type
+    const bannerColors: Record<string, string> = {
+      reception: '#4a90e2',
+      records_room: '#2ecc71',
+      er: '#ff6b6b',
+      lab: '#9b59b6',
+      break_room: '#f39c12',
+      it_office: '#00d4aa',
+    };
+    const bannerColor = bannerColors[this.room.id] || '#ffffff';
+    roomBanner.setColor(bannerColor);
+
     this.tweens.add({
       targets: roomBanner,
       alpha: 1,

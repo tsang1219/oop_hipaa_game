@@ -385,9 +385,9 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.add.text(c * CELL_SIZE + CELL_SIZE / 2, 26, colLabels[c], {
         fontFamily: '"Press Start 2P"',
         fontSize: '5px',
-        color: '#556688',
+        color: '#3a5d8e',
         align: 'center'
-      }).setOrigin(0.5, 0.5).setDepth(9).setAlpha(0.6);
+      }).setOrigin(0.5, 0.5).setDepth(9).setAlpha(0.8);
     }
 
     // Row labels (1-6) along the left edge
@@ -395,9 +395,9 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.add.text(4, r * CELL_SIZE + CELL_SIZE / 2, `${r + 1}`, {
         fontFamily: '"Press Start 2P"',
         fontSize: '5px',
-        color: '#556688',
+        color: '#3a5d8e',
         align: 'left'
-      }).setOrigin(0, 0.5).setDepth(1).setAlpha(0.6);
+      }).setOrigin(0, 0.5).setDepth(1).setAlpha(0.8);
     }
 
     // ── Bottom area: terminal status panel ───────────────────

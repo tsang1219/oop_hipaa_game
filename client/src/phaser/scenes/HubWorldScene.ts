@@ -123,6 +123,22 @@ export class HubWorldScene extends Phaser.Scene {
       color: '#666666',
     }).setOrigin(0.5);
 
+    // Dynamic hint text
+    const hintText = this.add.text(COLS * TILE_SIZE / 2, 76, 'Walk to a door and press SPACE', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '5px',
+      color: '#999999',
+    }).setOrigin(0.5);
+
+    this.tweens.add({
+      targets: hintText,
+      alpha: { from: 1, to: 0.4 },
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
     // -- LEFT DOOR: Privacy Quest --
     this.createDoor(3, 3, 'PRIVACY\nQUEST', 0x4a90e2, 'Explore hospital rooms\nand learn HIPAA Privacy');
 
