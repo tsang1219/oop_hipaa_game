@@ -823,6 +823,15 @@ export class BreachDefenseScene extends Phaser.Scene {
       onComplete: () => glowRing.destroy()
     });
 
+    // Tower type label beneath sprite
+    const labelText = this.add.text(px, py + 28, type, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '4px',
+      color: stats.color,
+      stroke: '#000000',
+      strokeThickness: 1,
+    }).setOrigin(0.5).setDepth(11).setAlpha(0.6);
+
     // Draw connection lines to nearby towers
     for (const other of this.towers) {
       if (other.id === tower.id) continue;

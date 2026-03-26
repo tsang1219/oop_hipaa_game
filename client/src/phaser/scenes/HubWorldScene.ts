@@ -140,6 +140,23 @@ export class HubWorldScene extends Phaser.Scene {
     carpetG.lineStyle(1, 0xdaa520, 0.2);
     carpetG.strokeRect(carpetX + 4, carpetY + 4, carpetW - 8, carpetH - 8);
 
+    // Floor arrow guides toward doors
+    const arrowG = this.add.graphics();
+    // Left arrow (pointing toward Privacy Quest door)
+    arrowG.fillStyle(0x4a90e2, 0.08);
+    arrowG.fillTriangle(
+      5 * TILE_SIZE, 7 * TILE_SIZE + TILE_SIZE / 2,   // tip
+      7 * TILE_SIZE, 7 * TILE_SIZE,                     // top-right
+      7 * TILE_SIZE, 8 * TILE_SIZE                      // bottom-right
+    );
+    // Right arrow (pointing toward Breach Defense door)
+    arrowG.fillStyle(0xff6b9d, 0.08);
+    arrowG.fillTriangle(
+      15 * TILE_SIZE, 7 * TILE_SIZE + TILE_SIZE / 2,   // tip
+      13 * TILE_SIZE, 7 * TILE_SIZE,                     // top-left
+      13 * TILE_SIZE, 8 * TILE_SIZE                      // bottom-left
+    );
+
     // Receptionist NPC near center — frame 0 = idle facing down
     const npc = this.add.sprite(10 * TILE_SIZE, 8 * TILE_SIZE, 'npc_receptionist_sheet', 0);
     npc.setOrigin(0, 0);

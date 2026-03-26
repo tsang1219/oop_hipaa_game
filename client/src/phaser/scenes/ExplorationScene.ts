@@ -355,6 +355,20 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // Room-specific wall decorations
+    if (roomId.includes('reception')) {
+      // Welcome sign on wall
+      decorGfx.fillStyle(0x4a90e2, 0.15);
+      decorGfx.fillRect(TILE * 2, TILE + 4, TILE * 3, TILE / 2);
+      decorGfx.lineStyle(1, 0x4a90e2, 0.25);
+      decorGfx.strokeRect(TILE * 2, TILE + 4, TILE * 3, TILE / 2);
+    } else if (roomId.includes('er')) {
+      // Red cross symbol on wall
+      decorGfx.fillStyle(0xff0000, 0.12);
+      decorGfx.fillRect(w / 2 - 6, TILE + 4, 12, 4);
+      decorGfx.fillRect(w / 2 - 2, TILE, 4, 12);
+    }
+
     // Room-specific floor details
     if (roomId.includes('er') || roomId.includes('emergency')) {
       // ER: floor warning stripes near edges
