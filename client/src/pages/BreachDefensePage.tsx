@@ -518,10 +518,15 @@ export default function BreachDefensePage() {
           </span>
           <div className={`w-24 h-2 bg-gray-700 rounded overflow-hidden ml-1 ${securityScore <= 25 ? 'shadow-[0_0_8px_rgba(255,68,68,0.6)]' : ''}`}>
             <div
-              className="h-full transition-all duration-300 rounded"
+              className="h-full rounded"
               style={{
                 width: `${securityScore}%`,
-                backgroundColor: securityScore > 50 ? '#44ff44' : securityScore > 25 ? '#ffaa00' : '#ff4444'
+                background: securityScore > 50
+                  ? 'linear-gradient(90deg, #2ecc71, #27ae60)'
+                  : securityScore > 25
+                  ? 'linear-gradient(90deg, #f39c12, #e67e22)'
+                  : 'linear-gradient(90deg, #e74c3c, #c0392b)',
+                transition: 'width 300ms ease-out, background 300ms ease-out',
               }}
             />
           </div>
@@ -577,7 +582,9 @@ export default function BreachDefensePage() {
 
       {/* Tower selection panel */}
       <Tooltip.Provider delayDuration={200}>
-        <div className="flex gap-1 p-2 bg-[#2a2a3e] border-2 border-[#e8618c] rounded w-[960px] justify-center flex-wrap">
+        <div className="flex gap-1 p-2 bg-[#2a2a3e] border-2 border-[#e8618c] rounded w-[960px] justify-center flex-wrap items-start"
+             style={{ borderTop: '3px solid #e8618c' }}>
+          <span className="font-['Press_Start_2P'] text-[7px] text-gray-500 mb-1 block w-full text-center tracking-[3px]">DEFENSES</span>
           {Object.entries(TOWERS).map(([id, tower]) => {
             const locked = wave < tower.unlockWave;
             const tooExpensive = budget < tower.cost;
@@ -623,7 +630,13 @@ export default function BreachDefensePage() {
                       </div>
                     </div>
                     <div className="text-[8px] text-gray-400">
-                      {locked ? `Wave ${tower.unlockWave}` : `$${tower.cost}`}
+                      {locked ? `Wave ${tower.unlockWave}` : (
+                        <span className="inline-flex items-center gap-0.5">
+                          <span className="inline-block w-2.5 h-2.5 rounded-full text-[5px] leading-[10px] text-center font-bold"
+                                style={{ background: 'linear-gradient(135deg, #f5d442, #c9a227)', color: '#3a2e00', boxShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>$</span>
+                          <span>{tower.cost}</span>
+                        </span>
+                      )}
                     </div>
                   </button>
                 </Tooltip.Trigger>

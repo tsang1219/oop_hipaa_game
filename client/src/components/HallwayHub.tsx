@@ -114,10 +114,16 @@ export default function HallwayHub({
           <div className="text-xs text-slate-400 mb-2">COMMUNITY TRUST METER</div>
           <div className="w-full bg-slate-700 rounded h-3 overflow-hidden mb-2">
             <div
-              className={`h-full transition-all duration-300 ${
-                privacyScore >= 70 ? 'bg-green-500' : privacyScore >= 40 ? 'bg-yellow-500' : 'bg-red-500'
-              }`}
-              style={{ width: `${privacyScore}%` }}
+              className="h-full rounded"
+              style={{
+                width: `${privacyScore}%`,
+                background: privacyScore >= 70
+                  ? 'linear-gradient(90deg, #2ecc71, #27ae60)'
+                  : privacyScore >= 40
+                  ? 'linear-gradient(90deg, #f39c12, #e67e22)'
+                  : 'linear-gradient(90deg, #e74c3c, #c0392b)',
+                transition: 'width 300ms ease-out, background 300ms ease-out',
+              }}
             />
           </div>
           <div className="text-xs font-['Press_Start_2P'] text-slate-200">

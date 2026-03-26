@@ -610,8 +610,13 @@ export default function PrivacyQuestPage() {
               fontWeight: 'bold',
               color: scoreDelta.value > 0 ? '#44ff44' : '#ff4444',
               textShadow: scoreDelta.value > 0
-                ? '0 0 8px rgba(68, 255, 68, 0.6), 0 0 16px rgba(68, 255, 68, 0.3)'
-                : '0 0 8px rgba(255, 68, 68, 0.6), 0 0 16px rgba(255, 68, 68, 0.3)',
+                ? '0 0 8px rgba(68, 255, 68, 0.7), 0 0 20px rgba(68, 255, 68, 0.4), 0 0 40px rgba(68, 255, 68, 0.15)'
+                : '0 0 8px rgba(255, 68, 68, 0.7), 0 0 20px rgba(255, 68, 68, 0.4), 0 0 40px rgba(255, 68, 68, 0.15)',
+              background: scoreDelta.value > 0
+                ? 'radial-gradient(ellipse at center, rgba(68, 255, 68, 0.12) 0%, transparent 70%)'
+                : 'radial-gradient(ellipse at center, rgba(255, 68, 68, 0.12) 0%, transparent 70%)',
+              padding: '4px 12px',
+              borderRadius: '4px',
               animation: 'score-float-up 0.9s ease-out forwards',
               transform: `translateX(-50%) ${scoreDelta.value > 0 ? 'scale(1.2)' : 'scale(1.1)'}`,
               zIndex: 30,
