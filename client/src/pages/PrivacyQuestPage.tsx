@@ -111,6 +111,9 @@ export default function PrivacyQuestPage() {
     return s ? new Set(JSON.parse(s)) : new Set();
   });
 
+  // Score milestone celebrations
+  const shownMilestones = useRef<Set<number>>(new Set());
+
   // Score delta floating indicator
   const prevPrivacyScoreRef = useRef(privacyScore);
   const [scoreDelta, setScoreDelta] = useState<{ value: number; key: number } | null>(null);
@@ -151,6 +154,30 @@ export default function PrivacyQuestPage() {
       }, 900);
     }
   }, [privacyScore]);
+
+  // ── Score milestone celebrations ────────────────────────────
+  useEffect(() => {
+    if (totalScenarios === 0) return;
+    const pct = Math.floor((completedNPCs.size / totalScenarios) * 100);
+    const milestones = [25, 50, 75, 100];
+    for (const m of milestones) {
+      if (pct >= m && !shownMilestones.current.has(m)) {
+        shownMilestones.current.add(m);
+        const labels: Record<number, string> = {
+          25: 'QUARTER WAY THERE!',
+          50: 'HALFWAY HERO!',
+          75: 'ALMOST THERE!',
+          100: 'HIPAA CHAMPION!'
+        };
+        notify(labels[m] || `${m}% Complete`, {
+          label: `${m}% PROGRESS`,
+          type: m === 100 ? 'success' : 'info'
+        });
+        // Camera flash via Phaser
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.7 });
+      }
+    }
+  }, [completedNPCs, totalScenarios, notify]);
 
   // ── Load gate state when room changes ────────────────────────
   useEffect(() => {

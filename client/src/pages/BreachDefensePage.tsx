@@ -243,6 +243,7 @@ export default function BreachDefensePage() {
       const threat = THREATS[threatKey as keyof typeof THREATS];
       if (threat) {
         notify(`${threat.name} — logged in Codex`, { label: 'THREAT DETECTED', type: 'discovery' });
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.6 });
       }
     });
   }, [seenThreats, notify]);

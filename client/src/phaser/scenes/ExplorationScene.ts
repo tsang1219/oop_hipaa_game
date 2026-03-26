@@ -274,6 +274,33 @@ export class ExplorationScene extends Phaser.Scene {
         frequency: 500,
         depth: 5,                         // above floor, below furniture
       } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
+
+      // Secondary ambient layer — slower, larger particles for depth
+      this.add.particles(w / 2, h / 2, 'particle_circle', {
+        x: { min: 0, max: w },
+        y: { min: 0, max: h },
+        speed: { min: 2, max: 8 },
+        angle: { min: 250, max: 290 },
+        scale: { start: 0.4, end: 0 },
+        alpha: { start: 0.15, end: 0 },
+        lifespan: { min: 6000, max: 10000 },
+        tint: 0xffffcc,
+        frequency: 3000,
+        quantity: 1,
+      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(0);
+
+      // Occasional sparkle — brief bright flash particles
+      this.add.particles(w / 2, h / 2, 'particle_circle', {
+        x: { min: 0, max: w },
+        y: { min: 0, max: h },
+        speed: { min: 0, max: 5 },
+        scale: { start: 0.5, end: 0 },
+        alpha: { start: 0.6, end: 0 },
+        lifespan: 400,
+        tint: 0xffffff,
+        frequency: 5000,
+        quantity: 1,
+      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(0);
     }
 
     // ── Obstacles / Walls ────────────────────────────────────────

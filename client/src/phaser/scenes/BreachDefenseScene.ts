@@ -84,6 +84,11 @@ export class BreachDefenseScene extends Phaser.Scene {
   private shownWaveStartBanners = new Set<number>();
   private waveKillCount = 0;
 
+  // Kill streak tracking
+  private killStreak = 0;
+  private lastKillTime = 0;
+  private killStreakText?: Phaser.GameObjects.Text;
+
   // Ambient decorations
   private scanLine?: Phaser.GameObjects.Rectangle;
   private headerText?: Phaser.GameObjects.Text;
@@ -124,6 +129,12 @@ export class BreachDefenseScene extends Phaser.Scene {
     this.shownWaveSplashes = new Set();
     this.shownWaveStartBanners = new Set();
     this.waveKillCount = 0;
+    this.killStreak = 0;
+    this.lastKillTime = 0;
+    if (this.killStreakText) {
+      this.killStreakText.destroy();
+      this.killStreakText = undefined;
+    }
     this.lastBroadcast = 0;
     if (this.dangerVignette) {
       this.dangerVignette.destroy();
@@ -1384,6 +1395,64 @@ export class BreachDefenseScene extends Phaser.Scene {
     }
     this.enemies = this.enemies.filter(e => e.hp > 0);
 
+    // ── Kill streak tracking ────────────────────────────────────
+    if (deadEnemies.length > 0) {
+      const now = this.time.now;
+      if (now - this.lastKillTime < 2000) {
+        this.killStreak += deadEnemies.length;
+      } else {
+        this.killStreak = deadEnemies.length;
+      }
+      this.lastKillTime = now;
+
+      // Show streak text at 3+ kills
+      if (this.killStreak >= 3) {
+        if (this.killStreakText) this.killStreakText.destroy();
+
+        const streakLabels: Record<number, string> = {
+          3: 'TRIPLE KILL!',
+          5: 'KILLING SPREE!',
+          8: 'UNSTOPPABLE!',
+          10: 'GODLIKE!'
+        };
+        // Find the highest matching label
+        let label = `${this.killStreak}x STREAK!`;
+        for (const [threshold, text] of Object.entries(streakLabels)) {
+          if (this.killStreak >= parseInt(threshold)) label = text;
+        }
+
+        this.killStreakText = this.add.text(
+          GRID_COLS * CELL_SIZE / 2, 40,
+          label,
+          { fontFamily: '"Press Start 2P"', fontSize: '10px', color: '#ffd700', stroke: '#000000', strokeThickness: 3 }
+        ).setOrigin(0.5).setDepth(45).setAlpha(0);
+
+        this.tweens.add({
+          targets: this.killStreakText,
+          alpha: 1,
+          scale: { from: 0.5, to: 1.1 },
+          duration: 300,
+          ease: 'Back.easeOut',
+          onComplete: () => {
+            if (this.killStreakText) {
+              this.tweens.add({
+                targets: this.killStreakText,
+                alpha: 0,
+                duration: 400,
+                delay: 1200,
+                onComplete: () => {
+                  if (this.killStreakText) {
+                    this.killStreakText.destroy();
+                    this.killStreakText = undefined;
+                  }
+                }
+              });
+            }
+          }
+        });
+      }
+    }
+
     // ── Phase 7: Broadcast state (throttled) ───────────────────
     if (time - this.lastBroadcast > 200) {
       this.broadcastState();
@@ -1398,6 +1467,10 @@ export class BreachDefenseScene extends Phaser.Scene {
   };
 
   shutdown() {
+    if (this.killStreakText) {
+      this.killStreakText.destroy();
+      this.killStreakText = undefined;
+    }
     if (this.dangerVignette) {
       this.dangerVignette.destroy();
       this.dangerVignette = undefined;
