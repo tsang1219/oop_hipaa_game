@@ -792,6 +792,9 @@ export class BreachDefenseScene extends Phaser.Scene {
     const hpBarFill = this.add.rectangle(px, py - 30, 40, 5, 0x44ff44)
       .setDepth(17);
 
+    // Subtle spawn sound
+    this.sound.play('sfx_interact', { volume: 0.15 });
+
     // HP bars fade in after a brief delay
     hpBarBg.setAlpha(0);
     hpBarFill.setAlpha(0);
@@ -1436,6 +1439,18 @@ export class BreachDefenseScene extends Phaser.Scene {
         proj.x += (dx / dist) * proj.speed * CELL_SIZE * dt;
         proj.y += (dy / dist) * proj.speed * CELL_SIZE * dt;
         proj.graphics.setPosition(proj.x, proj.y);
+
+        // Projectile trail dot
+        if (Math.random() < 0.3) {
+          const trail = this.add.circle(proj.x, proj.y, 2, proj.color, 0.4).setDepth(19);
+          this.tweens.add({
+            targets: trail,
+            alpha: 0,
+            scale: 0.2,
+            duration: 200,
+            onComplete: () => trail.destroy()
+          });
+        }
       }
     }
 

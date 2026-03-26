@@ -121,14 +121,29 @@ export class HubWorldScene extends Phaser.Scene {
       loop: true
     });
 
-    // NPC speech bubble
-    this.add.text(10 * TILE_SIZE + 16, 7 * TILE_SIZE - 4, 'Welcome!', {
+    // NPC speech bubble with typing effect
+    const bubbleBg = this.add.rectangle(
+      10 * TILE_SIZE + 16, 7 * TILE_SIZE - 4,
+      56, 16, 0x333333
+    ).setOrigin(0.5).setDepth(8);
+
+    const welcomeText = this.add.text(10 * TILE_SIZE + 16, 7 * TILE_SIZE - 4, '', {
       fontFamily: '"Press Start 2P"',
       fontSize: '6px',
       color: '#ffffff',
-      backgroundColor: '#333333',
-      padding: { x: 4, y: 3 },
-    }).setOrigin(0.5);
+    }).setOrigin(0.5).setDepth(9);
+
+    // Typing effect
+    const fullText = 'Welcome!';
+    let charIndex = 0;
+    this.time.addEvent({
+      delay: 80,
+      callback: () => {
+        charIndex++;
+        welcomeText.setText(fullText.slice(0, charIndex));
+      },
+      repeat: fullText.length - 1
+    });
 
     // Player — frame 0 = idle facing down
     this.player = this.physics.add.sprite(

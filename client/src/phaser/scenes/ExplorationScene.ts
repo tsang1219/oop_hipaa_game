@@ -443,8 +443,7 @@ export class ExplorationScene extends Phaser.Scene {
       const sprite = this.add.sprite(npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2, texKey, 0);
       sprite.setDepth(25);
       if (completed) {
-        sprite.setAlpha(0.4);
-        sprite.setTint(0x888888);
+        sprite.setAlpha(0.7);
       }
 
       // Name label below sprite
