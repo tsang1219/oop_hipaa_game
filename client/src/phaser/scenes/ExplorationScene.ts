@@ -390,6 +390,23 @@ export class ExplorationScene extends Phaser.Scene {
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
+      // Interaction zone glow ring — pulsing blue aura for incomplete zones
+      if (!this.completedZones.has(zone.id)) {
+        const zoneGlow = this.add.circle(
+          sprite.x, sprite.y, 20, 0x00aaff, 0
+        ).setStrokeStyle(1.5, 0x00aaff, 0).setDepth(sprite.depth - 1);
+
+        this.tweens.add({
+          targets: zoneGlow,
+          strokeAlpha: { from: 0, to: 0.4 },
+          scale: { from: 0.8, to: 1.2 },
+          duration: 1200,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+        });
+      }
+
       this.interactables.push({ type: 'zone', id: zone.id, data: zone, sprite });
     }
 
@@ -644,6 +661,15 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
 
+    // Listen for correct/incorrect answer feedback from React
+    eventBridge.on('react:answer-feedback', (data: { type: string }) => {
+      if (data.type === 'correct') {
+        this.cameras.main.flash(200, 100, 255, 100, false); // green flash
+      } else if (data.type === 'incorrect') {
+        this.cameras.main.flash(200, 255, 80, 80, false); // red flash
+      }
+    });
+
     // Sync mute state from localStorage before any audio plays
     if (localStorage.getItem('sfx_muted') === 'true') {
       this.sound.mute = true;
@@ -672,6 +698,39 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Room entrance — fade in from black
     this.cameras.main.fadeIn(500, 0, 0, 0);
+
+    // Room name entrance banner — slides in and fades out
+    const roomBanner = this.add.text(
+      this.cameras.main.centerX, 40,
+      this.room.name || 'Unknown Room',
+      {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '10px',
+        color: '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 3,
+        align: 'center',
+      }
+    ).setOrigin(0.5).setDepth(100).setScrollFactor(0).setAlpha(0);
+
+    this.tweens.add({
+      targets: roomBanner,
+      alpha: 1,
+      y: 50,
+      duration: 400,
+      ease: 'Quad.easeOut',
+      delay: 300,
+      onComplete: () => {
+        this.tweens.add({
+          targets: roomBanner,
+          alpha: 0,
+          duration: 500,
+          delay: 1500,
+          ease: 'Quad.easeIn',
+          onComplete: () => roomBanner.destroy()
+        });
+      }
+    });
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
   }
@@ -790,6 +849,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
+    eventBridge.off('react:answer-feedback');
     if (this.moveTimer) this.moveTimer.destroy();
     if (this.npcPulseTween) {
       this.npcPulseTween.stop();

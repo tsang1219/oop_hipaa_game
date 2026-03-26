@@ -107,6 +107,19 @@ export class HubWorldScene extends Phaser.Scene {
       ease: 'Sine.easeInOut',
     });
 
+    // Random idle head turn — NPC occasionally faces different direction
+    this.time.addEvent({
+      delay: 3000 + Math.random() * 4000,
+      callback: () => {
+        if (!npc || !npc.active) return;
+        // Randomly pick a direction: 0=down, 3=left, 6=right, 9=up (frame indices)
+        const directions = [0, 3, 6]; // Don't turn up (looks weird)
+        const frame = directions[Math.floor(Math.random() * directions.length)];
+        npc.setFrame(frame);
+      },
+      loop: true
+    });
+
     // NPC speech bubble
     this.add.text(10 * TILE_SIZE + 16, 7 * TILE_SIZE - 4, 'Welcome!', {
       fontFamily: '"Press Start 2P"',

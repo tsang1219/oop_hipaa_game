@@ -1310,6 +1310,21 @@ export class BreachDefenseScene extends Phaser.Scene {
 
         tower.lastFired = time;
         this.playRecoilTween(tower.sprite);
+
+        // Brief range flash on fire
+        const rangeFlash = this.add.circle(
+          towerPx, towerPy,
+          stats.range * CELL_SIZE,
+          colorNum, 0
+        ).setStrokeStyle(1, colorNum, 0.25).setDepth(3);
+
+        this.tweens.add({
+          targets: rangeFlash,
+          strokeAlpha: 0,
+          duration: 300,
+          ease: 'Quad.easeOut',
+          onComplete: () => rangeFlash.destroy()
+        });
       }
     }
 
