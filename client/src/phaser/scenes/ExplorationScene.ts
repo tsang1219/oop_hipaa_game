@@ -603,6 +603,17 @@ export class ExplorationScene extends Phaser.Scene {
     );
     this.playerShadow.setDepth(29);
 
+    // Idle shadow pulse
+    this.tweens.add({
+      targets: this.playerShadow,
+      scaleX: { from: 1.0, to: 1.05 },
+      alpha: { from: 0.3, to: 0.2 },
+      duration: 1200,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
     // "YOU" label above the player
     this.playerLabel = this.add.text(
       this.player.x, this.player.y - TILE / 2 - 4,

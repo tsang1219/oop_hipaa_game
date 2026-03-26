@@ -737,6 +737,31 @@ export class BreachDefenseScene extends Phaser.Scene {
       onComplete: () => glowRing.destroy()
     });
 
+    // Draw connection lines to nearby towers
+    for (const other of this.towers) {
+      if (other.id === tower.id) continue;
+      const dx = other.gridX - gridX;
+      const dy = other.gridY - gridY;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      if (dist <= 2) { // Adjacent or diagonal
+        const line = this.add.graphics().setDepth(1);
+        line.lineStyle(1, 0x3a5d8e, 0.2);
+        line.beginPath();
+        line.moveTo(px, py);
+        line.lineTo(other.gridX * CELL_SIZE + CELL_SIZE / 2, other.gridY * CELL_SIZE + CELL_SIZE / 2);
+        line.strokePath();
+
+        // Fade in
+        line.setAlpha(0);
+        this.tweens.add({
+          targets: line,
+          alpha: 1,
+          duration: 400,
+          ease: 'Sine.easeIn'
+        });
+      }
+    }
+
     // If this is the first tower and wave hasn't started, start spawning
     if (this.towers.length === 1 && !this.waveState.active && this.gameState === 'PLAYING') {
       this.waveState.active = true;
@@ -1592,6 +1617,20 @@ export class BreachDefenseScene extends Phaser.Scene {
         this.statusText.setText('MONITORING...');
         this.statusText.setColor('#2a8a5a');
       }
+    }
+
+    // Dynamic music intensity based on threat level
+    if (this.bgMusic && this.bgMusic instanceof Phaser.Sound.WebAudioSound) {
+      const targetVol = this.securityScore <= 30
+        ? this.musicBaseVolume * 1.3  // Louder when critical
+        : this.securityScore <= 60
+        ? this.musicBaseVolume * 1.1  // Slightly louder when threatened
+        : this.musicBaseVolume;
+
+      // Smooth interpolation toward target
+      const currentVol = this.bgMusic.volume;
+      const newVol = currentVol + (targetVol - currentVol) * 0.02;
+      this.bgMusic.volume = newVol;
     }
 
     if (time - this.lastBroadcast > 200) {
