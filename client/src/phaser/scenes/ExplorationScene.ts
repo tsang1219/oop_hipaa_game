@@ -655,11 +655,12 @@ export class ExplorationScene extends Phaser.Scene {
         20, 8,
         0x000000, 0.3,
       );
-      npcShadow.setDepth(24);
       if (completed) npcShadow.setAlpha(0.15);
 
       const sprite = this.add.sprite(npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2, texKey, 0);
-      sprite.setDepth(25);
+      const npcDepth = 5 + Math.floor(sprite.y / TILE);
+      sprite.setDepth(npcDepth);
+      npcShadow.setDepth(npcDepth - 1);
       if (completed) {
         sprite.setAlpha(0.7);
       }
@@ -676,7 +677,7 @@ export class ExplorationScene extends Phaser.Scene {
           stroke: '#000000',
           strokeThickness: 2,
         },
-      ).setOrigin(0.5, 0).setDepth(26);
+      ).setOrigin(0.5, 0).setDepth(npcDepth + 1);
       if (completed) nameLabel.setAlpha(0.4);
 
       // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
@@ -704,7 +705,7 @@ export class ExplorationScene extends Phaser.Scene {
       if (npc.isFinalBoss && !completed) {
         const bossText = this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 10, 'BOSS', {
           fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#e74c3c',
-        }).setOrigin(0.5).setDepth(35);
+        }).setOrigin(0.5).setDepth(npcDepth + 3);
         this.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
 
         // Boss glow ring — pulsing aura that draws the player's attention
@@ -746,7 +747,7 @@ export class ExplorationScene extends Phaser.Scene {
         const bubbleY = npc.y * TILE + TILE / 2 - 20;
         const bubble = this.add.image(bubbleX, bubbleY, bubbleTexKey);
         bubble.setAlpha(0.8);
-        bubble.setDepth(27);
+        bubble.setDepth(npcDepth + 2);
         this.tweens.add({
           targets: bubble,
           y: bubbleY - 3,
@@ -1042,6 +1043,9 @@ export class ExplorationScene extends Phaser.Scene {
       return;
     }
 
+    // SNES-style depth sorting: characters lower on screen render in front
+    this.player.setDepth(5 + Math.floor(this.player.y / TILE));
+
     const body = this.player.body as Phaser.Physics.Arcade.Body;
 
     // If following a path, don't accept keyboard movement
@@ -1116,9 +1120,11 @@ export class ExplorationScene extends Phaser.Scene {
       this.tileY = Math.round((this.player.y - TILE / 2) / TILE);
     }
 
-    // Update player shadow + label position to follow player
+    // Update player shadow + label position and depth to follow player
     this.playerShadow.setPosition(this.player.x, this.player.y + TILE / 2 - 2);
+    this.playerShadow.setDepth(this.player.depth - 1);
     this.playerLabel.setPosition(this.player.x, this.player.y - TILE / 2 - 4);
+    this.playerLabel.setDepth(this.player.depth + 1);
 
     // Proximity check
     this.checkProximity();

@@ -1036,6 +1036,77 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.destroy();
   }
 
+  if (!scene.textures.exists('furn_nurse_station')) {
+    const g = scene.add.graphics();
+    // L-shaped counter
+    g.fillStyle(0xb0a090);
+    g.fillRect(2, 12, 28, 4);
+    g.fillStyle(lighten(0xb0a090, 20));
+    g.fillRect(2, 12, 28, 1);
+    // Counter top
+    g.fillStyle(0xd4c5a9);
+    g.fillRect(2, 10, 28, 3);
+    g.fillStyle(lighten(0xd4c5a9, 15));
+    g.fillRect(2, 10, 28, 1);
+    // Front panel
+    g.fillStyle(0x9a8b7a);
+    g.fillRect(3, 16, 26, 10);
+    g.fillStyle(darken(0x9a8b7a, 20));
+    g.fillRect(28, 16, 1, 10);
+    g.fillRect(4, 25, 24, 1);
+    // Panel dividers
+    g.fillStyle(darken(0x9a8b7a, 15));
+    g.fillRect(15, 16, 1, 10);
+    // Computer monitor on counter
+    g.fillStyle(0x333333);
+    g.fillRect(18, 5, 8, 6);
+    g.fillStyle(0x2ecc71);
+    g.fillRect(19, 6, 6, 4);
+    g.fillStyle(0x444444);
+    g.fillRect(21, 11, 4, 1);
+    // Paper stack
+    g.fillStyle(0xfff8dc);
+    g.fillRect(5, 8, 6, 3);
+    g.fillStyle(darken(0xfff8dc, 15));
+    g.fillRect(5, 10, 6, 1);
+    g.generateTexture('furn_nurse_station', TILE, TILE);
+    g.destroy();
+  }
+
+  if (!scene.textures.exists('furn_microscope')) {
+    const g = scene.add.graphics();
+    // Base
+    g.fillStyle(0x444444);
+    g.fillRect(9, 24, 14, 4);
+    g.fillStyle(0x555555);
+    g.fillRect(9, 24, 14, 1);
+    // Arm (vertical)
+    g.fillStyle(0x555555);
+    g.fillRect(14, 8, 4, 16);
+    g.fillStyle(0x666666);
+    g.fillRect(14, 8, 1, 16);
+    // Eyepiece
+    g.fillStyle(0x333333);
+    g.fillRect(12, 4, 4, 5);
+    g.fillStyle(0x444444);
+    g.fillRect(12, 4, 4, 1);
+    // Lens tube
+    g.fillStyle(0x666666);
+    g.fillRect(13, 9, 6, 3);
+    // Stage
+    g.fillStyle(0x777777);
+    g.fillRect(10, 18, 12, 3);
+    g.fillStyle(0x888888);
+    g.fillRect(10, 18, 12, 1);
+    // Focus knob
+    g.fillStyle(0x888888);
+    g.fillRect(19, 12, 3, 4);
+    g.fillStyle(0x999999);
+    g.fillRect(19, 12, 1, 4);
+    g.generateTexture('furn_microscope', TILE, TILE);
+    g.destroy();
+  }
+
   if (!scene.textures.exists('furn_trash')) {
     const g = scene.add.graphics();
     // Can body (metal grey)
@@ -1084,7 +1155,8 @@ export function furnitureTextureKey(obstacleType?: string): string {
     plant: 'furn_plant',
     clock: 'furn_clock',
     water_cooler: 'furn_water_cooler',
-    nurse_station: 'furn_counter',
+    nurse_station: 'furn_nurse_station',
+    microscope: 'furn_microscope',
     patient_bay: 'furn_bed',
     filing_cabinet: 'furn_filing_cabinet',
     trash: 'furn_trash',
