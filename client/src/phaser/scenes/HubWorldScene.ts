@@ -215,6 +215,9 @@ export class HubWorldScene extends Phaser.Scene {
       }
     }
 
+    // Fade-in from black on scene entrance
+    this.cameras.main.fadeIn(600, 0, 0, 0);
+
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'HubWorld');
   }
@@ -558,6 +561,22 @@ export class HubWorldScene extends Phaser.Scene {
     const wallBlock = this.add.rectangle(cx, cy, doorWidth, doorHeight);
     wallBlock.setVisible(false);
     this.walls.add(wallBlock);
+
+    // Pulsing door glow
+    const doorGlow = this.add.rectangle(
+      tileX * TILE_SIZE + TILE_SIZE * 1.5,
+      tileY * TILE_SIZE + TILE_SIZE * 1.5,
+      TILE_SIZE * 3 + 4, TILE_SIZE * 3 + 4
+    ).setStrokeStyle(2, color, 0).setFillStyle(color, 0).setDepth(0);
+
+    this.tweens.add({
+      targets: doorGlow,
+      strokeAlpha: 0.3,
+      duration: 1500,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
   }
 
   private createFurniture() {

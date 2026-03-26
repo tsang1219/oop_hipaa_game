@@ -35,6 +35,15 @@ export default function BreachDefensePage() {
   const prevBudgetRef = useRef(budget);
   const [budgetFlash, setBudgetFlash] = useState<'spend' | 'gain' | null>(null);
   const budgetFlashTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [budgetScale, setBudgetScale] = useState(1);
+
+  // Animation state for wave number transition
+  const [waveScale, setWaveScale] = useState(1);
+  const prevWaveRef = useRef(wave);
+
+  // Animation state for security score pulse on drop
+  const [scorePulse, setScorePulse] = useState(false);
+  const prevScoreRef = useRef(securityScore);
 
   // Tutorial state
   const [currentTutorial, setCurrentTutorial] = useState<string | null>(null);
@@ -252,6 +261,8 @@ export default function BreachDefensePage() {
       const direction = budget > prevBudgetRef.current ? 'gain' : 'spend';
       prevBudgetRef.current = budget;
       setBudgetFlash(direction);
+      setBudgetScale(1.15);
+      setTimeout(() => setBudgetScale(1), 200);
 
       if (budgetFlashTimer.current) clearTimeout(budgetFlashTimer.current);
       budgetFlashTimer.current = setTimeout(() => {
@@ -259,6 +270,24 @@ export default function BreachDefensePage() {
       }, 400);
     }
   }, [budget]);
+
+  // ── Wave number transition animation ───────────────────────────
+  useEffect(() => {
+    if (wave !== prevWaveRef.current) {
+      prevWaveRef.current = wave;
+      setWaveScale(1.2);
+      setTimeout(() => setWaveScale(1), 300);
+    }
+  }, [wave]);
+
+  // ── Security score pulse on drop ───────────────────────────────
+  useEffect(() => {
+    if (securityScore < prevScoreRef.current) {
+      setScorePulse(true);
+      setTimeout(() => setScorePulse(false), 400);
+    }
+    prevScoreRef.current = securityScore;
+  }, [securityScore]);
 
   // ── Threat discovery notifications ────────────────────────────
   useEffect(() => {
@@ -454,7 +483,11 @@ export default function BreachDefensePage() {
 
       {/* HUD bar */}
       <div className="flex gap-6 items-center p-2 bg-[#2a2a3e] border-2 border-[#e8618c] rounded w-[960px] justify-between px-4">
-        <div className={`flex items-center gap-2 ${securityScore <= 25 ? 'animate-[hp-throb_0.8s_ease-in-out_infinite]' : ''}`}>
+        <div className={`flex items-center gap-2 ${securityScore <= 25 ? 'animate-[hp-throb_0.8s_ease-in-out_infinite]' : ''}`}
+          style={{
+            boxShadow: scorePulse ? '0 0 15px rgba(255, 50, 50, 0.5)' : 'none',
+            transition: 'box-shadow 200ms ease-out'
+          }}>
           <Heart className={`w-4 h-4 text-red-400 ${securityScore <= 25 ? 'animate-ping' : ''}`}
             style={securityScore <= 25 ? { animationDuration: '1.2s' } : undefined}
           />
@@ -471,7 +504,8 @@ export default function BreachDefensePage() {
             />
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2"
+          style={{ transform: `scale(${budgetScale})`, transition: 'transform 200ms ease-out' }}>
           <DollarSign className={`w-4 h-4 transition-colors duration-150 ${
             budgetFlash === 'spend' ? 'text-red-400' : budgetFlash === 'gain' ? 'text-emerald-300' : 'text-green-400'
           }`} />
@@ -497,7 +531,8 @@ export default function BreachDefensePage() {
             ${budget}
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2"
+          style={{ transform: `scale(${waveScale})`, transition: 'transform 300ms ease-out' }}>
           <Layers className="w-4 h-4 text-blue-400" />
           <span className="text-[11px] text-blue-400">Wave {wave}/10</span>
         </div>

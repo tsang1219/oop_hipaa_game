@@ -148,6 +148,15 @@ export default function PrivacyQuestPage() {
       prevPrivacyScoreRef.current = privacyScore;
       setScoreDelta({ value: delta, key: Date.now() });
 
+      // Flash Phaser camera on score change
+      if (delta > 0) {
+        // Green flash for gains
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
+      } else if (delta < 0) {
+        // Red flash for losses — play alert
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_breach_alert', volume: 0.35 });
+      }
+
       if (scoreDeltaTimer.current) clearTimeout(scoreDeltaTimer.current);
       scoreDeltaTimer.current = setTimeout(() => {
         setScoreDelta(null);
