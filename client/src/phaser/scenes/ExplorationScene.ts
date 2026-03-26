@@ -338,6 +338,26 @@ export class ExplorationScene extends Phaser.Scene {
       decorGfx.strokePath();
     }
 
+    // ── Ceiling light pools (overhead lighting effect on floor) ──
+    const lightGfx = this.add.graphics().setDepth(0);
+    const lightSpacing = TILE * 4;
+    for (let ly = lightSpacing; ly < h - lightSpacing; ly += lightSpacing) {
+      for (let lx = lightSpacing; lx < w - lightSpacing; lx += lightSpacing) {
+        // Check we're not on a wall/obstacle
+        const tileX = Math.floor(lx / TILE);
+        const tileY = Math.floor(ly / TILE);
+        const onObstacle = room.obstacles.some((o: any) =>
+          tileX >= o.x && tileX < o.x + o.width && tileY >= o.y && tileY < o.y + o.height
+        );
+        if (!onObstacle) {
+          lightGfx.fillStyle(0xffffff, 0.04);
+          lightGfx.fillCircle(lx, ly, TILE * 1.5);
+          lightGfx.fillStyle(0xffffff, 0.02);
+          lightGfx.fillCircle(lx, ly, TILE * 2.5);
+        }
+      }
+    }
+
     // ── Ambient dust particles — subtle floating motes ──────────
     if (this.textures.exists('particle_circle')) {
       this.add.particles(0, 0, 'particle_circle', {
@@ -437,8 +457,12 @@ export class ExplorationScene extends Phaser.Scene {
         // Furniture — place a sprite at center of the obstacle area
         const texKey = furnitureTextureKey(obsType);
         if (obs.width === 1 && obs.height === 1) {
+          // Drop shadow beneath furniture
+          this.add.ellipse(ox + TILE / 2, oy + TILE / 2 + 12, TILE - 4, 8, 0x000000, 0.12);
           this.add.sprite(ox + TILE / 2, oy + TILE / 2, texKey);
         } else {
+          // Drop shadow beneath large furniture
+          this.add.ellipse(ox + ow / 2, oy + oh / 2 + oh / 3, ow - 4, oh / 3, 0x000000, 0.1);
           // For multi-tile furniture, fill with a rectangle and one sprite
           this.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh, 0x8b7355, 0.4)
             .setStrokeStyle(1, 0x5d4e37);

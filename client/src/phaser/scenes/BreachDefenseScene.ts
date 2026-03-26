@@ -367,6 +367,12 @@ export class BreachDefenseScene extends Phaser.Scene {
     bottomGfx.moveTo(0, bottomY);
     bottomGfx.lineTo(GRID_COLS * CELL_SIZE, bottomY);
     bottomGfx.strokePath();
+    // Double-line border effect
+    bottomGfx.lineStyle(1, 0x2a3d5e, 0.4);
+    bottomGfx.beginPath();
+    bottomGfx.moveTo(0, bottomY + 3);
+    bottomGfx.lineTo(GRID_COLS * CELL_SIZE, bottomY + 3);
+    bottomGfx.strokePath();
     // Faint scan lines for terminal aesthetic
     for (let sy = bottomY + 2; sy < bottomY + bottomH; sy += 4) {
       bottomGfx.fillStyle(0xffffff, 0.012);
@@ -761,6 +767,20 @@ export class BreachDefenseScene extends Phaser.Scene {
           ease: 'Sine.easeInOut'
         });
       }
+    });
+
+    // Tower base glow (placed beneath tower)
+    const baseGlow = this.add.ellipse(px, py + 20, 40, 16, towerColor, 0.15)
+      .setDepth(9);
+    // Subtle pulse on base glow
+    this.tweens.add({
+      targets: baseGlow,
+      alpha: { from: 0.15, to: 0.08 },
+      scaleX: { from: 1, to: 1.1 },
+      duration: 2000,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
     });
 
     // Brief glow ring that scales up and fades out
