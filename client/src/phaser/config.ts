@@ -20,6 +20,7 @@ export function createGameConfig(options: {
     scale: {
       mode: Phaser.Scale.FIT,
       autoCenter: Phaser.Scale.CENTER_BOTH,
+      autoRound: true,
     },
     scene: [BootScene, HubWorldScene, ExplorationScene, BreachDefenseScene],
     physics: {

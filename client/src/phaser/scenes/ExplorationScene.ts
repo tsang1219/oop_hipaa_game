@@ -257,6 +257,25 @@ export class ExplorationScene extends Phaser.Scene {
         floor.fillStyle(shadowColor, 0.5);
         floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom edge
         floor.fillRect(px + TILE - 1, py, 1, TILE);  // right edge
+
+        // Subtle inner cross pattern on every other tile (linoleum texture)
+        if ((x + y) % 2 === 0) {
+          floor.fillStyle(highlightColor, 0.15);
+          floor.fillRect(px + 8, py + 2, 16, 1);  // horizontal line
+          floor.fillRect(px + 14, py + 2, 1, 28);  // vertical line
+        }
+
+        // Specular highlight on ~20% of tiles (polished floor gleam)
+        const hashVal = ((x * 7 + y * 13 + 37) * 2654435761) >>> 0;
+        if (hashVal % 5 === 0) {
+          floor.fillStyle(0xffffff, 0.08);
+          floor.fillRect(px + 6 + (hashVal % 12), py + 4 + (hashVal % 10) % 8, 4, 2);
+        }
+
+        // Grout lines (thin dark lines between tiles)
+        floor.fillStyle(shadowColor, 0.3);
+        floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout
+        floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout
       }
     }
 
@@ -337,21 +356,38 @@ export class ExplorationScene extends Phaser.Scene {
             const wpx = wx * TILE;
             const wpy = wy * TILE;
 
-            // Main wall fill
-            wallG.fillStyle(0x5d4e37, 1);
+            // Main wall fill — use two alternating shades for brick-like pattern
+            const isEvenTile = (wx + wy) % 2 === 0;
+            const wallBase = isEvenTile ? 0x5d4e37 : 0x574930;
+            wallG.fillStyle(wallBase, 1);
             wallG.fillRect(wpx, wpy, TILE, TILE);
 
-            // 1px border
-            wallG.lineStyle(1, 0x4a3f2e, 1);
-            wallG.strokeRect(wpx, wpy, TILE, TILE);
+            // Horizontal mortar line at 1/3 and 2/3 height
+            wallG.fillStyle(0x4a3f2e, 0.6);
+            wallG.fillRect(wpx, wpy + 10, TILE, 1);
+            wallG.fillRect(wpx, wpy + 21, TILE, 1);
 
-            // 1px highlight strip at top edge
-            wallG.fillStyle(0x7a6b52, 0.7);
+            // Vertical mortar offset (brick bond pattern)
+            const vOffset = wy % 2 === 0 ? 16 : 0;
+            wallG.fillStyle(0x4a3f2e, 0.5);
+            wallG.fillRect(wpx + vOffset, wpy, 1, TILE);
+
+            // Top highlight
+            wallG.fillStyle(0x7a6b52, 0.6);
             wallG.fillRect(wpx, wpy, TILE, 1);
+            wallG.fillRect(wpx, wpy, 1, TILE); // left highlight
 
-            // 2px darker shadow strip at bottom edge (wall meets floor)
+            // Bottom shadow (wall meets floor)
             wallG.fillStyle(0x3a3124, 0.8);
             wallG.fillRect(wpx, wpy + TILE - 2, TILE, 2);
+            wallG.fillRect(wpx + TILE - 1, wpy, 1, TILE); // right shadow
+
+            // Subtle surface texture — tiny noise dots
+            if ((wx * 3 + wy * 5) % 4 === 0) {
+              wallG.fillStyle(0x6a5b44, 0.3);
+              wallG.fillRect(wpx + 8, wpy + 6, 2, 1);
+              wallG.fillRect(wpx + 20, wpy + 14, 2, 1);
+            }
           }
         }
       } else {

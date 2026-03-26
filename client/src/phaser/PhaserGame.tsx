@@ -27,6 +27,12 @@ export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
 
       gameRef.current = new Phaser.Game(config);
 
+      // Ensure crisp pixel rendering on the canvas
+      const canvas = containerRef.current?.querySelector('canvas');
+      if (canvas) {
+        canvas.style.imageRendering = 'pixelated';
+      }
+
       const handleSceneReady = (sceneKey: string) => {
         onSceneReady?.(sceneKey);
       };
@@ -47,6 +53,8 @@ export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
           width,
           height,
           imageRendering: 'pixelated',
+          // @ts-expect-error -- crisp-edges is a valid CSS value for cross-browser pixel art rendering
+          WebkitImageRendering: 'crisp-edges',
         }}
       />
     );

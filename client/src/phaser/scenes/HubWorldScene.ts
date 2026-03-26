@@ -60,8 +60,14 @@ export class HubWorldScene extends Phaser.Scene {
 
         // Subtle specular highlight on some tiles for polish effect
         if ((x + y) % 5 === 0) {
-          floorGraphics.fillStyle(0xffffff, 0.06);
-          floorGraphics.fillRect(tx + 4, ty + 4, 12, 8);
+          floorGraphics.fillStyle(0xffffff, 0.08);
+          floorGraphics.fillRect(tx + 8, ty + 6, 6, 2);
+        }
+
+        // Subtle cross-pattern on alternating tiles
+        if ((x + y) % 2 === 0) {
+          floorGraphics.fillStyle(0xdfd3be, 0.12);
+          floorGraphics.fillRect(tx + 4, ty + 15, 24, 1);
         }
       }
     }
