@@ -731,6 +731,25 @@ export class ExplorationScene extends Phaser.Scene {
       if (isMoving && !this.paused && this.time.now - this.lastFootstepTime > 350) {
         this.sound.play('sfx_footstep', { volume: 0.25 });
         this.lastFootstepTime = this.time.now;
+
+        // Footstep dust puff
+        if (this.textures.exists('particle_circle')) {
+          const dustEmitter = this.add.particles(
+            this.player.x, this.player.y + 12, 'particle_circle', {
+            speed: { min: 5, max: 15 },
+            angle: { min: 220, max: 320 },
+            scale: { start: 0.3, end: 0 },
+            alpha: { start: 0.25, end: 0 },
+            lifespan: 300,
+            tint: 0xccbb99,
+            frequency: -1,
+          });
+          dustEmitter.setDepth(1);
+          dustEmitter.explode(2);
+          this.time.delayedCall(400, () => {
+            if (dustEmitter && dustEmitter.active) dustEmitter.destroy();
+          });
+        }
       }
 
       if (!left && !right && !up && !down) {
@@ -873,6 +892,25 @@ export class ExplorationScene extends Phaser.Scene {
 
       this.sound.play('sfx_footstep', { volume: 0.25 });
       this.lastFootstepTime = this.time.now;
+
+      // Footstep dust puff
+      if (this.textures.exists('particle_circle')) {
+        const dustEmitter = this.add.particles(
+          this.player.x, this.player.y + 12, 'particle_circle', {
+          speed: { min: 5, max: 15 },
+          angle: { min: 220, max: 320 },
+          scale: { start: 0.3, end: 0 },
+          alpha: { start: 0.25, end: 0 },
+          lifespan: 300,
+          tint: 0xccbb99,
+          frequency: -1,
+        });
+        dustEmitter.setDepth(1);
+        dustEmitter.explode(2);
+        this.time.delayedCall(400, () => {
+          if (dustEmitter && dustEmitter.active) dustEmitter.destroy();
+        });
+      }
 
       if (dx < 0) {
         this.player.anims.play('walk_left', true);

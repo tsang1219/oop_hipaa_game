@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { THREATS, THREAT_COLORS, TOWERS } from '../../game/breach-defense/constants';
+import { eventBridge, BRIDGE_EVENTS } from '../../phaser/EventBridge';
 
 const colorToHex = (c: number) => '#' + c.toString(16).padStart(6, '0');
 
@@ -22,6 +23,10 @@ export function WaveIntroBanner({
   onDismiss,
   autoDismissMs = 3000,
 }: WaveIntroBannerProps) {
+  useEffect(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.5 });
+  }, []);
+
   useEffect(() => {
     const timer = setTimeout(onDismiss, autoDismissMs);
     return () => clearTimeout(timer);

@@ -667,7 +667,18 @@ export class BreachDefenseScene extends Phaser.Scene {
       targets: sprite,
       scale: [0.5, 1.15, 0.95, 1.0],
       duration: 350,
-      ease: 'Back.easeOut'
+      ease: 'Back.easeOut',
+      onComplete: () => {
+        // Idle breathing animation for placed towers
+        this.tweens.add({
+          targets: sprite,
+          y: py - 2,
+          duration: 1200 + Math.random() * 600,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut'
+        });
+      }
     });
 
     // Brief glow ring that scales up and fades out
