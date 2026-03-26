@@ -451,6 +451,14 @@ export class ExplorationScene extends Phaser.Scene {
               wallG.fillRect(wpx + 8, wpy + 6, 2, 1);
               wallG.fillRect(wpx + 20, wpy + 14, 2, 1);
             }
+
+            // Wainscoting/molding on top of walls (crown molding effect)
+            if (wy === obs.y) {
+              wallG.fillStyle(0x8a7b64, 0.7);
+              wallG.fillRect(wpx, wpy, TILE, 3);
+              wallG.fillStyle(0x9a8b74, 0.5);
+              wallG.fillRect(wpx, wpy, TILE, 1);
+            }
           }
         }
       } else {
@@ -778,6 +786,18 @@ export class ExplorationScene extends Phaser.Scene {
       repeat: -1,
       ease: 'Sine.easeInOut'
     });
+
+    // Visual door frame at spawn point
+    const doorFrameG = this.add.graphics().setDepth(1);
+    const spX = room.spawnPoint.x * TILE;
+    const spY = room.spawnPoint.y * TILE;
+    // Door frame posts
+    doorFrameG.fillStyle(0x8b7355, 0.6);
+    doorFrameG.fillRect(spX - 2, spY - TILE / 2, 4, TILE + TILE / 2);
+    doorFrameG.fillRect(spX + TILE - 2, spY - TILE / 2, 4, TILE + TILE / 2);
+    // Door header
+    doorFrameG.fillStyle(0x8b7355, 0.5);
+    doorFrameG.fillRect(spX - 2, spY - TILE / 2, TILE + 4, 4);
 
     // ── Input ────────────────────────────────────────────────────
     this.cursors = this.input.keyboard!.createCursorKeys();

@@ -922,6 +922,74 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.generateTexture('furn_water_cooler', TILE, TILE);
     g.destroy();
   }
+
+  if (!scene.textures.exists('furn_filing_cabinet')) {
+    const g = scene.add.graphics();
+    const metal = 0x78909c;
+    // Main body
+    g.fillStyle(metal);
+    g.fillRect(8, 3, 16, 26);
+    // Body highlight
+    g.fillStyle(lighten(metal, 20));
+    g.fillRect(8, 3, 1, 26);
+    g.fillRect(8, 3, 16, 1);
+    // Body shadow
+    g.fillStyle(darken(metal, 25));
+    g.fillRect(23, 4, 1, 25);
+    g.fillRect(9, 28, 14, 1);
+    // Drawer divisions
+    g.fillStyle(darken(metal, 15));
+    g.fillRect(9, 9, 14, 1);
+    g.fillRect(9, 16, 14, 1);
+    g.fillRect(9, 23, 14, 1);
+    // Drawer handles
+    g.fillStyle(0xcccccc);
+    g.fillRect(14, 5, 4, 2);
+    g.fillRect(14, 11, 4, 2);
+    g.fillRect(14, 18, 4, 2);
+    g.fillRect(14, 25, 4, 2);
+    // Handle highlights
+    g.fillStyle(0xeeeeee);
+    g.fillRect(14, 5, 2, 1);
+    g.fillRect(14, 11, 2, 1);
+    g.fillRect(14, 18, 2, 1);
+    g.fillRect(14, 25, 2, 1);
+    // Label slot on top drawer
+    g.fillStyle(0xffffff);
+    g.fillRect(12, 6, 8, 2);
+    g.generateTexture('furn_filing_cabinet', TILE, TILE);
+    g.destroy();
+  }
+
+  if (!scene.textures.exists('furn_trash')) {
+    const g = scene.add.graphics();
+    // Can body (metal grey)
+    g.fillStyle(0x9e9e9e);
+    g.fillRect(10, 10, 12, 16);
+    // Body highlight
+    g.fillStyle(lighten(0x9e9e9e, 20));
+    g.fillRect(10, 10, 1, 15);
+    // Body shadow
+    g.fillStyle(darken(0x9e9e9e, 25));
+    g.fillRect(21, 10, 1, 16);
+    g.fillRect(11, 25, 10, 1);
+    // Rim
+    g.fillStyle(0xbdbdbd);
+    g.fillRect(9, 9, 14, 2);
+    // Rim highlight
+    g.fillStyle(0xd0d0d0);
+    g.fillRect(9, 9, 14, 1);
+    // Trash visible inside (crumpled paper)
+    g.fillStyle(0xf5f5dc);
+    g.fillRect(12, 10, 3, 2);
+    g.fillStyle(0xe8e8d0);
+    g.fillRect(16, 11, 4, 2);
+    // Base
+    g.fillStyle(darken(0x9e9e9e, 30));
+    g.fillRect(10, 26, 12, 2);
+    g.generateTexture('furn_trash', TILE, TILE);
+    g.destroy();
+  }
 }
 
 /**
@@ -943,6 +1011,9 @@ export function furnitureTextureKey(obstacleType?: string): string {
     water_cooler: 'furn_water_cooler',
     nurse_station: 'furn_counter',
     patient_bay: 'furn_bed',
+    filing_cabinet: 'furn_filing_cabinet',
+    trash: 'furn_trash',
+    trash_can: 'furn_trash',
   };
   return map[obstacleType || ''] || 'furn_desk';
 }
