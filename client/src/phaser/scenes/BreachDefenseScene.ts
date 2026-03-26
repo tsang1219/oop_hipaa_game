@@ -1289,6 +1289,46 @@ export class BreachDefenseScene extends Phaser.Scene {
           target.strongFlashUntil = time + 120 + 150;
           target.strongFlashColor = proj.color;
         }
+
+        // Impact particles at hit point
+        const impactEmitter = this.add.particles(proj.x, proj.y, 'particle_circle', {
+          speed: { min: 20, max: 60 },
+          angle: { min: 0, max: 360 },
+          scale: { start: 0.6, end: 0 },
+          alpha: { start: 0.8, end: 0 },
+          lifespan: 200,
+          tint: proj.color,
+          frequency: -1
+        });
+        impactEmitter.setDepth(20);
+        impactEmitter.explode(4);
+        this.time.delayedCall(300, () => {
+          if (impactEmitter && impactEmitter.active) impactEmitter.destroy();
+        });
+
+        // Screen shake on strong hits
+        if (proj.isStrong) {
+          this.cameras.main.shake(80, 0.003);
+        }
+
+        // Floating damage number
+        const dmgText = this.add.text(proj.x, proj.y - 10, `-${proj.damage}`, {
+          fontFamily: '"Press Start 2P"',
+          fontSize: proj.isStrong ? '8px' : '6px',
+          color: proj.isStrong ? '#ff6644' : '#ffffff',
+          stroke: '#000000',
+          strokeThickness: 2,
+        }).setDepth(25).setOrigin(0.5);
+
+        this.tweens.add({
+          targets: dmgText,
+          y: dmgText.y - 25,
+          alpha: 0,
+          duration: 600,
+          ease: 'Quad.easeOut',
+          onComplete: () => dmgText.destroy()
+        });
+
         proj.damage = 0;
       } else {
         proj.x += (dx / dist) * proj.speed * CELL_SIZE * dt;

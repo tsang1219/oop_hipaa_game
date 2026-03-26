@@ -425,6 +425,19 @@ export class ExplorationScene extends Phaser.Scene {
           fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#e74c3c',
         }).setOrigin(0.5).setDepth(35);
         this.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
+
+        // Boss glow ring — pulsing aura that draws the player's attention
+        const bossGlow = this.add.circle(sprite.x, sprite.y, 24, 0xff4444, 0)
+          .setStrokeStyle(2, 0xff6644, 0.5)
+          .setDepth(sprite.depth - 1);
+        this.tweens.add({
+          targets: bossGlow,
+          scale: { from: 0.8, to: 1.3 },
+          alpha: { from: 0.5, to: 0 },
+          duration: 1500,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
       }
 
       // Speech bubble indicator for uncompleted NPCs — "talk to me!" cue
@@ -919,6 +932,32 @@ export class ExplorationScene extends Phaser.Scene {
 
     if (ia.type === 'npc') {
       const npc = ia.data as NPC;
+
+      // First-time NPC discovery sparkle — celebrate the moment
+      if (!this.completedNPCs.has(npc.id)) {
+        this.cameras.main.flash(150, 200, 200, 255, false);
+        if (this.textures.exists('particle_circle')) {
+          const sparkle = this.add.particles(ia.sprite.x, ia.sprite.y, 'particle_circle', {
+            speed: { min: 40, max: 90 },
+            angle: { min: 0, max: 360 },
+            scale: { start: 0.5, end: 0 },
+            alpha: { start: 1, end: 0 },
+            tint: [0xffd700, 0xffd700, 0xffa500, 0xffec8b],
+            lifespan: 400,
+            quantity: 4,
+            depth: 99,
+            emitting: false,
+          } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
+          sparkle.explode(4);
+          this.time.delayedCall(500, () => sparkle.destroy());
+        }
+      }
+
+      // Boss encounter — dramatic camera zoom-in
+      if (npc.isFinalBoss) {
+        this.cameras.main.zoomTo(1.15, 300, 'Sine.easeInOut');
+      }
+
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_INTERACT_NPC, {
         npcId: npc.id,
         npcName: npc.name,
@@ -966,6 +1005,11 @@ export class ExplorationScene extends Phaser.Scene {
   // ── Resume after dialogue ──────────────────────────────────────
   private onDialogueComplete = () => {
     this.paused = false;
+
+    // Zoom back from boss encounter
+    if (this.cameras.main.zoom !== 1) {
+      this.cameras.main.zoomTo(1, 300, 'Sine.easeInOut');
+    }
 
     // Fade out dialogue dim overlay
     if (this.dialogueDimOverlay) {
