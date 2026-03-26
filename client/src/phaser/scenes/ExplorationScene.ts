@@ -295,6 +295,49 @@ export class ExplorationScene extends Phaser.Scene {
       ).setDepth(0);
     }
 
+    // ── Room-specific decorative details ────────────────────────
+    const decorGfx = this.add.graphics().setDepth(1);
+
+    // Baseboard strip along bottom of walls — universal room detail
+    decorGfx.fillStyle(0x4a3f2e, 0.5);
+    for (const obs of room.obstacles) {
+      if ((obs as any).type === 'wall') {
+        const bx = obs.x * TILE;
+        const by = (obs.y + obs.height) * TILE - 3;
+        const bw = obs.width * TILE;
+        decorGfx.fillRect(bx, by, bw, 3);
+        // Baseboard highlight
+        decorGfx.fillStyle(0x6a5b44, 0.4);
+        decorGfx.fillRect(bx, by, bw, 1);
+        decorGfx.fillStyle(0x4a3f2e, 0.5);
+      }
+    }
+
+    // Room-specific floor details
+    if (roomId.includes('er') || roomId.includes('emergency')) {
+      // ER: floor warning stripes near edges
+      decorGfx.fillStyle(0xffcc00, 0.08);
+      decorGfx.fillRect(0, 0, w, 4);
+      decorGfx.fillRect(0, h - 4, w, 4);
+    } else if (roomId.includes('lab')) {
+      // Lab: biohazard symbol hint in corner
+      decorGfx.fillStyle(0xf39c12, 0.06);
+      decorGfx.fillCircle(w - 24, h - 24, 12);
+      decorGfx.fillStyle(0x000000, 0.04);
+      decorGfx.fillCircle(w - 24, h - 24, 6);
+    } else if (roomId.includes('it') || roomId.includes('server')) {
+      // Server room: floor cable channels
+      decorGfx.lineStyle(2, 0x333333, 0.15);
+      decorGfx.beginPath();
+      decorGfx.moveTo(TILE * 2, TILE);
+      decorGfx.lineTo(TILE * 2, h - TILE);
+      decorGfx.strokePath();
+      decorGfx.beginPath();
+      decorGfx.moveTo(w - TILE * 2, TILE);
+      decorGfx.lineTo(w - TILE * 2, h - TILE);
+      decorGfx.strokePath();
+    }
+
     // ── Ambient dust particles — subtle floating motes ──────────
     if (this.textures.exists('particle_circle')) {
       this.add.particles(0, 0, 'particle_circle', {

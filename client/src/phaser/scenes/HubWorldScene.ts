@@ -788,6 +788,42 @@ export class HubWorldScene extends Phaser.Scene {
 
     drawInfoBoard(Math.floor(1.5 * TILE_SIZE), 5 * TILE_SIZE);
     drawInfoBoard(Math.floor((COLS - 1.5) * TILE_SIZE), 5 * TILE_SIZE);
+
+    // Welcome mats in front of doors
+    const matG = this.add.graphics();
+    // Left door mat (Privacy Quest — blue)
+    matG.fillStyle(0x4a90e2, 0.3);
+    matG.fillRect(3 * TILE_SIZE, 6 * TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE);
+    matG.fillStyle(0x4a90e2, 0.15);
+    matG.fillRect(3 * TILE_SIZE + 2, 6 * TILE_SIZE + 2, 3 * TILE_SIZE - 4, TILE_SIZE - 4);
+    // Right door mat (Breach Defense — pink)
+    matG.fillStyle(0xff6b9d, 0.3);
+    matG.fillRect(14 * TILE_SIZE, 6 * TILE_SIZE, 3 * TILE_SIZE, TILE_SIZE);
+    matG.fillStyle(0xff6b9d, 0.15);
+    matG.fillRect(14 * TILE_SIZE + 2, 6 * TILE_SIZE + 2, 3 * TILE_SIZE - 4, TILE_SIZE - 4);
+
+    // Wall clock (top wall, centered)
+    const clockX = 10 * TILE_SIZE;
+    const clockY = TILE_SIZE + 8;
+    // Clock face
+    gfx.fillStyle(0xf5f5f0, 1);
+    gfx.fillCircle(clockX, clockY, 10);
+    // Clock border
+    gfx.lineStyle(2, 0x333333, 0.8);
+    gfx.strokeCircle(clockX, clockY, 10);
+    // Clock hands (hour + minute)
+    gfx.lineStyle(1, 0x333333, 0.9);
+    gfx.beginPath();
+    gfx.moveTo(clockX, clockY);
+    gfx.lineTo(clockX + 4, clockY - 3); // hour hand
+    gfx.strokePath();
+    gfx.beginPath();
+    gfx.moveTo(clockX, clockY);
+    gfx.lineTo(clockX - 1, clockY - 7); // minute hand
+    gfx.strokePath();
+    // Clock center dot
+    gfx.fillStyle(0x333333, 1);
+    gfx.fillCircle(clockX, clockY, 1.5);
   }
 
   private createPlant(tileX: number, tileY: number) {
