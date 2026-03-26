@@ -90,6 +90,9 @@ export class BreachDefenseScene extends Phaser.Scene {
   private statusText?: Phaser.GameObjects.Text;
   private statusCursor?: Phaser.GameObjects.Text;
 
+  // Danger vignette for low security score
+  private dangerVignette?: Phaser.GameObjects.Graphics;
+
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.35;
@@ -122,6 +125,10 @@ export class BreachDefenseScene extends Phaser.Scene {
     this.shownWaveStartBanners = new Set();
     this.waveKillCount = 0;
     this.lastBroadcast = 0;
+    if (this.dangerVignette) {
+      this.dangerVignette.destroy();
+      this.dangerVignette = undefined;
+    }
   }
 
   create() {
@@ -695,12 +702,28 @@ export class BreachDefenseScene extends Phaser.Scene {
       .setDisplaySize(48, 48)
       .setDepth(15);
 
+    // Dramatic entrance animation — spawn from nothing
+    sprite.setAlpha(0).setScale(0.3);
+    this.tweens.add({
+      targets: sprite,
+      alpha: 1,
+      scaleX: 48 / sprite.width,
+      scaleY: 48 / sprite.height,
+      duration: 300,
+      ease: 'Back.easeOut'
+    });
+
     // HP bar background
     const hpBarBg = this.add.rectangle(px, py - 30, 40, 5, 0x333333)
       .setDepth(16);
     // HP bar fill
     const hpBarFill = this.add.rectangle(px, py - 30, 40, 5, 0x44ff44)
       .setDepth(17);
+
+    // HP bars fade in after a brief delay
+    hpBarBg.setAlpha(0);
+    hpBarFill.setAlpha(0);
+    this.tweens.add({ targets: [hpBarBg, hpBarFill], alpha: 1, duration: 200, delay: 200 });
 
     const enemy: EnemyData = {
       id: Phaser.Math.RND.uuid(),
@@ -778,6 +801,30 @@ export class BreachDefenseScene extends Phaser.Scene {
   }
 
   private activateWave() {
+    // Tension buildup before wave starts
+    if (this.headerText) {
+      const origColor = this.headerText.style.color;
+      this.headerText.setColor('#ff4444');
+      this.time.delayedCall(600, () => {
+        if (this.headerText) this.headerText.setColor(origColor || '#00d4aa');
+      });
+    }
+
+    const warningText = this.add.text(
+      GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
+      'INCOMING THREATS DETECTED',
+      { fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#ff6644', stroke: '#000000', strokeThickness: 2 }
+    ).setOrigin(0.5).setDepth(50);
+
+    this.tweens.add({
+      targets: warningText,
+      alpha: { from: 1, to: 0.2 },
+      duration: 200,
+      yoyo: true,
+      repeat: 2,
+      onComplete: () => warningText.destroy()
+    });
+
     this.waveState.active = true;
     this.sound.play('sfx_wave_start', { volume: 0.7 });
   }
@@ -1118,6 +1165,31 @@ export class BreachDefenseScene extends Phaser.Scene {
       }
     }
 
+    // ── Low-security danger vignette ──────────────────────────
+    if (this.securityScore <= 40 && this.gameState === 'PLAYING') {
+      if (!this.dangerVignette) {
+        this.dangerVignette = this.add.graphics().setDepth(35).setScrollFactor(0);
+      }
+      const intensity = Math.max(0, (40 - this.securityScore) / 40); // 0 at 40%, 1 at 0%
+      this.dangerVignette.clear();
+      // Red edges that get more intense as score drops
+      const w = GRID_COLS * CELL_SIZE;
+      const h = GRID_ROWS * CELL_SIZE + 96;
+      const edgeWidth = 30 + intensity * 40;
+      this.dangerVignette.fillStyle(0xff0000, intensity * 0.15);
+      // Top edge
+      this.dangerVignette.fillRect(0, 0, w, edgeWidth);
+      // Bottom edge
+      this.dangerVignette.fillRect(0, h - edgeWidth, w, edgeWidth);
+      // Left edge
+      this.dangerVignette.fillRect(0, 0, edgeWidth, h);
+      // Right edge
+      this.dangerVignette.fillRect(w - edgeWidth, 0, edgeWidth, h);
+    } else if (this.dangerVignette) {
+      this.dangerVignette.destroy();
+      this.dangerVignette = undefined;
+    }
+
     // ── Phase 4: Tower targeting & firing ──────────────────────
     for (const tower of this.towers) {
       const stats = TOWERS[tower.type];
@@ -1176,6 +1248,20 @@ export class BreachDefenseScene extends Phaser.Scene {
           color: colorNum,
           graphics: arc,
           isStrong: !!isStrong
+        });
+
+        // Brief targeting beam from tower to target
+        const beamLine = this.add.graphics().setDepth(19);
+        beamLine.lineStyle(1.5, colorNum, 0.4);
+        beamLine.beginPath();
+        beamLine.moveTo(towerPx, towerPy);
+        beamLine.lineTo(bestTarget.sprite.x, bestTarget.sprite.y);
+        beamLine.strokePath();
+        this.tweens.add({
+          targets: beamLine,
+          alpha: 0,
+          duration: 150,
+          onComplete: () => beamLine.destroy()
         });
 
         tower.lastFired = time;
@@ -1272,6 +1358,10 @@ export class BreachDefenseScene extends Phaser.Scene {
   };
 
   shutdown() {
+    if (this.dangerVignette) {
+      this.dangerVignette.destroy();
+      this.dangerVignette = undefined;
+    }
     if (this.bgMusic) {
       this.bgMusic.stop();
       this.bgMusic = undefined;

@@ -10,6 +10,7 @@ interface ChoicePromptProps {
 
 export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
   const [visible, setVisible] = useState(false);
+  const [showOptions, setShowOptions] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   
   const options = gate.choiceOptions || [];
@@ -19,7 +20,11 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
       setVisible(true);
       eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
     }, 100);
-    return () => clearTimeout(showTimer);
+    const optionsTimer = setTimeout(() => setShowOptions(true), 500);
+    return () => {
+      clearTimeout(showTimer);
+      clearTimeout(optionsTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -33,13 +38,16 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
       } else if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         if (options[selectedIndex]) {
+          eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
           onChoice(options[selectedIndex].unlocksId);
         }
       } else if (e.key === '1' && options[0]) {
         e.preventDefault();
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
         onChoice(options[0].unlocksId);
       } else if (e.key === '2' && options[1]) {
         e.preventDefault();
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
         onChoice(options[1].unlocksId);
       }
     };
@@ -77,7 +85,15 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
               className={`text-left justify-start p-4 h-auto ${
                 selectedIndex === index ? 'ring-2 ring-primary ring-offset-2' : ''
               }`}
-              onClick={() => onChoice(option.unlocksId)}
+              style={{
+                opacity: showOptions ? 1 : 0,
+                transform: showOptions ? 'translateY(0)' : 'translateY(8px)',
+                transition: `all 300ms ease-out ${index * 100}ms`,
+              }}
+              onClick={() => {
+                eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
+                onChoice(option.unlocksId);
+              }}
               data-testid={`button-choice-${index}`}
             >
               <span className="mr-2 text-xs opacity-60">{index + 1}.</span>

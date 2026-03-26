@@ -25,6 +25,7 @@ export class HubWorldScene extends Phaser.Scene {
   private readonly musicBaseVolume = 0.3;
   // Idle frame index per direction: down=0, left=3, right=6, up=9 (row*3+0)
   private lastFacingFrame = 0;
+  private transitioning = false;
 
   constructor() {
     super({ key: 'HubWorld' });
@@ -283,8 +284,17 @@ export class HubWorldScene extends Phaser.Scene {
     this.checkDoorProximity();
 
     // Interact
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey) && this.nearDoor) {
-      eventBridge.emit(BRIDGE_EVENTS.HUB_SELECT_GAME, this.nearDoor);
+    if (Phaser.Input.Keyboard.JustDown(this.interactKey) && this.nearDoor && !this.transitioning) {
+      this.transitioning = true;
+
+      // Dramatic door enter transition
+      this.cameras.main.flash(300, 255, 255, 255, false);
+      this.cameras.main.fade(400, 0, 0, 0);
+
+      // Brief pause for the fade, then emit
+      this.time.delayedCall(350, () => {
+        eventBridge.emit(BRIDGE_EVENTS.HUB_SELECT_GAME, this.nearDoor);
+      });
     }
   }
 
