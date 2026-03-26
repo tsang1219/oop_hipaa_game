@@ -358,8 +358,8 @@ export class BreachDefenseScene extends Phaser.Scene {
     const gridWidth = GRID_COLS * CELL_SIZE;
     const scanTop = 20;
     const scanBottom = GRID_ROWS * CELL_SIZE;
-    this.scanLine = this.add.rectangle(gridWidth / 2, scanTop, gridWidth, 2, 0x00d4aa, 0.15)
-      .setDepth(7);
+    this.scanLine = this.add.rectangle(gridWidth / 2, scanTop, gridWidth, 2, 0x00d4aa, 0.08)
+      .setDepth(3);
     this.tweens.add({
       targets: this.scanLine,
       y: scanBottom,

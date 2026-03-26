@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { AlertCircle, Shield, Lock } from 'lucide-react';
+import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface TutorialModalProps {
   title: string;
@@ -14,6 +15,10 @@ export function TutorialModal({ title, description, onAcknowledge, type = 'info'
   const [isVisible, setIsVisible] = useState(false);
   const Icon = type === 'threat' ? AlertCircle : type === 'tower' ? Lock : Shield;
   const iconColor = type === 'threat' ? 'text-red-500' : type === 'tower' ? 'text-[#FF6B9D]' : 'text-blue-500';
+
+  useEffect(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
+  }, []);
 
   useEffect(() => {
     requestAnimationFrame(() => setIsVisible(true));
