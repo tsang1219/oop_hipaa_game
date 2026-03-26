@@ -548,8 +548,8 @@ export class ExplorationScene extends Phaser.Scene {
           // Drop shadow beneath large furniture
           this.add.ellipse(ox + ow / 2, oy + oh / 2 + oh / 3, ow - 4, oh / 3, 0x000000, 0.1);
           // For multi-tile furniture, fill with a rectangle and one sprite
-          this.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh, 0x8b7355, 0.4)
-            .setStrokeStyle(1, 0x5d4e37);
+          this.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh, 0x8b7355, 0.25)
+            .setStrokeStyle(1, 0x5d4e37, 0.4);
           this.add.sprite(ox + ow / 2, oy + oh / 2, texKey);
         }
       }

@@ -961,6 +961,81 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.destroy();
   }
 
+  if (!scene.textures.exists('furn_exam_table')) {
+    const g = scene.add.graphics();
+    // Table body (medical white/grey)
+    g.fillStyle(0xe0e0e0);
+    g.fillRect(4, 10, 24, 14);
+    // Table highlight
+    g.fillStyle(0xf0f0f0);
+    g.fillRect(4, 10, 24, 2);
+    g.fillRect(4, 10, 1, 14);
+    // Table shadow
+    g.fillStyle(0xcccccc);
+    g.fillRect(27, 11, 1, 13);
+    g.fillRect(5, 23, 22, 1);
+    // Cushion (blue medical)
+    g.fillStyle(0x5b9bd5);
+    g.fillRect(6, 11, 20, 10);
+    g.fillStyle(lighten(0x5b9bd5, 20));
+    g.fillRect(6, 11, 20, 2);
+    // Paper roll strip
+    g.fillStyle(0xffffff);
+    g.fillRect(6, 13, 20, 1);
+    // Legs
+    g.fillStyle(0xaaaaaa);
+    g.fillRect(6, 24, 3, 5);
+    g.fillRect(23, 24, 3, 5);
+    g.fillStyle(0xbbbbbb);
+    g.fillRect(6, 24, 1, 5);
+    g.fillRect(23, 24, 1, 5);
+    g.generateTexture('furn_exam_table', TILE, TILE);
+    g.destroy();
+  }
+
+  if (!scene.textures.exists('furn_bookshelf')) {
+    const g = scene.add.graphics();
+    const wood = 0x6d5535;
+    // Frame
+    g.fillStyle(wood);
+    g.fillRect(4, 2, 24, 28);
+    g.fillStyle(lighten(wood, 20));
+    g.fillRect(4, 2, 1, 28);
+    g.fillRect(4, 2, 24, 1);
+    g.fillStyle(darken(wood, 25));
+    g.fillRect(27, 3, 1, 27);
+    g.fillRect(5, 29, 22, 1);
+    // Shelf dividers
+    g.fillStyle(darken(wood, 15));
+    g.fillRect(5, 9, 22, 2);
+    g.fillRect(5, 18, 22, 2);
+    // Books top shelf (colorful spines)
+    const bookColors = [0xe74c3c, 0x2980b9, 0x27ae60, 0xf39c12, 0x8e44ad, 0x1abc9c];
+    for (let i = 0; i < 6; i++) {
+      const bx = 6 + i * 3;
+      g.fillStyle(bookColors[i]);
+      g.fillRect(bx, 3, 2, 6);
+      g.fillStyle(lighten(bookColors[i], 30));
+      g.fillRect(bx, 3, 1, 1);
+    }
+    // Books middle shelf
+    for (let i = 0; i < 5; i++) {
+      const bx = 7 + i * 4;
+      g.fillStyle(bookColors[(i + 2) % bookColors.length]);
+      g.fillRect(bx, 11, 3, 7);
+      g.fillStyle(lighten(bookColors[(i + 2) % bookColors.length], 25));
+      g.fillRect(bx, 11, 1, 1);
+    }
+    // Bottom shelf — folders
+    g.fillStyle(0xf5deb3);
+    g.fillRect(7, 21, 14, 7);
+    g.fillStyle(darken(0xf5deb3, 20));
+    g.fillRect(11, 21, 1, 7);
+    g.fillRect(16, 21, 1, 7);
+    g.generateTexture('furn_bookshelf', TILE, TILE);
+    g.destroy();
+  }
+
   if (!scene.textures.exists('furn_trash')) {
     const g = scene.add.graphics();
     // Can body (metal grey)
@@ -1014,6 +1089,8 @@ export function furnitureTextureKey(obstacleType?: string): string {
     filing_cabinet: 'furn_filing_cabinet',
     trash: 'furn_trash',
     trash_can: 'furn_trash',
+    exam_table: 'furn_exam_table',
+    bookshelf: 'furn_bookshelf',
   };
   return map[obstacleType || ''] || 'furn_desk';
 }
