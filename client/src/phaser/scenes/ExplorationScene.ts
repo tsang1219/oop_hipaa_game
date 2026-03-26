@@ -951,6 +951,21 @@ export class ExplorationScene extends Phaser.Scene {
     vignette.setDepth(50);
     vignette.setScrollFactor(0);
 
+    // Subtle ambient vignette for depth
+    const vignetteGfx = this.add.graphics().setDepth(90).setScrollFactor(0);
+    // Corner shadows (subtle)
+    vignetteGfx.fillStyle(0x000000, 0.08);
+    vignetteGfx.fillRect(0, 0, 40, 40);
+    vignetteGfx.fillRect(camW - 40, 0, 40, 40);
+    vignetteGfx.fillRect(0, camH - 40, 40, 40);
+    vignetteGfx.fillRect(camW - 40, camH - 40, 40, 40);
+    // Edge darkening (very subtle)
+    vignetteGfx.fillStyle(0x000000, 0.03);
+    vignetteGfx.fillRect(0, 0, camW, 10);
+    vignetteGfx.fillRect(0, camH - 10, camW, 10);
+    vignetteGfx.fillRect(0, 0, 10, camH);
+    vignetteGfx.fillRect(camW - 10, 0, 10, camH);
+
     // ── Listen for React events — MUST be before music to survive any audio errors ──
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);

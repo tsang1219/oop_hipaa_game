@@ -281,6 +281,44 @@ export class BreachDefenseScene extends Phaser.Scene {
     }
     pathGlow.strokePath();
 
+    // Path edge highlights — thin brighter lines along path borders
+    const pathEdge = this.add.graphics().setDepth(1);
+    pathEdge.lineStyle(1, 0x9b7bdf, 0.1);
+    for (const p of PATHS[0]) {
+      const cx = p.x * CELL_SIZE;
+      const cy = p.y * CELL_SIZE;
+      // Check which sides are NOT adjacent to path
+      const hasLeft = pathSet.has(`${p.x - 1},${p.y}`);
+      const hasRight = pathSet.has(`${p.x + 1},${p.y}`);
+      const hasUp = pathSet.has(`${p.x},${p.y - 1}`);
+      const hasDown = pathSet.has(`${p.x},${p.y + 1}`);
+
+      if (!hasLeft) {
+        pathEdge.beginPath();
+        pathEdge.moveTo(cx, cy);
+        pathEdge.lineTo(cx, cy + CELL_SIZE);
+        pathEdge.strokePath();
+      }
+      if (!hasRight) {
+        pathEdge.beginPath();
+        pathEdge.moveTo(cx + CELL_SIZE, cy);
+        pathEdge.lineTo(cx + CELL_SIZE, cy + CELL_SIZE);
+        pathEdge.strokePath();
+      }
+      if (!hasUp) {
+        pathEdge.beginPath();
+        pathEdge.moveTo(cx, cy);
+        pathEdge.lineTo(cx + CELL_SIZE, cy);
+        pathEdge.strokePath();
+      }
+      if (!hasDown) {
+        pathEdge.beginPath();
+        pathEdge.moveTo(cx, cy + CELL_SIZE);
+        pathEdge.lineTo(cx + CELL_SIZE, cy + CELL_SIZE);
+        pathEdge.strokePath();
+      }
+    }
+
     // Path entry portal glow (where enemies spawn)
     const pathStart = PATHS[0][0];
     const startX = (pathStart.x - 1) * CELL_SIZE + CELL_SIZE / 2;

@@ -443,3 +443,13 @@
     transform: translateY(-30px);
   }
 }
+
+@keyframes gentle-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.85; }
+}
+
+@keyframes subtle-glow {
+  0%, 100% { box-shadow: 0 0 5px rgba(255, 107, 157, 0.2); }
+  50% { box-shadow: 0 0 15px rgba(255, 107, 157, 0.4); }
+}
