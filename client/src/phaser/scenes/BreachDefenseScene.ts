@@ -973,6 +973,7 @@ export class BreachDefenseScene extends Phaser.Scene {
               towersActive: this.towers.length
             }
           });
+          const waveKills = this.waveKillCount;
           this.waveKillCount = 0;
 
           // ── Wave complete celebration effects ──
@@ -995,6 +996,30 @@ export class BreachDefenseScene extends Phaser.Scene {
                 alpha: 0, y: clearedText.y - 40,
                 duration: 600, delay: 800, ease: 'Quad.easeIn',
                 onComplete: () => clearedText.destroy()
+              });
+            }
+          });
+
+          // Wave stats beneath the cleared text
+          const statsText = this.add.text(
+            GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2 + 25,
+            `${waveKills} threats stopped`,
+            { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#aaffaa', stroke: '#000000', strokeThickness: 2 }
+          ).setOrigin(0.5).setDepth(50).setAlpha(0);
+
+          this.tweens.add({
+            targets: statsText,
+            alpha: 1,
+            duration: 300,
+            delay: 400,
+            ease: 'Sine.easeOut',
+            onComplete: () => {
+              this.tweens.add({
+                targets: statsText,
+                alpha: 0,
+                duration: 400,
+                delay: 1000,
+                onComplete: () => statsText.destroy()
               });
             }
           });
@@ -1492,7 +1517,18 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.sound.play('sfx_enemy_death', { volume: 0.6 });
 
       const threatName = THREATS[e.type]?.name || e.type;
-      const label = this.add.text(e.sprite.x, e.sprite.y - 20, threatName, {
+      // Occasional witty kill messages for variety
+      const killMessages = [
+        'NEUTRALIZED!',
+        'ACCESS DENIED!',
+        'BLOCKED!',
+        'QUARANTINED!',
+        'PATCHED!',
+      ];
+      const displayText = Math.random() < 0.3
+        ? killMessages[Math.floor(Math.random() * killMessages.length)]
+        : threatName;
+      const label = this.add.text(e.sprite.x, e.sprite.y - 20, displayText, {
         fontFamily: '"Press Start 2P"',
         fontSize: '7px',
         color: '#44ff44',

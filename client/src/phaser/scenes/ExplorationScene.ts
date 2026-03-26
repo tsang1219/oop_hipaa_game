@@ -260,6 +260,22 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // Room-specific ambient color overlay
+    const roomTints: Record<string, number> = {
+      reception: 0x4a90e2,     // Blue — professional
+      records_room: 0x2ecc71,  // Green — organized
+      er: 0xff6b6b,            // Red — urgent
+      lab: 0x9b59b6,           // Purple — scientific
+      break_room: 0xf39c12,    // Warm amber — relaxed
+      it_office: 0x00d4aa,     // Teal — tech
+    };
+    const tintColor = roomTints[this.room.id] || 0xffffff;
+    if (tintColor !== 0xffffff) {
+      this.add.rectangle(
+        w / 2, h / 2, w, h, tintColor, 0.04
+      ).setDepth(0);
+    }
+
     // ── Ambient dust particles — subtle floating motes ──────────
     if (this.textures.exists('particle_circle')) {
       this.add.particles(0, 0, 'particle_circle', {
