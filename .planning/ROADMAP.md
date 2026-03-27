@@ -135,7 +135,13 @@ Plans:
   4. When the encounter ends, the player is returned to the exact room position they were standing in when it triggered — ExplorationScene resumes without reloading.
   5. The compliance score HUD updates during exploration to reflect both dialogue choices and encounter performance on a single unified meter.
   6. The encounter ends with a debrief screen showing score and 1-2 HIPAA takeaways before returning to the RPG world.
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 13-01-PLAN.md — Encounter constants (ENCOUNTER_WAVES_INBOUND, budgets, towers) + BreachDefenseScene parameterization via init(data)
+- [ ] 13-02-PLAN.md — EventBridge encounter events + ExplorationScene sleep/wake lifecycle + IT Office trigger zone
+- [ ] 13-03-PLAN.md — NarrativeContextCard + EncounterDebrief + EncounterHud components + PrivacyQuestPage phase state machine
+- [ ] 13-04-PLAN.md — Encounter-mode terminal handlers in BreachDefenseScene + unified complianceScore + /breach route removal
 
 ### Phase 14: Three-Act Narrative Arc
 **Goal**: The game has a felt narrative shape — acts advance based on completion, music shifts between acts, and NPCs acknowledge the player's earlier actions at key moments.
@@ -184,7 +190,7 @@ Plans:
 | 9. Floor Tiles | v1.1 | 0/0 | Deferred | - |
 | 10. Integration + Cleanup | v1.1 | 0/0 | Deferred | - |
 | 11. Pre-Restructure Foundation | v2.0 | 0/4 | Not started | - |
-| 12. Unified Navigation | v2.0 | 0/TBD | Not started | - |
-| 13. Encounter Integration | v2.0 | 0/TBD | Not started | - |
+| 12. Unified Navigation | v2.0 | 0/4 | Not started | - |
+| 13. Encounter Integration | v2.0 | 0/4 | Not started | - |
 | 14. Three-Act Narrative Arc | v2.0 | 0/4 | Not started | - |
 | 15. Polish and Completion | v2.0 | 0/3 | Not started | - |
