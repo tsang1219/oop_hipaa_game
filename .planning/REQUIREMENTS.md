@@ -75,17 +75,41 @@
 
 ## Traceability
 
-<!-- Populated during roadmap creation -->
-
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| — | — | — |
+| FOUN-03 | Phase 11 | Pending |
+| FOUN-04 | Phase 11 | Pending |
+| FOUN-01 | Phase 12 | Pending |
+| FOUN-02 | Phase 12 | Pending |
+| NAV-01 | Phase 12 | Pending |
+| NAV-02 | Phase 12 | Pending |
+| NAV-03 | Phase 12 | Pending |
+| NAV-04 | Phase 12 | Pending |
+| NAV-05 | Phase 12 | Pending |
+| NAV-06 | Phase 12 | Pending |
+| NAV-07 | Phase 12 | Pending |
+| NAV-08 | Phase 12 | Pending |
+| ENC-01 | Phase 13 | Pending |
+| ENC-02 | Phase 13 | Pending |
+| ENC-03 | Phase 13 | Pending |
+| ENC-04 | Phase 13 | Pending |
+| ENC-05 | Phase 13 | Pending |
+| ENC-06 | Phase 13 | Pending |
+| ENC-07 | Phase 13 | Pending |
+| NARR-01 | Phase 14 | Pending |
+| NARR-02 | Phase 14 | Pending |
+| NARR-03 | Phase 14 | Pending |
+| NARR-04 | Phase 14 | Pending |
+| NARR-05 | Phase 14 | Pending |
+| NARR-06 | Phase 15 | Pending |
+| NARR-07 | Phase 15 | Pending |
+| NARR-08 | Phase 15 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 27 total
-- Mapped to phases: 0
-- Unmapped: 27 ⚠️
+- Mapped to phases: 27
+- Unmapped: 0
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-03-26 after initial definition*
+*Last updated: 2026-03-27 — traceability populated after roadmap creation*
