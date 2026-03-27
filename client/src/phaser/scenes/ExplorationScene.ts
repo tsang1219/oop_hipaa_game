@@ -1000,13 +1000,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
 
     // Listen for correct/incorrect answer feedback from React
-    eventBridge.on(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, (data: { type: string }) => {
-      if (data.type === 'correct') {
-        this.cameras.main.flash(200, 100, 255, 100, false); // green flash
-      } else if (data.type === 'incorrect') {
-        this.cameras.main.flash(200, 255, 80, 80, false); // red flash
-      }
-    });
+    eventBridge.on(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
 
     // Sync mute state from localStorage before any audio plays
     if (localStorage.getItem('sfx_muted') === 'true') {
@@ -1217,7 +1211,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
-    eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK);
+    eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
     // Clean up input handlers
     this.input.off('pointerdown');
     // Kill all tweens to prevent leaked infinite loops
@@ -1230,12 +1224,14 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private onMusicVolume = (vol: number) => {
+    if (!this.scene.isActive()) return;
     if (this.bgMusic) {
       (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.musicBaseVolume * vol;
     }
   };
 
   private onPlaySfx = (data: { key: string; volume?: number }) => {
+    if (!this.scene.isActive()) return;
     try {
       if (this.sound && this.sound.get(data.key)) {
         this.sound.play(data.key, { volume: data.volume ?? 0.5 });
@@ -1506,8 +1502,19 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
+  // ── Answer feedback flash (correct/incorrect) ─────────────────
+  private onAnswerFeedback = (data: { type: string }) => {
+    if (!this.scene.isActive()) return;
+    if (data.type === 'correct') {
+      this.cameras.main.flash(200, 100, 255, 100, false); // green flash
+    } else if (data.type === 'incorrect') {
+      this.cameras.main.flash(200, 255, 80, 80, false); // red flash
+    }
+  };
+
   // ── Resume after dialogue ──────────────────────────────────────
   private onDialogueComplete = () => {
+    if (!this.scene.isActive()) return;
     this.paused = false;
 
     // Zoom back from boss encounter
@@ -1539,6 +1546,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   // ── Pause from modal (intro / help icon) ───────────────────────
   private onPauseFromModal = () => {
+    if (!this.scene.isActive()) return;
     this.paused = true;
   };
 
