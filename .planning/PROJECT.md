@@ -2,11 +2,11 @@
 
 ## What This Is
 
-Two HIPAA educational games — PrivacyQuest (privacy RPG exploration) and BreachDefense (security tower defense) — built with Phaser 3 + React, connected through a hospital lobby hub world. Both games are functionally complete with sound, animation, visual effects, HUD data, and onboarding polish shipped in v1.0.
+A unified HIPAA educational RPG where the player walks through a continuous hospital as a new employee, meeting staff, discovering scenarios, and making compliance decisions. Encounter mechanics (tower defense, PHI sorting) are triggered from the RPG world and reinforce learning. Built with Phaser 3 + React 18 + TypeScript.
 
 ## Core Value
 
-Both games must feel like real games — not prototypes. Sound, visual feedback, and player guidance are the gaps between "it works" and "it's fun to play."
+The player should forget they're doing compliance training. One continuous game that feels like a polished SNES-era RPG — not two separate modules with game skins.
 
 ## Requirements
 
@@ -30,35 +30,39 @@ Both games must feel like real games — not prototypes. Sound, visual feedback,
 
 ### Active
 
-## Current Milestone: v1.1 Sprite Overhaul
+## Current Milestone: v2.0 One Game
 
-**Goal:** Replace all programmatic fillRect sprites with AI-generated PNG pixel art across PrivacyQuest and the Hub World — characters, portraits, furniture, interactive objects, and floor tiles.
+**Goal:** Restructure PrivacyQuest + BreachDefense from two separate games into one cohesive RPG with continuous hospital navigation, integrated tower defense encounters, and a three-act narrative arc.
 
 **Target features:**
 
-- AI-generated 4-direction character spritesheets (9 characters) replacing SpriteFactory rectangles
-- NPC dialogue portraits (6 characters) replacing placeholder SVG components
-- Hospital furniture and room objects (\~14 items) as individual PNG sprites
-- Interactive educational objects (4 items) with glowing/magical aesthetic
-- Hospital floor tiles (8 variants) replacing checkerboard programmatic floors
-- BootScene sprite loading, animation registration, and SpriteFactory retirement
+- Continuous hospital navigation — player walks between departments through doors (no room picker, no hub menu)
+- Door-to-door transitions with visual cues (locked/available/completed) and hallway connectors
+- Linear department unlock progression (Reception → Break Room → Lab → Records → IT → ER)
+- Inbound TD encounter integrated into RPG world — condensed 4-wave format, triggered from narrative events
+- Encounter trigger/return system — RPG event launches encounter, results feed back to world state
+- Three-act narrative arc with act progression, per-act music shifts, and transition dialogue
+- Unified compliance score across all encounter types
+- Bug stabilization pass on surviving systems before restructure
 
 ### Out of Scope
 
-- Tower sell/upgrade system — changes game balance significantly
-- Game speed control (fast-forward) — undermines educational content timing
-- BreachDefense save state — session-based play is intentional (15-20 min)
+- New encounter types (PHI sorting, outbound TD, breach triage) — v2.1 "Full Vision"
+- Remaining sprite overhaul (portraits, furniture, tiles) — folded into v2.1
+- End-of-game report screen — v2.1
+- Admin console / certificate generation / analytics — future roadmap
 - Mobile/responsive layout — desktop-first
-- Background music/ambient loops — SFX-only delivers 80% of game feel
-- Real-time multiplayer / leaderboards — requires backend, not relevant to individual HIPAA training
+- Real-time multiplayer / leaderboards — requires backend
+- Tower sell/upgrade system — changes game balance significantly
 
 ## Context
 
-Shipped v1.0 Polish milestone with \~12,400 LOC across 68 files.
+Shipped v1.0 Polish milestone (~12,400 LOC, 68 files). v1.1 Sprite Overhaul partially complete (character sprites shipped, rest deferred).
 Tech stack: Phaser 3.90+ / React 18 / TypeScript / Vite 5 / Tailwind 3.
-Art: Programmatic pixel sprites (32px/64px) for PrivacyQuest (being replaced in v1.1), BreachDefense has PNG sprites for towers/threats.
+Art: Character spritesheets (32x32 frames) for player + 9 NPCs. BreachDefense has PNG sprites for towers/threats. Some programmatic sprites remain (furniture, tiles).
 Audio: 6 Kenney CC0 OGG files loaded in BootScene, played via `this.sound.play()`.
 Hosting: Desktop browser (Chrome/Firefox), no Safari support yet (OGG-only audio).
+Enhancement brief: `.planning/ENHANCEMENT_BRIEF.md` — full design reference for the unified RPG restructure.
 
 ## Key Decisions
 
@@ -82,4 +86,4 @@ Hosting: Desktop browser (Chrome/Firefox), no Safari support yet (OGG-only audio
 
 ---
 
-*Last updated: 2026-03-01 after v1.1 milestone start*
+*Last updated: 2026-03-26 after v2.0 milestone start*
