@@ -19,6 +19,7 @@ import { ValidationOverlay } from '../dev/ValidationOverlay';
 import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
+import { migrateV1toV2, loadSave, writeSave, type SaveDataV2 } from '@/lib/saveData';
 
 type PageMode = 'hub' | 'exploration' | 'dialogue' | 'gameover' | 'win';
 
@@ -45,6 +46,10 @@ interface RoomWithStory {
 const rooms = roomDataJson.rooms as RoomWithStory[];
 const scenes = (gameDataJson as any).scenes as Scene[];
 
+// Run migration before React renders — idempotent, returns v2 save
+const ROOM_IDS = (roomDataJson.rooms as any[]).map((r: any) => r.id);
+const initialSave = migrateV1toV2(ROOM_IDS);
+
 export default function PrivacyQuestPage() {
   const { toast } = useToast();
   const { notify } = useNotification();
@@ -58,37 +63,14 @@ export default function PrivacyQuestPage() {
   const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
   const [currentNPCId, setCurrentNPCId] = useState<string | null>(null);
 
-  const [completedRooms, setCompletedRooms] = useState<string[]>(() => {
-    try { const s = localStorage.getItem('completedRooms'); return s ? JSON.parse(s) : []; }
-    catch { return []; }
-  });
-  const [collectedStories, setCollectedStories] = useState<string[]>(() => {
-    try { const s = localStorage.getItem('collectedStories'); return s ? JSON.parse(s) : []; }
-    catch { return []; }
-  });
-  const [completedNPCs, setCompletedNPCs] = useState<Set<string>>(() => {
-    try { const s = localStorage.getItem('completedNPCs'); return s ? new Set(JSON.parse(s)) : new Set(); }
-    catch { return new Set(); }
-  });
-  const [completedZones, setCompletedZones] = useState<Set<string>>(() => {
-    try { const s = localStorage.getItem('completedZones'); return s ? new Set(JSON.parse(s)) : new Set(); }
-    catch { return new Set(); }
-  });
-  const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
-    try { const s = localStorage.getItem('collectedEducationalItems'); return s ? new Set(JSON.parse(s)) : new Set(); }
-    catch { return new Set(); }
-  });
-  const [privacyScore, setPrivacyScore] = useState(() => {
-    const s = localStorage.getItem('current-privacy-score');
-    const parsed = s ? parseInt(s, 10) : NaN;
-    return isNaN(parsed) ? 100 : parsed;
-  });
-  const [finalPrivacyScore, setFinalPrivacyScore] = useState(100);
-  const [gameStartTime] = useState(() => {
-    const s = localStorage.getItem('gameStartTime');
-    const parsed = s ? parseInt(s, 10) : NaN;
-    return isNaN(parsed) ? Date.now() : parsed;
-  });
+  const [completedRooms, setCompletedRooms] = useState<string[]>(initialSave.completedRooms);
+  const [collectedStories, setCollectedStories] = useState<string[]>(initialSave.collectedStories);
+  const [completedNPCs, setCompletedNPCs] = useState<Set<string>>(new Set(initialSave.completedNPCs));
+  const [completedZones, setCompletedZones] = useState<Set<string>>(new Set(initialSave.completedZones));
+  const [collectedItems, setCollectedItems] = useState<Set<string>>(new Set(initialSave.collectedItems));
+  const [privacyScore, setPrivacyScore] = useState<number>(initialSave.privacyScore);
+  const [finalPrivacyScore, setFinalPrivacyScore] = useState<number>(initialSave.finalPrivacyScore);
+  const [gameStartTime] = useState<number>(initialSave.gameStartTime);
 
   // Modal state
   const [showStoryModal, setShowStoryModal] = useState(false);
@@ -101,17 +83,14 @@ export default function PrivacyQuestPage() {
   // Room cleared banner
   const [roomClearedBanner, setRoomClearedBanner] = useState<{ roomName: string } | null>(null);
 
-  // Gate state per room
-  const [resolvedGates, setResolvedGates] = useState<Set<string>>(() => {
-    if (!currentRoomId) return new Set();
-    try { const s = localStorage.getItem(`resolvedGates_${currentRoomId}`); return s ? new Set(JSON.parse(s)) : new Set(); }
-    catch { return new Set(); }
-  });
-  const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(() => {
-    if (!currentRoomId) return new Set();
-    try { const s = localStorage.getItem(`unlockedNpcs_${currentRoomId}`); return s ? new Set(JSON.parse(s)) : new Set(); }
-    catch { return new Set(); }
-  });
+  // Gate state per room (current room view)
+  const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
+  const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(new Set());
+
+  // Accumulated gate state across all rooms (for v2 persistence)
+  const resolvedGatesAll = useRef<Record<string, string[]>>(initialSave.resolvedGates);
+  const unlockedNpcsAll = useRef<Record<string, string[]>>(initialSave.unlockedNpcs);
+  const npcPulsedRooms = useRef<string[]>(initialSave.npcPulsedRooms);
 
   // Score milestone celebrations
   const shownMilestones = useRef<Set<number>>(new Set());
@@ -121,27 +100,40 @@ export default function PrivacyQuestPage() {
   const [scoreDelta, setScoreDelta] = useState<{ value: number; key: number } | null>(null);
   const scoreDeltaTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Intro modal — shown once (gated by localStorage flag), skipped in QA mode
+  // Intro modal — shown once, skipped in QA mode
   const [showIntroModal, setShowIntroModal] = useState(() => {
     if (new URLSearchParams(window.location.search).has('qa-room')) return false;
-    return !localStorage.getItem('pq:onboarding:seen');
+    return !initialSave.onboardingSeen;
   });
 
   // Mute toggle
-  const [muted, setMuted] = useState(() =>
-    localStorage.getItem('sfx_muted') === 'true'
-  );
+  const [muted, setMuted] = useState<boolean>(initialSave.sfxMuted);
   const totalScenarios = rooms.reduce((sum, r) => sum + r.npcs.filter((n: any) => !n.isFinalBoss).length, 0);
   const currentRoom = rooms.find(r => r.id === currentRoomId) || null;
 
-  // ── Persistence ──────────────────────────────────────────────
-  useEffect(() => { localStorage.setItem('gameStartTime', gameStartTime.toString()); }, [gameStartTime]);
-  useEffect(() => { localStorage.setItem('completedRooms', JSON.stringify(completedRooms)); }, [completedRooms]);
-  useEffect(() => { localStorage.setItem('collectedStories', JSON.stringify(collectedStories)); }, [collectedStories]);
-  useEffect(() => { localStorage.setItem('completedNPCs', JSON.stringify(Array.from(completedNPCs))); }, [completedNPCs]);
-  useEffect(() => { localStorage.setItem('completedZones', JSON.stringify(Array.from(completedZones))); }, [completedZones]);
-  useEffect(() => { localStorage.setItem('collectedEducationalItems', JSON.stringify(Array.from(collectedItems))); }, [collectedItems]);
-  useEffect(() => { localStorage.setItem('current-privacy-score', privacyScore.toString()); }, [privacyScore]);
+  // ── Consolidated persistence (replaces 7 individual effects) ──
+  useEffect(() => {
+    const currentMusicVolume = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+    writeSave({
+      version: 2,
+      completedRooms,
+      collectedStories,
+      completedNPCs: Array.from(completedNPCs),
+      completedZones: Array.from(completedZones),
+      collectedItems: Array.from(collectedItems),
+      privacyScore,
+      finalPrivacyScore,
+      resolvedGates: resolvedGatesAll.current,
+      unlockedNpcs: unlockedNpcsAll.current,
+      npcPulsedRooms: npcPulsedRooms.current,
+      gameStartTime,
+      onboardingSeen: !showIntroModal,
+      sfxMuted: muted,
+      musicVolume: isNaN(currentMusicVolume) ? 0.6 : currentMusicVolume,
+    });
+  }, [completedRooms, collectedStories, completedNPCs, completedZones,
+      collectedItems, privacyScore, finalPrivacyScore, gameStartTime,
+      muted, showIntroModal]);
 
   // ── Score delta floating indicator ──────────────────────────
   useEffect(() => {
@@ -190,19 +182,13 @@ export default function PrivacyQuestPage() {
     }
   }, [completedNPCs, totalScenarios, notify]);
 
-  // ── Load gate state when room changes ────────────────────────
+  // ── Load gate state when room changes (from v2 accumulated refs) ──
   useEffect(() => {
     if (!currentRoomId) return;
-    let parsedGates: Set<string> = new Set();
-    let parsedNpcs: Set<string> = new Set();
-    try {
-      const sg = localStorage.getItem(`resolvedGates_${currentRoomId}`);
-      parsedGates = sg ? new Set(JSON.parse(sg)) : new Set();
-    } catch { /* corrupted data, reset */ }
-    try {
-      const sn = localStorage.getItem(`unlockedNpcs_${currentRoomId}`);
-      parsedNpcs = sn ? new Set(JSON.parse(sn)) : new Set();
-    } catch { /* corrupted data, reset */ }
+    const gatesForRoom = resolvedGatesAll.current[currentRoomId] || [];
+    const npcsForRoom = unlockedNpcsAll.current[currentRoomId] || [];
+    const parsedGates = new Set(gatesForRoom);
+    const parsedNpcs = new Set(npcsForRoom);
     setResolvedGates(parsedGates);
     setUnlockedNpcs(parsedNpcs);
 
@@ -239,12 +225,17 @@ export default function PrivacyQuestPage() {
     const newResolved = new Set(resolvedGates);
     newResolved.add(gateId);
     setResolvedGates(newResolved);
-    if (currentRoomId) localStorage.setItem(`resolvedGates_${currentRoomId}`, JSON.stringify(Array.from(newResolved)));
+    // Update accumulated ref for v2 persistence
+    if (currentRoomId) {
+      resolvedGatesAll.current[currentRoomId] = Array.from(newResolved);
+    }
     if (unlockNpcId) {
       const newUnlocked = new Set(unlockedNpcs);
       newUnlocked.add(unlockNpcId);
       setUnlockedNpcs(newUnlocked);
-      if (currentRoomId) localStorage.setItem(`unlockedNpcs_${currentRoomId}`, JSON.stringify(Array.from(newUnlocked)));
+      if (currentRoomId) {
+        unlockedNpcsAll.current[currentRoomId] = Array.from(newUnlocked);
+      }
     }
   }, [resolvedGates, unlockedNpcs, currentRoomId]);
 
@@ -449,7 +440,10 @@ export default function PrivacyQuestPage() {
   }, [currentRoomId, collectedStories]);
 
   // ── Dialogue complete ────────────────────────────────────────
-  const handleDialogueComplete = useCallback(() => {
+  const handleDialogueComplete = useCallback((result?: { finalPrivacyScore: number }) => {
+    if (result?.finalPrivacyScore !== undefined) {
+      setFinalPrivacyScore(result.finalPrivacyScore);
+    }
     if (currentNPCId) {
       const newCompleted = new Set(completedNPCs);
       const isFirstCompletion = !newCompleted.has(currentNPCId);
@@ -464,11 +458,10 @@ export default function PrivacyQuestPage() {
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
       }
 
-      // Win condition check
+      // Win condition check — use privacyScore state, not localStorage
       if (currentSceneId === 'final_boss_1' && newCompleted.size === totalScenarios + 1) {
-        const ps = parseInt(localStorage.getItem('final-privacy-score') || '100');
-        if (ps > 0) {
-          setFinalPrivacyScore(ps);
+        if (privacyScore > 0) {
+          setFinalPrivacyScore(privacyScore);
           setPageMode('win');
           return;
         }
@@ -481,7 +474,7 @@ export default function PrivacyQuestPage() {
 
     // Resume Phaser scene
     eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
-  }, [currentNPCId, currentSceneId, completedNPCs, totalScenarios, currentRoom, notify]);
+  }, [currentNPCId, currentSceneId, completedNPCs, totalScenarios, currentRoom, notify, privacyScore]);
 
   const handleGameOver = useCallback((finalScore: number) => {
     setFinalPrivacyScore(finalScore);
@@ -494,8 +487,7 @@ export default function PrivacyQuestPage() {
   }, []);
 
   const handleDismissIntroModal = useCallback(() => {
-    localStorage.setItem('pq:onboarding:seen', '1');
-    setShowIntroModal(false);
+    setShowIntroModal(false); // triggers writeSave with onboardingSeen: true
     eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
   }, []);
 

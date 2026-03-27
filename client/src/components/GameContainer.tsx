@@ -10,7 +10,7 @@ type GamePhase = 'dialogue' | 'choices' | 'feedback';
 
 interface GameContainerProps {
   scenes: Scene[];
-  onComplete?: () => void;
+  onComplete?: (result: { finalPrivacyScore: number }) => void;
   onGameOver?: (finalScore: number) => void;
   npcId?: string;
   npcName?: string;
@@ -66,8 +66,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
   const handleNextScene = () => {
     if (currentScene.isEnd) {
       setGameComplete(true);
-      localStorage.setItem('final-privacy-score', privacyScore.toString());
-      onComplete?.();
+      onComplete?.({ finalPrivacyScore: privacyScore });
     } else {
       if (selectedChoice?.nextSceneId) {
         const nextSceneIndex = scenes.findIndex(s => s.id === selectedChoice.nextSceneId);
@@ -76,8 +75,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
         } else {
           const nextIndex = currentSceneIndex + 1;
           if (nextIndex >= scenes.length) {
-            localStorage.setItem('final-privacy-score', privacyScore.toString());
-            onComplete?.();
+            onComplete?.({ finalPrivacyScore: privacyScore });
           } else {
             setCurrentSceneIndex(nextIndex);
           }
@@ -85,8 +83,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
       } else {
         const nextIndex = currentSceneIndex + 1;
         if (nextIndex >= scenes.length) {
-          localStorage.setItem('final-privacy-score', privacyScore.toString());
-          onComplete?.();
+          onComplete?.({ finalPrivacyScore: privacyScore });
         } else {
           setCurrentSceneIndex(nextIndex);
         }

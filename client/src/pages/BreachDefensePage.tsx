@@ -15,6 +15,7 @@ import { useNotification } from '../components/NotificationToast';
 import { GameBanner } from '../components/GameBanner';
 import { OnboardingOverlay, type OnboardingStep } from '../components/breach-defense/OnboardingOverlay';
 import { Shield, BookOpen, ArrowLeft, Heart, DollarSign, Layers } from 'lucide-react';
+import { loadSave, writeSave } from '@/lib/saveData';
 
 type TowerType = keyof typeof TOWERS;
 
@@ -109,10 +110,8 @@ export default function BreachDefensePage() {
   // Track previous threats for discovery notifications
   const prevSeenThreatsRef = useRef<string[]>([]);
 
-  // Mute toggle
-  const [muted, setMuted] = useState(() =>
-    localStorage.getItem('sfx_muted') === 'true'
-  );
+  // Mute toggle — read from v2 save
+  const [muted, setMuted] = useState(() => loadSave().sfxMuted);
 
   // ── Scene launch ───────────────────────────────────────────────
 
@@ -341,12 +340,14 @@ export default function BreachDefensePage() {
     }
   }, [wave, notify]);
 
-  // Mute toggle — apply to Phaser + persist
+  // Mute toggle — apply to Phaser + persist (both standalone key + v2 save)
   useEffect(() => {
     if (gameRef.current?.sound) {
       gameRef.current.sound.setMute(muted);
     }
-    localStorage.setItem('sfx_muted', String(muted));
+    localStorage.setItem('sfx_muted', String(muted)); // ExplorationScene compat
+    const save = loadSave();
+    writeSave({ ...save, sfxMuted: muted });
   }, [muted]);
 
   // ── QA auto-start via ?qa-start URL param ──────────────────────
