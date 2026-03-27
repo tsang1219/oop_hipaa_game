@@ -24,7 +24,6 @@ export const BRIDGE_EVENTS = {
   // Phaser -> React
   SCENE_READY: 'scene:ready',
   HUB_SELECT_GAME: 'hub:select-game',
-  HUB_SELECT_ROOM: 'hub:select-room',
   EXPLORATION_INTERACT_NPC: 'exploration:interact-npc',
   EXPLORATION_INTERACT_ZONE: 'exploration:interact-zone',
   EXPLORATION_INTERACT_ITEM: 'exploration:interact-item',
@@ -36,7 +35,6 @@ export const BRIDGE_EVENTS = {
   BREACH_GAME_OVER: 'breach:game-over',
   BREACH_VICTORY: 'breach:victory',
   BREACH_TOWER_PLACED: 'breach:tower-placed',
-  BREACH_TUTORIAL_TRIGGER: 'breach:tutorial-trigger',
 
   // React -> Phaser
   REACT_PAUSE_EXPLORATION: 'react:pause-exploration',

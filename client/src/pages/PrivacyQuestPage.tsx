@@ -392,6 +392,9 @@ export default function PrivacyQuestPage() {
       eventBridge.off(BRIDGE_EVENTS.EXPLORATION_INTERACT_ITEM, onInteractItem);
       eventBridge.off(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, onExitRoom);
     };
+  // Note: toast/notify are stable hook refs; handleExitRoom is defined below but
+  // only called at runtime (not during effect setup), so the closure is safe.
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentRoomId, resolvedGates, completedZones, collectedItems, isNpcGated]);
 
   // ── Room completion check ────────────────────────────────────

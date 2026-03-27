@@ -13,6 +13,7 @@ import { WaveIntroBanner } from '../components/breach-defense/WaveIntroBanner';
 import { ThreatStrip } from '../components/breach-defense/ThreatStrip';
 import { useNotification } from '../components/NotificationToast';
 import { GameBanner } from '../components/GameBanner';
+import { OnboardingOverlay, type OnboardingStep } from '../components/breach-defense/OnboardingOverlay';
 import { Shield, BookOpen, ArrowLeft, Heart, DollarSign, Layers } from 'lucide-react';
 
 type TowerType = keyof typeof TOWERS;
@@ -87,6 +88,9 @@ export default function BreachDefensePage() {
     endMessage?: string;
     stats?: { threatsStop: number; threatsTotal: number; towersActive: number };
   } | null>(null);
+
+  // Onboarding state
+  const [onboardingStep, setOnboardingStep] = useState<OnboardingStep>(null);
 
   // Track newly unlocked towers for glow effect
   const [newlyUnlockedTowers, setNewlyUnlockedTowers] = useState<Set<string>>(new Set());
@@ -202,18 +206,12 @@ export default function BreachDefensePage() {
       );
     };
 
-    const onTutorialTrigger = (data: { tutorialKey: string }) => {
-      setCurrentTutorial(data.tutorialKey);
-      setPageState('TUTORIAL');
-    };
-
     eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_START, onWaveStart);
     eventBridge.on(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onStateUpdate);
     eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, onWaveComplete);
     eventBridge.on(BRIDGE_EVENTS.BREACH_GAME_OVER, onGameOver);
     eventBridge.on(BRIDGE_EVENTS.BREACH_VICTORY, onVictory);
     eventBridge.on(BRIDGE_EVENTS.BREACH_TOWER_PLACED, onTowerPlaced);
-    eventBridge.on(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, onTutorialTrigger);
 
     return () => {
       eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_START, onWaveStart);
@@ -222,7 +220,6 @@ export default function BreachDefensePage() {
       eventBridge.off(BRIDGE_EVENTS.BREACH_GAME_OVER, onGameOver);
       eventBridge.off(BRIDGE_EVENTS.BREACH_VICTORY, onVictory);
       eventBridge.off(BRIDGE_EVENTS.BREACH_TOWER_PLACED, onTowerPlaced);
-      eventBridge.off(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, onTutorialTrigger);
     };
   }, []);
 
@@ -368,8 +365,8 @@ export default function BreachDefensePage() {
   // ── Handlers ───────────────────────────────────────────────────
 
   const handleStart = useCallback(() => {
-    setPageState('TUTORIAL');
-    setCurrentTutorial('welcome');
+    setPageState('PAUSED'); // Dismiss the START screen overlay
+    setOnboardingStep('WELCOME');
     eventBridge.emit(BRIDGE_EVENTS.REACT_START_BREACH);
   }, []);
 
@@ -380,25 +377,67 @@ export default function BreachDefensePage() {
     eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
   }, [selectedTower]);
 
-  const handleDismissTutorial = useCallback(() => {
-    const tut = currentTutorial;
-    setCurrentTutorial(null);
+  // Onboarding step advance handler
+  const handleOnboardingAdvance = useCallback((nextStep: OnboardingStep) => {
+    setOnboardingStep(nextStep);
 
-    if (tut === 'welcome') {
-      setCurrentTutorial('firstTower');
-    } else {
+    if (nextStep === 'SELECT_TOWER') {
+      // Enable tower panel so player can pick one
       setPageState('PLAYING');
       eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
+    } else if (nextStep === 'PLACE_TOWER') {
+      // Show grid highlights in Phaser
+      eventBridge.emit(BRIDGE_EVENTS.REACT_ONBOARDING_HIGHLIGHT);
+    } else if (nextStep === 'PREP') {
+      // Clear highlights and start the prep countdown
+      eventBridge.emit(BRIDGE_EVENTS.REACT_ONBOARDING_CLEAR);
+      eventBridge.emit(BRIDGE_EVENTS.REACT_START_PREP);
+      setOnboardingStep(null);
     }
-  }, [currentTutorial]);
+  }, []);
+
+  // Transition: tower selected during SELECT_TOWER step
+  useEffect(() => {
+    if (onboardingStep === 'SELECT_TOWER' && selectedTower !== null) {
+      handleOnboardingAdvance('PLACE_TOWER');
+    }
+  }, [selectedTower, onboardingStep, handleOnboardingAdvance]);
+
+  // Transition: tower placed during PLACE_TOWER step
+  useEffect(() => {
+    const onTowerPlacedDuringOnboarding = () => {
+      if (onboardingStep === 'PLACE_TOWER') {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_ONBOARDING_CLEAR);
+        setOnboardingStep('TOWER_PLACED');
+      }
+    };
+    eventBridge.on(BRIDGE_EVENTS.BREACH_TOWER_PLACED, onTowerPlacedDuringOnboarding);
+    return () => { eventBridge.off(BRIDGE_EVENTS.BREACH_TOWER_PLACED, onTowerPlacedDuringOnboarding); };
+  }, [onboardingStep]);
+
+  // Mid-game tutorial handler (waves 3, 5, 7, 9 only)
+  const handleDismissTutorial = useCallback(() => {
+    setCurrentTutorial(null);
+    setPageState('PLAYING');
+    eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
+  }, []);
 
   const handleRecapContinue = useCallback(() => {
     setShowRecap(false);
     setRecapConcept(null);
     setWaveEndMessage(undefined);
     setWaveEndStats(undefined);
-    eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
-  }, []);
+
+    // If the next wave has an educational lesson, show it now
+    const tutorialWaves = [3, 5, 7, 9];
+    if (tutorialWaves.includes(wave)) {
+      setCurrentTutorial(`wave_${wave}`);
+      setPageState('TUTORIAL');
+    } else {
+      setPageState('PLAYING');
+      eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
+    }
+  }, [wave]);
 
   const handleBannerDismiss = useCallback(() => {
     setShowWaveBanner(false);
@@ -422,6 +461,7 @@ export default function BreachDefensePage() {
     setWave(1);
     setSelectedTower(null);
     setCurrentTutorial(null);
+    setOnboardingStep(null);
     setShowRecap(false);
     setShowCodex(false);
     setSeenThreats([]);
@@ -447,13 +487,7 @@ export default function BreachDefensePage() {
 
   const getTutorialContent = () => {
     if (!currentTutorial) return null;
-
-    if (currentTutorial === 'welcome') {
-      return TUTORIAL_CONTENT.welcome;
-    }
-    if (currentTutorial === 'firstTower') {
-      return TUTORIAL_CONTENT.firstTower;
-    }
+    // Only mid-game tutorials (waves 3, 5, 7, 9) — onboarding handles the rest
     const waveMatch = currentTutorial.match(/^wave_(\d+)$/);
     if (waveMatch) {
       const waveNum = parseInt(waveMatch[1]);
@@ -484,9 +518,11 @@ export default function BreachDefensePage() {
         }
       `}</style>
 
-      {/* Phaser canvas */}
+      {/* Phaser canvas with overlaid HUD + tower panel */}
       <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <PhaserGame ref={gameRef} width={960} height={720} />
+
+        {/* Wave intro banner overlay */}
         {showWaveBanner && waveBannerData && (
           <WaveIntroBanner
             wave={waveBannerData.wave}
@@ -498,168 +534,155 @@ export default function BreachDefensePage() {
             autoDismissMs={3000}
           />
         )}
-      </div>
 
-      {/* Incoming threat strip */}
-      <ThreatStrip threats={currentWaveThreats} />
+        {/* Threat strip — overlaid just above the HUD panel */}
+        <div className="absolute left-0 right-0 flex justify-center z-10" style={{ bottom: 130 }}>
+          <ThreatStrip threats={currentWaveThreats} />
+        </div>
 
-      {/* HUD bar */}
-      <div className="flex gap-6 items-center p-2 bg-[#2a2a3e] border-2 border-[#e8618c] rounded w-[960px] justify-between px-4">
-        <div className={`flex items-center gap-2 ${securityScore <= 25 ? 'animate-[hp-throb_0.8s_ease-in-out_infinite]' : ''}`}
-          style={{
-            boxShadow: scorePulse ? '0 0 15px rgba(255, 50, 50, 0.5)' : 'none',
-            transition: 'box-shadow 200ms ease-out'
-          }}>
-          <Heart className={`w-4 h-4 text-red-400 ${securityScore <= 25 ? 'animate-ping' : ''}`}
-            style={securityScore <= 25 ? { animationDuration: '1.2s' } : undefined}
-          />
-          <span className="text-[11px] text-red-400">
-            {securityScore}%
-          </span>
-          <div className={`w-24 h-2 bg-gray-700 rounded overflow-hidden ml-1 ${securityScore <= 25 ? 'shadow-[0_0_8px_rgba(255,68,68,0.6)]' : ''}`}>
-            <div
-              className="h-full rounded"
+        {/* Combined Tower panel + HUD — overlaid on bottom terminal area */}
+        <div className="absolute bottom-0 left-0 right-0 z-10 backdrop-blur-sm"
+          style={{ background: 'rgba(20, 22, 40, 0.92)', borderTop: '2px solid #3a5d8e' }}>
+          {/* Tower selection row (top — closest to grid for easy access) */}
+          <Tooltip.Provider delayDuration={200}>
+            <div className="flex gap-1 px-2 py-1.5 justify-center flex-wrap items-center" style={{ borderBottom: '1px solid rgba(58, 93, 142, 0.3)' }}>
+              <span className="text-[6px] text-gray-500 tracking-[2px] mr-1">DEFENSES</span>
+              {Object.entries(TOWERS).map(([id, tower]) => {
+                const locked = wave < tower.unlockWave;
+                const tooExpensive = budget < tower.cost;
+                const isSelected = selectedTower === id;
+                const disabled = locked || tooExpensive || pageState !== 'PLAYING';
+                const isSuggested = currentWaveSuggestedTowers.includes(id);
+                const isNewlyUnlocked = newlyUnlockedTowers.has(id);
+
+                return (
+                  <Tooltip.Root key={id}>
+                    <Tooltip.Trigger asChild>
+                      <button
+                        onClick={() => !disabled && handleSelectTower(id as TowerType)}
+                        disabled={disabled}
+                        style={{ transition: 'transform 0.15s ease-out, border-color 0.2s, box-shadow 0.2s, opacity 0.2s', transform: isSelected ? 'scale(1.08)' : 'scale(1)' }}
+                        className={`relative p-1 border-2 rounded text-center w-[90px] ${
+                          isSelected
+                            ? 'border-yellow-400 bg-yellow-900/30 shadow-[0_0_12px_rgba(255,200,0,0.5)] animate-[selected-pulse_1.5s_ease-in-out_infinite]'
+                            : isSuggested && !locked
+                              ? 'border-yellow-400 animate-pulse shadow-[0_0_8px_rgba(255,200,0,0.4)]'
+                              : 'border-gray-600 hover:border-gray-400'
+                        } ${isNewlyUnlocked && !locked ? 'ring-2 ring-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.5)]' : ''
+                        } ${locked ? 'opacity-25 cursor-not-allowed' : tooExpensive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
+                      >
+                        {isSuggested && !locked && (
+                          <span className="absolute -top-1.5 -right-1.5 text-[5px] bg-yellow-400 text-black px-1 font-bold border border-black leading-tight">
+                            HINT
+                          </span>
+                        )}
+                        <div className="flex items-center gap-1 justify-center">
+                          {!locked && (
+                            <div className={`w-2 h-2 flex-shrink-0 ${
+                              id === 'MFA' ? 'bg-blue-500' :
+                              id === 'PATCH' ? 'bg-green-500' :
+                              id === 'FIREWALL' ? 'bg-orange-500' :
+                              id === 'ENCRYPTION' ? 'bg-purple-500' :
+                              id === 'TRAINING' ? 'bg-yellow-500' :
+                              id === 'ACCESS' ? 'bg-red-500' : 'bg-gray-500'
+                            }`} />
+                          )}
+                          <div className="text-[8px] font-bold truncate" style={{ color: tower.color }}>
+                            {locked ? '???' : tower.name}
+                          </div>
+                        </div>
+                        <div className="text-[7px] text-gray-400">
+                          {locked ? `Wave ${tower.unlockWave}` : (
+                            <span className="inline-flex items-center gap-0.5">
+                              <span className="inline-block w-2 h-2 rounded-full text-[5px] leading-[8px] text-center font-bold"
+                                    style={{ background: 'linear-gradient(135deg, #f5d442, #c9a227)', color: '#3a2e00', boxShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>$</span>
+                              <span>{tower.cost}</span>
+                            </span>
+                          )}
+                        </div>
+                      </button>
+                    </Tooltip.Trigger>
+                    {!locked && (
+                      <Tooltip.Portal>
+                        <Tooltip.Content
+                          className="bg-[#1a1a2e] border-2 border-[#FF6B9D] p-2 rounded max-w-[200px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
+                          style={{ fontFamily: '"Press Start 2P", monospace' }}
+                          side="top"
+                          sideOffset={4}
+                        >
+                          <p className="text-[7px] text-gray-200 mb-1.5 leading-relaxed">{tower.desc}</p>
+                          <p className="text-[6px] text-green-400">+ {tower.strongAgainst.join(', ')}</p>
+                          <p className="text-[6px] text-red-400">- {tower.weakAgainst.join(', ')}</p>
+                          <Tooltip.Arrow className="fill-[#FF6B9D]" />
+                        </Tooltip.Content>
+                      </Tooltip.Portal>
+                    )}
+                  </Tooltip.Root>
+                );
+              })}
+            </div>
+          </Tooltip.Provider>
+
+          {/* HUD stats row (bottom — status info) */}
+          <div className="flex items-center justify-between px-3 py-1">
+            <div className={`flex items-center gap-2 ${securityScore <= 25 ? 'animate-[hp-throb_0.8s_ease-in-out_infinite]' : ''}`}
               style={{
-                width: `${securityScore}%`,
-                background: securityScore > 50
-                  ? 'linear-gradient(90deg, #2ecc71, #27ae60)'
-                  : securityScore > 25
-                  ? 'linear-gradient(90deg, #f39c12, #e67e22)'
-                  : 'linear-gradient(90deg, #e74c3c, #c0392b)',
-                transition: 'width 300ms ease-out, background 300ms ease-out',
-              }}
-            />
+                boxShadow: scorePulse ? '0 0 15px rgba(255, 50, 50, 0.5)' : 'none',
+                transition: 'box-shadow 200ms ease-out'
+              }}>
+              <Heart className={`w-3.5 h-3.5 text-red-400 ${securityScore <= 25 ? 'animate-ping' : ''}`}
+                style={securityScore <= 25 ? { animationDuration: '1.2s' } : undefined}
+              />
+              <span className="text-[10px] text-red-400">{securityScore}%</span>
+              <div className={`w-20 h-1.5 bg-gray-700 rounded overflow-hidden ${securityScore <= 25 ? 'shadow-[0_0_8px_rgba(255,68,68,0.6)]' : ''}`}>
+                <div className="h-full rounded" style={{
+                  width: `${securityScore}%`,
+                  background: securityScore > 50
+                    ? 'linear-gradient(90deg, #2ecc71, #27ae60)'
+                    : securityScore > 25
+                    ? 'linear-gradient(90deg, #f39c12, #e67e22)'
+                    : 'linear-gradient(90deg, #e74c3c, #c0392b)',
+                  transition: 'width 300ms ease-out, background 300ms ease-out',
+                }} />
+              </div>
+            </div>
+            <div className="flex items-center gap-2"
+              style={{ transform: `scale(${budgetScale})`, transition: 'transform 200ms ease-out' }}>
+              <DollarSign className={`w-3.5 h-3.5 transition-colors duration-150 ${
+                budgetFlash === 'spend' ? 'text-red-400' : budgetFlash === 'gain' ? 'text-emerald-300' : 'text-green-400'
+              }`} />
+              <span className={`text-[10px] transition-all duration-150 ${
+                budgetFlash === 'spend' ? 'text-red-400' : budgetFlash === 'gain' ? 'text-emerald-300' : 'text-green-400'
+              }`} style={{
+                display: 'inline-block',
+                transform: budgetFlash === 'gain' ? 'scale(1.25)' : budgetFlash === 'spend' ? 'scale(1.1)' : 'scale(1)',
+                textShadow: budgetFlash === 'gain' ? '0 0 8px rgba(52, 211, 153, 0.8)' : budgetFlash === 'spend' ? '0 0 6px rgba(248, 113, 113, 0.6)' : 'none',
+                transition: 'transform 0.15s ease-out, color 0.15s ease-out, text-shadow 0.15s ease-out',
+              }}>${budget}</span>
+            </div>
+            <div className="flex items-center gap-2"
+              style={{ transform: `scale(${waveScale})`, transition: 'transform 300ms ease-out' }}>
+              <Layers className="w-3.5 h-3.5 text-blue-400" />
+              <span className="text-[10px] text-blue-400">Wave {wave}/10</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={() => setShowCodex(true)}
+                className="flex items-center gap-1 text-[7px] text-purple-300 hover:text-purple-100 transition-colors">
+                <BookOpen className="w-3 h-3" /> CODEX
+              </button>
+              <button onClick={() => setMuted(m => !m)}
+                className="text-[9px] text-gray-300 hover:text-white transition-colors"
+                title={muted ? 'Unmute' : 'Mute'}>
+                {muted ? '\u{1F507}' : '\u{1F50A}'}
+              </button>
+              <MusicVolumeSlider />
+            </div>
           </div>
         </div>
-        <div className="flex items-center gap-2"
-          style={{ transform: `scale(${budgetScale})`, transition: 'transform 200ms ease-out' }}>
-          <DollarSign className={`w-4 h-4 transition-colors duration-150 ${
-            budgetFlash === 'spend' ? 'text-red-400' : budgetFlash === 'gain' ? 'text-emerald-300' : 'text-green-400'
-          }`} />
-          <span
-            className={`text-[11px] transition-all duration-150 ${
-              budgetFlash === 'spend'
-                ? 'text-red-400'
-                : budgetFlash === 'gain'
-                ? 'text-emerald-300'
-                : 'text-green-400'
-            }`}
-            style={{
-              display: 'inline-block',
-              transform: budgetFlash === 'gain' ? 'scale(1.25)' : budgetFlash === 'spend' ? 'scale(1.1)' : 'scale(1)',
-              textShadow: budgetFlash === 'gain'
-                ? '0 0 8px rgba(52, 211, 153, 0.8)'
-                : budgetFlash === 'spend'
-                ? '0 0 6px rgba(248, 113, 113, 0.6)'
-                : 'none',
-              transition: 'transform 0.15s ease-out, color 0.15s ease-out, text-shadow 0.15s ease-out',
-            }}
-          >
-            ${budget}
-          </span>
-        </div>
-        <div className="flex items-center gap-2"
-          style={{ transform: `scale(${waveScale})`, transition: 'transform 300ms ease-out' }}>
-          <Layers className="w-4 h-4 text-blue-400" />
-          <span className="text-[11px] text-blue-400">Wave {wave}/10</span>
-        </div>
-        <button
-          onClick={() => setShowCodex(true)}
-          className="flex items-center gap-1 text-[8px] text-purple-300 hover:text-purple-100 transition-colors"
-        >
-          <BookOpen className="w-3 h-3" />
-          CODEX
-        </button>
-        <button
-          onClick={() => setMuted(m => !m)}
-          className="text-[10px] text-gray-300 hover:text-white transition-colors"
-          title={muted ? 'Unmute' : 'Mute'}
-        >
-          {muted ? '\u{1F507}' : '\u{1F50A}'}
-        </button>
-        <MusicVolumeSlider />
+
+        {/* Onboarding overlay */}
+        <OnboardingOverlay step={onboardingStep} onAdvance={handleOnboardingAdvance} />
       </div>
-
-      {/* Tower selection panel */}
-      <Tooltip.Provider delayDuration={200}>
-        <div className="flex gap-1 p-2 bg-[#2a2a3e] border-2 border-[#e8618c] rounded w-[960px] justify-center flex-wrap items-start"
-             style={{ borderTop: '3px solid #e8618c' }}>
-          <span className="font-['Press_Start_2P'] text-[7px] text-gray-500 mb-1 block w-full text-center tracking-[3px]">DEFENSES</span>
-          {Object.entries(TOWERS).map(([id, tower]) => {
-            const locked = wave < tower.unlockWave;
-            const tooExpensive = budget < tower.cost;
-            const isSelected = selectedTower === id;
-            const disabled = locked || tooExpensive || pageState !== 'PLAYING';
-            const isSuggested = currentWaveSuggestedTowers.includes(id);
-            const isNewlyUnlocked = newlyUnlockedTowers.has(id);
-
-            return (
-              <Tooltip.Root key={id}>
-                <Tooltip.Trigger asChild>
-                  <button
-                    onClick={() => !disabled && handleSelectTower(id as TowerType)}
-                    disabled={disabled}
-                    style={{ transition: 'transform 0.15s ease-out, border-color 0.2s, box-shadow 0.2s, opacity 0.2s', transform: isSelected ? 'scale(1.08)' : 'scale(1)' }}
-                    className={`relative p-1.5 border-2 rounded text-center w-[100px] ${
-                      isSelected
-                        ? 'border-yellow-400 bg-yellow-900/30 shadow-[0_0_12px_rgba(255,200,0,0.5)] animate-[selected-pulse_1.5s_ease-in-out_infinite]'
-                        : isSuggested && !locked
-                          ? 'border-yellow-400 animate-pulse shadow-[0_0_8px_rgba(255,200,0,0.4)]'
-                          : 'border-gray-600 hover:border-gray-400'
-                    } ${isNewlyUnlocked && !locked ? 'ring-2 ring-purple-400 shadow-[0_0_12px_rgba(168,85,247,0.5)]' : ''
-                    } ${locked ? 'opacity-25 cursor-not-allowed' : tooExpensive ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}`}
-                  >
-                    {isSuggested && !locked && (
-                      <span className="absolute -top-1.5 -right-1.5 text-[5px] bg-yellow-400 text-black px-1 font-bold border border-black leading-tight">
-                        HINT
-                      </span>
-                    )}
-                    <div className="flex items-center gap-1 justify-center">
-                      {!locked && (
-                        <div className={`w-2 h-2 flex-shrink-0 ${
-                          id === 'MFA' ? 'bg-blue-500' :
-                          id === 'PATCH' ? 'bg-green-500' :
-                          id === 'FIREWALL' ? 'bg-orange-500' :
-                          id === 'ENCRYPTION' ? 'bg-purple-500' :
-                          id === 'TRAINING' ? 'bg-yellow-500' :
-                          id === 'ACCESS' ? 'bg-red-500' : 'bg-gray-500'
-                        }`} />
-                      )}
-                      <div className="text-[9px] font-bold truncate" style={{ color: tower.color }}>
-                        {locked ? '???' : tower.name}
-                      </div>
-                    </div>
-                    <div className="text-[8px] text-gray-400">
-                      {locked ? `Wave ${tower.unlockWave}` : (
-                        <span className="inline-flex items-center gap-0.5">
-                          <span className="inline-block w-2.5 h-2.5 rounded-full text-[5px] leading-[10px] text-center font-bold"
-                                style={{ background: 'linear-gradient(135deg, #f5d442, #c9a227)', color: '#3a2e00', boxShadow: '0 1px 2px rgba(0,0,0,0.3)' }}>$</span>
-                          <span>{tower.cost}</span>
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                </Tooltip.Trigger>
-                {!locked && (
-                  <Tooltip.Portal>
-                    <Tooltip.Content
-                      className="bg-[#1a1a2e] border-2 border-[#FF6B9D] p-2 rounded max-w-[200px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] z-50"
-                      style={{ fontFamily: '"Press Start 2P", monospace' }}
-                      side="top"
-                      sideOffset={4}
-                    >
-                      <p className="text-[7px] text-gray-200 mb-1.5 leading-relaxed">{tower.desc}</p>
-                      <p className="text-[6px] text-green-400">+ {tower.strongAgainst.join(', ')}</p>
-                      <p className="text-[6px] text-red-400">- {tower.weakAgainst.join(', ')}</p>
-                      <Tooltip.Arrow className="fill-[#FF6B9D]" />
-                    </Tooltip.Content>
-                  </Tooltip.Portal>
-                )}
-              </Tooltip.Root>
-            );
-          })}
-        </div>
-      </Tooltip.Provider>
 
       {/* Controls hint + back button */}
       <div className="flex items-center gap-4 w-[960px] justify-between">
