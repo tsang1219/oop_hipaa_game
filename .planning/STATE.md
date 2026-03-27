@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
-status: ready_to_plan
+status: executing
 last_updated: "2026-03-27"
 progress:
   total_phases: 5
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  completed_phases: 1
+  total_plans: 19
+  completed_plans: 4
 ---
 
 # Project State
@@ -18,29 +18,29 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** The player should forget they're doing compliance training. One continuous game.
-**Current focus:** v2.0 Phase 11 — Pre-Restructure Foundation
+**Current focus:** v2.0 Phase 12 — Unified Navigation
 
 ## Current Position
 
-Phase: 11 of 15 (Pre-Restructure Foundation)
+Phase: 12 of 15 (Unified Navigation)
 Plan: Not started
-Status: Ready to plan
-Last activity: 2026-03-27 — v2.0 roadmap created (Phases 11-15)
+Status: Phase 11 complete, Phase 12 ready
+Last activity: 2026-03-27 — Phase 11 executed (4 plans, all success criteria met)
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [##░░░░░░░░] 21%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 0 (v2.0)
-- Average duration: —
-- Total execution time: —
+- Total plans completed: 4 (v2.0)
+- Average duration: ~8m/plan
+- Total execution time: ~31m
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| - | - | - | - |
+| 11. Pre-Restructure Foundation | 4/4 | ~31m | ~8m |
 
 *Updated after each plan completion*
 
@@ -54,6 +54,10 @@ Progress: [░░░░░░░░░░] 0%
 - [v2.0-roadmap]: FOUN-04 + FOUN-03 isolated in Phase 11 — must ship and verify before any restructure code lands
 - [v2.0-roadmap]: FOUN-01 + FOUN-02 merged into Phase 12 with NAV-01..08 — UnifiedGamePage and useGameState are immediately consumed by the door system; split would create a phase delivering nothing visible
 - [v2.0-roadmap]: Phase 14 depends on both 12 and 13 — act advancement conditions include encounter completion results; wiring act logic before encounters are stable creates false completion states
+- [Phase 11]: SaveDataV2 schema includes sfxMuted and musicVolume per user decision
+- [Phase 11]: Module-level migrateV1toV2() runs before React render for earliest migration
+- [Phase 11]: sfx_muted standalone key still written on toggle for ExplorationScene backward compat
+- [Phase 11]: GameContainer passes finalPrivacyScore via callback instead of orphan localStorage key
 
 ### Pending Todos
 
@@ -69,5 +73,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-03-27
-Stopped at: v2.0 roadmap created — Phases 11-15 written, requirements mapped, STATE.md initialized
-Resume: Run `/gsd:plan-phase 11` to begin Phase 11 planning
+Stopped at: Completed Phase 11 — all 4 plans executed, success criteria verified
+Resume: Run `/gsd:plan-phase 12` or `/gsd:execute-phase 12` to begin Phase 12

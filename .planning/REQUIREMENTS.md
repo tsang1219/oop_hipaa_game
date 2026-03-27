@@ -9,8 +9,8 @@
 
 - [ ] **FOUN-01**: Game runs on a single route (/) with one persistent Phaser instance — no route-switching between game modes
 - [ ] **FOUN-02**: Unified game state hook (useGameState) tracks department completion, encounter results, act progression, and compliance score in one structure
-- [ ] **FOUN-03**: Versioned localStorage save schema replaces 14+ fragmented keys with a single structured object and migration from v1 format
-- [ ] **FOUN-04**: Bug stabilization pass on surviving systems (ExplorationScene, dialogue, EventBridge listener cleanup, scoring) before restructure work begins
+- [x] **FOUN-03**: Versioned localStorage save schema replaces 14+ fragmented keys with a single structured object and migration from v1 format
+- [x] **FOUN-04**: Bug stabilization pass on surviving systems (ExplorationScene, dialogue, EventBridge listener cleanup, scoring) before restructure work begins
 
 ### Navigation
 
@@ -77,8 +77,8 @@
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| FOUN-03 | Phase 11 | Pending |
-| FOUN-04 | Phase 11 | Pending |
+| FOUN-03 | Phase 11 | Complete |
+| FOUN-04 | Phase 11 | Complete |
 | FOUN-01 | Phase 12 | Pending |
 | FOUN-02 | Phase 12 | Pending |
 | NAV-01 | Phase 12 | Pending |
@@ -112,4 +112,4 @@
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-03-27 — traceability populated after roadmap creation*
+*Last updated: 2026-03-27 — FOUN-03, FOUN-04 complete (Phase 11)*
