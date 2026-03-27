@@ -1,103 +1,91 @@
-# Requirements: PrivacyQuest + BreachDefense
+# Requirements: PrivacyQuest v2.0 — One Game
 
-**Defined:** 2026-03-01
-**Core Value:** Both games must feel like real games — not prototypes.
+**Defined:** 2026-03-26
+**Core Value:** The player should forget they're doing compliance training. One continuous game that feels like a polished SNES-era RPG.
 
-## v1.1 Requirements
+## v2.0 Requirements
 
-Requirements for v1.1 Sprite Overhaul. Each maps to roadmap phases.
+### Foundation
 
-### Character Sprites
+- [ ] **FOUN-01**: Game runs on a single route (/) with one persistent Phaser instance — no route-switching between game modes
+- [ ] **FOUN-02**: Unified game state hook (useGameState) tracks department completion, encounter results, act progression, and compliance score in one structure
+- [ ] **FOUN-03**: Versioned localStorage save schema replaces 14+ fragmented keys with a single structured object and migration from v1 format
+- [ ] **FOUN-04**: Bug stabilization pass on surviving systems (ExplorationScene, dialogue, EventBridge listener cleanup, scoring) before restructure work begins
 
-- [x] **CHAR-01**: Player character has an AI-generated 4-direction spritesheet (32x32, 3 frames per direction: idle + 2 walk frames) loaded in BootScene
-- [x] **CHAR-02**: All 8 NPC types (Receptionist, Nurse, Doctor, IT Tech, Compliance Officer, General Staff, Patient, Visitor) have AI-generated 4-direction spritesheets matching the player format
-- [x] **CHAR-03**: Walk cycle animations are registered in BootScene and play during movement in ExplorationScene and HubWorldScene
-- [x] **CHAR-04**: NPCs display subtle idle breathing/blinking animation when standing still
+### Navigation
 
-### NPC Portraits
+- [ ] **NAV-01**: Player walks between departments through doors with camera fade transitions (~300ms out/in)
+- [ ] **NAV-02**: Doors display visual state indicators — locked (dark tint), available (glow pulse), completed (checkmark badge)
+- [ ] **NAV-03**: Departments unlock linearly based on completion (Reception → Break Room → Lab → Records → IT → ER)
+- [ ] **NAV-04**: Hallway connectors between departments provide pacing breaks with floor/walls/doors (no interactables)
+- [ ] **NAV-05**: Player spawns at the correct door after transitions (entering Room B from Room A → player appears at Room A's door in Room B)
+- [ ] **NAV-06**: Player can backtrack through completed areas by walking back through doors
+- [ ] **NAV-07**: HallwayHub room picker is removed — all 5 responsibilities (unlock gating, room entry, tutorial trigger, completion display, room metadata) are transferred to in-world systems
+- [ ] **NAV-08**: Hub world transforms from game-picker lobby into hospital entrance area (first room the player enters)
 
-- [ ] **PORT-01**: 6 NPC dialogue portraits (Nurse Nina, Dr. HIPAA, Tech Tyler, Officer Knox, Receptionist Rosa, Boss Director) are AI-generated at 128x128 pixels
-- [ ] **PORT-02**: Portraits replace placeholder SVG components in React dialogue overlays
-- [ ] **PORT-03**: Each portrait has at least 2 expression variants (default + one emotion: happy, stern, surprised, etc.) selectable during dialogue
+### Encounter Integration
 
-### Furniture & Objects
+- [ ] **ENC-01**: Encounter trigger/return system — ExplorationScene sleeps while encounter runs, wakes on completion with player position preserved
+- [ ] **ENC-02**: Condensed inbound TD encounter — 4 waves, 3 tower types per wave tier, ~3-5 minute duration, using existing BreachDefenseScene with encounter-mode config
+- [ ] **ENC-03**: Encounter launches with narrative context card explaining why it's happening ("Dr. Patel flagged suspicious logins...")
+- [ ] **ENC-04**: Encounter results feed back to unified game state (score, pass/fail, completion flag)
+- [ ] **ENC-05**: Inbound TD encounter triggers from IT Office / Act 3 narrative moment
+- [ ] **ENC-06**: Unified compliance score aggregates across dialogue choices and encounter performance, visible in HUD during exploration
+- [ ] **ENC-07**: Encounter has clear start screen (narrative card) and end screen (recap with HIPAA takeaways)
 
-- [ ] **FURN-01**: ~14 hospital room objects (desk, hospital bed, filing cabinet, exam table, server rack, workstation, medicine cabinet, waiting chair, plant, water cooler, whiteboard, poster, computer terminal, bookshelf) are AI-generated as individual 32x32 or 32x64 PNG sprites
-- [ ] **FURN-02**: Furniture sprites replace programmatic fillRect objects in ExplorationScene room layouts
-- [ ] **FURN-03**: Select furniture items have subtle idle animations (blinking server rack lights, spinning ceiling fan, flickering monitor)
+### Narrative Arc
 
-### Interactive Objects
+- [ ] **NARR-01**: Act progression system with conditions that advance Act 1 → 2 → 3 (based on department completion + encounter status)
+- [ ] **NARR-02**: Per-act music shifts using existing tracks — hub theme (Act 1 warm), exploration theme (Act 2 uneasy), breach theme (Act 3 urgent)
+- [ ] **NARR-03**: Soft act transitions with no hard title cards — music crossfades and environmental cues signal the shift
+- [ ] **NARR-04**: Transition dialogue — NPCs reference player's earlier actions and bridge between acts (targeted: 2-3 key decisions remembered, reflected in 3-5 NPC lines)
+- [ ] **NARR-05**: Department ordering supports narrative flow (Reception/Break Room = Act 1, Lab/Records = Act 2, IT/ER = Act 3)
+- [ ] **NARR-06**: Environmental storytelling in hallway connectors (bulletin boards, ambient details that shift per act)
+- [ ] **NARR-07**: Per-department completion fanfare (visual flourish + chime + badge) when all NPCs/zones/items in a department are completed
+- [ ] **NARR-08**: Progress breadcrumb on HUD showing department completion status and current act
 
-- [ ] **ITEM-01**: 4 educational collectibles (Privacy Manual, Security Poster, Training Computer, Incident Report Clipboard) are AI-generated with glowing/magical aesthetic at 32x32
-- [ ] **ITEM-02**: Interactive objects are visually distinct from regular furniture through glow/sparkle effects
-- [ ] **ITEM-03**: Collectibles play a pickup animation sequence when the player interacts with them
+## v2.1 Requirements (Deferred)
 
-### Floor Tiles
+### New Encounter Types
 
-- [ ] **TILE-01**: 8 floor tile variants (hospital floor, carpet, lab floor, lobby floor, wall top, wall bottom, door, window) are AI-generated as seamless 32x32 tiles
-- [ ] **TILE-02**: Floor tiles replace the programmatic checkerboard floor rendering in ExplorationScene
-- [ ] **TILE-03**: Rooms use tilemap-based rendering with proper wall/floor transitions between tile types
+- **PHI-01**: PHI sorting encounter — drag/tap interface, PHI vs Not-PHI buckets, 2-3 document sets
+- **PHI-02**: Outbound TD encounter — inverted direction, cultural/administrative safeguard towers
+- **BREACH-01**: Breach triage encounter — classify incidents as reportable or not, notification timelines
 
-### Integration & Cleanup
+### Polish & Completion
 
-- [ ] **INTG-01**: All new PNG sprites are preloaded in BootScene (spritesheets via `this.load.spritesheet()`, single images via `this.load.image()`)
-- [ ] **INTG-02**: SpriteFactory.ts programmatic textures are fully retired and the file is removed
-- [ ] **INTG-03**: ExplorationScene and HubWorldScene use new sprite texture keys instead of SpriteFactory keys
-- [ ] **INTG-04**: Sprites are organized in a texture atlas for efficient loading and reduced draw calls
-
-## v2 Requirements
-
-Deferred to future release. Tracked but not in current roadmap.
-
-### Visual Polish
-
-- **VPOL-01**: Scene transition animations (camera fade, door opening) between rooms and pages
-- **VPOL-02**: Player movement acceleration/deceleration curves for smoother feel
-- **VPOL-03**: NPC interaction zoom-in/focus tween before dialogue opens
-- **VPOL-04**: BreachDefense tower placement "pop in" scale tween
+- **POLISH-01**: End-of-game report screen (department scores, knowledge areas, time)
+- **POLISH-02**: Remaining sprite overhaul (portraits, furniture, tiles, SpriteFactory retirement)
+- **POLISH-03**: Expanded sound effects for new encounter types
+- **POLISH-04**: Per-area ambient audio
 
 ## Out of Scope
 
 | Feature | Reason |
 |---------|--------|
-| BreachDefense sprite replacement | Tower/threat PNGs already exist and look good |
-| Background music/ambient loops | SFX-only is sufficient for now |
-| Animated tile effects (water, sparks) | Complexity beyond MVP visual upgrade |
-| Procedural room generation | Rooms are hand-designed, not generated |
-| Mobile touch controls | Desktop-first |
+| Admin console / certificate generation | Requires backend — future roadmap |
+| Analytics and reporting | Requires backend — future roadmap |
+| Mobile/responsive layout | Desktop-first for compliance training context |
+| Multiplayer / leaderboards | Requires backend, not relevant to individual training |
+| World map / minimap | Hospital is 6 rooms — spatial cues and room names suffice |
+| Difficulty modes | Compliance training has one target: learner knows the material |
+| Skip/fast-forward encounter | Bypasses the teaching moment — encounters are short enough (3-5 min) |
+| Full branching narrative | 23 NPCs x full branching = unmaintainable; targeted choice memory (2-3 decisions) achieves the feel at 5% cost |
+| Save-to-cloud / progress sync | localStorage sufficient for desktop single-user |
 
 ## Traceability
 
-Which phases cover which requirements. Updated during roadmap creation.
+<!-- Populated during roadmap creation -->
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| CHAR-01 | Phase 6 | Complete |
-| CHAR-02 | Phase 6 | Complete |
-| CHAR-03 | Phase 6 | Complete |
-| CHAR-04 | Phase 6 | Complete |
-| PORT-01 | Phase 7 | Pending |
-| PORT-02 | Phase 7 | Pending |
-| PORT-03 | Phase 7 | Pending |
-| FURN-01 | Phase 8 | Pending |
-| FURN-02 | Phase 8 | Pending |
-| FURN-03 | Phase 8 | Pending |
-| ITEM-01 | Phase 8 | Pending |
-| ITEM-02 | Phase 8 | Pending |
-| ITEM-03 | Phase 8 | Pending |
-| TILE-01 | Phase 9 | Pending |
-| TILE-02 | Phase 9 | Pending |
-| TILE-03 | Phase 9 | Pending |
-| INTG-01 | Phase 10 | Pending |
-| INTG-02 | Phase 10 | Pending |
-| INTG-03 | Phase 10 | Pending |
-| INTG-04 | Phase 10 | Pending |
+| — | — | — |
 
 **Coverage:**
-- v1.1 requirements: 20 total
-- Mapped to phases: 20
-- Unmapped: 0 ✓
+- v2.0 requirements: 27 total
+- Mapped to phases: 0
+- Unmapped: 27 ⚠️
 
 ---
-*Requirements defined: 2026-03-01*
-*Last updated: 2026-03-01 after roadmap creation*
+*Requirements defined: 2026-03-26*
+*Last updated: 2026-03-26 after initial definition*
