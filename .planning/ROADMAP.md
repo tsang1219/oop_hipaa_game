@@ -97,7 +97,13 @@ Plans:
   2. A returning player's v1.0 localStorage data (14 fragmented keys) is automatically migrated to a single `pq:save:v2` object on first boot — their room completion and score carry over.
   3. A fresh player starts with a clean `pq:save:v2` schema with no residual v1 keys present.
   4. All known pre-restructure bugs documented in FOUN-04 scope are verified fixed before Phase 12 begins.
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 11-01-PLAN.md — Create saveData.ts: SaveDataV2 schema, migrateV1toV2, loadSave, writeSave
+- [ ] 11-02-PLAN.md — Wire migration into PrivacyQuestPage + BreachDefensePage + GameContainer
+- [ ] 11-03-PLAN.md — ExplorationScene bug fixes: named REACT_ANSWER_FEEDBACK handler + scene.isActive() guards
+- [ ] 11-04-PLAN.md — PrivacyQuestPage stale closure fixes: functional setState + handleExitRoom dependency
 
 ### Phase 12: Unified Navigation
 **Goal**: The player walks through a continuous hospital on a single route — door-to-door transitions with visual state, linear department unlock, backtracking, and no room picker.
@@ -160,7 +166,7 @@ Plans:
 | 8. Furniture + Objects | v1.1 | 0/0 | Deferred | - |
 | 9. Floor Tiles | v1.1 | 0/0 | Deferred | - |
 | 10. Integration + Cleanup | v1.1 | 0/0 | Deferred | - |
-| 11. Pre-Restructure Foundation | v2.0 | 0/TBD | Not started | - |
+| 11. Pre-Restructure Foundation | v2.0 | 0/4 | Not started | - |
 | 12. Unified Navigation | v2.0 | 0/TBD | Not started | - |
 | 13. Encounter Integration | v2.0 | 0/TBD | Not started | - |
 | 14. Three-Act Narrative Arc | v2.0 | 0/TBD | Not started | - |
