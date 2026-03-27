@@ -27,6 +27,7 @@ export const BRIDGE_EVENTS = {
   EXPLORATION_INTERACT_NPC: 'exploration:interact-npc',
   EXPLORATION_INTERACT_ZONE: 'exploration:interact-zone',
   EXPLORATION_INTERACT_ITEM: 'exploration:interact-item',
+  // EXPLORATION_EXIT_ROOM payload: { targetRoomId: string, fromDoorId: string } (door nav) or string (legacy ESC exit)
   EXPLORATION_EXIT_ROOM: 'exploration:exit-room',
   EXPLORATION_PLAYER_MOVED: 'exploration:player-moved',
   BREACH_STATE_UPDATE: 'breach:state-update',
@@ -39,7 +40,10 @@ export const BRIDGE_EVENTS = {
   // React -> Phaser
   REACT_PAUSE_EXPLORATION: 'react:pause-exploration',
   REACT_DIALOGUE_COMPLETE: 'react:dialogue-complete',
+  // REACT_LOAD_ROOM payload: { room: RoomData, spawnDoorId?: string, completedNPCs: string[], completedZones: string[], collectedItems: string[], doorStates: Record<string, 'locked' | 'available' | 'completed'> }
   REACT_LOAD_ROOM: 'react:load-room',
+  // REACT_DOOR_LOCKED: React tells scene the door is locked (play locked SFX + visual)
+  REACT_DOOR_LOCKED: 'react:door-locked',
   REACT_PLACE_TOWER: 'react:place-tower',
   REACT_START_BREACH: 'react:start-breach-defense',
   REACT_RETURN_TO_HUB: 'react:return-to-hub',
