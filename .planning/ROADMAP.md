@@ -116,7 +116,13 @@ Plans:
   4. Departments unlock in order (Reception → Break Room → Lab → Records → IT → ER) — the player cannot walk into a locked area.
   5. The player can walk back through a completed department without restriction — completed doors open freely.
   6. The HallwayHub room picker menu is gone — no floating department selection UI exists anywhere.
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 12-01-PLAN.md — useGameState hook + UNLOCK_ORDER + EventBridge door constants
+- [ ] 12-02-PLAN.md — roomData.json: doors[] schema + hallway rooms + hospital_entrance
+- [ ] 12-03-PLAN.md — ExplorationScene: door detection, visual states, fade transition, spawn position
+- [ ] 12-04-PLAN.md — UnifiedGamePage + route collapse + HubWorldScene retirement + HallwayHub removal
 
 ### Phase 13: Encounter Integration
 **Goal**: The inbound tower defense encounter launches from an in-world narrative trigger, runs in a condensed 4-wave format, and feeds results back to the shared game state — the player never leaves the Phaser game instance.
