@@ -59,33 +59,35 @@ export default function PrivacyQuestPage() {
   const [currentNPCId, setCurrentNPCId] = useState<string | null>(null);
 
   const [completedRooms, setCompletedRooms] = useState<string[]>(() => {
-    const s = localStorage.getItem('completedRooms');
-    return s ? JSON.parse(s) : [];
+    try { const s = localStorage.getItem('completedRooms'); return s ? JSON.parse(s) : []; }
+    catch { return []; }
   });
   const [collectedStories, setCollectedStories] = useState<string[]>(() => {
-    const s = localStorage.getItem('collectedStories');
-    return s ? JSON.parse(s) : [];
+    try { const s = localStorage.getItem('collectedStories'); return s ? JSON.parse(s) : []; }
+    catch { return []; }
   });
   const [completedNPCs, setCompletedNPCs] = useState<Set<string>>(() => {
-    const s = localStorage.getItem('completedNPCs');
-    return s ? new Set(JSON.parse(s)) : new Set();
+    try { const s = localStorage.getItem('completedNPCs'); return s ? new Set(JSON.parse(s)) : new Set(); }
+    catch { return new Set(); }
   });
   const [completedZones, setCompletedZones] = useState<Set<string>>(() => {
-    const s = localStorage.getItem('completedZones');
-    return s ? new Set(JSON.parse(s)) : new Set();
+    try { const s = localStorage.getItem('completedZones'); return s ? new Set(JSON.parse(s)) : new Set(); }
+    catch { return new Set(); }
   });
   const [collectedItems, setCollectedItems] = useState<Set<string>>(() => {
-    const s = localStorage.getItem('collectedEducationalItems');
-    return s ? new Set(JSON.parse(s)) : new Set();
+    try { const s = localStorage.getItem('collectedEducationalItems'); return s ? new Set(JSON.parse(s)) : new Set(); }
+    catch { return new Set(); }
   });
   const [privacyScore, setPrivacyScore] = useState(() => {
     const s = localStorage.getItem('current-privacy-score');
-    return s ? parseInt(s) : 100;
+    const parsed = s ? parseInt(s, 10) : NaN;
+    return isNaN(parsed) ? 100 : parsed;
   });
   const [finalPrivacyScore, setFinalPrivacyScore] = useState(100);
   const [gameStartTime] = useState(() => {
     const s = localStorage.getItem('gameStartTime');
-    return s ? parseInt(s) : Date.now();
+    const parsed = s ? parseInt(s, 10) : NaN;
+    return isNaN(parsed) ? Date.now() : parsed;
   });
 
   // Modal state
@@ -102,13 +104,13 @@ export default function PrivacyQuestPage() {
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(() => {
     if (!currentRoomId) return new Set();
-    const s = localStorage.getItem(`resolvedGates_${currentRoomId}`);
-    return s ? new Set(JSON.parse(s)) : new Set();
+    try { const s = localStorage.getItem(`resolvedGates_${currentRoomId}`); return s ? new Set(JSON.parse(s)) : new Set(); }
+    catch { return new Set(); }
   });
   const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(() => {
     if (!currentRoomId) return new Set();
-    const s = localStorage.getItem(`unlockedNpcs_${currentRoomId}`);
-    return s ? new Set(JSON.parse(s)) : new Set();
+    try { const s = localStorage.getItem(`unlockedNpcs_${currentRoomId}`); return s ? new Set(JSON.parse(s)) : new Set(); }
+    catch { return new Set(); }
   });
 
   // Score milestone celebrations
@@ -191,16 +193,23 @@ export default function PrivacyQuestPage() {
   // ── Load gate state when room changes ────────────────────────
   useEffect(() => {
     if (!currentRoomId) return;
-    const sg = localStorage.getItem(`resolvedGates_${currentRoomId}`);
-    setResolvedGates(sg ? new Set(JSON.parse(sg)) : new Set());
-    const sn = localStorage.getItem(`unlockedNpcs_${currentRoomId}`);
-    setUnlockedNpcs(sn ? new Set(JSON.parse(sn)) : new Set());
+    let parsedGates: Set<string> = new Set();
+    let parsedNpcs: Set<string> = new Set();
+    try {
+      const sg = localStorage.getItem(`resolvedGates_${currentRoomId}`);
+      parsedGates = sg ? new Set(JSON.parse(sg)) : new Set();
+    } catch { /* corrupted data, reset */ }
+    try {
+      const sn = localStorage.getItem(`unlockedNpcs_${currentRoomId}`);
+      parsedNpcs = sn ? new Set(JSON.parse(sn)) : new Set();
+    } catch { /* corrupted data, reset */ }
+    setResolvedGates(parsedGates);
+    setUnlockedNpcs(parsedNpcs);
 
     // Check for choice gates in the new room
     const room = rooms.find(r => r.id === currentRoomId);
     const gates: Gate[] = room?.config?.gates || [];
-    const resolved = sg ? new Set(JSON.parse(sg)) : new Set();
-    const choiceGate = gates.find(g => g.type === 'choice' && !resolved.has(g.id));
+    const choiceGate = gates.find(g => g.type === 'choice' && !parsedGates.has(g.id));
     if (choiceGate) setActiveChoiceGate(choiceGate);
   }, [currentRoomId]);
 

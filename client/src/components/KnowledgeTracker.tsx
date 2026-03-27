@@ -29,13 +29,15 @@ export default function KnowledgeTracker() {
 
   useEffect(() => {
     const updateProgress = () => {
-      const saved = localStorage.getItem('collectedEducationalItems');
-      if (saved) {
-        const collected = JSON.parse(saved);
-        const principleIds = PRIVACY_PRINCIPLES.map(p => p.id);
-        const learned = collected.filter((id: string) => principleIds.includes(id));
-        setLearnedPrinciples(new Set(learned));
-      }
+      try {
+        const saved = localStorage.getItem('collectedEducationalItems');
+        if (saved) {
+          const collected = JSON.parse(saved);
+          const principleIds = PRIVACY_PRINCIPLES.map(p => p.id);
+          const learned = collected.filter((id: string) => principleIds.includes(id));
+          setLearnedPrinciples(new Set(learned));
+        }
+      } catch { /* corrupted localStorage, ignore */ }
     };
 
     updateProgress();

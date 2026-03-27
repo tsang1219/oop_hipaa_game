@@ -1000,7 +1000,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
 
     // Listen for correct/incorrect answer feedback from React
-    eventBridge.on('react:answer-feedback', (data: { type: string }) => {
+    eventBridge.on(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, (data: { type: string }) => {
       if (data.type === 'correct') {
         this.cameras.main.flash(200, 100, 255, 100, false); // green flash
       } else if (data.type === 'incorrect') {
@@ -1210,11 +1210,18 @@ export class ExplorationScene extends Phaser.Scene {
       this.bgMusic.stop();
       this.bgMusic = undefined;
     }
+    // Clean up sound unlock listener
+    this.sound.off('unlocked');
+    // Clean up EventBridge listeners
     eventBridge.off(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
-    eventBridge.off('react:answer-feedback');
+    eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK);
+    // Clean up input handlers
+    this.input.off('pointerdown');
+    // Kill all tweens to prevent leaked infinite loops
+    this.tweens.killAll();
     if (this.moveTimer) this.moveTimer.destroy();
     if (this.npcPulseTween) {
       this.npcPulseTween.stop();

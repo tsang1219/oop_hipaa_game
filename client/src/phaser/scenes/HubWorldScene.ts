@@ -360,7 +360,9 @@ export class HubWorldScene extends Phaser.Scene {
       this.bgMusic.stop();
       this.bgMusic = undefined;
     }
+    this.sound.off('unlocked');
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
+    this.tweens.killAll();
   }
 
   private onMusicVolume = (vol: number) => {

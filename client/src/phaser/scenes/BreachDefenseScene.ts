@@ -106,6 +106,9 @@ export class BreachDefenseScene extends Phaser.Scene {
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.35;
 
+  // Onboarding cell highlights
+  private onboardingHighlights: Phaser.GameObjects.Rectangle[] = [];
+
   // State broadcast throttle
   private lastBroadcast = 0;
 
@@ -447,59 +450,20 @@ export class BreachDefenseScene extends Phaser.Scene {
       bottomGfx.fillRect(0, sy, GRID_COLS * CELL_SIZE, 1);
     }
 
-    // Terminal cursor blink indicator
-    const cursor = this.add.rectangle(
-      10, bottomY + bottomH - 12, 6, 8, 0x2a8a5a, 0.6
-    ).setDepth(9);
-    this.tweens.add({
-      targets: cursor,
-      alpha: { from: 0.6, to: 0 },
-      duration: 600,
-      yoyo: true,
-      repeat: -1,
-    });
-
-    // Terminal status text lines
+    // Terminal area is now covered by React HUD overlay — keep minimal decorations only
+    // Status text (hidden behind overlay but updated for state tracking)
     const statusFont = { fontFamily: '"Press Start 2P"', fontSize: '6px', color: '#2a8a5a' };
-    this.add.text(10, bottomY + 14, 'SYSTEM: Network monitoring active', statusFont)
-      .setDepth(1).setAlpha(0.4);
-    this.statusText = this.add.text(10, bottomY + 32, 'AWAITING AUTHORIZATION...', statusFont)
-      .setDepth(1).setAlpha(0.4);
-    this.add.text(10, bottomY + 50, 'THREATS: Scanning...', statusFont)
-      .setDepth(1).setAlpha(0.4);
+    this.statusText = this.add.text(10, bottomY + 14, 'AWAITING AUTHORIZATION...', statusFont)
+      .setDepth(1).setAlpha(0.2);
+    this.statusCursor = this.add.text(10, bottomY + 26, '_', statusFont)
+      .setDepth(1).setAlpha(0.2);
 
-    // System info decoration
-    this.add.text(10, bottomY + bottomH - 18, '> SYS: HIPAA_SEC v4.2.1', {
-      fontFamily: '"Press Start 2P"',
-      fontSize: '5px',
-      color: '#334455',
-    }).setDepth(9);
-
-    this.add.text(10, bottomY + bottomH - 10, '> NET: 10.0.0.1/24 ACTIVE', {
-      fontFamily: '"Press Start 2P"',
-      fontSize: '5px',
-      color: '#334455',
-    }).setDepth(9);
-
-    // Wave counter — top-right of bottom panel
+    // Wave counter — top-right of bottom panel (peeks through semi-transparent overlay)
     this.waveCounterText = this.add.text(
       GRID_COLS * CELL_SIZE - 10, bottomY + 10,
       `WAVE ${this.wave}/${WAVES.length}`,
       { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#00d4aa' }
-    ).setOrigin(1, 0).setDepth(9);
-
-    // Blinking cursor after the authorization text
-    const cursorX = this.statusText.x + this.statusText.width + 4;
-    this.statusCursor = this.add.text(cursorX, bottomY + 32, '_', statusFont)
-      .setDepth(1).setAlpha(0.4);
-    this.tweens.add({
-      targets: this.statusCursor,
-      alpha: 0,
-      duration: 500,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Stepped'
-    });
+    ).setOrigin(1, 0).setDepth(9).setAlpha(0.3);
 
     // ── Vignette overlay — subtle edge darkening for cinematic framing ──
     const camW = this.cameras.main.width;
@@ -650,11 +614,17 @@ export class BreachDefenseScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_START_BREACH, this.onStartGame, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL, this.onDismissTutorial, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_RESTART_BREACH, this.onRestart, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_START_PREP, this.onStartPrepCountdown, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_ONBOARDING_HIGHLIGHT, this.showPlacementHighlights, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_ONBOARDING_CLEAR, this.clearPlacementHighlights, this);
 
     // Sync mute state from localStorage before any audio plays
     if (localStorage.getItem('sfx_muted') === 'true') {
       this.sound.mute = true;
     }
+
+    // Stop any lingering audio from other scenes (e.g., hub world music)
+    this.sound.stopAll();
 
     // Background music — fade in gently after a beat
     const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
@@ -712,8 +682,12 @@ export class BreachDefenseScene extends Phaser.Scene {
   }
 
   private onStartGame() {
-    this.gameState = 'PLAYING';
-    // Update terminal status now that authorization is granted
+    // Don't start gameplay yet — wait for tutorials to complete.
+    // React drives the tutorial chain (welcome → firstTower → wave_1).
+    // The scene stays PAUSED until React emits REACT_DISMISS_TUTORIAL.
+    this.gameState = 'PAUSED';
+
+    // Update terminal status
     if (this.statusText) {
       this.statusText.setText('STATUS: Defenses deployed');
     }
@@ -721,6 +695,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.tweens.killTweensOf(this.statusCursor);
       this.statusCursor.setAlpha(0);
     }
+
     // Emit wave start banner for wave 1
     if (!this.shownWaveStartBanners.has(1)) {
       this.shownWaveStartBanners.add(1);
@@ -733,23 +708,82 @@ export class BreachDefenseScene extends Phaser.Scene {
         threats: waveData.threats,
       });
     }
-    // Trigger wave 1 splash (delayed so banner shows first)
-    if (!this.shownWaveSplashes.has(1)) {
-      this.shownWaveSplashes.add(1);
-      this.gameState = 'PAUSED';
-      this.time.delayedCall(3500, () => {
-        eventBridge.emit(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, { tutorialKey: 'wave_1' });
-      });
-    }
+
     this.broadcastState();
   }
 
   private onDismissTutorial() {
     this.gameState = 'PLAYING';
-    if (!this.waveState.active) {
-      this.activateWave();
-      this.waveState.nextSpawnTime = this.time.now + 2000;
+    // For mid-game tutorials (wave 3, 5, 7, 9), activate the next wave after a brief delay.
+    // Wave 1 is handled separately by the prep countdown.
+    if (this.wave > 1 && !this.waveState.active) {
+      this.time.delayedCall(2000, () => {
+        if (!this.waveState.active && this.gameState === 'PLAYING') {
+          this.activateWave();
+          this.waveState.nextSpawnTime = this.time.now + 1500;
+        }
+      });
     }
+    this.broadcastState();
+  }
+
+  /**
+   * Start a visible countdown on the Phaser canvas, then activate the wave.
+   * Called from React after the tutorial chain completes.
+   */
+  private onStartPrepCountdown() {
+    if (this.waveState.active) return;
+    this.gameState = 'PLAYING';
+
+    const totalSeconds = 8;
+    const countdownText = this.add.text(
+      GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2 - 20,
+      '',
+      { fontFamily: '"Press Start 2P"', fontSize: '11px', color: '#00d4aa', stroke: '#000000', strokeThickness: 3 }
+    ).setOrigin(0.5).setDepth(50);
+
+    const hintText = this.add.text(
+      GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2 + 10,
+      'PLACE YOUR DEFENSES',
+      { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#8888aa', stroke: '#000000', strokeThickness: 2 }
+    ).setOrigin(0.5).setDepth(50);
+
+    this.tweens.add({
+      targets: hintText,
+      alpha: { from: 0.4, to: 1 },
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut'
+    });
+
+    let remaining = totalSeconds;
+    const tick = () => {
+      if (remaining <= 0) {
+        countdownText.destroy();
+        hintText.destroy();
+        this.activateWave();
+        this.waveState.nextSpawnTime = this.time.now + 1500;
+        return;
+      }
+      countdownText.setText(`Wave starts in ${remaining}...`);
+      // Pulse effect on each tick
+      this.tweens.add({
+        targets: countdownText,
+        scale: { from: 1.15, to: 1 },
+        duration: 300,
+        ease: 'Back.easeOut'
+      });
+      if (remaining <= 3) {
+        countdownText.setColor('#ff6644');
+        this.sound.play('sfx_interact', { volume: 0.2 });
+      }
+      remaining--;
+      this.time.delayedCall(1000, tick);
+    };
+
+    tick();
+    this.broadcastState();
   }
 
   private onRestart() {
@@ -825,6 +859,10 @@ export class BreachDefenseScene extends Phaser.Scene {
       .setDisplaySize(56, 56)
       .setDepth(10);
 
+    // Capture the base scale set by setDisplaySize (varies per PNG resolution)
+    const baseScaleX = sprite.scaleX;
+    const baseScaleY = sprite.scaleY;
+
     const tower: TowerData = {
       id: Phaser.Math.RND.uuid(),
       type,
@@ -855,13 +893,16 @@ export class BreachDefenseScene extends Phaser.Scene {
       if (placeEmitter && placeEmitter.active) placeEmitter.destroy();
     });
 
-    // Scale pulse on the newly placed tower sprite
+    // Scale pulse on the newly placed tower sprite (relative to display size)
+    sprite.setScale(baseScaleX * 0.5, baseScaleY * 0.5);
     this.tweens.add({
       targets: sprite,
-      scale: [0.5, 1.15, 0.95, 1.0],
+      scaleX: { from: baseScaleX * 0.5, to: baseScaleX },
+      scaleY: { from: baseScaleY * 0.5, to: baseScaleY },
       duration: 350,
       ease: 'Back.easeOut',
       onComplete: () => {
+        sprite.setScale(baseScaleX, baseScaleY);
         // Idle breathing animation for placed towers
         this.tweens.add({
           targets: sprite,
@@ -940,11 +981,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       }
     }
 
-    // If this is the first tower and wave hasn't started, start spawning
-    if (this.towers.length === 1 && !this.waveState.active && this.gameState === 'PLAYING') {
-      this.waveState.active = true;
-      this.waveState.nextSpawnTime = this.time.now + 2000;
-    }
+    // Wave spawning is controlled by the prep countdown — not by tower placement
 
     eventBridge.emit(BRIDGE_EVENTS.BREACH_TOWER_PLACED, {
       type,
@@ -1077,6 +1114,47 @@ export class BreachDefenseScene extends Phaser.Scene {
       }
     }
     return buff;
+  }
+
+  // ── Onboarding highlights ────────────────────────────────────
+
+  private showPlacementHighlights() {
+    this.clearPlacementHighlights();
+
+    // Suggested cells near the path — good strategic positions for wave 1
+    const suggestedCells = [
+      { x: 1, y: 2 }, // above path start
+      { x: 2, y: 2 }, // above path
+      { x: 4, y: 4 }, // below path bend
+    ];
+
+    for (const cell of suggestedCells) {
+      const rect = this.add.rectangle(
+        cell.x * CELL_SIZE + CELL_SIZE / 2,
+        cell.y * CELL_SIZE + CELL_SIZE / 2,
+        CELL_SIZE - 4, CELL_SIZE - 4,
+        0x44ff44, 0.15
+      ).setStrokeStyle(2, 0x44ff44, 0.5).setDepth(6);
+
+      this.tweens.add({
+        targets: rect,
+        alpha: { from: 0.15, to: 0.5 },
+        duration: 800,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+
+      this.onboardingHighlights.push(rect);
+    }
+  }
+
+  private clearPlacementHighlights() {
+    for (const rect of this.onboardingHighlights) {
+      this.tweens.killTweensOf(rect);
+      rect.destroy();
+    }
+    this.onboardingHighlights = [];
   }
 
   private broadcastState() {
@@ -1264,18 +1342,18 @@ export class BreachDefenseScene extends Phaser.Scene {
             }
           }
 
-          // Check for wave splash screen
-          if ([1, 3, 5, 7, 9].includes(this.wave) && !this.shownWaveSplashes.has(this.wave)) {
+          // Check for wave with educational lesson (triggered by React after recap)
+          if ([3, 5, 7, 9].includes(this.wave) && !this.shownWaveSplashes.has(this.wave)) {
             this.shownWaveSplashes.add(this.wave);
             this.gameState = 'PAUSED';
-            this.time.delayedCall(3500, () => {
-              eventBridge.emit(BRIDGE_EVENTS.BREACH_TUTORIAL_TRIGGER, {
-                tutorialKey: `wave_${this.wave}`
-              });
-            });
+            // React will trigger the tutorial after the recap modal is dismissed
+            // (via BREACH_WAVE_COMPLETE data, which React checks for pending tutorial)
           } else {
-            // Auto-start next wave after delay
-            this.activateWave();
+            // Auto-start next wave with brief prep time
+            this.time.delayedCall(3000, () => {
+              this.activateWave();
+              this.waveState.nextSpawnTime = this.time.now + 1500;
+            });
           }
         } else {
           // Victory!
@@ -1913,10 +1991,22 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.bgMusic.stop();
       this.bgMusic = undefined;
     }
+    // Clean up sound unlock listener
+    this.sound.off('unlocked');
+    // Clean up input handlers
+    this.input.off('pointermove');
+    this.input.off('pointerdown');
+    // Clean up EventBridge listeners
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SELECT_TOWER_TYPE, this.onSelectTowerType, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_START_BREACH, this.onStartGame, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL, this.onDismissTutorial, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_START_PREP, this.onStartPrepCountdown, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_ONBOARDING_HIGHLIGHT, this.showPlacementHighlights, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_ONBOARDING_CLEAR, this.clearPlacementHighlights, this);
+    this.clearPlacementHighlights();
     eventBridge.off(BRIDGE_EVENTS.REACT_RESTART_BREACH, this.onRestart, this);
+    // Kill all tweens to prevent leaked infinite loops
+    this.tweens.killAll();
   }
 }

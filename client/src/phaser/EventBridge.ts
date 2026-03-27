@@ -47,7 +47,11 @@ export const BRIDGE_EVENTS = {
   REACT_RETURN_TO_HUB: 'react:return-to-hub',
   REACT_SELECT_TOWER_TYPE: 'react:select-tower-type',
   REACT_DISMISS_TUTORIAL: 'react:dismiss-tutorial',
+  REACT_START_PREP: 'react:start-prep-countdown',
+  REACT_ONBOARDING_HIGHLIGHT: 'react:onboarding-highlight',
+  REACT_ONBOARDING_CLEAR: 'react:onboarding-clear',
   REACT_RESTART_BREACH: 'react:restart-breach',
   REACT_SET_MUSIC_VOLUME: 'react:set-music-volume',
   REACT_PLAY_SFX: 'react:play-sfx',
+  REACT_ANSWER_FEEDBACK: 'react:answer-feedback',
 } as const;

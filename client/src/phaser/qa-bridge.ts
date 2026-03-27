@@ -19,7 +19,12 @@ declare global {
   }
 }
 
+let cleanupFn: (() => void) | null = null;
+
 export function initQABridge() {
+  // Clean up previous listener if re-initialized
+  if (cleanupFn) cleanupFn();
+
   const qa: QABridge = {
     sceneReady: null,
     scenesVisited: [],
@@ -27,12 +32,19 @@ export function initQABridge() {
   };
   window.__QA__ = qa;
 
-  eventBridge.on(BRIDGE_EVENTS.SCENE_READY, (sceneKey: string) => {
+  const onSceneReady = (sceneKey: string) => {
     qa.sceneReady = sceneKey;
     if (!qa.scenesVisited.includes(sceneKey)) {
       qa.scenesVisited.push(sceneKey);
     }
-  });
+  };
+
+  eventBridge.on(BRIDGE_EVENTS.SCENE_READY, onSceneReady);
+
+  cleanupFn = () => {
+    eventBridge.off(BRIDGE_EVENTS.SCENE_READY, onSceneReady);
+    cleanupFn = null;
+  };
 }
 
 /**
