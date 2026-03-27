@@ -1,223 +1,270 @@
 # Pitfalls Research
 
-**Domain:** Game polish — Phaser 3.90+ / React 18 hybrid: sound, sprites, VFX, HUD, onboarding
-**Researched:** 2026-02-27
-**Confidence:** HIGH (Phaser-specific pitfalls verified via official docs + community issue tracker; UX pitfalls MEDIUM via multiple credible sources)
+**Domain:** Unified RPG restructure — merging two Phaser 3 game modes, door-to-door navigation, encounter integration, narrative arc
+**Researched:** 2026-03-26
+**Confidence:** HIGH — based on direct codebase analysis of existing ExplorationScene, BreachDefenseScene, EventBridge, React page architecture, and localStorage save format; confirmed against known Phaser 3 scene lifecycle behavior
 
 ---
 
 ## Critical Pitfalls
 
-### Pitfall 1: Audio Preloaded in Wrong Scene or at Wrong Time
+### Pitfall 1: Stale Closures in EventBridge Handlers During Room Transitions
 
 **What goes wrong:**
-Sound files loaded with `this.load.audio()` outside of a scene's `preload()` method fail silently or throw "Sound not found" at play time. The Loader only auto-starts during `preload()`. Calling load methods after the scene has created will require manually calling `Loader.start()` — a step developers routinely skip. In this codebase, `BootScene.preload()` already loads all PNG sprites; audio must join that same preload block or it will not exist when `ExplorationScene` or `BreachDefenseScene` calls `this.sound.play()`.
+
+React's EventBridge listeners registered in `useEffect` capture stale state via closures. When the player walks from room A to room B (the new continuous navigation), the React page still has handlers that reference room A's `currentRoomId`, `resolvedGates`, and `completedNPCs`. Any EventBridge event fired during the transition (e.g. `EXPLORATION_EXIT_ROOM`) is caught by the stale closure. The existing page already documents this risk: `// Note: handleExitRoom is defined below but only called at runtime (not during effect setup), so the closure is safe`. With continuous navigation, the player enters rooms 6-15 times per session, making stale closure hits far more likely.
+
+The effect dependency list on the EventBridge handler registration already has this fragility: `[currentRoomId, resolvedGates, completedZones, collectedItems, isNpcGated]` — but `handleExitRoom` (a `useCallback`) captures `completedNPCs`, `completedZones`, and `completedRooms`. Any omission means the handler runs with last room's values.
 
 **Why it happens:**
-Developers add `this.load.audio()` to `create()` or a helper function after the fact, forgetting that the Loader auto-trigger only fires once per `preload()`.
+
+Rooms were previously selected from a menu (one room at a time, with a return to hub between each). There was no rapid succession of room entries to surface the stale state timing issue. Continuous walking means rooms transition within 1-2 seconds of each other, and React state updates settle slower than Phaser scene transitions.
 
 **How to avoid:**
-Add all `this.load.audio('key', ['/assets/sfx.mp3', '/assets/sfx.ogg'])` calls to `BootScene.preload()` alongside the existing sprite loads. Never load audio from `create()` without also calling `this.load.start()`. Verify by logging `this.cache.audio.exists('key')` before first play.
 
-**Warning signs:**
-- Console: `"Sound Manager: sound.play - sound key not found: [key]"` on first play
-- No audio error in preload, but error fires only at runtime when sound is triggered
-- Audio works in isolation but fails after scene switches
+Use a `useRef` for values that EventBridge handlers need to read, updated synchronously on every render:
 
-**Phase to address:** Sound phase (first polish phase) — establish the full audio manifest in `BootScene.preload()` before any scene attempts playback.
-
----
-
-### Pitfall 2: Browser Autoplay Policy Blocks First Sound
-
-**What goes wrong:**
-The Web Audio API starts in a suspended state. Browsers block audio playback until a user gesture occurs on the page. Calling `this.sound.play()` before the first click/tap silently fails. Chrome logs: `"The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page."` — but code continues without throwing, so developers assume audio is working.
-
-**Why it happens:**
-The game's BootScene transitions into HubWorld automatically with no user gesture before scene ready. The first `SCENE_READY` event fires, React navigates, and the game is running before the player has ever clicked anything. Any sound triggered automatically (e.g., an intro ambient) will be muted.
-
-**How to avoid:**
-Do NOT play sounds on scene `create()` or on auto-start transitions. Trigger all first sounds on explicit player interaction (button click, first keypress, first pointer down). Phaser automatically resumes AudioContext on first user gesture — trust this mechanism. For the intro modal in PrivacyQuest, do not play a sound when the modal opens; play it when the player clicks "Continue." Optionally listen to `this.sound.on(Phaser.Sound.Events.UNLOCKED, ...)` to confirm the context is active before playing ambient sounds.
-
-**Warning signs:**
-- Audio "works on second try" but not immediately after load
-- Chrome DevTools shows AudioContext in `"suspended"` state
-- `this.sound.locked` is `true` when checked in `create()`
-
-**Phase to address:** Sound phase — enforce the rule that all sounds are triggered from user interaction handlers, never from scene lifecycle methods.
-
----
-
-### Pitfall 3: Particle API Breaking Change (v3.60+) — `createEmitter` Removed
-
-**What goes wrong:**
-Any tutorial, StackOverflow answer, or AI suggestion written before Phaser 3.60 will show the old pattern:
 ```typescript
-// OLD (pre-3.60) — BROKEN in Phaser 3.90:
-const particles = this.add.particles('texture');
-const emitter = particles.createEmitter({ ... });
+const stateRef = useRef({ currentRoomId, completedNPCs, resolvedGates });
+useEffect(() => { stateRef.current = { currentRoomId, completedNPCs, resolvedGates }; });
+
+const onExitRoom = useCallback(() => {
+  const { currentRoomId } = stateRef.current; // always current
+}, []); // stable ref — no stale dependency
 ```
-In Phaser 3.60+, `ParticleEmitterManager` was removed entirely. `this.add.particles()` now returns a `ParticleEmitter` directly:
+
+This pattern is especially critical for the encounter return path: when BreachDefense completes and control returns to the RPG world, the RPG state must be current, not frozen from when the encounter was launched.
+
+**Warning signs:**
+
+- Room completion fires for the wrong room after navigating between departments
+- NPC completion state appears to reset when returning from an encounter
+- Score change fires for a previously completed NPC (double award)
+
+**Phase to address:** Phase 1 (navigation foundation) — establish the ref pattern for all EventBridge handlers before any encounter integration. Retrofitting this later requires auditing every handler.
+
+---
+
+### Pitfall 2: EventBridge Listener Accumulation on Scene Restart
+
+**What goes wrong:**
+
+The EventBridge singleton persists for the lifetime of the Phaser game instance. Each call to `game.scene.start('Exploration', data)` runs `create()`, which registers new EventBridge listeners. If `shutdown()` misses any listener, duplicates accumulate. With 6 departments entered across a session, `REACT_DIALOGUE_COMPLETE` fires 6 callbacks instead of 1 — causing double-completion of NPCs, double-score awards, and phantom state updates. By the fourth room, a correct answer awards +18 score instead of +3.
+
+The current `shutdown()` in ExplorationScene correctly calls `eventBridge.off()` for its 5 existing listeners. The v2.0 restructure will add new event types: encounter triggers, act progression events, door unlock signals, narrative beat callbacks. Each new event type is a new leak risk.
+
+**Why it happens:**
+
+New events added during the restructure will be registered in `create()` but omitted from `shutdown()` under time pressure. The EventBridge provides no warning when a listener is added a second time — the second `eventBridge.on(event, handler)` call adds another subscriber silently.
+
+**How to avoid:**
+
+Add a centralized cleanup registration pattern to ExplorationScene and BreachDefenseScene:
+
 ```typescript
-// NEW (3.60+) — correct for Phaser 3.90:
-const emitter = this.add.particles(x, y, 'texture', { ... });
-```
-Using the old API in Phaser 3.90 throws at runtime.
+private boundListeners: Array<{ event: string; handler: Function }> = [];
 
-**Why it happens:**
-The Phaser particle API was completely redesigned in 3.60. This project uses 3.90. But nearly all third-party resources (tutorials, forum posts, AI code suggestions) still show the pre-3.60 API. It is the most commonly copied wrong pattern.
+private onBridge(event: string, handler: Function) {
+  eventBridge.on(event, handler, this);
+  this.boundListeners.push({ event, handler });
+}
 
-**How to avoid:**
-Always use `this.add.particles(x, y, textureKey, config)` — the return value is the emitter. Verify against the current Phaser 3 docs at `docs.phaser.io`. Do not copy particle code from any source without confirming it is post-3.60 syntax.
-
-**Warning signs:**
-- Runtime error: `"this.add.particles(...).createEmitter is not a function"`
-- Copy-pasted particle code from forum posts or AI completions
-- Any particle code referencing `ParticleEmitterManager` class
-
-**Phase to address:** VFX phase — check API version before writing any particle code; test emitters in isolation before integration.
-
----
-
-### Pitfall 4: Walk Cycle Requires a Spritesheet Loaded in BootScene — setTexture Approach Cannot Animate
-
-**What goes wrong:**
-The current `ExplorationScene` uses `setTexture('player_down')`, `setTexture('player_left')` etc. to simulate direction-facing. This switches between 4 static textures. If a walk cycle is added using `anims.create()`, it requires a spritesheet loaded via `this.load.spritesheet()` — not individual `generateTexture()` images. Attempting to create an animation that references programmatically-generated textures (one frame each) results in an animation with one frame that does not cycle.
-
-**Why it happens:**
-`generateTexture()` in `BootScene` creates single-frame named textures. Each direction is a separate texture key. `anims.create()` needs either: (a) a spritesheet where multiple frames are packed into one image, or (b) a texture atlas. There is no way to combine the four existing programmatic textures into an animation without creating a new spritesheet.
-
-**How to avoid:**
-Choose one of two paths and commit to it:
-- **Path A (PNG spritesheet):** Create a 4-direction walk cycle spritesheet PNG (e.g., 4 columns × 4 rows = 16 frames at 32×32, ~128×128 total). Load it in `BootScene.preload()` as `this.load.spritesheet('player', '/assets/player.png', { frameWidth: 32, frameHeight: 32 })`. Create animations with `this.anims.create()`. The `setTexture()` calls in `ExplorationScene` become `this.player.anims.play('walk_down')`.
-- **Path B (programmatic spritesheet):** Draw all frames into a single Graphics object at runtime and call `generateTexture('player_sheet', totalWidth, frameHeight)`, then treat it as a spritesheet. More complex, harder to maintain.
-Path A is strongly preferred.
-
-**Warning signs:**
-- Walk cycle animation plays but shows same static frame (1-frame animation)
-- `anims.create()` with `generateFrameNumbers()` logs warnings about zero frames
-- `generateTexture()` is called per-direction in BootScene (current state)
-
-**Phase to address:** Sprite phase — decide on spritesheet vs. programmatic before writing any `anims.create()` code. This is a pre-condition for animation work.
-
----
-
-### Pitfall 5: EventBridge Listeners Not Removed from Singleton Across Scene Restarts
-
-**What goes wrong:**
-`eventBridge` is a singleton (`EventBridge.getInstance()`). Listeners added with `eventBridge.on(event, handler, context)` in `ExplorationScene.create()` or `BreachDefenseScene.create()` accumulate if `shutdown()` does not remove the exact matching listener. When scenes restart (player exits room, re-enters), listeners from prior scene instances stack up. Each interaction triggers the handler multiple times. The `BreachDefenseScene.onRestart()` path is especially vulnerable — it resets game data but does not re-register listeners, while the React page's `useEffect` cleanup may remove the bridge listener at an unexpected time.
-
-**Why it happens:**
-The existing `shutdown()` in both scenes does call `eventBridge.off()` correctly for scene-side listeners. The risk comes from adding new sound/VFX listeners during the polish phase without adding matching `off()` calls in `shutdown()`.
-
-**How to avoid:**
-Every `eventBridge.on(EVENT, handler, this)` added during polish must have a matching `eventBridge.off(EVENT, handler, this)` in `shutdown()`. Use the same function reference and context — not an arrow function inline (arrow functions create new references each call, making `off()` ineffective). Test by navigating in and out of a room multiple times and confirming sounds/effects fire exactly once per event.
-
-**Warning signs:**
-- Sound effects play 2× or 3× after re-entering a room
-- Particle bursts fire multiple times for one enemy death after game restart
-- `eventBridge.listenerCount(eventName)` grows on each scene start
-
-**Phase to address:** Sound phase (first use of new listeners) — establish the pattern before it can proliferate.
-
----
-
-## Moderate Pitfalls
-
-### Pitfall 6: Particle Emitter Not Stopped or Destroyed After One-Shot Effect
-
-**What goes wrong:**
-`this.add.particles(x, y, key, { quantity: 20, lifespan: 500 })` creates an emitter that runs indefinitely by default (continuous mode). An enemy death effect set up this way keeps spawning particles forever from the death position, accumulating game objects per enemy death until frame rate degrades.
-
-**Prevention:**
-Always configure burst-style one-shot effects with `{ quantity: 20, lifespan: 500, stopAfter: 20 }` or call `emitter.explode(20, x, y)`. After the emitter completes, destroy it: `emitter.on('complete', () => emitter.destroy())`. For BreachDefense enemy deaths, create the emitter, call `explode()`, then destroy in the callback. In Phaser 3.60+, `emitter.explode(count, x, y)` fires a one-shot burst and then stops automatically when quantity is exhausted — but the emitter object still exists in the display list until explicitly destroyed. Set `maxParticles` as a hard cap for any continuous emitter to prevent runaway accumulation.
-
-**Warning signs:**
-- Frame rate drops gradually during a long BreachDefense session
-- Chrome DevTools shows growing number of display list objects over time
-- Particles still visible at enemy spawn position long after death
-
-**Phase to address:** VFX phase — confirm destroy-after-complete for every one-shot emitter before marking VFX tasks done.
-
----
-
-### Pitfall 7: React Overlay Intercepts Phaser Canvas Clicks (or Vice Versa)
-
-**What goes wrong:**
-React HTML elements positioned over the Phaser canvas (the HUD, tower panel, modal overlays) cause pointer events to fire in both the DOM and Phaser simultaneously. Clicking a React button that visually overlaps the Phaser grid triggers tower placement in the Phaser scene. This is a documented issue — z-index alone does not prevent event propagation from React to Phaser canvas.
-
-**Prevention:**
-Apply `pointer-events: none` to the Phaser canvas container div when React modals/overlays are active. In `BreachDefensePage.tsx`, set a CSS class on the `PhaserGame` wrapper based on `pageState`:
-```tsx
-<div className={pageState !== 'PLAYING' ? 'pointer-events-none' : ''}>
-  <PhaserGame ... />
-</div>
-```
-Conversely, when adding hover-description behavior to the tower panel, apply `pointer-events: none` to those elements to prevent hover events from reaching the Phaser canvas below.
-
-**Warning signs:**
-- Tower placed in Phaser when clicking a React button in the HUD
-- Unexpected NPC interaction triggered by clicking the PrivacyQuest dialogue modal "Continue" button
-- Phaser `pointerdown` fires during tutorial modal interaction
-
-**Phase to address:** HUD phase — test every new React HUD element for click bleed-through before considering it done.
-
----
-
-### Pitfall 8: `anims.create()` Called on Every Scene Restart Creates Duplicate Animation Keys
-
-**What goes wrong:**
-Animations registered with `this.anims.create({ key: 'walk_down', ... })` are stored on the global `AnimationManager` (game-level, not scene-level). If `ExplorationScene.create()` calls `anims.create()` unconditionally, the second time the scene starts (e.g., player exits room and re-enters), Phaser logs a warning and the animation may not behave correctly.
-
-**Prevention:**
-Guard all `anims.create()` calls with:
-```typescript
-if (!this.anims.exists('walk_down')) {
-  this.anims.create({ key: 'walk_down', ... });
+shutdown() {
+  this.boundListeners.forEach(({ event, handler }) =>
+    eventBridge.off(event, handler, this)
+  );
+  this.boundListeners = [];
+  // ...rest of cleanup
 }
 ```
-Or call `anims.create()` only in `BootScene.create()` once, where it will persist for the lifetime of the game. Prefer the BootScene approach — it mirrors what the codebase already does with `generateAllTextures()`.
+
+Every new `eventBridge.on()` call must use `this.onBridge()`. The shutdown is then self-maintaining.
 
 **Warning signs:**
-- Console: `"Animation with key walk_down already exists"` warning
-- Walk animation plays wrong after first scene restart
-- `this.anims.exists()` is not called before `this.anims.create()`
 
-**Phase to address:** Sprite phase — all `anims.create()` calls should live in BootScene, not ExplorationScene.
+- Score changes by double the expected amount on second room entry
+- Audio plays twice on a single interaction (two listeners firing)
+- React state updates fire in pairs visible in React DevTools
+- NPC marked complete twice in the same session
+
+**Phase to address:** Phase 1 (navigation) — add the centralized listener pattern to ExplorationScene before adding new event types. Audit BreachDefenseScene's shutdown() completeness at the same time.
 
 ---
 
-### Pitfall 9: Tutorial Modal Teaches Controls Before Player Knows What They Need
+### Pitfall 3: Two Game Loops Running Simultaneously After Encounter Launch
 
 **What goes wrong:**
-A first-visit intro modal for PrivacyQuest that lists all controls (WASD, Space, ESC, click-to-move) before the player has tried anything creates cognitive overload. Per game UX research, "no one wants to read a novel before they can move their character." Players dismiss modal content without reading it, then discover controls through failure. The existing BreachDefense modal chain (12 sequential modals) is already too heavy; replicating it in PrivacyQuest would be a regression.
 
-**Prevention:**
-Limit the intro modal to one sentence of context (what the player is doing and why) and one sentence of primary control (WASD or click to move). Surface secondary controls (Space to interact, ESC to exit room) as contextual in-world prompts the first time they are relevant — e.g., show the Space prompt only when the player first reaches proximity to an NPC, not before. This matches the PROJECT.md plan: "brief intro modal + contextual in-world hints."
+When BreachDefenseScene launches as an encounter from within the RPG world, ExplorationScene must be fully stopped or sleeping. If React calls `game.scene.start('BreachDefense')` directly without stopping ExplorationScene, both scenes remain active. Phaser allows multiple active scenes. ExplorationScene's `update()` loop continues, consuming CPU and — critically — still processing keyboard input. WASD keys move the RPG player while tower defense waves are running.
+
+The current BreachDefensePage manually calls `game.scene.stop('HubWorld')` before starting BreachDefense. But when encounter launch comes from within ExplorationScene (the v2.0 design), the calling code must explicitly stop or sleep Exploration first.
+
+**Why it happens:**
+
+Phaser's `scene.start(key)` stops only the scene that invokes it via the scene manager. If the trigger comes from React via EventBridge, no Phaser scene is "calling" — React calls `game.scene.start('BreachDefense')`, which adds BreachDefense but does not stop Exploration.
+
+**How to avoid:**
+
+The encounter launch sequence must be scene-initiated, not React-initiated:
+
+1. Player triggers encounter narrative moment in ExplorationScene
+2. ExplorationScene emits `ENCOUNTER_TRIGGER` to React with encounter config
+3. React confirms (shows brief encounter intro UI)
+4. React emits `REACT_LAUNCH_ENCOUNTER` back to Phaser
+5. ExplorationScene receives it, calls `this.scene.sleep()` on itself, then `this.scene.start('BreachDefense', { encounterConfig })`
+
+Use `scene.sleep()` (not `scene.stop()`) for ExplorationScene so the player's room position, nearby interactable state, and ambient particles are preserved for the return. Use `scene.stop()` for BreachDefenseScene on encounter exit so it initializes cleanly next time.
 
 **Warning signs:**
-- Intro modal lists more than 3 items
-- Controls are listed before the player has moved
-- Modal requires more than one dismiss to clear
 
-**Phase to address:** Onboarding phase — write modal copy at the end, after testing reveals what players actually need to know first.
+- Player character moves during BreachDefense waves
+- Footstep sounds play during tower defense
+- Frame rate drops during encounter (two full update loops competing)
+- ExplorationScene background music continues playing under BreachDefense music
+
+**Phase to address:** Phase 2 (encounter integration) — this is the highest-risk moment of the entire restructure. Define the launch/return protocol contract before any implementation.
 
 ---
 
-### Pitfall 10: HUD Text Positioned Relative to World Coordinates Scrolls Off-Screen
+### Pitfall 4: Save Format Migration Breaks Existing Progress
 
 **What goes wrong:**
-Phaser text objects created with default settings (`setScrollFactor(1)`) move with the camera. For PrivacyQuest rooms larger than 640×480, the camera follows the player. HUD elements (room name, interaction prompt, wave intro text) that are created at fixed world positions but not given `setScrollFactor(0)` will not stay anchored to the viewport — they'll scroll away.
 
-**Prevention:**
-All HUD text objects must call `.setScrollFactor(0)` to pin them to the screen (as `promptText` and `roomNameText` already do in `ExplorationScene`). When adding wave intro text or tooltip elements inside `BreachDefenseScene`, apply `setScrollFactor(0)` consistently. For the React HUD overlay, this is not an issue (React elements are in the DOM, not the Phaser world), but any Phaser-rendered text feedback (e.g., floating damage numbers) must use `setScrollFactor(0)` or world-position calculations.
+The v1.0 save format is fragmented across 14+ localStorage keys:
+`completedRooms`, `collectedStories`, `completedNPCs`, `completedZones`, `collectedEducationalItems`, `current-privacy-score`, `resolvedGates_${roomId}` (6 keys), `unlockedNpcs_${roomId}` (6 keys), `pq:onboarding:seen`, `pq:room:${roomId}:npcPulsed` (6 keys), `sfx_muted`, `music_volume`, `gameStartTime`, `final-privacy-score`.
+
+The v2.0 unified game needs additional state: act progression, encounter completion records, department unlock state, breach defense session scores feeding into the unified compliance score. Adding new keys to this already-fragmented format creates: (1) v1 saves missing required v2 keys crash or silently return wrong defaults on read, and (2) the key proliferation becomes undebuggable.
+
+**Why it happens:**
+
+The existing format grew organically — each feature added its own key. There was no schema. Migration was never planned because the game had no version boundary. The v2.0 restructure IS that version boundary, and ignoring it means running two incompatible data models simultaneously.
+
+**How to avoid:**
+
+Before adding any new state, consolidate the save format into a single versioned key:
+
+```typescript
+interface SaveDataV2 {
+  version: 2;
+  privacyScore: number;
+  completedNPCs: string[];
+  completedZones: string[];
+  collectedItems: string[];
+  completedRooms: string[];
+  collectedStories: string[];
+  actProgress: 1 | 2 | 3;
+  encountersCompleted: string[];
+  breachScores: Record<string, number>;
+  resolvedGates: Record<string, string[]>;
+  unlockedNpcs: Record<string, string[]>;
+  flags: Record<string, boolean>;
+  gameStartTime: number;
+}
+```
+
+Write a `migrateV1toV2()` function that reads all v1 keys, assembles the v2 object, writes `pq:save:v2`, and clears old keys. Run once on game init. New code reads/writes only `pq:save:v2`.
 
 **Warning signs:**
-- HUD elements are not visible when camera has scrolled
-- Room name or prompt disappears when player walks toward the edge of a large room
-- Text appears at correct position on `create()` but drifts during movement
 
-**Phase to address:** HUD and VFX phases — check `scrollFactor` for every new Phaser text object created during polish.
+- `JSON.parse` errors in the console on game load
+- Act progression resets to Act 1 on page refresh
+- Encounter results don't persist between sessions
+- Players report "I completed everything but the game forgot"
+
+**Phase to address:** Phase 0 (bug stabilization before restructure) — the migration must be the first code written, before any restructure work begins. If v1 keys exist, migrate; if neither exists, start fresh.
+
+---
+
+### Pitfall 5: React Page Architecture Assumes One Mode Per Route
+
+**What goes wrong:**
+
+The v1.0 architecture has three React pages, each owning its Phaser game instance. If the restructure keeps separate routes for separate modes (navigating from `/privacy` to `/breach` when an encounter triggers), the Phaser game instance is destroyed and recreated on every page navigation via React router. This means:
+
+1. All Phaser scene state (player position, ambient particles, tweens) is destroyed
+2. BootScene must re-run, causing a loading flash visible to the player
+3. Any state passed via EventBridge at the moment of route change is lost
+4. The new page has no Phaser content until BootScene completes (~400ms)
+
+**Why it happens:**
+
+Routing frameworks (Wouter in this project) destroy and mount components on route change. `PhaserGame`'s `useEffect` cleanup calls `gameRef.current.destroy(true)`. This is correct cleanup for route-level navigation but catastrophic for mid-game scene switching. The current architecture works because HubWorld, PrivacyQuest, and BreachDefense were separate modes at separate routes — the game instance was always fresh. Continuous play eliminates that safety.
+
+**How to avoid:**
+
+The unified game must live on a single route with a single Phaser game instance. React page mode (`'exploration' | 'encounter' | 'dialogue' | 'transition'`) is managed by React state, not by routes. The Phaser canvas never unmounts. React HUD components swap based on mode.
+
+This means BreachDefensePage's tower selection panel, wave banner, and codex modal must become an `EncounterHUD` component rendered conditionally by the unified page. No new routes are needed.
+
+**Warning signs:**
+
+- `navigate('/breach')` or `navigate('/privacy')` called during encounter trigger
+- PhaserGame component appears more than once in the React component tree
+- BootScene loading bar visible during mid-game encounter launch
+- Player position resets to default spawn on encounter return
+
+**Phase to address:** Phase 1 (navigation foundation) — the single-page, single-instance architecture must be established first. All subsequent work (encounters, acts, narrative) depends on this foundation.
+
+---
+
+### Pitfall 6: BreachDefense Game State Not Reset Between Encounters
+
+**What goes wrong:**
+
+BreachDefenseScene accumulates state across a session: `enemies[]`, `towers[]`, `projectiles[]`, `waveState`, `securityScore`, `budget`, `grantedStipends`. The `onRestart` handler clears these, but it was designed for single-session restart within one BreachDefense sitting — not for "sleep scene, wake for second encounter later." If BreachDefenseScene is incorrectly slept instead of stopped, all state persists across encounters: towers from encounter 1 are present at encounter 2's start, security score carries over, enemies from wave 4 are still in the array when wave 1 attempts to spawn.
+
+**Why it happens:**
+
+`scene.sleep()` freezes the scene with all state intact — correct for ExplorationScene (player position preserved), but wrong for BreachDefenseScene (needs clean slate per encounter). The distinction is easy to miss: both `sleep()` and `stop()` pause execution, but only `stop()` calls `shutdown()` and clears the display list.
+
+**How to avoid:**
+
+For BreachDefenseScene: always use `scene.stop()` to end encounters. On encounter launch, call `scene.start('BreachDefense', { encounterConfig })` — this runs `shutdown()` + `init()` + `create()` cleanly. Pass encounter config as init data: which 3 towers are available, how many waves, narrative context string for the post-encounter debrief.
+
+For ExplorationScene: use `scene.sleep()` to preserve room state (player position, completed NPC markers, ambient effects). Wake with `scene.wake('Exploration')` on encounter return.
+
+**Warning signs:**
+
+- Towers from a previous encounter appear at the start of a new encounter
+- Security score starts at non-100 value on second encounter
+- Budget shows a value carried over from a prior encounter
+- Enemies from a previous wave are present when wave 1 spawning starts
+
+**Phase to address:** Phase 2 (encounter integration) — define the sleep/stop contract for each scene type before implementation.
+
+---
+
+### Pitfall 7: Content Regression When Removing HallwayHub Room Picker
+
+**What goes wrong:**
+
+The `HallwayHub` component currently controls which rooms are unlocked, shows unlock requirements, tracks completion state visually, and provides the entry point for the intro tutorial modal. Removing it in favor of in-world door navigation means all of this logic needs to move somewhere else. The risk is that unlock logic is dropped ("we'll add it back later"), completion indicators are lost, or the intro tutorial no longer fires because the HallwayHub was the trigger.
+
+The HallwayHub also houses the first display of each room's name, subtitle, and unlock requirement description. This information needs to appear somewhere in the door-to-door world — it cannot silently disappear.
+
+**Why it happens:**
+
+During a large restructure, the "delete the old thing" step happens before "add the equivalent new thing" is complete. The HallwayHub is visually removed (because it's replaced by walking), but its behavioral responsibilities (unlock gating, room entry point, first-time intro) are left as TODO items that ship incomplete.
+
+**How to avoid:**
+
+Before removing HallwayHub, write a complete inventory of every behavioral responsibility it holds:
+- Unlock condition evaluation (depends on `completedRooms` count)
+- Room entry initiation (`game.scene.start('Exploration', data)`)
+- Intro tutorial trigger (first visit only)
+- Visual completion state (checkmarks, room status)
+- Room name/subtitle display
+
+Each responsibility needs a new home in the door-to-door world before HallwayHub is removed. The door object in ExplorationScene takes over entry initiation. Door visual state (locked/available/complete) takes over completion display. The intro tutorial fires on first door interaction instead.
+
+**Warning signs:**
+
+- Rooms can be entered in any order regardless of unlock requirements
+- Completed rooms show no visual distinction from incomplete ones when walking past doors
+- The intro tutorial never fires in the new architecture
+- No in-world indication of a room's name or status when approaching a door
+
+**Phase to address:** Phase 1 (navigation foundation) — HallwayHub responsibility transfer must be fully mapped and implemented before HallwayHub is removed from the codebase.
 
 ---
 
@@ -225,11 +272,12 @@ All HUD text objects must call `.setScrollFactor(0)` to pin them to the screen (
 
 | Shortcut | Immediate Benefit | Long-term Cost | When Acceptable |
 |----------|-------------------|----------------|-----------------|
-| Skip OGG fallback, ship MP3 only | Simpler audio manifest | Safari on iOS may fail; OGG saves ~20% bandwidth | Never for production; acceptable for MVP if iOS not a target |
-| setTexture() for player facing instead of anims.create() | No spritesheet prep needed (current state) | Cannot add walk animation frames later without refactor | Only acceptable if walk cycle is explicitly out of scope |
-| Inline arrow functions as EventBridge listeners | Concise code | `off()` cannot remove them; listeners leak on restart | Never — always use named method references |
-| Create particle emitters without `stopAfter` or `maxParticles` | Simpler code | Accumulating display objects degrade frame rate | Never for repeated events (enemy death); acceptable for one-time events with explicit `destroy()` |
-| Add `anims.create()` inside `ExplorationScene.create()` | Feels natural, co-located with scene | Duplicate key warning on every re-entry | Never — put animations in BootScene |
+| Duplicate BreachDefensePage JSX into unified page | Ship encounter overlay fast | Two copies of 400+ lines of HUD code diverge silently | Never — extract as component from the start |
+| Add new localStorage keys without migration | Each feature ships independently | v2 state reads may return `null` for missing keys, defaulting incorrectly | Never after v2 launch — always schema-version the save |
+| Use `scene.stop()` on ExplorationScene during encounter | Simple, well-tested | Player respawns at room door on encounter return instead of same position | Acceptable for MVP if return-to-position is v2.1 — but document the decision |
+| Pass act progression as URL query params | Avoids page architecture refactor | Back navigation on browser breaks game state; acts can only progress forward | Never |
+| Directly checking `game.scene.getScene('Exploration').isActive()` from React | Quick scene status check | Bypasses EventBridge contract; couples React tightly to Phaser internals | Dev/debug code only, never in production paths |
+| Skip `shutdown()` updates when adding new events "just for now" | Faster iteration | Silent listener leak that manifests only after multiple room entries | Never |
 
 ---
 
@@ -237,12 +285,14 @@ All HUD text objects must call `.setScrollFactor(0)` to pin them to the screen (
 
 | Integration | Common Mistake | Correct Approach |
 |-------------|----------------|------------------|
-| Phaser SoundManager | Play sounds on `create()` or scene init | Play first sounds only on player gesture handlers (click, keydown) |
-| EventBridge singleton | Arrow functions in `.on()` calls | Named methods with `this` context; matching `.off()` in `shutdown()` |
-| React overlay + Phaser canvas | Assuming z-index prevents click bleed-through | Use `pointer-events: none` on canvas wrapper when overlays are active |
-| Phaser particle API (3.90) | Copying `createEmitter()` pattern from pre-3.60 docs | Use `this.add.particles(x, y, key, config)` returning emitter directly |
-| Phaser anims global registry | Calling `anims.create()` in per-scene `create()` | Call `anims.create()` once in BootScene; guard with `anims.exists()` check |
-| Spritesheet vs generateTexture | Using `generateTexture()` frames in `anims.create()` | `generateTexture()` produces single-frame textures; load a real spritesheet for multi-frame animations |
+| Encounter launch | React calls `game.scene.start('BreachDefense')` directly | ExplorationScene receives `REACT_LAUNCH_ENCOUNTER`, sleeps itself, then starts BreachDefense with encounter config |
+| Encounter result return | React navigates back to `/privacy` route | BreachDefenseScene emits `ENCOUNTER_COMPLETE` with score; ExplorationScene wakes; no route change |
+| Act progression trigger | React checks completion state on every render | ExplorationScene emits `ACT_PROGRESS` when narrative milestone hit; React listens once |
+| Door transition animation | React controls the fade overlay | Phaser owns the camera fade (`this.cameras.main.fadeOut/fadeIn`); React shows minimal door-open UI only |
+| Unified score write | Both Exploration and BreachDefense write to `current-privacy-score` directly | One canonical `ScoreManager` module read/written by both scenes, preventing concurrent writes |
+| Background music between acts | `this.sound.stopAll()` then play new track | Fade out current track over 800ms, then fade in new — `stopAll()` creates a jarring cut |
+| Return-to-room player spawn | Player spawns at room's default `spawnPoint` | Spawn at door that was used to exit to encounter — requires tracking which door triggered the encounter |
+| Condensed encounter config | Reuse full 10-wave WAVES constant | Pass encounter-specific wave config (4 waves, 3 tower types) as init data — do not hardcode in BreachDefenseScene |
 
 ---
 
@@ -250,11 +300,11 @@ All HUD text objects must call `.setScrollFactor(0)` to pin them to the screen (
 
 | Trap | Symptoms | Prevention | When It Breaks |
 |------|----------|------------|----------------|
-| Continuous particle emitters on enemy death | FPS drops from 60 to 40+ after 20+ enemy deaths | Use `emitter.explode()` + destroy callback, or `stopAfter: N` | After ~10 simultaneous emitters in BreachDefense mid-game |
-| Uncleaned tweens on interactable items | Tweens accumulate for each room load; memory grows | `this.tweens.killAll()` on scene shutdown is automatic; verify `killTweensOf(sprite)` is called on collected items (already done in `updateCompletionState`) | Visible after 6+ room visits |
-| EventBridge listener duplication | Sounds play 2×, 4× per event; grows exponentially per scene visit | Named method references + symmetric `off()` in `shutdown()` | After 2+ room re-entries |
-| Phaser Graphics object retained for floor/walls | Each `room.create()` recreates all Graphics; old ones not destroyed on scene restart | ExplorationScene destroys on `shutdown()` (scenes are fully stopped); verify no static objects persist | Non-issue with `scene.stop()` but becomes a problem if `scene.sleep()` is used instead |
-| React state updates on every Phaser update() | Re-renders throttle to 200ms broadcast (already implemented in BreachDefenseScene) | Keep throttle; never remove the `lastBroadcast` guard during HUD improvements | If broadcast throttle is removed, React re-renders 60× per second |
+| Ambient particle emitters not destroyed on room exit | Frame rate drops after visiting 3+ rooms | Verify `shutdown()` calls `this.tweens.killAll()` AND explicitly destroys particle emitters — `killAll()` only stops tween targets, not emitters themselves | After ~4 room entries (3 emitters × 4 rooms = 12 active emitters) |
+| Physics static groups from wall obstacles accumulate | Physics collision detection slows | `scene.start()` calls `shutdown()` which Phaser uses to clear physics world; verify `walls` group is not held in an external reference that prevents GC | Noticeable at 6+ rooms in session |
+| React state update cascade on encounter return | UI freezes 200-400ms on encounter exit | Batch encounter results into single setState call; use `useReducer` for related state | Any encounter with 5+ state fields updating simultaneously |
+| `generateAllTextures()` called on every scene start | ~40ms delay per room entry | Already idempotent but still iterates all texture keys on each call; acceptable for 6 rooms, monitor if hallway scenes added | After 10+ room entries |
+| BFS pathfinding in large rooms | Click-to-move has perceptible delay >100ms | BFS is O(w×h); fine for current 6×6 to 12×10 rooms; keep hallway connector scenes narrow | Only if open-area hallways added (keep them narrow corridors) |
 
 ---
 
@@ -262,26 +312,26 @@ All HUD text objects must call `.setScrollFactor(0)` to pin them to the screen (
 
 | Pitfall | User Impact | Better Approach |
 |---------|-------------|-----------------|
-| Intro modal lists all controls before player moves | Players dismiss without reading; controls are still unknown | One sentence of context, one primary control; reveal secondary controls contextually |
-| Sound plays without any indication mute is possible | Players with sensitive environments have no escape | Add mute toggle or at minimum confirm there is no ambient loop before shipping sound |
-| Tower hover description appears as tooltip inside Phaser canvas | React tooltips over canvas cause pointer event bleed-through | Surface tower descriptions in the existing React tower panel below the canvas, on selection — not as a canvas overlay |
-| Wave intro text shown mid-combat (wrong timing) | Player is busy placing towers; misses the text | Show wave intro text before the wave timer starts; pause game state during display (already the pattern in BreachDefenseScene via PAUSED state) |
-| Walk cycle animates during click-to-move path following | Path-following uses tweens (not velocity), animation timing drifts from movement | Sync animation framerate to tile traversal speed: start walk anim on path start, stop on arrival; use `repeat: -1` with `frameRate` tuned to 120ms-per-tile traversal time |
+| No visual transition between room and encounter | Jarring cut; player loses spatial context | Camera fade-out from room (400ms), brief black frame with narrative text, then BreachDefense fade-in |
+| Encounter launches with no narrative setup | Player doesn't know why tower defense started | ExplorationScene shows NPC dialogue or environment event before encounter trigger; the "why" must land before the mechanic starts |
+| Returning from encounter with no acknowledgment | Player is back in room with no feedback on encounter result | On wake, ExplorationScene shows brief overlay: "Defense complete — compliance score: +12" before resuming |
+| Act transitions happen invisibly | Player doesn't notice they've entered Act 2/3 | Acts need a cinematic moment: music crossfade, brief title card, NPC transition dialogue |
+| Locked department door gives no context | Players hit a locked door with only a small lock icon — confusing | On approach, locked door shows brief text explaining unlock condition + audio denial cue |
+| Condensed encounter feels truncated | Players who know full BreachDefense feel cheated | Frame via dialogue ("we only have a few minutes!") — the 4-wave format is narratively justified, not a cut |
+| Player can't tell current act | No sense of narrative progress | Persistent HUD indicator with current act and department name |
 
 ---
 
 ## "Looks Done But Isn't" Checklist
 
-- [ ] **Sound:** Audio key exists in cache — verify `this.cache.audio.exists('key')` logs `true` at scene create time, not just that the `load.audio()` call is present.
-- [ ] **Sound:** Sound plays at least once in Chrome (autoplay context unlocked) AND on iOS Safari (stricter policy) — test with a physical gesture.
-- [ ] **Walk cycle:** Animation plays correct frames for each direction — confirm by holding each direction key for 2+ seconds and watching the sprite cycle.
-- [ ] **Walk cycle:** Animation stops when player stops — idle frame shown, not mid-walk pose frozen.
-- [ ] **Particles:** Enemy death particle burst fires exactly once per death — confirm by letting 10 enemies die and checking no accumulating emitters remain.
-- [ ] **Particles:** Frame rate stays ≥55 FPS during wave 10 of BreachDefense — profile in Chrome DevTools with particles active.
-- [ ] **HUD wave text:** Wave intro text disappears after player dismissal — confirm it does not persist into gameplay.
-- [ ] **HUD tower description:** Hover description does not block clicks on the tower button itself — test click registration after description appears.
-- [ ] **Onboarding modal:** PrivacyQuest intro modal does not re-appear on room re-entry — only on first visit, checked against localStorage.
-- [ ] **EventBridge:** Navigate into PrivacyQuest room, exit, re-enter — confirm interaction sound fires exactly once, not twice.
+- [ ] **Door transition:** Animation plays — verify ExplorationScene's `shutdown()` fires before new scene's `create()`, or phantom tweens from room A execute during room B load
+- [ ] **Encounter launch:** BreachDefense shows and plays — verify ExplorationScene is actually sleeping (not still in update loop) by confirming keyboard input is disabled during encounter
+- [ ] **Encounter return:** Player is back in room — verify encounter score was written to unified save BEFORE ExplorationScene woke, not after (race condition window)
+- [ ] **Department unlock:** Door shows as available — verify unlock condition reads from v2 save format, not a v1 key that no longer exists
+- [ ] **Unified score:** HUD shows combined value — verify BreachDefense session score is merged using the same scale as privacy score, not raw security score 0-100 naively added
+- [ ] **EventBridge cleanup on encounter exit:** Verify BreachDefense `shutdown()` fires correctly when `scene.stop()` is called from ExplorationScene's wake handler — not only when the React page unmounts
+- [ ] **NPC completion persists across act boundary:** Complete NPCs in Reception (Act 1); walk to Act 2 departments; return to Reception; confirm NPCs still show as completed
+- [ ] **Background music crossfade:** Act transition plays new track — verify old track's Phaser sound object is properly stopped and reference cleared before new track is added, or memory leaks a sound instance per transition
 
 ---
 
@@ -289,12 +339,13 @@ All HUD text objects must call `.setScrollFactor(0)` to pin them to the screen (
 
 | Pitfall | Recovery Cost | Recovery Steps |
 |---------|---------------|----------------|
-| Audio loads in wrong scene | LOW | Move `load.audio()` to `BootScene.preload()`, re-test |
-| Wrong particle API (pre-3.60 syntax) | LOW | Replace `particles.createEmitter()` with `this.add.particles(x, y, key, config)` directly |
-| Duplicate animation keys | LOW | Add `if (!this.anims.exists(key))` guard or move to BootScene |
-| Walk cycle cannot use generateTexture frames | MEDIUM | Must create a PNG spritesheet and update BootScene loader + ExplorationScene to use `anims.play()` instead of `setTexture()` |
-| EventBridge listener leak | MEDIUM | Audit all `eventBridge.on()` calls; convert arrow functions to named methods; add matching `off()` in every `shutdown()` |
-| React overlay blocks Phaser input in wrong state | LOW | Add `pointer-events-none` class to PhaserGame wrapper div based on `pageState` |
+| Stale closure state corruption | MEDIUM | Add `stateRef` pattern to all EventBridge handlers in unified page; approximately 8-12 handler functions need updating |
+| EventBridge listener accumulation | LOW | Add centralized `boundListeners` array to both scenes; run multi-room session test to verify each event fires exactly once per interaction |
+| Two game loops simultaneous | HIGH | Audit all encounter launch paths; add `if (!this.scene.isActive()) return;` guard at top of ExplorationScene `update()` to detect misconfiguration |
+| Save format corruption | MEDIUM | Write recovery function: read whatever v1 keys exist, assemble best-effort v2 save, prompt player to confirm before resetting partial data |
+| Single-page refactor incomplete | HIGH | Complete unified page architecture before any encounter integration — encounter launch requires stable canvas; cannot patch halfway through |
+| BreachDefense state not reset | LOW | Add `resetGameState()` method called at top of `init()` that explicitly zeroes all arrays and resets all primitive state to starting values |
+| HallwayHub removal incomplete | MEDIUM | Keep HallwayHub in codebase behind a feature flag until each responsibility has a verified replacement in the door-to-door world |
 
 ---
 
@@ -302,34 +353,33 @@ All HUD text objects must call `.setScrollFactor(0)` to pin them to the screen (
 
 | Pitfall | Prevention Phase | Verification |
 |---------|------------------|--------------|
-| Audio loaded in wrong scene | Sound (Phase 1) | `cache.audio.exists()` check in scene create |
-| Autoplay policy blocks first sound | Sound (Phase 1) | Test with fresh browser profile; check `this.sound.locked` |
-| Particle API breaking change | VFX (Phase 3) | No `createEmitter` calls anywhere in codebase |
-| Walk cycle needs real spritesheet | Sprite (Phase 2) | Spritesheet PNG exists in BootScene.preload() before anims.create() |
-| EventBridge listener duplication | Sound (Phase 1 — first new listener) | Multi-entry test: enter room, exit, re-enter; sound fires once |
-| Particle emitter not destroyed after burst | VFX (Phase 3) | Profiler shows stable object count during combat |
-| React overlay click bleed-through | HUD (Phase 4) | Click each HUD element; confirm no unintended Phaser interaction |
-| anims.create() duplicate keys | Sprite (Phase 2) | No console warnings on room re-entry |
-| Tutorial modal overload | Onboarding (Phase 5) | Modal has ≤3 items; contextual hints appear only at relevant moment |
-| HUD text not setScrollFactor(0) | HUD (Phase 4) | HUD visible after camera scrolls to room edge |
+| Stale closure state | Phase 1 — Navigation Foundation | Walk room A → room B; complete NPC in B; verify room A NPCs still marked complete in save |
+| EventBridge listener accumulation | Phase 1 — Navigation Foundation | Enter 6 rooms in sequence; correct answer gives exactly +3, not a multiple |
+| Two game loops simultaneous | Phase 2 — Encounter Integration | During BreachDefense wave, press WASD; RPG player must not move |
+| Save format migration | Phase 0 — Bug Stabilization | Load page with v1 save data; verify v2 format written; clear v1 keys; reload; state preserved |
+| React page architecture | Phase 1 — Navigation Foundation | No route changes during any in-game transition; confirm with browser network tab |
+| BreachDefense state reset | Phase 2 — Encounter Integration | Complete encounter 1; trigger encounter 2; wave 1 must start with full budget and clean enemy array |
+| Particle emitter accumulation | Phase 1 — Navigation Foundation | Enter 5 rooms; confirm frame rate stays above 55fps via Phaser debug overlay |
+| Act transition UX | Phase 3 — Narrative Arc | Act 1→2 transition plays music shift + title card; acts cannot be skipped |
+| Unified score scale mismatch | Phase 2 — Encounter Integration | Complete BreachDefense at 80% efficiency; verify score contribution matches documented formula |
+| HallwayHub content regression | Phase 1 — Navigation Foundation | Every HallwayHub responsibility in a checklist verified in door-to-door world before HallwayHub is deleted |
 
 ---
 
 ## Sources
 
-- [Phaser 3 Audio Docs — official](https://docs.phaser.io/phaser/concepts/audio) — HIGH confidence, current
-- [Phaser 3.60 Particle Emitter changelog — GitHub](https://github.com/phaserjs/phaser/blob/v3.60.0/changelog/3.60/ParticleEmitter.md) — HIGH confidence, authoritative
-- [Repeated Pointer Events with overlapping HTML — Phaser issue #6697](https://github.com/phaserjs/phaser/issues/6697) — HIGH confidence, confirmed bug + fix
-- [Mouse input goes through overlay HTML — Phaser issue #4447](https://github.com/photonstorm/phaser/issues/4447) — HIGH confidence, documented behavior
-- [Event listeners causing memory leaks — html5gamedevs](https://www.html5gamedevs.com/topic/40166-event-listeners-causing-memory-leaks/) — MEDIUM confidence, community-verified
-- [Sounds keep looping after changing scene — html5gamedevs](https://www.html5gamedevs.com/topic/38921-sounds-keep-looping-after-changing-scene/) — MEDIUM confidence, community-verified pattern
-- [Web Audio Best Practices for Phaser 3 — Ourcade](https://blog.ourcade.co/posts/2020/phaser-3-web-audio-best-practices-games/) — MEDIUM confidence, pre-3.60 but autoplay mechanics unchanged
-- [Phaser 3 Animations Docs — official](https://docs.phaser.io/phaser/concepts/animations) — HIGH confidence, current
-- [Game UX: Best practices for video game onboarding 2024 — Inworld](https://inworld.ai/blog/game-ux-best-practices-for-video-game-onboarding) — MEDIUM confidence, design research
-- [Tutorial UX: Indie Game Onboarding — Wayline](https://www.wayline.io/blog/tutorial-ux-indie-game-onboarding) — MEDIUM confidence, design research
-- [Phaser 3 ParticleEmitter docs (current)](https://docs.phaser.io/api-documentation/class/gameobjects-particles-particleemitter) — HIGH confidence, current
-- Codebase analysis: `BootScene.ts`, `ExplorationScene.ts`, `BreachDefenseScene.ts`, `EventBridge.ts`, `SpriteFactory.ts` — HIGH confidence, direct inspection
+- Direct codebase analysis: `client/src/phaser/scenes/ExplorationScene.ts` — shutdown() at line 1208, stale closure comment at line 395-398, EventBridge registrations in create()
+- Direct codebase analysis: `client/src/phaser/scenes/BreachDefenseScene.ts` — shutdown() at line 1981, all entity arrays accumulating during update()
+- Direct codebase analysis: `client/src/phaser/EventBridge.ts` — singleton pattern, no reset mechanism, extends Phaser.Events.EventEmitter which silently allows duplicate listeners
+- Direct codebase analysis: `client/src/pages/PrivacyQuestPage.tsx` — 14 fragmented localStorage keys at lines 62-88, 139-144, 199-203
+- Direct codebase analysis: `client/src/pages/BreachDefensePage.tsx` — scene start pattern with manual stop at lines 129-130
+- Direct codebase analysis: `client/src/phaser/config.ts` — all 4 scenes registered in single Phaser instance
+- Direct codebase analysis: `client/src/phaser/PhaserGame.tsx` — `gameRef.current.destroy(true)` in useEffect cleanup
+- `.planning/ENHANCEMENT_BRIEF.md` — encounter design (section 4.2), navigation mechanics (section 5), act structure (section 3)
+- `.planning/PROJECT.md` — v2.0 scope, existing constraints, key decisions log
+- Phaser 3 scene lifecycle (HIGH confidence): `scene.start()` calls `shutdown()` then `init()` then `create()`; `scene.sleep()` pauses update without clearing state or calling shutdown; `scene.stop()` calls `shutdown()` and removes from display list
+- Phaser 3 EventEmitter behavior (HIGH confidence): `on()` adds a new subscriber on every call regardless of existing registrations; no deduplication; no warning on duplicate
 
 ---
-*Pitfalls research for: Phaser 3.90 + React 18 game polish (sound, sprites, VFX, HUD, onboarding)*
-*Researched: 2026-02-27*
+*Pitfalls research for: Unified RPG restructure (PrivacyQuest + BreachDefense v2.0)*
+*Researched: 2026-03-26*

@@ -1,19 +1,8 @@
 # Feature Research
 
-**Domain:** RPG exploration game + tower defense game polish (Phaser 3 + React, educational/HIPAA)
-**Researched:** 2026-02-27
-**Confidence:** HIGH (genre conventions well-established; Phaser API confirmed via official docs)
-
----
-
-## Context
-
-Both games are functionally complete. This research answers: what separates "it works" from "it feels like a real game"? Features are evaluated against two genres simultaneously — top-down RPG exploration (PrivacyQuest) and tower defense (BreachDefense) — and mapped to what already exists vs. what is missing.
-
-Existing baseline (do not re-implement):
-- PrivacyQuest: BFS pathfinding, proximity detection, NPC dialogue, room completion tracking, HallwayHub room picker
-- BreachDefense: Grid placement, tower targeting, projectile physics, wave system, 12-modal tutorial chain, Codex, RecapModal
-- Both: EventBridge, Press Start 2P font, pixel art aesthetic, programmatic/PNG sprites
+**Domain:** RPG with integrated mini-game encounters and three-act narrative arc (educational game)
+**Researched:** 2026-03-26
+**Confidence:** HIGH (patterns grounded in existing codebase + verified design references)
 
 ---
 
@@ -21,186 +10,136 @@ Existing baseline (do not re-implement):
 
 ### Table Stakes (Users Expect These)
 
-Features that players of these genres assume exist. Missing them = the game feels unfinished or amateur. No credit is given for having them; players only notice when they are absent.
-
-#### Sound
+Features players assume exist. Missing these = product feels like a prototype, not a game.
 
 | Feature | Why Expected | Complexity | Notes |
 |---------|--------------|------------|-------|
-| Footstep SFX (PrivacyQuest) | All top-down RPGs since SNES era have movement audio feedback. Silent movement feels broken. | LOW | Phaser `this.sound.play()` per tile step during path movement or WASD. Kenney RPG Audio pack has footstep variants (CC0). |
-| Interaction / confirm SFX | Clicking on an NPC or picking up an item with no audio feels unresponsive. Players assume they mis-clicked. | LOW | Single "confirm" or "collect" tone. One sound covers all interactions. |
-| Tower placement SFX (BreachDefense) | Every tower defense game plays a placement click when a tower is set. Absence makes placement feel unregistered. | LOW | Short mechanical/click SFX on `BREACH_TOWER_PLACED`. |
-| Enemy reach-end / breach SFX | Players need audio warning when security score drops. Screen-only feedback is missed during active gameplay. | LOW | Alert/alarm tone on security score decrement. |
-| Enemy death SFX | Tower defense genre expectation: killed enemies make a sound. Confirms the action succeeded. | LOW | Short pop/zap per enemy type, or single generic death sound. |
-| Wave start cue (BreachDefense) | Players look away during prep; an audio cue signals incoming wave without requiring visual attention. | LOW | Short horn/alert sound on wave begin. |
-
-**Confidence:** HIGH. Phaser `this.sound.play(key)` is confirmed working. Browser autoplay is handled automatically by Phaser after first user gesture (official docs confirmed). MP3 is the recommended format for broad compatibility. Kenney.nl and freesound.org provide CC0 assets covering all categories above.
-
-#### Sprites and Animation
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| 4-directional player facing (PrivacyQuest) | Already implemented via `player_left/right/up/down` texture swap. Minimum viable. | DONE | Already exists — texture key swap on movement direction. |
-| Walk cycle animation (PrivacyQuest) | All top-down RPGs animate the player while walking. Static texture on a moving body looks like a gliding rectangle. | MEDIUM | Requires spritesheet with 2-3 frames per direction (8-12 frames total). `this.anims.create()` + `sprite.play()`. No `anims.create()` calls exist yet — net-new addition. |
-| NPC idle distinction by role (PrivacyQuest) | NPCs currently all use same silhouette with color swaps. Players cannot tell doctor from patient at a glance. | MEDIUM | Programmatic sprites already exist in SpriteFactory.ts. Enhance with role-specific visual markers (white coat shape for doctor, hospital gown for patient). Does NOT require external assets. |
-| HP bars on enemies (BreachDefense) | Already implemented: green/yellow/red bar above each enemy. | DONE | Already exists. |
-| Tower type visual distinctiveness (BreachDefense) | Already uses PNG sprites loaded in BootScene. | DONE | Already exists via `tower_${type}` textures. |
-
-**Confidence:** HIGH. Phaser's animation system (`anims.create`, `sprite.play`) is documented and standard for this use case.
-
-#### Visual Effects (VFX)
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Enemy death visual (BreachDefense) | Currently enemies are `destroy()`-ed with no feedback. The enemy disappears instantly — players cannot tell if their tower killed it or it reached the end. | MEDIUM | Fade-out tween (alpha 1→0, duration 200ms) + small particle burst. Phaser `this.tweens.add` + `this.add.particles` (new emitter API in Phaser 3.60+). |
-| Tower firing visual emphasis (BreachDefense) | Projectiles currently are 4px circles. Players cannot tell when a tower is active vs idle. | LOW | Tween tower sprite scale 1→1.1→1 (20ms) on fire event — "recoil" effect. No asset needed. |
-| Item pickup feedback (PrivacyQuest) | Items currently just set alpha 0.4 and stop bobbing. No confirmation that collection happened. | LOW | Scale tween 1→1.3→0 on collection + brief flash tween. |
-| Interaction range indicator (PrivacyQuest) | No visual cue that the player is close enough to interact — only text prompt appears. Players miss the prompt while moving. | LOW | Subtle highlight ring/glow tween on nearby interactable when player enters range. Currently only text is shown. |
-
-**Confidence:** MEDIUM-HIGH. Tween patterns are confirmed Phaser 3 API. Particle emitter API changed in Phaser 3.60 (new unified emitter) — implementation must use current API not deprecated `ParticleEmitterManager`. Verify against Phaser 3.87+ docs.
-
-#### HUD
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Wave intro text overlay (BreachDefense) | Genre convention since Kingdom Rush: a brief "Wave X incoming" banner at wave start. Players learn what to expect. | LOW | Data already in `WAVES[n].name`. React overlay text, tween in/out over 2 seconds. |
-| Suggested tower hint per wave (BreachDefense) | Player needs strategic guidance that matches educational intent. Data exists in `WAVES[n].suggestedTowers` but is not surfaced. | LOW | Display in React HUD panel during wave prep. Single line, no modal needed. |
-| Tower hover description (BreachDefense) | Every tower defense game shows tooltip on hover. Players cannot make informed tower choices without cost/range/damage visible at selection time. | LOW | Already has tower panel in BreachDefensePage. Add description text on hover in React selection panel (no Phaser work required). |
-| Wave end message (BreachDefense) | `WAVES[n].endMessage` exists in constants but is never shown. Brief educational recap per wave completion. | LOW | Toast or banner in React overlay on `BREACH_WAVE_COMPLETE`. |
-| Room name display (PrivacyQuest) | Already implemented: `roomNameText` at top of canvas. | DONE | Already exists. |
-| Privacy score / progress display (PrivacyQuest) | Already implemented in React overlay via PrivacyMeter. | DONE | Already exists. |
-| Budget / security score display (BreachDefense) | Already implemented in React HUD. | DONE | Already exists. |
-
-**Confidence:** HIGH. All missing HUD data (`WAVES[n].suggestedTowers`, `WAVES[n].endMessage`, `WAVES[n].name`) confirmed present in `client/src/game/breach-defense/constants.ts`. Implementation is purely React overlay + EventBridge — no Phaser scene changes.
-
-#### Onboarding
-
-| Feature | Why Expected | Complexity | Notes |
-|---------|--------------|------------|-------|
-| Controls introduction for PrivacyQuest | Currently the only hint is small text below the canvas reading "WASD or Arrow Keys to move — SPACE to interact — ESC to exit room". Players do not read it and get stuck. | LOW | Brief intro modal on first room entry (one-time, localStorage-gated). Cover: move, interact, ESC. Dismiss on any key or button click. |
-| First NPC highlight (PrivacyQuest) | Players who enter a room for the first time do not know which entity to approach. A subtle visual cue pointing to the first NPC prevents abandonment. | LOW | Animated arrow or pulsing ring on first available (non-completed) NPC, visible for ~5 seconds or until movement starts. |
-| BreachDefense pre-game brief | Already has 12-modal tutorial chain on game start. | DONE | Existing — possibly too heavy, but functional. |
-| Skip tutorial option | Players replaying should not be forced through tutorials again. | LOW | Already gated by `shownWaveSplashes` set in BreachDefense. PrivacyQuest intro modal should check localStorage flag. |
-
-**Confidence:** HIGH. Pattern is standard across all educational games. Implementation is React modal + localStorage flag — well within existing codebase patterns.
+| Camera fade on door transition | Every RPG since SNES uses a fade/wipe to signal area changes. Without it, a scene swap feels like a crash. | LOW | Phaser `this.cameras.main.fadeOut/fadeIn()` — native API, ~10 lines. ExplorationScene already has a `transitioning` guard pattern in HubWorldScene to copy. |
+| Visual door state indicators | Players need to know "can I go in there?" before walking across the room. Locked/available/completed. | LOW | Three visual states via tint + icon overlay on door sprite. Locked = dark tint, available = glow pulse tween, completed = checkmark badge. All achievable with existing Phaser tween patterns already in project. |
+| Player spawns at correct door after transition | When returning from Room B to Room A, player appears at the Room B door, not the center of Room A. | LOW | Pass `spawnDoor` ID in scene `init()` data. ExplorationScene already accepts init data. Requires door registry per room — straightforward. |
+| Backtrack through completed areas | Players who miss something, or are curious, must be able to re-enter completed rooms. Locking players out of completed areas is a design crime in an educational game. | LOW | Completion flag gates progression unlock, not re-entry. Already partially modeled in HallwayHub completion state — preserve this logic. |
+| Pause while encounter is active | RPG world must freeze while mini-game encounter is running. No phantom NPC interactions, no movement. | LOW | ExplorationScene already has a `paused` flag pattern. Set it true when encounter launches via EventBridge, false on return. |
+| Encounter result feeds back to world state | Completing the encounter must visibly change something in the RPG world (NPC reacts, door unlocks, narrative progresses). Without this, encounters feel disconnected. | MEDIUM | EventBridge `ENCOUNTER_COMPLETE` event — React handler — Phaser `scene.resume()` with result data. Needs a defined result schema: `{ encounterId, passed, score }`. |
+| Unified score HUD visible during exploration | Score must be on screen at all times, not just during encounters. Players need to feel accumulation. | LOW | HUD already exists in BreachDefensePage. Unified score HUD as a persistent React overlay — scores animate on change, already working in BreachDefense. Port pattern to unified game. |
+| Hallway connectors as pacing breaks | Empty corridor between rooms provides a breath between intense scenarios. Without it, room-to-room feels like clicking through a list. | MEDIUM | Short static scene or mini hallway layout in ExplorationScene with no interactables — just ambient art and movement. Not a full room, but needs floor/walls/doors at each end. |
+| Act progression that always moves forward | Player should always eventually reach Act 3. Score can be low, they can fail every encounter — but they finish training. Gating on perfect performance is an anti-pattern in compliance training. | LOW | Boolean flags: `act1Complete`, `act2Complete`. Advance when conditions met (e.g., N departments visited + encounter attempted). Saved to localStorage with existing persistence layer. |
+| Encounter has clear start/end screens | Player needs to know they're entering a different mode and when they've returned. Dropping into TD mid-exploration with no intro is disorienting. | LOW | Encounter intro card (existing tutorial modal pattern) and recap (existing RecapModal pattern). Both already in BreachDefense. Reuse structure, customize content per trigger context. |
+| Audio shift on act transition | Act transitions without a music change feel flat. Warm to tense to urgent. Already called out in CLAUDE.md Commandment 1. | LOW | Existing tracks: hub theme (Act 1), exploration theme (Act 2), breach theme (Act 3). Reassign, crossfade on act boundary. Phaser `this.sound.play()` with volume tween pattern already in project. |
 
 ---
 
 ### Differentiators (Competitive Advantage)
 
-Features that set these games apart. Not expected by players of generic tower defense or RPG games, but create memorable moments aligned with the HIPAA educational mission.
+Features that make this feel like a real game, not a dressed-up compliance module. Aligned with the Nintendo Test in CLAUDE.md.
 
 | Feature | Value Proposition | Complexity | Notes |
 |---------|-------------------|------------|-------|
-| HIPAA-contextualized SFX labels | On enemy death, a flash of the threat type name (e.g. "PHISHING blocked!") reinforces the educational content at the moment of reward. | LOW | Floating damage text already conceptually present. Extend to include threat type label. |
-| Tower "strong against" visual indicator | When a tower fires at an enemy it's effective against, show a distinct color pulse (matching the "strong against" tag). Teaches HIPAA security relationships through visual feedback. | MEDIUM | Requires checking `isStrong` flag in firing code and emitting distinct particle color. |
-| Room completion animation (PrivacyQuest) | When all NPCs in a room are complete, a brief "Room Cleared" banner with score flash reinforces progress. Existing behavior is silent state change. | LOW | React overlay, triggered by existing room completion detection. |
-| Wave threat preview (BreachDefense) | Show icons of incoming threat types before a wave starts (1-2 second preview). Players can make strategic tower decisions. | MEDIUM | Data in `WAVES[n].threats`. Small React overlay panel, timed to dismiss when wave begins. |
-| Sound feedback differentiating correct vs. incorrect choices (PrivacyQuest) | Good/bad choice sounds during NPC dialogue reinforce HIPAA principles. Currently no audio distinguishes positive vs. negative outcomes. | LOW | Two tones: ascending for good choice, descending for bad. Triggered by EventBridge on dialogue score delta. |
-
-**Confidence:** MEDIUM. Wave threat preview and strong-against visual indicator require Phaser scene changes in addition to React work. Other differentiators are React-only.
+| Hallway NPC ambient lines on first pass | An NPC you pass in the hallway says something contextually relevant to the act. First-time-only, brief, non-blocking. Builds hospital-as-living-world feeling. | MEDIUM | Triggered on first entry to hallway connector. Single dialogue bubble over NPC head, auto-dismisses after 3s. No choice required — pure ambience. Needs hallway NPC data structure (simple: `{ id, line, actRequired }`). |
+| Encounter trigger with narrative context window | Before encounter launches, a brief narrative card explains WHY the encounter is happening now ("Dr. Patel just flagged suspicious logins. You need to act fast."). Makes encounter feel earned not dropped-in. | LOW | Pre-encounter narrative card (1-2 sentences, NPC portrait). Reuses existing dialogue modal pattern. Duration ~4 seconds with manual dismiss option. |
+| Encounter results change NPC dialogue | After completing the IT Office encounter, a coworker in the ER references it: "Heard you stopped those hackers." Rewards careful play and builds world continuity. | MEDIUM | Requires result flags in game state. NPCs check `gameState.encounters.inboundTD.passed` and branch dialogue accordingly. Existing NPC dialogue system already supports branching — add state-conditional variant. |
+| Soft act transitions (no hard cuts) | Acts change naturally as conditions are met — no "YOU HAVE ENTERED ACT 2" title card. The player only notices in retrospect. Environmental storytelling signals the shift. | MEDIUM | Act flag set in game state. Music crossfades. New ambient dialogue unlocks in existing NPCs. No UI announcement. Most polished experience but requires careful content staging across act boundaries. |
+| Per-department completion fanfare | When all NPCs + zones + items in a department are done, a brief visual flourish (room glow + chime + completion badge) rewards thorough play. Missing this = exploration feels incomplete. | LOW | Existing PrivacyQuest completion state already tracks per-room progress. Add a celebratory tween sequence when 100% triggers. Existing particle and sound patterns are in place. |
+| Condensed TD encounter pacing (4 waves, 3 towers) | Full 10-wave BreachDefense inside an RPG would break pacing. Condensed format (3-5 minutes) fits the "encounter not game" model. | MEDIUM | Requires a separate encounter config (wave data, available towers) passed to BreachDefenseScene at launch. BreachDefense already reads tower/wave data from constants — add an "encounter mode" config path. Scene needs a `maxWaves` and `availableTowers` override. |
+| Encounter launches as Phaser scene overlay | RPG exploration scene stays running beneath the encounter. On encounter end, exploration scene is already there — no reload, no cold start. Seamless re-entry. | MEDIUM | Use `this.scene.launch('BreachDefense', encounterConfig)` + `this.scene.pause('Exploration')`. On encounter complete, `this.scene.resume('Exploration')`. Phaser supports parallel scenes with layered rendering. Already verified: Phaser `scene.launch()` runs scenes in parallel. |
+| Progress breadcrumb on HUD | Small department progress indicator (e.g., 3/6 departments, current act badge) always visible. Players should see how far they've come (Commandment 9). | LOW | React HUD component. Reads from unified game state. Animate on department complete. Minimal implementation: icon row with completion dots per department. |
 
 ---
 
 ### Anti-Features (Commonly Requested, Often Problematic)
 
-Features that seem attractive but should be deliberately excluded from this milestone.
-
 | Feature | Why Requested | Why Problematic | Alternative |
 |---------|---------------|-----------------|-------------|
-| Background music / ambient loops | "All games have music" — often the first thing non-developers request. | Adds licensing risk, loop transition complexity, audio mixing with SFX, significantly larger audio bundle, and autoplay policy complexity on first load. Music composition quality also sets player expectations high. | SFX-only audio delivers 80% of game feel at 10% of the implementation cost. Music is explicitly out of scope per PROJECT.md. |
-| Tower sell/upgrade mechanic | A natural tower defense feature request after playing a few waves. | Requires significant balance re-work, new UI affordances (right-click or sell button), refund economics, and testing across all 10 waves. Meaningfully changes the strategic game. | Defer to post-MVP. The game has 6 towers and 10 waves — the current set is balanced without sell/upgrade. |
-| Game speed control (fast-forward) | Power users want to speed through waves they've mastered. | Changes how players experience educational content — fast-forward undermines the HIPAA recap timing. Also requires clamping all time-dependent systems (spawn intervals, projectile speeds, tween durations). | Not needed for MVP. Session is short (~15-20 min). |
-| Mobile / touch controls | Touch is a large potential audience. | Canvas is fixed 640x480. Touch tower placement, tap-to-move, and on-screen WASD controls each require separate implementations. Out of scope per PROJECT.md. | Desktop-first is correct for HIPAA training contexts (typically accessed via workstation). |
-| Persistent BreachDefense save state | Players may want to resume a game mid-wave. | Session state for tower defense involves serializing tower positions, enemy positions, HP values, projectile states, wave timers — significant complexity. On reload, Phaser must reconstruct all game objects from serialized data. | Session-based play is intentional. The game is 15-20 minutes. Explicitly out of scope per PROJECT.md. |
-| Full particle system overhaul | "More particles = more polish" is a common trap. | Over-particled games read as noisy. Educational context requires players focus on the board, not spectacle. Frame rate impact on budget devices. | Targeted, minimal particles on specific high-value events (enemy death, item collect). Not a global system upgrade. |
-| Typeface replacement | "Press Start 2P is too small / hard to read" — valid accessibility concern but large scope. | Requires audit of every text element across 4 scenes and all React components. Touch-screen font sizes, line wrapping, responsive containers — cascading changes. | Accept known limitation for this milestone. Add to accessibility backlog. |
-| Real-time multiplayer / leaderboards | Common "make it social" request for educational games. | Requires backend, auth, data storage — the server is currently vestigial with zero API routes. Huge infrastructure scope jump. | Not relevant to the educational mission (individual HIPAA training). |
+| Room picker / department select menu | Familiar pattern from v1.0, easy to understand, feels like a "safety net" for players who get lost. | Breaks spatial continuity — the entire point of unified navigation is that the hospital is a place, not a menu. Every time a player hits a menu, they're reminded they're in training software. | Lock doors visually (dim tint + lock icon). Let players try the door and see "Not yet — finish [area] first." Spatial feedback replaces menu selection. |
+| World map / minimap | RPG standard. Many players will ask for it. | Hospital is intentionally small (6 rooms + corridors). A map would reveal the entire structure upfront, removing the sense of discovery. It also requires asset work not planned for this milestone. | Room name text in corner (already exists in ExplorationScene). Hallway connector layout gives spatial cues. Defer until playtests prove players actually get lost. |
+| Save-to-cloud / progress sync | Seems modern, expected for "real" products. | Requires backend, auth, and data storage — all out of scope. Adds infrastructure complexity for a desktop-only training tool. | localStorage is sufficient for desktop single-user use case. Per-act save points (not mid-encounter) keep save scope manageable. |
+| Difficulty modes (easy/hard) | Seems like good accessibility design. | Compliance training has one difficulty requirement: the learner knows the material by the end. Variable difficulty risks under-teaching on easy mode. Adds content branching complexity. | Score reflects quality, not pass/fail. Wrong answers teach via educational feedback. The game self-adjusts: fail an encounter, the same material appears in dialogue later. |
+| Real-time encounter score during TD | Showing live score during the encounter keeps players informed. | Adds HUD complexity to an already-complex TD scene. During a 4-wave encounter, players focus on tower placement — score display pulls attention at wrong moment. | Show score only in recap modal after encounter. Existing RecapModal pattern handles this perfectly. |
+| Full branching narrative with remembered choices | Sounds like EarthBound or Undertale — choices that visibly shape the world. | Requires extensive conditional content authoring across 23 NPCs, 6 departments, 3 encounters. Quickly becomes unmaintainable. Risk of content gaps breaking narrative. | Targeted choice memory: 2-3 key decisions are remembered and referenced (IT Office encounter outcome, one Privacy choice in Records). This creates the feel of a living world with ~5% of the implementation cost of full branching. |
+| Skip/fast-forward encounter option | Accessibility/frustration relief for players replaying or who find TD unengaging. | Lets players bypass the core teaching moment. The encounter is the reinforcement — skipping it is skipping the lesson. For a compliance product, this is a training gap. | Encounters are short enough (3-5 min) that skip pressure is minimal. If playtests show frustration, add a "simplified mode" that lowers threat count, not a skip. |
 
 ---
 
 ## Feature Dependencies
 
 ```
-Walk cycle animation (PrivacyQuest)
-    └──requires──> Spritesheet asset (4 directions × 2-3 frames)
-                       └──requires──> Asset creation (programmatic or external PNG)
+[Door Transition System]
+    requires --> [Door State Indicators]
+    requires --> [Player Spawn Position Data]
+    requires --> [Scene Fade API] (already in Phaser, zero build cost)
 
-Tower hover description (BreachDefense)
-    └──requires──> Tower selection panel already exists [DONE]
+[Encounter Trigger System]
+    requires --> [Exploration Scene Pause Flag] (already exists — `paused` var)
+    requires --> [EventBridge ENCOUNTER events] (add 2-3 new event types)
+    requires --> [Encounter Result Schema]
+    pattern-reuses --> [Door Transition System] (same scene-switch + fade pattern)
 
-Wave intro text overlay
-    └──requires──> BREACH_WAVE_COMPLETE / BREACH_STATE_UPDATE events [DONE]
-    └──enhances──> Wave end message (same event, different timing)
+[Encounter Result Schema]
+    requires --> [Unified Game State] (localStorage structure)
+    feeds --> [NPC Dialogue Branching on Result]
+    feeds --> [Act Progression Conditions]
 
-Enemy death visual (BreachDefense)
-    └──requires──> Phaser 3.60+ particle emitter API (verify version)
-    └──enhances──> Enemy death SFX (same trigger point — compound effect)
+[Act Progression System]
+    requires --> [Unified Game State]
+    requires --> [Department Completion Tracking] (already exists in PrivacyQuest)
+    requires --> [Encounter Result Schema]
+    enhances --> [Audio Act Shift] (music crossfade on act boundary)
+    enhances --> [Hallway NPC Ambient Lines] (act-gated content unlocks)
 
-Tower firing visual (BreachDefense)
-    └──enhances──> Tower firing SFX (same trigger point — compound effect)
+[Unified Score HUD]
+    requires --> [Unified Game State]
+    enhances --> [Progress Breadcrumb] (same state, additional display)
 
-Item pickup feedback (PrivacyQuest)
-    └──enhances──> Interaction / confirm SFX (same trigger point)
+[Condensed TD Encounter]
+    requires --> [Encounter Trigger System]
+    requires --> [BreachDefenseScene encounter-mode config] (new: maxWaves, availableTowers)
+    requires --> [Encounter Result Schema]
 
-Sound effects (all)
-    └──requires──> Audio asset files preloaded in BootScene
-    └──requires──> First user gesture before browser allows audio (handled automatically by Phaser)
-
-PrivacyQuest intro modal
-    └──requires──> localStorage flag to gate one-time display
-    └──conflicts──> Showing it on every room entry (must be first-visit-only)
-
-First NPC highlight
-    └──requires──> PrivacyQuest intro modal dismissed first (sequential)
-
-HIPAA-contextualized SFX labels
-    └──enhances──> Enemy death SFX (compound feedback on same event)
-    └──enhances──> Enemy death visual (compound feedback on same event)
-
-Sound feedback for dialogue choices (PrivacyQuest)
-    └──requires──> EventBridge event carrying score delta or choice quality
-    └──requires──> Audio assets (two distinct tones)
+[Per-Department Completion Fanfare]
+    requires --> [Department Completion Tracking] (already exists)
+    enhances --> [Progress Breadcrumb] (triggers breadcrumb update animation)
 ```
 
 ### Dependency Notes
 
-- **Walk cycle requires spritesheet first:** Cannot implement `anims.create()` without frame data. Programmatic generation via `generateTexture()` in SpriteFactory is possible (draw 3 frames per direction using existing `drawCharacter` function with positional offset), avoiding need for external PNG. This is the fastest path.
-- **Sound effects share a single prerequisite:** All SFX depend on audio files being preloaded in `BootScene.preload()`. Loading all audio at boot (in BootScene, before any game starts) satisfies all downstream sound features simultaneously.
-- **Enemy death visual + SFX are one touch point:** Both fire at the same code location (`deadEnemies` cleanup loop in `BreachDefenseScene.ts` Phase 6). Implement both together to avoid touching that loop twice.
-- **Tower firing visual + SFX are one touch point:** Both fire at `tower.lastFired = time` assignment in Phase 4. Implement together.
-- **HUD data features are all React-only:** Wave intro, suggestedTowers hint, tower hover description, and endMessage all read from existing constants and display in React overlays. Zero Phaser scene changes needed. Can be implemented in a single pass through BreachDefensePage.tsx.
+- **Door Transition requires Door State Indicators:** A player trying to open a locked door with no visual feedback is a UX bug, not a missing feature. Build both together.
+- **Encounter Trigger requires Exploration Scene Pause:** Without pausing, the player sprite drifts during TD and NPC interactions can fire through the overlay. The `paused` flag already exists in ExplorationScene — just wire it to the encounter event.
+- **Act Progression requires Unified Game State:** Acts cannot advance without a single source of truth that persists across scene transitions. This is the one structural piece the entire milestone depends on — design this schema first in Phase 1.
+- **Condensed TD requires encounter-mode config:** BreachDefenseScene currently loads all 10 waves and 6 towers from constants. An "encounter mode" flag with override config (`maxWaves: 4`, `availableTowers: ['firewall', 'mfa-shield', 'training-beacon']`) is the minimal invasive change. Do not rebuild the scene.
+- **NPC Dialogue Branching on Result conflicts with Full Branching Narrative (anti-feature):** Keep result-based branching narrow (2-3 key decisions). Full branching is an anti-feature — see above.
 
 ---
 
 ## MVP Definition
 
-### Launch With (v1) — This Milestone
+This is a subsequent milestone on an existing product. "MVP" here means the minimum to validate that the unified RPG experience feels cohesive and continuous. All v1.0 content is preserved.
 
-Minimum set to go from "prototype" to "feels like a real game":
+### Launch With (v2.0 Core)
 
-- [ ] **Core SFX bundle** (footstep, interact, tower-place, enemy-death, breach-alert, wave-start) — audio feedback is the single highest-impact change per unit of effort. Players tolerate much more in terms of visual quality if audio is present.
-- [ ] **Walk cycle animation** — the most visually jarring gap in PrivacyQuest. A static character gliding across the floor is the first thing any player notices.
-- [ ] **Enemy death visual** (fade + particle) — without death feedback, BreachDefense reads as enemies teleporting out of existence. Kills must feel satisfying.
-- [ ] **BreachDefense HUD data** (wave intro, suggestedTowers, tower description, endMessage) — all data is in constants already. This is display work only, and it surfaces HIPAA educational content that currently never reaches the player.
-- [ ] **PrivacyQuest intro modal + first NPC highlight** — without any onboarding, new players do not know to use SPACE or that they should approach NPCs. First-room abandonment is a real risk.
+- [ ] Door-to-door transitions with camera fade — establishes spatial continuity, eliminates room-picker UX
+- [ ] Visual door state indicators (locked/available/completed) — player navigation feedback without menu
+- [ ] Player spawn position at correct door — prevents disorientation on backtrack
+- [ ] Unified game state in localStorage — enables everything else, design this schema first
+- [ ] Encounter trigger + return system (EventBridge events + scene pause/resume) — connects RPG and TD
+- [ ] Condensed TD encounter config (4 waves, 3 towers, encounter-mode flag) — makes TD feel like encounter not game
+- [ ] Act progression flags (conditions checked on department completion + encounter results) — gives the game shape
+- [ ] Audio act shift (reassign existing tracks per act) — zero new assets, high emotional impact
+- [ ] Unified score HUD across both encounter types — player sees single running score
 
-### Add After Validation (v1.x)
+### Add After Validation (v2.x)
 
-Polish that extends experience quality once core is solid:
+- [ ] Hallway connector scenes with ambient NPCs — add once core navigation is solid, playtests confirm pacing
+- [ ] NPC dialogue branching on encounter result — add once encounter result schema is proven stable
+- [ ] Per-department completion fanfare — polish pass after content integration confirmed
+- [ ] Encounter narrative context window (pre-encounter card) — adds story, not structure; safe to add late
+- [ ] Progress breadcrumb HUD — validate core HUD first, add breadcrumb in polish pass
 
-- [ ] **Tower firing visual** (recoil tween) — adds combat feel; lower priority than death feedback since projectiles already visually travel to target.
-- [ ] **Item pickup feedback** — items already bob and fade; adding a collect burst is incremental.
-- [ ] **NPC role visual distinctiveness** — improves PrivacyQuest readability; SpriteFactory changes are contained.
-- [ ] **Sound feedback for dialogue choices** — differentiating correct/incorrect choices aligns with HIPAA mission but requires identifying the right EventBridge hook.
-- [ ] **Interaction range indicator** — reduces player friction; current text-only prompt is functional.
+### Future Consideration (v2.1+)
 
-### Future Consideration (v2+)
-
-- [ ] **Wave threat preview panel** — good educational feature but adds complexity to BreachDefense UI layout.
-- [ ] **HIPAA-contextualized kill text** — nice narrative touch; lower priority than core audio/visual.
-- [ ] **Room completion animation** — current silent state change works; animation is polish-on-polish.
-- [ ] **Background music** — explicitly deferred; scope and complexity exceed value for this milestone.
+- [ ] PHI Sorting mini-game (new encounter type) — significant build, warrants its own milestone phase
+- [ ] Outbound TD variant (inverted grid, new threats/towers) — even larger build
+- [ ] Breach triage encounter — design still pinned, not ready to build
+- [ ] End-of-game report screen — requires encounter results + act completion data to be mature first
+- [ ] Admin console / certificate / analytics — out of scope for this project
 
 ---
 
@@ -208,58 +147,64 @@ Polish that extends experience quality once core is solid:
 
 | Feature | User Value | Implementation Cost | Priority |
 |---------|------------|---------------------|----------|
-| Core SFX bundle (6 sounds) | HIGH | LOW | P1 |
-| Walk cycle animation | HIGH | MEDIUM | P1 |
-| Enemy death visual | HIGH | MEDIUM | P1 |
-| BreachDefense HUD data surfacing | HIGH | LOW | P1 |
-| PrivacyQuest intro modal | HIGH | LOW | P1 |
-| First NPC highlight | MEDIUM | LOW | P1 |
-| Tower firing recoil tween | MEDIUM | LOW | P2 |
-| Item pickup feedback | MEDIUM | LOW | P2 |
-| Interaction range indicator | MEDIUM | LOW | P2 |
-| NPC role visual distinctiveness | MEDIUM | MEDIUM | P2 |
-| Dialogue choice sound feedback | MEDIUM | LOW | P2 |
-| Wave threat preview panel | MEDIUM | MEDIUM | P3 |
-| HIPAA-contextualized kill text | LOW | LOW | P3 |
-| Room completion animation | LOW | LOW | P3 |
+| Camera fade + door transitions | HIGH | LOW | P1 |
+| Door state indicators (locked/available/complete) | HIGH | LOW | P1 |
+| Unified game state (localStorage schema) | HIGH | LOW | P1 |
+| Exploration scene pause during encounter | HIGH | LOW | P1 |
+| Encounter trigger/return system (EventBridge) | HIGH | MEDIUM | P1 |
+| Condensed TD encounter config | HIGH | MEDIUM | P1 |
+| Act progression flags | HIGH | LOW | P1 |
+| Audio act shift | HIGH | LOW | P1 |
+| Unified score HUD | MEDIUM | LOW | P1 |
+| Player spawn at correct door | MEDIUM | LOW | P1 |
+| Hallway connector scenes | MEDIUM | MEDIUM | P2 |
+| Pre-encounter narrative context card | MEDIUM | LOW | P2 |
+| NPC dialogue branching on encounter result | MEDIUM | MEDIUM | P2 |
+| Per-department completion fanfare | MEDIUM | LOW | P2 |
+| Progress breadcrumb HUD | LOW | LOW | P2 |
+| Hallway ambient NPC lines | LOW | MEDIUM | P2 |
+| Soft act transitions (no title card) | LOW | MEDIUM | P2 |
+| World map / minimap | LOW | HIGH | P3 (anti-feature — defer) |
+| Save-to-cloud | LOW | HIGH | P3 (anti-feature — out of scope) |
+| Difficulty modes | LOW | MEDIUM | P3 (anti-feature — avoid) |
 
 **Priority key:**
-- P1: Must have for this milestone — prototype-to-game gap
-- P2: Should have — extends quality, no new dependencies
-- P3: Nice to have — defer if time-constrained
+- P1: Must have for v2.0 launch — game is broken or confusing without it
+- P2: Should have — add when core is stable, before final polish
+- P3: Defer or explicitly avoid
 
 ---
 
-## Competitor Feature Analysis (Genre Reference)
+## Competitor Feature Analysis
 
-| Feature | Top-Down RPG (e.g. Stardew Valley, Undertale) | Tower Defense (e.g. Kingdom Rush, BTD) | Our Approach |
-|---------|----------------------------------------------|----------------------------------------|--------------|
-| Walk animation | 4+ frame cycles, idle animation | N/A (towers are static) | 2-3 frame walk cycle per direction (minimum viable) |
-| Sound per action | Footsteps, interact, door, collect, UI | Placement, fire, death, wave horn, win/lose | 6 core SFX covering all table stakes events |
-| HUD | Map/mini-map, inventory, quest log | Resources, wave counter, lives, speed | Wave info + suggestedTowers surfaced from existing data |
-| Onboarding | Brief pop-up for controls, NPC mentor | Tutorial waves with guided placement | Modal for controls + first-NPC highlight (lightweight) |
-| VFX on death | Flash, particles, score float | Explosion particles, float score | Fade + particle burst (genre appropriate) |
-| Tower feedback | N/A | Muzzle flash, recoil, range indicator | Recoil tween (already have range indicator on hover) |
-| Interactable cues | Exclamation mark, glow, bobbing | N/A | Already have bobbing; add proximity ring |
+This is an internal project with no direct commercial competitors. Comparable patterns from reference games:
+
+| Feature | Pokemon (Game Boy) | Chrono Trigger (SNES) | Our Approach |
+|---------|-------------------|----------------------|--------------|
+| Door/area transitions | Instant fade-to-black, respawn at entry door | Fade + brief loading message | Camera fadeOut (200ms) — scene start — camera fadeIn (200ms). Player spawns at entry door matching origin. |
+| Encounter trigger | Random encounter on overworld step | On-screen enemies contact player sprite | Story flag triggers encounter intro card — scene launch as overlay — exploration scene paused beneath |
+| Return from encounter | Battle ends — exactly same overworld position | Same pattern | Resume paused exploration scene — player exactly where they left off, no reload |
+| Act progression | Linear gym badge — Elite Four | Three disc structure, automatic chapter transitions | Flags: N departments complete + encounter attempted — act advances, music shifts — no title card |
+| Score / progress display | Pokedex completion count, badge display | HP/MP bars, level display | Running compliance score HUD (animate on change) + department dots in progress breadcrumb |
+| Mini-game integration | Voltorb Flip (optional, skippable) | Boss encounters (mandatory, narrative-triggered) | Mandatory, narrative-triggered, condensed format (~4 min), pre/post narrative wrapper |
+
+The key distinction from both references: our encounters are **mandatory and narrative-triggered**, not random or optional. The educational purpose requires the player to engage. This is closer to Chrono Trigger's boss-as-story-climax pattern than Pokemon's random encounters. The narrative wrapper (pre-encounter card + post-encounter recap) is the mechanism that makes mandatory feel natural rather than forced.
 
 ---
 
 ## Sources
 
-- [Phaser 3 Audio documentation](https://docs.phaser.io/phaser/concepts/audio) — HIGH confidence, official docs
-- [Phaser 3 Animations documentation](https://docs.phaser.io/phaser/concepts/animations) — HIGH confidence, official docs
-- [Phaser 3 ParticleEmitter API](https://docs.phaser.io/api-documentation/class/gameobjects-particles-particleemitter) — HIGH confidence, official docs
-- [Game Developer: Squeezing More Juice from Game Design](https://www.gamedeveloper.com/design/squeezing-more-juice-out-of-your-game-design-) — MEDIUM confidence, industry article
-- [GameAnalytics: Game Juice article](https://www.gameanalytics.com/blog/squeezing-more-juice-out-of-your-game-design) — MEDIUM confidence, industry article
-- [Inworld AI: Game UX Onboarding Best Practices](https://inworld.ai/blog/game-ux-best-practices-for-video-game-onboarding) — MEDIUM confidence, industry article
-- [Kenney.nl RPG Audio](https://kenney.nl/assets/rpg-audio) — HIGH confidence, confirmed CC0 asset source
-- [Kenney.nl Audio Catalog](https://www.kenney.nl/assets/category:Audio) — HIGH confidence, confirmed CC0 asset source
-- [OpenGameArt.org Walk Cycles](https://opengameart.org/content/walk-cycles-0) — MEDIUM confidence, community asset source
-- [MDN: Audio for Web Games](https://developer.mozilla.org/en-US/docs/Games/Techniques/Audio_for_Web_Games) — HIGH confidence, official MDN docs
-- [Ourcade: Phaser 3 Web Audio Best Practices](https://blog.ourcade.co/posts/2020/phaser-3-web-audio-best-practices-games/) — MEDIUM confidence, tutorial blog
-- Project codebase analysis (`ExplorationScene.ts`, `BreachDefenseScene.ts`, `SpriteFactory.ts`, `CONCERNS.md`) — HIGH confidence, direct code review
+- `.planning/ENHANCEMENT_BRIEF.md` — full v2.0 encounter designs, hospital layout, phase plan
+- `.planning/PROJECT.md` — validated v1.0 features, tech constraints, out-of-scope items
+- `client/src/phaser/scenes/ExplorationScene.ts` — existing `paused` flag, `init()` data pattern, BFS pathfinding
+- `client/src/phaser/scenes/HubWorldScene.ts` — existing `transitioning` guard, door detection pattern
+- Phaser 3 Scene API — `scene.launch()`, `scene.pause()`, `scene.resume()`, `cameras.main.fadeOut()`: [Phaser docs](https://newdocs.phaser.io/docs/3.80.0/focus/Phaser.Scenes.ScenePlugin-transition), [Rex Rainbow notes](https://rexrainbow.github.io/phaser3-rex-notes/docs/site/scenemanager/)
+- Phaser 3 inter-scene data passing — `this.scene.start(key, data)` / `init(data)`: [official example](https://phaser.io/examples/v3/view/scenes/passing-data-to-a-scene)
+- "Designing RPG Mini-Games (and Getting Them Right)" — Game Developer: narrative logic must be airtight, treat mini-games as real games, budget realistically — [gamedeveloper.com](https://www.gamedeveloper.com/design/designing-rpg-mini-games-and-getting-them-right-)
+- Chrono Trigger encounter design analysis — [Medium: Great Game UX: Encounter Design in Chrono Trigger](https://medium.com/games-r-ux/great-game-ux-encounter-design-in-chrono-trigger-5505a5563bdd)
+- Phaser parallel scenes + overlay pattern — [Phaser forum: HUD scene](https://phaser.discourse.group/t/hud-scene-multiple-scenes/6348), [Feronato article on parallel scenes](https://emanueleferonato.com/2021/02/25/understanding-phaser-capability-of-running-multiple-scenes-simoultaneously-with-a-real-world-example-continous-particle-scrolling-background-while-main-scene-restarts/)
+- CLAUDE.md Nintendo Test commandments — internal design philosophy reference
 
 ---
-
-*Feature research for: PrivacyQuest RPG + BreachDefense tower defense polish milestone*
-*Researched: 2026-02-27*
+*Feature research for: RPG unified hospital navigation + encounter integration + three-act arc*
+*Researched: 2026-03-26*

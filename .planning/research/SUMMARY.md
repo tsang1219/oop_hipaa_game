@@ -1,201 +1,257 @@
 # Project Research Summary
 
-**Project:** PrivacyQuest + BreachDefense — Game Polish Milestone
-**Domain:** Phaser 3 + React 18 hybrid educational game polish (sound, sprites, VFX, HUD, onboarding)
-**Researched:** 2026-02-27
+**Project:** PrivacyQuest + BreachDefense v2.0
+**Domain:** Unified Phaser 3 + React educational RPG — hospital navigation, encounter integration, three-act narrative arc
+**Researched:** 2026-03-26
 **Confidence:** HIGH
 
 ## Executive Summary
 
-Both games (PrivacyQuest RPG exploration and BreachDefense tower defense) are functionally complete with a well-established Phaser 3 + React 18 hybrid architecture. The gap between "working prototype" and "feels like a real game" is five specific systems: sound effects, walk cycle animation, visual death feedback, HUD data surfacing, and first-play onboarding. All five are achievable using existing stack capabilities — no new npm packages, no framework changes, no architectural redesign required. The stack is already at its correct final form (Phaser 3.90 + React 18 + EventBridge), and all research confirms the built-in Phaser APIs (WebAudioSoundManager, AnimationManager, TweenManager, ParticleEmitter) are sufficient.
+PrivacyQuest v2.0 transforms two standalone HIPAA training games into a single continuous hospital RPG. The player walks between departments through door-to-door transitions, triggering narrative events and embedded tower defense encounters — all within one Phaser game instance on a single React route. Research confirms this is achievable without any new npm dependencies, using Phaser 3.90's built-in scene manager (`scene.launch()`, `scene.sleep()`, `scene.wake()`), camera fade API, and the Phaser Registry (DataManager) as the cross-scene state bus. The existing architecture is sound; v2.0 is additive restructuring, not a rewrite.
 
-The recommended approach is to execute in small, targeted phases that respect the established architectural boundary: Phaser scenes own game state, audio, particles, and animation; React owns HUD text, modals, and overlays; EventBridge is the sole communication channel between them. The four parallel research streams converge on a consistent implementation strategy with clear build-order dependencies: audio assets must be preloaded in BootScene before any scene plays sound, walk frame textures must exist before AnimationFactory can register animations, and the particle texture key must exist before VFX can fire. BreachDefense HUD improvements are pure React and have no dependencies on any Phaser work, making them an independent parallel track.
+The recommended approach centers on three structural decisions that must be made first: (1) Collapse the three-route architecture into a single `UnifiedGamePage` at `/` with a persistent Phaser instance — React route changes are fatal to mid-game state; (2) use ExplorationScene as the single data-driven world scene, restarting with new room data on door transitions rather than managing N per-room scenes; and (3) store all cross-scene persistent state in the Phaser Registry (runtime) and a single versioned localStorage key (persistence), not fragmented across the 14+ ad-hoc keys the v1.0 codebase accumulated. These three decisions unblock everything else.
 
-The key risks are all API-level gotchas rather than architectural unknowns: Phaser's particle API broke in 3.60 (the old `createEmitter` pattern throws in 3.90), walk cycle animation requires a real spritesheet (not the existing `generateTexture` single-frame approach), EventBridge listeners leak if not cleaned up in `shutdown()`, and browser autoplay policy silently mutes any sound triggered before the first user gesture. All five risks have clear, documented mitigations. With these mitigations addressed, the polish milestone is low-risk.
+The highest risks are all implementation-level, not design-level: stale React closures corrupting room-transition state, EventBridge listener accumulation from missed `shutdown()` cleanup, save format migration breaking v1.0 player progress, and BreachDefenseScene failing to reset state between sequential encounters. All are documented with specific prevention patterns and must be addressed early — Phase 0 (save migration) and Phase 1 (navigation foundation) — before any encounter or narrative work begins.
+
+---
 
 ## Key Findings
 
 ### Recommended Stack
 
-The stack requires zero new dependencies. All required APIs — audio (`this.sound.play()`), particles (`this.add.particles()`), tweens (`this.tweens.add()`), and animation (`this.anims.create()`) — are Phaser 3.90 built-ins. Sound assets (8-12 SFX files) will be sourced from Kenney.nl CC0 packs (interface-sounds, digital-audio, impact-sounds) and placed in `client/public/audio/`. Sprite walk frames are the only external asset decision point: use a CC0 PNG spritesheet from OpenGameArt or Kenney RPG pack, or generate programmatic frames in SpriteFactory (slower, lower quality ceiling, but preserves visual style consistency).
+No new npm packages are required. The full v2.0 feature set is achievable with the existing stack: Phaser 3.90, React 18, TypeScript 5.6, Vite 5, Tailwind 3, EventBridge (custom), and `nanoid`.
+
+The critical additions for v2.0 are Phaser built-ins previously unused in this project: `scene.launch()` to run BreachDefense as a parallel overlay on top of a sleeping ExplorationScene; `cameras.main.fadeOut()` + `FADE_OUT_COMPLETE` for door crossfades (preferred over `scene.transition()` which requires manual alpha lerp); `this.registry` as game-wide DataManager for cross-scene state; and `registry.events.on('changedata-*')` so React can subscribe to game state without polling. The Registry is lifecycle-managed by Phaser (cleared on `game.destroy()`) and avoids the stale hot-reload state that global module singletons accumulate.
 
 **Core technologies:**
-- **Phaser 3.90:** All game-side work (sound, particles, tweens, animation) — built-in APIs cover every requirement, no plugins needed
-- **React 18:** All HUD overlays, intro modals, wave intro banners, tower hover descriptions — already owns this boundary, extend via state + EventBridge listeners
-- **EventBridge (existing singleton):** Cross-boundary communication for onboarding triggers — use only when data must cross the Phaser/React divide; SFX and particles stay inside Phaser entirely
+- Phaser ScenePlugin (3.90): `scene.launch/sleep/wake` for encounter overlay pattern — keeps ExplorationScene in memory during TD encounters with no rebuild cost on return
+- Phaser CameraEffects (3.90): `cameras.main.fadeOut/fadeIn` for door transitions — built-in black crossfade matching SNES aesthetic, zero boilerplate vs. `scene.transition()`
+- Phaser Registry/DataManager (3.90): `this.registry.set/get/inc/merge` for unified game state — accessible in every scene, fires `changedata` events React can subscribe to directly
+- EventBridge (custom): extend existing event list with 8 new encounter/act constants — preserve singleton pattern and all 26 existing events
+- localStorage (browser API): single versioned key `pq:save:v2` replacing 14 fragmented keys — serialize on act transitions and room completions
 
-**Critical version constraint:** Phaser is at 3.90 and should stay there. Phaser 4 is RC4 as of May 2025 — not stable, would require significant API migration. Do not upgrade.
+**What NOT to use:**
+- `scene.transition()` — requires manual alpha lerp in `onUpdate`; use camera fade instead
+- `scene.start('Exploration')` from within an encounter — destroys BreachDefense AND forces Exploration `init()` + `create()`; player position lost; use `scene.stop()` + `scene.wake('Exploration')` instead
+- XState / Zustand / Redux — overkill for a 3-state act machine and flat game state; Registry handles both cleanly
+- Global TypeScript module singleton for game state — persists across hot-reloads, can't be cleared on game restart
+
+Full detail: `.planning/research/STACK.md`
+
+---
 
 ### Expected Features
 
-**Must have (table stakes) — prototype-to-game gap:**
-- Core SFX bundle (footstep, interact, tower-place, enemy-death, breach-alert, wave-start) — silent movement and silent tower placement feel broken to any player of these genres
-- Walk cycle animation (PrivacyQuest) — a static character gliding across the floor is the single most visually jarring gap; all top-down RPGs since the SNES era animate the player
-- Enemy death visual feedback (BreachDefense) — without a death effect, enemies teleport out of existence; kills must feel confirmed and satisfying
-- BreachDefense HUD data surfacing (wave intro text, suggestedTowers hint, tower hover description, endMessage) — all data already exists in `constants.ts` and never reaches the player; this is display work only
-- PrivacyQuest intro modal + first NPC highlight — without controls context, new players get stuck and abandon on first room entry
+The v2.0 feature set divides cleanly into P1 (game broken without), P2 (polish after core), and explicit anti-features to avoid.
 
-**Should have (differentiators and quality-of-life):**
-- Tower firing recoil tween — adds combat feedback; lower priority than death feedback since projectiles already travel visually
-- Item pickup feedback (PrivacyQuest) — items already bob and fade; a collect burst is incremental polish
-- NPC role visual distinctiveness — doctors vs. patients currently look identical at a glance
-- Dialogue choice sound feedback — ascending/descending tones for correct/incorrect HIPAA answers reinforce the educational mission
-- Interaction range indicator — reduces friction when players miss the approach prompt
+**Must have (table stakes — P1):**
+- Camera fade on door transitions — every RPG since SNES signals area changes this way; without it, scene swaps read as crashes
+- Visual door state indicators (locked/available/completed) — three visual states via tint + icon overlay; players must know "can I go in there?" before crossing the room
+- Player spawns at correct door after backtrack — pass `spawnDoor` ID in scene `init()` data
+- Unified game state in localStorage (single versioned schema) — enables everything else; design this schema first, before any code
+- Encounter trigger + return system (EventBridge events + scene sleep/resume) — connects RPG and TD without destroying Phaser game instance
+- Condensed TD encounter config (4 waves, 3 towers, encounter-mode flag) — makes TD feel like a narrative encounter, not a separate game
+- Act progression flags (conditions checked on department completion + encounter results) — gives the game a narrative shape
+- Audio act shift (reassign existing 3 tracks to 3 acts via crossfade) — zero new assets, high emotional impact
+- Unified score HUD visible during exploration — player must see score accumulating across both game modes
+- Backtrack through completed areas — locking players out of completed rooms is a design crime in compliance training
 
-**Defer (v2+):**
-- Background music — licensing risk, loop complexity, audio mixing; SFX-only delivers 80% of game feel at 10% the cost
-- Wave threat preview panel — good educational feature but adds BreachDefense UI complexity
-- HIPAA-contextualized kill text — nice narrative touch, low priority
-- Tower sell/upgrade, game speed control, mobile touch, persistent save state — out of scope per PROJECT.md
+**Should have (differentiators — P2):**
+- Encounter trigger with narrative context window — brief card explaining why TD is launching now ("Dr. Patel just flagged suspicious logins")
+- Per-department completion fanfare — visual flourish + chime on 100% completion
+- NPC dialogue branching on encounter result — coworker references encounter outcome; builds world continuity
+- Progress breadcrumb HUD — department dots + act badge always visible
+- Hallway connector scenes with ambient NPCs — breathing room between departments
+
+**Defer (v2.1+):**
+- PHI Sorting mini-game — significant build, warrants its own milestone
+- Outbound TD variant — new threats/towers data required, path direction decision unresolved
+- End-of-game report screen — needs mature encounter result + act data first
+
+**Explicit anti-features (do not build):**
+- Room picker / department select menu — breaks spatial continuity; replace with locked doors giving in-world feedback
+- World map / minimap — hospital is intentionally small (6 rooms); reveals structure before discovery
+- Difficulty modes — compliance training has one difficulty: learner knows the material by end
+- Full branching narrative — unmaintainable across 23 NPCs; limit to 2-3 key remembered decisions
+
+Full detail: `.planning/research/FEATURES.md`
+
+---
 
 ### Architecture Approach
 
-The architecture is additive — all four new systems slot into the existing structure without redesign. BootScene is the single asset loading point (audio joins existing PNG preloads there). A new `AnimationFactory.ts` mirrors `SpriteFactory.ts` exactly — pure `registerAllAnims(scene)` function called once from `BootScene.create()`. All SFX fire directly in the scene that detects the triggering event (no EventBridge relay for sound). Onboarding events are the only new EventBridge traffic: 3 new constants (`EXPLORATION_FIRST_ENTER`, `EXPLORATION_NEAR_FIRST_NPC`, `EXPLORATION_CONTROLS_HINT`).
+The v2.0 architecture collapses three React routes and three separate game experiences into a single `UnifiedGamePage` at `/` with a single persistent Phaser instance. ExplorationScene is the primary always-running world scene; BreachDefenseScene launches as a parallel overlay (sleep/wake pattern) for encounters; act state lives in a React `useGameState` hook backed by localStorage and pushed to scenes at room-load time via EventBridge.
 
-**Major components and what changes:**
-1. **BootScene** — add `load.audio()` calls + call `AnimationFactory.registerAllAnims(this)` after textures
-2. **SpriteFactory** — add `particle_dot` programmatic texture (8x8 white circle, ~5 lines)
-3. **AnimationFactory (new)** — `registerAllAnims(scene)`: 4 directions × 3 frames walk + 4 idle anims
-4. **ExplorationScene** — replace `setTexture()` with `anims.play()`; add `this.sound.play()` calls; emit 3 new onboarding events; add `off()` calls to `shutdown()`
-5. **BreachDefenseScene** — add enemy-death particle burst + `emitter.destroy()` callback; add tower-fire scale tween; add `this.sound.play()` at event trigger points
-6. **PrivacyQuestPage** — add intro modal with localStorage gate; listen for onboarding EventBridge events; render first-NPC hint
-7. **BreachDefensePage** — surface wave intro text, suggestedTowers, tower hover description, endMessage from existing constants (pure React, no Phaser coordination)
+The key architectural insight: React router navigation (`navigate('/breach')`) destroys and recreates the Phaser game instance, losing all scene state. This was acceptable in v1.0 when modes were separate. For a unified RPG where encounter launch must preserve room state and player position, it is fatal. The fix is to never change routes during gameplay — all mode switching happens at the Phaser scene layer.
+
+**Major components:**
+1. `UnifiedGamePage` (React) — merges HubWorldPage + PrivacyQuestPage; owns Phaser instance lifecycle; hosts `useGameState` hook; swaps HUD mode between exploration and encounter
+2. `ExplorationScene` (Phaser) — data-driven world scene; handles door detection, room transitions, encounter triggers, sleep/wake hooks; restarts with new room data on each door transition
+3. `BreachDefenseScene` (Phaser) — receives encounter config via `init(data)` for condensed mode (4 waves, 3 towers) vs. full standalone at `/breach`; always stopped (not slept) on encounter exit for clean state reset
+4. `useGameState` (React hook) — unified state: act, score, rooms, encounters, persistence; runs `actProgressionLogic` on state change; persists to single versioned localStorage key
+5. `GameProgressionService` (TypeScript module) — pure function checking registry state for act advancement conditions; 30 lines, no FSM library
+6. EventBridge (extended) — 8 new event constants for encounter lifecycle (`ENCOUNTER_TRIGGERED`, `ENCOUNTER_COMPLETE`, `REACT_LAUNCH_ENCOUNTER`, `REACT_RETURN_FROM_ENCOUNTER`) and act progression (`ACT_CHANGED`, `REACT_SET_ACT`)
+
+**Data flow contracts (define before implementation):**
+- Room transition: ExplorationScene emits `EXPLORATION_EXIT_ROOM` → React validates unlock → emits `REACT_LOAD_ROOM` → ExplorationScene restarts with new data
+- Encounter launch: ExplorationScene emits `ENCOUNTER_TRIGGERED` → React shows context card → emits `REACT_LAUNCH_ENCOUNTER` → ExplorationScene sleeps itself, starts BreachDefense
+- Encounter return: BreachDefenseScene writes result to registry → emits `ENCOUNTER_COMPLETE` → React updates state → emits `REACT_RETURN_FROM_ENCOUNTER` → ExplorationScene wakes
+
+**PHI Sorting:** Build as React-only full-screen overlay. ExplorationScene sleeps. React renders the sorting UI. On complete, React emits return event, scene wakes. No Phaser scene needed — drag-and-drop document UI belongs in React, not in canvas.
+
+Full detail: `.planning/research/ARCHITECTURE.md`
+
+---
 
 ### Critical Pitfalls
 
-1. **Particle API breaking change** — `this.add.particles(key).createEmitter()` was removed in Phaser 3.60 and throws in 3.90. Always use `this.add.particles(x, y, key, config)` returning the emitter directly. Most tutorials and AI suggestions show the old broken pattern — verify against current Phaser docs before writing any particle code.
+Seven pitfalls identified from direct codebase analysis. The top five require action before any restructure begins.
 
-2. **Walk cycle requires a real spritesheet** — `generateTexture()` creates single-frame textures; `anims.create()` referencing them produces a 1-frame animation that does not cycle. The current `setTexture()` approach cannot be extended to walk animation without a spritesheet. Commit to a spritesheet PNG loaded via `this.load.spritesheet()` in BootScene, or commit to programmatic multi-frame generation — do not try to bridge the two approaches.
+1. **Stale closures in EventBridge handlers during room transitions** — React's EventBridge listeners capture stale state via closures. With continuous navigation (6-15 room entries per session vs. the previous one-at-a-time flow), stale closure hits become near-certain. Prevention: use `useRef` for all values that EventBridge handlers read, updated synchronously on every render. Establish this pattern in Phase 1 before any encounter integration — retrofitting requires auditing every handler.
 
-3. **EventBridge listener leak on scene restart** — the singleton EventBridge accumulates listeners if `shutdown()` does not call `off()` with the exact same function reference and context. Arrow function listeners cannot be removed. All new `eventBridge.on(EVENT, handler, this)` calls added during polish must have matching `eventBridge.off(EVENT, handler, this)` in `shutdown()`. Test by entering and exiting a room 3 times; sounds should fire exactly once per event.
+2. **EventBridge listener accumulation on scene restart** — Each `scene.start()` runs `create()`, registering new listeners. Missed `shutdown()` cleanup accumulates duplicates silently. By room 4, a correct answer awards +12 instead of +3. Prevention: add a centralized `boundListeners` array to ExplorationScene and BreachDefenseScene; every new `eventBridge.on()` call uses a helper that auto-registers for cleanup. Establish in Phase 1 before adding new event types.
 
-4. **Audio loaded outside BootScene.preload()** — the Loader auto-trigger only fires during `preload()`. `load.audio()` calls in `create()` or helper functions fail silently at play time. Add all audio to `BootScene.preload()` alongside existing image loads; verify with `this.cache.audio.exists('key')` before first play.
+3. **Two game loops running simultaneously after encounter launch** — If React calls `game.scene.start('BreachDefense')` directly without stopping ExplorationScene, both update loops run: WASD moves the RPG player during TD waves. Prevention: encounter launch must be scene-initiated. ExplorationScene receives `REACT_LAUNCH_ENCOUNTER`, calls `this.scene.sleep()` on itself, then starts BreachDefense. Never launch from React directly.
 
-5. **Browser autoplay policy silently mutes first sound** — `this.sound.play()` called from scene `create()` or any auto-transition (before user gesture) will silently fail. Phaser auto-resumes the AudioContext on first user gesture — trust this and ensure the first sound call happens in a player input handler (click, keypress), not in lifecycle methods. `this.sound.locked` will be `true` until unlocked.
+4. **Save format migration breaks existing progress** — v1.0 has 14+ fragmented localStorage keys incompatible with v2.0 state requirements. Prevention: consolidate into single `pq:save:v2` key with a `migrateV1toV2()` function run on game init. This is Phase 0 work — the first code written before any restructure.
+
+5. **BreachDefenseScene state not reset between encounters** — `scene.sleep()` preserves all state (towers, enemies, budget). Using sleep instead of stop means encounter 2 starts with encounter 1's towers. Prevention: always use `scene.stop()` for BreachDefenseScene (triggers `shutdown()` and clean `init()`). Only ExplorationScene uses `sleep()`.
+
+Additional pitfalls: React page architecture assuming one mode per route (fix: single unified page); HallwayHub content regression when room picker is removed (fix: inventory every HallwayHub responsibility and assign each a replacement before deletion).
+
+Full detail: `.planning/research/PITFALLS.md`
+
+---
 
 ## Implications for Roadmap
 
-Based on combined research, the build order has clear hard dependencies. Assets before code (audio files must exist to load). BootScene first (loads everything else). Parallel tracks after BootScene is modified (animation, particles, and BreachDefense HUD are independent). Onboarding last (depends on EventBridge constants finalized by other phases).
+### Phase 0: Save Format Migration and Bug Stabilization
+**Rationale:** Must come first. The v1.0 save format (14+ fragmented localStorage keys) is incompatible with v2.0 state requirements. Migrating after the restructure begins creates data corruption risk. All subsequent phases write to the consolidated format — if it doesn't exist yet, they write to a partial schema that breaks existing player sessions.
+**Delivers:** Single versioned `pq:save:v2` schema; `migrateV1toV2()` function that runs once on boot and clears v1 keys; existing bugs fixed without changing APIs
+**Avoids:** Save format corruption (Pitfall 4)
+**Research flag:** Standard patterns — no additional research needed; execute directly
 
-### Phase 1: Audio Foundation
+---
 
-**Rationale:** Sound is the single highest-impact change per unit of effort. All downstream sound features share one prerequisite: audio files preloaded in BootScene. Establishing the full audio manifest and playback pattern first prevents the most common pitfall (audio loaded in wrong place) from infecting every subsequent phase. All 6 table-stakes SFX are addressable in one BootScene modification pass.
+### Phase 1: Unified Navigation Foundation
+**Rationale:** Everything downstream depends on this. Encounter integration (Phase 2), PHI Sorting (Phase 3), and act narrative (Phase 5) all require `UnifiedGamePage`, `useGameState`, the door system in ExplorationScene, and the `REACT_LOAD_ROOM` event payload. This phase establishes the contracts that all subsequent phases consume. Pitfalls 1, 2, and 5 must be addressed here — retrofitting them into Phases 2-5 is far more expensive.
+**Delivers:** Single-route game at `/`; `UnifiedGamePage` replacing HubWorldPage + PrivacyQuestPage; door-to-door room transitions with camera fade (300ms); door visual state indicators (locked/available/complete); player spawn at correct door; unified game state hook; hallway connector rooms in roomData.json; HallwayHub responsibilities fully migrated and verified before deletion
+**Features from FEATURES.md:** Camera fade transitions (P1), door state indicators (P1), unified game state (P1), player spawn position (P1), backtrack through completed areas (P1)
+**Avoids:** Stale closure state (Pitfall 1) — establish `useRef` pattern for all handlers; EventBridge accumulation (Pitfall 2) — establish `boundListeners` cleanup pattern; React page architecture (Pitfall 5) — single page, single Phaser instance; HallwayHub regression (Pitfall 7) — responsibility inventory before deletion; particle emitter accumulation — verify `shutdown()` destroys emitters, not just tweens
+**Research flag:** Standard patterns — well-documented Phaser + React patterns; no additional research needed
 
-**Delivers:** Footstep SFX, NPC interaction SFX, tower placement SFX, enemy death SFX, breach alert SFX, wave start SFX. Players will immediately feel the game is alive.
+---
 
-**Addresses:** Core SFX bundle (P1 table stakes from FEATURES.md)
+### Phase 2: Encounter Integration (Inbound TD)
+**Rationale:** Requires Phase 1 complete. The door system established in Phase 1 is the model for encounter triggers. `useGameState` from Phase 1 receives encounter results. BreachDefenseScene encounter-mode config is the smallest invasive change to an otherwise stable scene. This is the highest-risk phase — define the launch/return protocol contract before any implementation.
+**Delivers:** Sleep/wake encounter pattern; TD triggered from ExplorationScene narrative event; condensed 4-wave encounter config via `init(data)`; encounter result written to registry before ExplorationScene wakes; unified compliance score updated; encounter HUD mode swap in React; pre-encounter narrative context card; post-encounter debrief overlay
+**Features from FEATURES.md:** Encounter trigger + return system (P1), condensed TD encounter config (P1), unified score HUD (P1), encounter narrative context window (P2)
+**Avoids:** Two game loops simultaneous (Pitfall 3) — scene-initiated launch protocol, never React-initiated; BreachDefense state not reset (Pitfall 6) — always `scene.stop()` for BreachDefense, never `scene.sleep()`; unified score scale mismatch — define score conversion formula before implementing aggregation
+**Research flag:** Standard patterns — Phaser sleep/wake is documented; encounter config pattern is fully specified in STACK.md with code examples
 
-**Avoids:** Audio preloaded in wrong scene (Pitfall 1), autoplay policy block (Pitfall 2), EventBridge listener leak pattern (establish named-method-reference pattern here for all subsequent phases)
+---
 
-**Asset pre-work:** Download Kenney Interface Sounds + Digital Audio + Impact Sounds packs; select 6-8 OGG files; convert to MP3 for Safari fallback; place in `client/public/audio/`
+### Phase 3: PHI Sorting Encounter
+**Rationale:** Depends on Phase 1 (encounter trigger system) and partially on Phase 2 (React knows how to switch HUD mode for encounters). Independent of BreachDefense changes — different encounter type, different implementation path. Build as React-only overlay: ExplorationScene sleeps, React renders full-screen PHI sorting UI, on complete React emits `REACT_RETURN_FROM_ENCOUNTER`, scene wakes.
+**Delivers:** `PHISortingOverlay` React component; second encounter type wired into narrative
+**Avoids:** Building PHI sorting in Phaser (Architecture Anti-Pattern 3) — drag-and-drop document UI belongs in React
+**Research flag:** Needs planning — PHI sorting game design (sorting categories, HIPAA content, scoring formula) is not fully specified in research files. ENHANCEMENT_BRIEF.md has design intent; a dedicated content design pass is required before Phase 3 can be estimated or built.
 
-### Phase 2: Walk Cycle Animation (PrivacyQuest)
+---
 
-**Rationale:** Walk animation is the most visually jarring gap. It is architecturally isolated (BootScene texture generation + ExplorationScene playback) and has the most important pre-condition decision: PNG spritesheet vs. programmatic frames. Resolving this decision and completing it in one phase prevents partial states where animation is registered but the texture source is wrong.
+### Phase 4: Outbound TD Variant
+**Rationale:** Depends on Phase 2 (BreachDefenseScene encounter config pattern). Reuses the encounter config pattern from inbound TD — build the pattern once (Phase 2), extend it (Phase 4). Requires new outbound threat/tower data in constants and a path direction decision.
+**Delivers:** Second TD encounter type; outbound threat/tower constants; path direction resolved
+**Avoids:** Hardcoding outbound config in BreachDefenseScene — pass via init data (same pattern as inbound)
+**Research flag:** Needs a planning decision — outbound path direction (reverse existing serpentine vs. new waypoint layout) is an open architecture question. Wrong choice doubles the work. Resolve this decision explicitly before Phase 4 implementation begins.
 
-**Delivers:** 4-directional walk animation playing while the player moves, idle pose when stopped. Eliminates the gliding-rectangle visual.
+---
 
-**Addresses:** Walk cycle animation (P1 table stakes from FEATURES.md)
+### Phase 5: Three-Act Narrative Arc
+**Rationale:** Requires Phase 1 (room navigation) and Phase 2 (encounter results feed act conditions). Act state can be defined as a data structure in Phase 1, but the act advancement logic, music crossfades, and transition sequences require all navigation and encounter plumbing to be stable. Attempting act progression before encounters are wired creates false completion states.
+**Delivers:** `GameProgressionService` (pure function, act conditions); `ACT_CHANGED` event; music crossfade on act boundary (reassign existing 3 tracks); act transition dialogue sequence; `currentAct` in unified HUD
+**Features from FEATURES.md:** Act progression flags (P1), audio act shift (P1), act indicator in HUD, soft act transitions
+**Avoids:** Storing act state in Phaser scene variables (Architecture Anti-Pattern 2) — act lives in `useGameState`, pushed to scenes via `REACT_LOAD_ROOM` payload; XState library overkill — 30-line pure function handles 3-state machine cleanly
+**Research flag:** Standard patterns — act progression logic is fully specified in STACK.md; music crossfade pattern is documented; no additional research needed
 
-**Avoids:** Walk cycle using generateTexture frames in anims.create() (Pitfall 4), duplicate animation keys on scene restart (Pitfall 8 from PITFALLS.md)
+---
 
-**Decision required:** Commit to spritesheet PNG (load via BootScene, better quality) or programmatic 3-frame generation (no external asset, consistent style) before writing any `anims.create()` code.
+### Phase 6: Polish and Completion
+**Rationale:** All phases complete. No new architectural components. Additive polish pass using patterns established in prior phases.
+**Delivers:** Per-department completion fanfare; NPC dialogue branching on encounter result; progress breadcrumb HUD; hallway ambient NPC lines; end-of-game report screen (if in scope)
+**Features from FEATURES.md:** Per-department completion fanfare (P2), NPC dialogue branching (P2), progress breadcrumb (P2), hallway ambient NPC lines (P2)
+**Research flag:** Standard patterns — all patterns established in earlier phases; polish work only
 
-### Phase 3: Visual Effects — Enemy Death and Tower Feedback (BreachDefense)
-
-**Rationale:** Enemy death visual is the other P1 table-stakes gap. Groups naturally with tower fire tween because both fire inside BreachDefenseScene and both require the particle_dot texture added to SpriteFactory. Doing both in the same pass avoids touching the scene twice.
-
-**Delivers:** Enemy death particle burst (fade + explode at kill position), tower firing recoil tween (scale pulse on fire event). Kills feel confirmed; towers feel active.
-
-**Addresses:** Enemy death visual (P1), tower firing visual (P2) from FEATURES.md
-
-**Avoids:** Old particle API (Pitfall 3 — verify `this.add.particles(x, y, key, config)` syntax), emitter not destroyed after one-shot (Pitfall 6), performance from accumulating emitters (performance trap in PITFALLS.md)
-
-**Technical gate:** `particle_dot` texture key must be added to SpriteFactory before any emitter can reference it.
-
-### Phase 4: BreachDefense HUD Data Surfacing
-
-**Rationale:** All required data is already in `constants.ts`. This phase is pure React work in `BreachDefensePage.tsx` with no Phaser coordination — it can run in parallel with Phases 2-3 if resources allow, or immediately after Phase 1. It surfaces educational content that currently never reaches the player: wave intro text, suggestedTowers hints, tower hover description, and endMessage.
-
-**Delivers:** Wave intro banner on wave start (timed auto-dismiss), suggested tower hint in HUD panel during prep, tower description on hover/selection, wave endMessage on wave complete. Closes the gap between the rich data in constants.ts and what players actually see.
-
-**Addresses:** Wave intro text, suggestedTowers, tower hover description, endMessage (all P1 from FEATURES.md)
-
-**Avoids:** React overlay intercepts Phaser clicks (Pitfall 7 — apply pointer-events handling), HUD text not using setScrollFactor(0) if any Phaser text is added (Pitfall 10)
-
-### Phase 5: PrivacyQuest Onboarding
-
-**Rationale:** Onboarding depends on EventBridge event constants being finalized, making it a natural final phase. The intro modal and first-NPC highlight address first-room abandonment risk. This phase is last because it needs the EventBridge additions from all prior phases to be stable before adding 3 more constants.
-
-**Delivers:** First-visit intro modal (localStorage-gated, controls context in 2 sentences max), first-NPC pulsing highlight (auto-dismisses on movement), contextual SPACE prompt when player first reaches NPC proximity.
-
-**Addresses:** PrivacyQuest intro modal + first NPC highlight (P1 from FEATURES.md)
-
-**Avoids:** Tutorial modal listing all controls at once (Pitfall 9 — max 3 items, one primary control), EventBridge listener leak (add off() for all 3 new event listeners in ExplorationScene shutdown)
+---
 
 ### Phase Ordering Rationale
 
-- Phase 1 is mandatory first because all sound work requires audio files in BootScene; establishing the preload pattern before writing playback code prevents the most common pitfall
-- Phase 2 (animation) and Phase 3 (VFX) can run in parallel after Phase 1 since they touch different systems (ExplorationScene vs. BreachDefenseScene) and different asset concerns (spritesheet vs. particle texture)
-- Phase 4 (HUD) has zero dependencies on Phases 2 or 3 and can begin in parallel with Phase 1 — it is pure React
-- Phase 5 (onboarding) is last by convention: EventBridge constants should be stable, and writing modal copy after testing reveals what players actually need to know first produces better UX
+- **Phase 0 before everything:** Save migration is the only work that cannot be undone — corrupt a v1 save during restructure and player progress is permanently lost. It must be isolated, shipped, and verified before any restructure begins.
+- **Phase 1 before Phases 2-5:** The `UnifiedGamePage`, `useGameState`, and door system are the foundation contracts all downstream phases consume. Attempting encounter integration before stable navigation creates integration thrash and makes pitfall retrofix expensive.
+- **Phase 2 before Phase 4:** Outbound TD reuses the encounter config pattern from inbound TD. Build the pattern once, extend it.
+- **Phase 3 is partially independent:** PHI Sorting depends on Phase 1 trigger system and Phase 2 HUD mode switching, but not on Phase 2 BreachDefense changes. Could parallelize with Phase 4 if teams allow.
+- **Phase 5 last among core features:** Act advancement conditions include encounter completion results. Attempting act progression before encounters are wired creates false completion states that must be debugged under live act logic.
+
+---
 
 ### Research Flags
 
-Phases with well-documented patterns (standard research-phase skip):
-- **Phase 1 (Audio):** Phaser audio API is thoroughly documented; all patterns are verified; Kenney assets are known-CC0
-- **Phase 3 (VFX):** Particle and tween APIs are fully documented; code examples in ARCHITECTURE.md are verified against current docs
-- **Phase 4 (HUD):** Pure React display work; pattern already exists in BreachDefensePage; no new APIs
+Phases needing deeper research or design sessions before implementation:
+- **Phase 3 (PHI Sorting):** Encounter design — specific HIPAA content, sorting categories, scoring formula — not fully defined. Requires a content design pass before Phase 3 can be estimated.
+- **Phase 4 (Outbound TD):** Path direction decision (reverse existing serpentine vs. new waypoint layout) is an open architecture question from ARCHITECTURE.md. Requires an explicit decision before implementation.
 
-Phases that need validation during implementation:
-- **Phase 2 (Walk Cycle):** The spritesheet-vs-programmatic decision needs a judgment call with the specific asset in hand. If using OpenGameArt sprites, verify directional frame coverage before committing to the PNG path — research noted some chars have incomplete directional coverage. If programmatic, 60-90 min of SpriteFactory work to get foot positions right.
-- **Phase 5 (Onboarding):** Modal copy should be tested with a fresh-eyes user before finalizing. Research confirmed the pattern is correct; the content quality requires iteration.
+Phases with standard, well-documented patterns (no research-phase needed):
+- **Phase 0:** Save migration is a well-understood data transformation
+- **Phase 1:** Phaser scene restart + camera fade + EventBridge patterns fully specified in research
+- **Phase 2:** Phaser sleep/wake encounter pattern fully specified in STACK.md with code examples
+- **Phase 5:** Act progression logic fully specified in STACK.md; music crossfade pattern documented
+- **Phase 6:** Polish work using established in-project patterns
+
+---
 
 ## Confidence Assessment
 
 | Area | Confidence | Notes |
 |------|------------|-------|
-| Stack | HIGH | Phaser 3.90 APIs verified against official docs; all required capabilities confirmed as built-ins; no new dependencies needed |
-| Features | HIGH | Genre conventions are well-established; all P1 features verified against existing codebase constants; feature dependencies mapped |
-| Architecture | HIGH | Verified against live codebase inspection; build-order dependencies explicit; patterns confirmed via official Phaser + React docs |
-| Pitfalls | HIGH (Phaser), MEDIUM (UX) | All Phaser pitfalls verified via official changelogs and issue tracker; UX pitfalls from multiple credible industry sources |
+| Stack | HIGH | All APIs verified against official Phaser 3.90 docs; no new dependencies; patterns confirmed stable since Phaser 3.17+ |
+| Features | HIGH | Grounded in existing codebase + validated design references (ENHANCEMENT_BRIEF.md); anti-features explicitly reasoned with alternatives |
+| Architecture | HIGH | Based on direct codebase inspection of all 4 scenes + 3 pages + EventBridge; component boundaries are concrete, not theoretical |
+| Pitfalls | HIGH | Based on direct codebase analysis with specific line references; Phaser 3 scene lifecycle behavior confirmed against official docs |
 
 **Overall confidence:** HIGH
 
 ### Gaps to Address
 
-- **Spritesheet format compatibility:** If using an external PNG spritesheet for the player walk cycle, the frame layout (row-per-direction, pixels per frame) must be verified on download. Some OpenGameArt assets have incomplete directional coverage or non-standard frame counts. Fallback: generate programmatic 3-frame walk cycle in SpriteFactory to preserve visual style consistency.
+- **HubWorldScene retirement decision:** Should HubWorldScene become a room data entry (hospital-entrance in roomData.json) or be preserved as a special Act 1 intro sequence? This affects Phase 1 scope. Resolve during Phase 1 planning before implementation begins.
+- **PHI Sorting encounter content:** Sorting categories, HIPAA topic coverage, and scoring formula are not defined in research files. Requires content design work before Phase 3 can be estimated or built.
+- **Outbound TD path direction:** ARCHITECTURE.md identifies this as an open question. Resolve during Phase 4 planning — wrong choice doubles build cost.
+- **Unified score formula:** Both privacy (dialogue/zone interactions) and security (TD performance) feed the unified compliance score. Scale mapping is undefined. A wrong mapping (raw BreachDefense 0-100 naively added to privacy score) creates a broken incentive structure. Define the formula in Phase 2 planning before implementing score aggregation.
+- **BreachDefensePage standalone mode:** Should `/breach` always run in full 10-wave mode, or share the encounter-mode config with a `standalone: true` flag in init data? Decide during Phase 2 planning to avoid maintaining two separate page configs.
 
-- **SFX selection within Kenney packs:** Research confirmed CC0 status and pack contents at a category level. Specific file selection (which footstep variant, which impact sound) requires downloading and listening to the packs. Budget 30 minutes for audio curation before BootScene implementation begins.
-
-- **iOS Safari autoplay behavior:** Research confirms Phaser handles AudioContext unlock on first user gesture, but this was not tested on an iOS physical device. The mitigation (never play sound from lifecycle methods, always from input handlers) is correct regardless. Flag for device testing during Phase 1 verification.
-
-- **React state update throttling during HUD improvements (Phase 4):** BreachDefenseScene already broadcasts state at 200ms throttle to prevent 60 re-renders/second. Any new HUD data (wave intro, endMessage) should piggyback on the existing broadcast or use its own EventBridge emit — do not remove the throttle guard.
+---
 
 ## Sources
 
 ### Primary (HIGH confidence)
-
-- Phaser 3 Audio Docs — https://docs.phaser.io/phaser/concepts/audio — WebAudioSoundManager, autoplay, format arrays
-- Phaser 3 Animation Docs — https://docs.phaser.io/phaser/concepts/animations — anims.create(), sprite.play()
-- Phaser ParticleEmitter API (3.80+) — https://newdocs.phaser.io/docs/3.80.0/Phaser.GameObjects.Particles.ParticleEmitter — explode(), destroy()
-- Phaser 3.60 ParticleEmitter Changelog — https://github.com/phaserjs/phaser/blob/v3.60.0/changelog/3.60/ParticleEmitter.md — ParticleEmitterManager removal confirmed
-- Phaser v3.90 release announcement — https://phaser.io/news/2025/05/phaser-v390-released — current stable v3 confirmed
-- Phaser 4 RC4 announcement — https://phaser.io/news/2025/05/phaser-v4-release-candidate-4 — v4 not stable, confirms staying on 3.90
-- Phaser 3 + React official template — https://phaser.io/news/2024/02/official-phaser-3-and-react-template — validates EventBridge/overlay pattern
-- WebAudioSoundManager API — https://docs.phaser.io/api-documentation/class/sound-webaudiosoundmanager
-- Phaser pointer event bleed-through — GitHub issue #6697 + #4447 — confirmed behavior + pointer-events:none fix
-- Codebase direct inspection: BootScene.ts, ExplorationScene.ts, BreachDefenseScene.ts, SpriteFactory.ts, EventBridge.ts, constants.ts — live codebase
+- `client/src/phaser/scenes/ExplorationScene.ts` — shutdown() behavior, EventBridge registrations, paused flag, stale closure comment at line 395-398
+- `client/src/phaser/scenes/BreachDefenseScene.ts` — entity array accumulation, shutdown() at line 1981, onRestart handler
+- `client/src/phaser/EventBridge.ts` — singleton pattern, no deduplication behavior, extends Phaser.Events.EventEmitter
+- `client/src/pages/PrivacyQuestPage.tsx` — 14 fragmented localStorage keys at lines 62-88, 139-144, 199-203
+- `.planning/ENHANCEMENT_BRIEF.md` — encounter designs, hospital layout, act structure, phase plan
+- docs.phaser.io/phaser/concepts/scenes — Scene lifecycle, launch/sleep/wake (official, current)
+- docs.phaser.io/phaser/concepts/data-manager — Registry API: set/get/inc/merge/changedata (official, current)
+- phaser.io/examples/v3/view/scenes/sleep-and-wake — Official Phaser sleep/wake example
 
 ### Secondary (MEDIUM confidence)
+- rexrainbow.github.io/phaser3-rex-notes — SceneManager methods; isSleeping/isPaused status (community-maintained, widely used)
+- blog.ourcade.co/posts/2020/phaser-3-fade-out-scene-transition — Camera fadeOut + FADE_OUT_COMPLETE pattern (2020; API verified stable in 3.90)
+- gamedeveloper.com — "Designing RPG Mini-Games" — narrative logic, treat mini-games as real games, budget realistically
+- Medium — "Great Game UX: Encounter Design in Chrono Trigger" — mandatory narrative-triggered encounters vs. optional/random
 
-- Kenney Interface Sounds — https://kenney.nl/assets/interface-sounds — CC0 confirmed, specific file list requires download
-- Kenney Digital Audio — https://kenney.nl/assets/digital-audio — CC0 confirmed, 60 files
-- Kenney Impact Sounds — https://kenney.nl/assets/impact-sounds — CC0 confirmed, 130 files
-- OpenGameArt 32x32 RPG characters — https://opengameart.org/content/32x32-rpg-character-sprites — CC0, directional coverage incomplete for some chars
-- Game Developer: Game Juice design principles — industry design articles, multiple sources agree on SFX priority
-- Inworld AI / Wayline: Game UX onboarding best practices — modal copy guidelines, controls-first vs. contextual reveal
+### Tertiary (LOW confidence)
+- phaser.discourse.group — sleep/wake vs. start tradeoffs; community confirmation of behavior
 
 ---
-*Research completed: 2026-02-27*
+
+*Research completed: 2026-03-26*
 *Ready for roadmap: yes*
