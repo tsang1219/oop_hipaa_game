@@ -141,17 +141,28 @@ Plans:
   3. Act transitions happen through environmental cues and music only — no title card, chapter screen, or modal interrupts the player.
   4. At least 2-3 NPCs reference a specific earlier player decision when the player returns to their area — the dialogue text reflects what the player actually chose, not a generic line.
   5. Department ordering in the world matches narrative flow: Reception and Break Room are accessible in Act 1; Lab and Records gate Act 2; IT and ER are Act 3.
-**Plans**: TBD
+**Plans:** 4 plans
+
+Plans:
+- [ ] 14-01-PLAN.md — Type contracts: narrative.ts (ActState, DecisionState), ACT_ADVANCE event, Choice flagKey/flagValue schema
+- [ ] 14-02-PLAN.md — React act progression: useGameState hook, checkActAdvance in handleExitRoom, decision flag capture
+- [ ] 14-03-PLAN.md — Phaser music crossfade: crossfadeToMusic in ExplorationScene, ACT_ADVANCE listener lifecycle
+- [ ] 14-04-PLAN.md — NPC variant dialogue: 4 new scenes in gameData.json, getSceneIdForNPC routing in PrivacyQuestPage
 
 ### Phase 15: Polish and Completion
 **Goal**: Environmental storytelling, department completion fanfares, and a progress breadcrumb HUD make every accomplishment feel earned and the player's journey visible at all times.
 **Depends on**: Phase 14
 **Requirements**: NARR-06, NARR-07, NARR-08
+**Plans:** 3 plans
 **Success Criteria** (what must be TRUE):
   1. Hallway connectors between departments contain at least one ambient environmental detail (bulletin board text, prop, or NPC observation line) that changes or shifts between acts.
   2. Completing all NPCs, zones, and items in a department triggers a visible fanfare — a screen flash or sparkle effect, a chime, and a badge or checkmark that persists on the door.
   3. The HUD always shows the player's department completion status and current act — visible during exploration without interrupting play.
-**Plans**: TBD
+
+Plans:
+- [ ] 15-01-PLAN.md — hallwayContent.ts data file (5x3 content matrix) + ExplorationScene hallway board rendering
+- [ ] 15-02-PLAN.md — Fanfare sequence: sfx_fanfare audio + EventBridge event + ExplorationScene particle burst + door badge + PrivacyQuestPage in-room trigger
+- [ ] 15-03-PLAN.md — DepartmentBreadcrumb React component + PrivacyQuestPage mount
 
 ---
 
@@ -169,5 +180,5 @@ Plans:
 | 11. Pre-Restructure Foundation | v2.0 | 0/4 | Not started | - |
 | 12. Unified Navigation | v2.0 | 0/TBD | Not started | - |
 | 13. Encounter Integration | v2.0 | 0/TBD | Not started | - |
-| 14. Three-Act Narrative Arc | v2.0 | 0/TBD | Not started | - |
-| 15. Polish and Completion | v2.0 | 0/TBD | Not started | - |
+| 14. Three-Act Narrative Arc | v2.0 | 0/4 | Not started | - |
+| 15. Polish and Completion | v2.0 | 0/3 | Not started | - |
