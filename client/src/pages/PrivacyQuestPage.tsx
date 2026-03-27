@@ -291,6 +291,7 @@ export default function PrivacyQuestPage() {
       if (!game) return;
       const scene = game.scene.getScene('Exploration');
       if (scene) {
+        game.scene.stop('HubWorld');
         game.scene.start('Exploration', {
           room,
           completedNPCs: Array.from(completedNPCs),
@@ -317,6 +318,38 @@ export default function PrivacyQuestPage() {
       );
     }
   }, [completedNPCs, completedZones, collectedItems]);
+
+  // ── Room completion check ────────────────────────────────────
+  const checkRoomCompletion = (room: RoomWithStory): boolean => {
+    const reqs = room.completionRequirements;
+    if (!reqs) {
+      return room.npcs.filter((n: any) => !n.isFinalBoss).every((n: any) => completedNPCs.has(n.id));
+    }
+    return reqs.requiredNpcs.every(id => completedNPCs.has(id))
+      && reqs.requiredZones.every(id => completedZones.has(id))
+      && reqs.requiredItems.every(id => collectedItems.has(id));
+  };
+
+  const handleExitRoom = useCallback(() => {
+    const room = rooms.find(r => r.id === currentRoomId);
+    if (room) {
+      const isComplete = checkRoomCompletion(room);
+      if (isComplete && !completedRooms.includes(currentRoomId!)) {
+        setCompletedRooms(prev => [...prev, currentRoomId!]);
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
+
+        // Room completion celebration — notify + camera flash
+        notify(`Room Complete: ${room.name}`, { label: 'ALL CLEAR', type: 'success' });
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.7 });
+
+        // Show room cleared banner before story reveal or hub return
+        setRoomClearedBanner({ roomName: room.name });
+        return;
+      }
+    }
+    setCurrentRoomId(null);
+    setPageMode('hub');
+  }, [currentRoomId, completedRooms, completedNPCs, completedZones, collectedItems, notify]);
 
   // ── EventBridge listeners ────────────────────────────────────
   useEffect(() => {
@@ -349,12 +382,13 @@ export default function PrivacyQuestPage() {
         }
       }
 
-      // Mark zone complete
-      if (!completedZones.has(data.zoneId)) {
-        const newZones = new Set(completedZones);
-        newZones.add(data.zoneId);
-        setCompletedZones(newZones);
-      }
+      // Mark zone complete (functional setState to avoid stale closure)
+      setCompletedZones(prev => {
+        if (prev.has(data.zoneId)) return prev;
+        const next = new Set(prev);
+        next.add(data.zoneId);
+        return next;
+      });
 
       const sceneExists = scenes.some(s => s.id === data.sceneId);
       if (!sceneExists) {
@@ -369,12 +403,15 @@ export default function PrivacyQuestPage() {
 
     const onInteractItem = (data: { itemId: string; title: string; fact: string; type: string }) => {
       setSelectedItem({ title: data.title, fact: data.fact, type: data.type as any });
-      if (!collectedItems.has(data.itemId)) {
-        const newItems = new Set(collectedItems);
-        newItems.add(data.itemId);
-        setCollectedItems(newItems);
+      // Functional setState to avoid stale closure
+      setCollectedItems(prev => {
+        if (prev.has(data.itemId)) return prev;
+        const next = new Set(prev);
+        next.add(data.itemId);
+        // Notify only on first collection (inside functional form to check prev)
         notify(data.title, { label: 'HIPAA FACT LEARNED', type: 'discovery' });
-      }
+        return next;
+      });
     };
 
     const onExitRoom = () => {
@@ -392,42 +429,10 @@ export default function PrivacyQuestPage() {
       eventBridge.off(BRIDGE_EVENTS.EXPLORATION_INTERACT_ITEM, onInteractItem);
       eventBridge.off(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, onExitRoom);
     };
-  // Note: toast/notify are stable hook refs; handleExitRoom is defined below but
-  // only called at runtime (not during effect setup), so the closure is safe.
+  // handleExitRoom in deps ensures onExitRoom always uses the latest completedNPCs.
+  // completedZones/collectedItems removed — now using functional setState (no closure read).
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentRoomId, resolvedGates, completedZones, collectedItems, isNpcGated]);
-
-  // ── Room completion check ────────────────────────────────────
-  const checkRoomCompletion = (room: RoomWithStory): boolean => {
-    const reqs = room.completionRequirements;
-    if (!reqs) {
-      return room.npcs.filter((n: any) => !n.isFinalBoss).every((n: any) => completedNPCs.has(n.id));
-    }
-    return reqs.requiredNpcs.every(id => completedNPCs.has(id))
-      && reqs.requiredZones.every(id => completedZones.has(id))
-      && reqs.requiredItems.every(id => collectedItems.has(id));
-  };
-
-  const handleExitRoom = useCallback(() => {
-    const room = rooms.find(r => r.id === currentRoomId);
-    if (room) {
-      const isComplete = checkRoomCompletion(room);
-      if (isComplete && !completedRooms.includes(currentRoomId!)) {
-        setCompletedRooms(prev => [...prev, currentRoomId!]);
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
-
-        // Room completion celebration — notify + camera flash
-        notify(`Room Complete: ${room.name}`, { label: 'ALL CLEAR', type: 'success' });
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.7 });
-
-        // Show room cleared banner before story reveal or hub return
-        setRoomClearedBanner({ roomName: room.name });
-        return;
-      }
-    }
-    setCurrentRoomId(null);
-    setPageMode('hub');
-  }, [currentRoomId, completedRooms, completedNPCs, completedZones, collectedItems]);
+  }, [currentRoomId, resolvedGates, isNpcGated, handleExitRoom]);
 
   const handleRoomClearedComplete = useCallback(() => {
     setRoomClearedBanner(null);
