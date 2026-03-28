@@ -126,23 +126,16 @@ export async function interactWith(
   tileX: number,
   tileY: number,
 ): Promise<void> {
-  // Try moving to the target tile directly first
-  await movePlayerTo(page, tileX, tileY);
-  await page.waitForTimeout(400);
-
-  // Check if we're near the interactable
-  const nearby = await page.evaluate(() => window.__QA__?.nearbyInteractable);
-  if (nearby) {
-    await pressSpace(page);
-    return;
-  }
-
-  // Try adjacent tiles if direct move didn't work (tile might be blocked)
-  for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+  // Try adjacent tiles (NPC/zone sprite blocks the target tile itself)
+  for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0], [0, 0]]) {
     await movePlayerTo(page, tileX + dx, tileY + dy);
-    await page.waitForTimeout(400);
-    const nearby2 = await page.evaluate(() => window.__QA__?.nearbyInteractable);
-    if (nearby2) {
+    // Wait for proximity check to fire in the update loop (needs 1-2 frames)
+    await page.waitForFunction(
+      () => window.__QA__?.nearbyInteractable !== null,
+      { timeout: 2000 },
+    ).catch(() => {});
+    const nearby = await page.evaluate(() => window.__QA__?.nearbyInteractable);
+    if (nearby) {
       await pressSpace(page);
       return;
     }
