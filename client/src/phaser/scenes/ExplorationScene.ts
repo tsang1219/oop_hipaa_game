@@ -1093,6 +1093,9 @@ export class ExplorationScene extends Phaser.Scene {
     // Listen for correct/incorrect answer feedback from React
     eventBridge.on(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
 
+    // Fanfare listener (Phase 15)
+    eventBridge.on(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, this.handleFanfareEvent, this);
+
     // Door navigation listeners (Phase 12)
     eventBridge.on(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
@@ -1344,6 +1347,8 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
     eventBridge.off(BRIDGE_EVENTS.ACT_ADVANCE, this.onActAdvance, this);
+    // Fanfare listener (Phase 15)
+    eventBridge.off(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, this.handleFanfareEvent, this);
     // Door navigation listeners (Phase 12)
     eventBridge.off(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
@@ -1443,6 +1448,39 @@ export class ExplorationScene extends Phaser.Scene {
       // Sound manager may be in a bad state (e.g. sounds array null after
       // WebAudio context destruction). Safe to swallow here.
     }
+  };
+
+  // ── Department completion fanfare (Phase 15) ─────────────────────
+
+  private handleFanfareEvent = (data: { roomId: string; playerX: number; playerY: number }) => {
+    if (!this.scene.isActive()) return;
+    const { playerX, playerY } = data;
+
+    // Beat 1: Camera flash — gold-white
+    this.cameras.main.flash(350, 255, 220, 50, false);
+
+    // Beat 2: Particle burst — larger and more colorful than standard
+    if (this.textures.exists('particle_circle')) {
+      const emitter = this.add.particles(playerX, playerY, 'particle_circle', {
+        speed: { min: 80, max: 200 },
+        angle: { min: 0, max: 360 },
+        scale: { start: 0.8, end: 0 },
+        alpha: { start: 1, end: 0 },
+        tint: [0xffd700, 0x44ff44, 0x4ae2ff, 0xff6b9d],
+        lifespan: 900,
+        quantity: 30,
+        emitting: false,
+      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
+      emitter.explode(30, playerX, playerY);
+      this.time.delayedCall(1000, () => { if (emitter.active) emitter.destroy(); });
+    }
+
+    // Beat 3: Fanfare chime
+    try {
+      if (this.cache.audio.has('sfx_fanfare')) {
+        this.sound.play('sfx_fanfare', { volume: 0.9 });
+      }
+    } catch (_e) { /* ignore if sound unavailable */ }
   };
 
   // ── Act state helper (Phase 15) ──────────────────────────────────
@@ -1591,14 +1629,16 @@ export class ExplorationScene extends Phaser.Scene {
         });
 
       } else if (state === 'completed') {
-        // Green checkmark badge above door
+        // Gold checkmark badge above door (Phase 15 upgrade — persistent fanfare badge)
+        this.add.circle(doorPixelX, doorPixelY - TILE, 9, 0x2a6a2a, 1)
+          .setDepth(3);
         this.add.text(doorPixelX, doorPixelY - TILE, '\u2713', {
-          fontFamily: 'Arial',
-          fontSize: '14px',
-          color: '#44ff44',
+          fontFamily: '"Press Start 2P"',
+          fontSize: '9px',
+          color: '#ffd700',
           stroke: '#000000',
           strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(3);
+        }).setOrigin(0.5).setDepth(4);
       }
 
       // Door label (always shown)

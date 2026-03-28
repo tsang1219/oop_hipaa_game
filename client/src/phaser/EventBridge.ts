@@ -61,6 +61,7 @@ export const BRIDGE_EVENTS = {
   REACT_RETURN_FROM_ENCOUNTER: 'react:return-from-encounter', // React: debrief dismissed, return to RPG
   ACT_ADVANCE: 'react:act-advance',                           // payload: { newAct: 1|2|3, track: string, baseVolume?: number }
   CHOICE_FLAG_SET: 'react:choice-flag-set',                   // payload: { flagKey: string, flagValue: string | boolean }
+  REACT_ROOM_COMPLETE_FANFARE: 'react:room-complete-fanfare', // payload: { roomId: string; playerX: number; playerY: number }
 
   // Bidirectional
   ENCOUNTER_COMPLETE: 'encounter:complete',   // BreachDefenseScene -> React: encounter finished with result

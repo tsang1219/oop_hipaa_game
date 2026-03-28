@@ -104,6 +104,10 @@ export default function PrivacyQuestPage() {
   const unlockedNpcsAll = useRef<Record<string, string[]>>(initialSave.unlockedNpcs);
   const npcPulsedRooms = useRef<string[]>(initialSave.npcPulsedRooms);
 
+  // ── Fanfare tracking (Phase 15) ─────────────────────────────
+  const fanfareTriggeredRooms = useRef<Set<string>>(new Set());
+  const lastPlayerPos = useRef<{ x: number; y: number } | null>(null);
+
   // ── Current act state (Phase 15 breadcrumb HUD) ────────────
   const [currentAct, setCurrentAct] = useState<1 | 2 | 3>(() => {
     try {
@@ -261,6 +265,42 @@ export default function PrivacyQuestPage() {
     return () => { eventBridge.off(BRIDGE_EVENTS.CHOICE_FLAG_SET, onFlagSet); };
   }, [setDecision]);
 
+  // ── Track player position for fanfare emit (Phase 15) ────────
+  useEffect(() => {
+    const onPlayerMoved = (data: { x: number; y: number }) => {
+      lastPlayerPos.current = data;
+    };
+    eventBridge.on(BRIDGE_EVENTS.EXPLORATION_PLAYER_MOVED, onPlayerMoved);
+    return () => { eventBridge.off(BRIDGE_EVENTS.EXPLORATION_PLAYER_MOVED, onPlayerMoved); };
+  }, []);
+
+  // ── In-room fanfare trigger (Phase 15 — fires when last requirement met) ──
+  useEffect(() => {
+    if (!currentRoomId || pageMode !== 'exploration') return;
+    const room = rooms.find(r => r.id === currentRoomId);
+    if (!room) return;
+
+    // Already fired fanfare for this room this session
+    if (fanfareTriggeredRooms.current.has(currentRoomId)) return;
+
+    // Already completed before this session
+    if (completedRooms.includes(currentRoomId)) return;
+
+    const isNowComplete = checkRoomCompletion(room);
+    if (!isNowComplete) return;
+
+    // Mark fanfare triggered
+    fanfareTriggeredRooms.current.add(currentRoomId);
+
+    // Emit fanfare event to ExplorationScene
+    eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, {
+      roomId: currentRoomId,
+      playerX: lastPlayerPos.current?.x ?? 200,
+      playerY: lastPlayerPos.current?.y ?? 200,
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [completedNPCs, completedZones, collectedItems, currentRoomId, pageMode]);
+
   // Mute toggle — apply to Phaser + persist
   useEffect(() => {
     if (gameRef.current?.sound) {
@@ -392,11 +432,11 @@ export default function PrivacyQuestPage() {
         // Check if this room completion triggers an act advance (Phase 14)
         const updatedRooms = [...completedRooms, currentRoomId!];
         checkActAdvance(updatedRooms);
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
+        // Gentle click on exit — the big fanfare already played in-room (Phase 15)
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
 
-        // Room completion celebration — notify + camera flash
+        // Room completion celebration — notify
         notify(`Room Complete: ${room.name}`, { label: 'ALL CLEAR', type: 'success' });
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.7 });
 
         // Show room cleared banner before story reveal or hub return
         setRoomClearedBanner({ roomName: room.name });
