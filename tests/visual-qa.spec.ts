@@ -109,3 +109,73 @@ test('BreachDefense — Game Active', async ({ page }) => {
 
   expect(filterBenignErrors(errors)).toEqual([]);
 });
+
+// ── BreachDefense — Onboarding Flow ─────────────────────────────
+
+test('BreachDefense — Onboarding Flow', async ({ page }) => {
+  const errors = trackErrors(page);
+  await page.goto('/breach');
+  await page.waitForSelector('canvas', { timeout: 15_000 });
+  await page.waitForTimeout(SETTLE_MS);
+
+  // Step 1: Click "Start Mission"
+  const startBtn = page.getByText('Start Mission');
+  await expect(startBtn).toBeVisible();
+  await startBtn.click();
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: 'screenshots/breach-onboard-1-welcome.png', fullPage: true });
+
+  // Step 2: Welcome card should be visible — click to advance
+  const welcomeCard = page.getByText('MISSION BRIEF');
+  await expect(welcomeCard).toBeVisible({ timeout: 3000 });
+  await page.click('body'); // click to skip typewriter / advance
+  await page.waitForTimeout(500);
+  await page.click('body'); // advance past welcome
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: 'screenshots/breach-onboard-2-select-tower.png', fullPage: true });
+
+  // Step 3: "Pick a defense" hint should appear — tower panel should be visible
+  const pickHint = page.getByText('Pick a defense below');
+  await expect(pickHint).toBeVisible({ timeout: 3000 });
+
+  // Step 4: Click a tower button (MFA Shield — first unlocked, cheapest)
+  const mfaBtn = page.getByText('MFA Shield');
+  await expect(mfaBtn).toBeVisible({ timeout: 3000 });
+  await mfaBtn.click();
+  await page.waitForTimeout(500);
+  await page.screenshot({ path: 'screenshots/breach-onboard-3-place-tower.png', fullPage: true });
+
+  // Step 5: "Click a glowing cell" label should appear
+  const placeHint = page.getByText('Click a glowing cell');
+  await expect(placeHint).toBeVisible({ timeout: 3000 });
+
+  // Step 6: Click on the canvas to place a tower (cell 1,2 — one of the highlighted cells)
+  const canvas = page.locator('canvas');
+  const canvasBox = await canvas.boundingBox();
+  if (canvasBox) {
+    // Cell (1,2) at 64px cells, scaled 1.5x = (1*64+32)*1.5, (2*64+32)*1.5 = 144, 192
+    // Account for canvas position within its container
+    const scaleX = canvasBox.width / 640;
+    const scaleY = canvasBox.height / 480;
+    const clickX = canvasBox.x + (1 * 64 + 32) * scaleX;
+    const clickY = canvasBox.y + (2 * 64 + 32) * scaleY;
+    await page.mouse.click(clickX, clickY);
+  }
+  await page.waitForTimeout(1000);
+  await page.screenshot({ path: 'screenshots/breach-onboard-4-tower-placed.png', fullPage: true });
+
+  // Step 7: "TOWER PLACED!" celebration should appear
+  const placedMsg = page.getByText('TOWER PLACED!');
+  await expect(placedMsg).toBeVisible({ timeout: 3000 });
+
+  // Wait for auto-advance to prep countdown
+  await page.waitForTimeout(4000);
+  await page.screenshot({ path: 'screenshots/breach-onboard-5-prep.png', fullPage: true });
+
+  // Step 8: Prep countdown or wave should be starting
+  // Just verify no JS errors and game is still running
+  const canvasStillVisible = page.locator('canvas');
+  await expect(canvasStillVisible).toBeVisible();
+
+  expect(filterBenignErrors(errors)).toEqual([]);
+});
