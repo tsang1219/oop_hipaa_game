@@ -265,8 +265,10 @@
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
 
         {"x": 7, "y": 2, "width": 6, "height": 2, "type": "desk"},
         {"x": 6, "y": 2, "width": 1, "height": 3, "type": "desk"},
@@ -393,7 +395,8 @@
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
         {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
 
         {"x": 8, "y": 5, "width": 4, "height": 3, "type": "nurse_station"},
@@ -509,8 +512,10 @@
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
 
         {"x": 5, "y": 5, "width": 10, "height": 2, "type": "lab_bench"},
 
@@ -632,8 +637,10 @@
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
 
         {"x": 3, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
         {"x": 5, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
@@ -781,8 +788,10 @@
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
 
         {"x": 2, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
         {"x": 5, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
@@ -920,8 +929,10 @@
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
 
         {"x": 8, "y": 6, "width": 4, "height": 3, "type": "lunch_table"},
 
