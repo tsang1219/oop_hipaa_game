@@ -67,6 +67,13 @@ export class ExplorationScene extends Phaser.Scene {
   // Dialogue dim overlay — anticipation beat before dialogue opens
   private dialogueDimOverlay?: Phaser.GameObjects.Rectangle;
 
+  // Door navigation state (Phase 12)
+  private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
+  private doorStates: Record<string, 'locked' | 'available' | 'completed'> = {};
+  private pendingSpawnTileX: number | null = null;
+  private pendingSpawnTileY: number | null = null;
+  private transitioning = false;
+
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.25;
@@ -80,6 +87,8 @@ export class ExplorationScene extends Phaser.Scene {
     completedNPCs?: string[];
     completedZones?: string[];
     collectedItems?: string[];
+    spawnDoorId?: string;
+    doorStates?: Record<string, 'locked' | 'available' | 'completed'>;
   }) {
     this.room = data.room;
     this.completedNPCs = new Set(data.completedNPCs || []);
@@ -91,6 +100,32 @@ export class ExplorationScene extends Phaser.Scene {
     this.moveTimer = null;
     this.pendingInteraction = null;
     this.paused = false;
+
+    // Reset transitioning so scene restart doesn't freeze movement
+    this.transitioning = false;
+    this.nearDoor = null;
+
+    // Store door states for visual rendering
+    this.doorStates = data.doorStates ?? {};
+
+    // Read door-specific spawn position if provided
+    this.pendingSpawnTileX = null;
+    this.pendingSpawnTileY = null;
+    if (data.spawnDoorId && (data.room as any).doors) {
+      const spawnDoor = (data.room as any).doors.find((d: any) => d.id === data.spawnDoorId);
+      if (spawnDoor) {
+        // Offset spawn 1 tile inward from the door based on its side
+        let sx = spawnDoor.x;
+        let sy = spawnDoor.y;
+        if (spawnDoor.side === 'left') sx += 1;
+        else if (spawnDoor.side === 'right') sx -= 1;
+        else if (spawnDoor.side === 'top') sy += 1;
+        else if (spawnDoor.side === 'bottom') sy -= 1;
+        this.pendingSpawnTileX = sx;
+        this.pendingSpawnTileY = sy;
+      }
+    }
+
     if (this.npcPulseTween) {
       this.npcPulseTween.stop();
       this.npcPulseTween = null;
@@ -795,12 +830,16 @@ export class ExplorationScene extends Phaser.Scene {
     // ── Player ───────────────────────────────────────────────────
     // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
     // PLAYER_IDLE_FRAMES: down=0, left=3, right=6, up=9 (row * 3 + 0)
-    this.tileX = room.spawnPoint.x;
-    this.tileY = room.spawnPoint.y;
+    const spawnTileX = this.pendingSpawnTileX ?? room.spawnPoint.x;
+    const spawnTileY = this.pendingSpawnTileY ?? room.spawnPoint.y;
+    this.pendingSpawnTileX = null;
+    this.pendingSpawnTileY = null;
+    this.tileX = spawnTileX;
+    this.tileY = spawnTileY;
     // Use programmatic player texture — spritesheet has timing issues in QA/fast scene starts
     this.player = this.physics.add.sprite(
-      this.tileX * TILE + TILE / 2,
-      this.tileY * TILE + TILE / 2,
+      spawnTileX * TILE + TILE / 2,
+      spawnTileY * TILE + TILE / 2,
       'player_down',
     );
     this.player.setDepth(30);
@@ -873,33 +912,38 @@ export class ExplorationScene extends Phaser.Scene {
       delay: 300
     });
 
-    // ── Exit door glow at spawn point ──────────────────────────
-    const exitX = room.spawnPoint.x * TILE + TILE / 2;
-    const exitY = room.spawnPoint.y * TILE + TILE / 2;
-    const exitGlow = this.add.circle(exitX, exitY, 16, 0x2ecc71, 0)
-      .setStrokeStyle(1.5, 0x2ecc71, 0)
-      .setDepth(0);
-    this.tweens.add({
-      targets: exitGlow,
-      strokeAlpha: { from: 0, to: 0.4 },
-      scale: { from: 0.8, to: 1.3 },
-      duration: 1200,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
+    // ── Door visuals (Phase 12) — render all doors with state indicators ──
+    this.renderDoorStates();
 
-    // Visual door frame at spawn point
-    const doorFrameG = this.add.graphics().setDepth(1);
-    const spX = room.spawnPoint.x * TILE;
-    const spY = room.spawnPoint.y * TILE;
-    // Door frame posts
-    doorFrameG.fillStyle(0x8b7355, 0.6);
-    doorFrameG.fillRect(spX - 2, spY - TILE / 2, 4, TILE + TILE / 2);
-    doorFrameG.fillRect(spX + TILE - 2, spY - TILE / 2, 4, TILE + TILE / 2);
-    // Door header
-    doorFrameG.fillStyle(0x8b7355, 0.5);
-    doorFrameG.fillRect(spX - 2, spY - TILE / 2, TILE + 4, 4);
+    // ── Legacy exit door glow at spawn point (only if no doors[] present) ──
+    if (!(room as any).doors || (room as any).doors.length === 0) {
+      const exitX = room.spawnPoint.x * TILE + TILE / 2;
+      const exitY = room.spawnPoint.y * TILE + TILE / 2;
+      const exitGlow = this.add.circle(exitX, exitY, 16, 0x2ecc71, 0)
+        .setStrokeStyle(1.5, 0x2ecc71, 0)
+        .setDepth(0);
+      this.tweens.add({
+        targets: exitGlow,
+        strokeAlpha: { from: 0, to: 0.4 },
+        scale: { from: 0.8, to: 1.3 },
+        duration: 1200,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut'
+      });
+
+      // Visual door frame at spawn point
+      const doorFrameG = this.add.graphics().setDepth(1);
+      const spX = room.spawnPoint.x * TILE;
+      const spY = room.spawnPoint.y * TILE;
+      // Door frame posts
+      doorFrameG.fillStyle(0x8b7355, 0.6);
+      doorFrameG.fillRect(spX - 2, spY - TILE / 2, 4, TILE + TILE / 2);
+      doorFrameG.fillRect(spX + TILE - 2, spY - TILE / 2, 4, TILE + TILE / 2);
+      // Door header
+      doorFrameG.fillStyle(0x8b7355, 0.5);
+      doorFrameG.fillRect(spX - 2, spY - TILE / 2, TILE + 4, 4);
+    }
 
     // ── Input ────────────────────────────────────────────────────
     this.cursors = this.input.keyboard!.createCursorKeys();
@@ -1001,6 +1045,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Listen for correct/incorrect answer feedback from React
     eventBridge.on(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
+
+    // Door navigation listeners (Phase 12)
+    eventBridge.on(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
 
     // Sync mute state from localStorage before any audio plays
     if (localStorage.getItem('sfx_muted') === 'true') {
@@ -1192,8 +1240,16 @@ export class ExplorationScene extends Phaser.Scene {
       this.triggerInteraction(this.nearbyInteractable);
     }
 
-    // Escape to exit room
-    if (Phaser.Input.Keyboard.JustDown(this.escKey)) {
+    // Door proximity detection + auto-trigger (Phase 12)
+    if (!this.transitioning) {
+      this.checkDoorProximity();
+      if (this.nearDoor) {
+        this.handleDoorInteraction(this.nearDoor);
+      }
+    }
+
+    // Escape to exit room (legacy — only active when no doors[] present)
+    if (!(this.room as any).doors?.length && Phaser.Input.Keyboard.JustDown(this.escKey)) {
       this.sound.play('sfx_interact', { volume: 0.4 });
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, this.room.id);
     }
@@ -1212,6 +1268,9 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
+    // Door navigation listeners (Phase 12)
+    eventBridge.off(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
     // Clean up input handlers
     this.input.off('pointerdown');
     // Kill all tweens to prevent leaked infinite loops
@@ -1239,6 +1298,128 @@ export class ExplorationScene extends Phaser.Scene {
     } catch (e) {
       // Sound manager may be in a bad state (e.g. sounds array null after
       // WebAudio context destruction). Safe to swallow here.
+    }
+  };
+
+  // ── Door navigation (Phase 12) ──────────────────────────────────
+
+  private checkDoorProximity(): void {
+    const doors = (this.room as any).doors;
+    if (!doors || doors.length === 0) return;
+    const px = this.player.x;
+    const py = this.player.y;
+    for (const door of doors) {
+      const dx = Math.abs(px - (door.x * TILE + TILE / 2));
+      const dy = Math.abs(py - (door.y * TILE + TILE / 2));
+      if (dx < TILE * 1.5 && dy < TILE * 1.5) {
+        this.nearDoor = door;
+        return;
+      }
+    }
+    this.nearDoor = null;
+  }
+
+  private handleDoorInteraction(door: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string }): void {
+    if (this.transitioning) return;
+    this.transitioning = true;
+    this.cameras.main.fadeOut(300, 0, 0, 0);
+    this.time.delayedCall(300, () => {
+      eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
+        targetRoomId: door.targetRoomId,
+        fromDoorId: door.id,
+      });
+    });
+  }
+
+  private renderDoorStates(): void {
+    const doors = (this.room as any).doors;
+    if (!doors || doors.length === 0) return;
+
+    for (const door of doors) {
+      const doorPixelX = door.x * TILE + TILE / 2;
+      const doorPixelY = door.y * TILE + TILE / 2;
+      const state = this.doorStates[door.id] ?? 'available';
+
+      // Door frame
+      const frameG = this.add.graphics().setDepth(1);
+      const fx = door.x * TILE;
+      const fy = door.y * TILE - TILE / 2;
+      frameG.fillStyle(0x8b7355, 0.6);
+      frameG.fillRect(fx - 2, fy, 4, TILE + TILE / 2);
+      frameG.fillRect(fx + TILE - 2, fy, 4, TILE + TILE / 2);
+      frameG.fillStyle(0x8b7355, 0.5);
+      frameG.fillRect(fx - 2, fy, TILE + 4, 4);
+
+      if (state === 'locked') {
+        // Dark overlay + lock icon
+        const overlay = this.add.graphics().setDepth(2);
+        overlay.fillStyle(0x000000, 0.55);
+        overlay.fillRect(door.x * TILE - TILE / 2, door.y * TILE - TILE, TILE * 2, TILE * 3);
+        this.add.text(doorPixelX, doorPixelY, '[X]', {
+          fontFamily: '"Press Start 2P"',
+          fontSize: '10px',
+          color: '#ff4444',
+          stroke: '#000000',
+          strokeThickness: 2,
+        }).setOrigin(0.5).setDepth(3);
+
+      } else if (state === 'available') {
+        // Pulsing glow ring
+        const glow = this.add.circle(doorPixelX, doorPixelY, 18, 0x4a90e2, 0)
+          .setStrokeStyle(2, 0x4a90e2, 1).setDepth(2);
+        this.tweens.add({
+          targets: glow,
+          alpha: { from: 0.2, to: 0.8 },
+          scaleX: { from: 0.8, to: 1.3 },
+          scaleY: { from: 0.8, to: 1.3 },
+          duration: 1000,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+
+      } else if (state === 'completed') {
+        // Green checkmark badge above door
+        this.add.text(doorPixelX, doorPixelY - TILE, '\u2713', {
+          fontFamily: 'Arial',
+          fontSize: '14px',
+          color: '#44ff44',
+          stroke: '#000000',
+          strokeThickness: 2,
+        }).setOrigin(0.5).setDepth(3);
+      }
+
+      // Door label (always shown)
+      this.add.text(doorPixelX, doorPixelY + TILE, door.label, {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '6px',
+        color: state === 'locked' ? '#888888' : '#ffffff',
+        stroke: '#000000',
+        strokeThickness: 1,
+      }).setOrigin(0.5).setDepth(3);
+    }
+  }
+
+  private onLoadRoom = (data: {
+    room: any;
+    spawnDoorId?: string;
+    completedNPCs: string[];
+    completedZones: string[];
+    collectedItems: string[];
+    doorStates: Record<string, 'locked' | 'available' | 'completed'>;
+  }) => {
+    this.scene.restart(data);
+  };
+
+  private onDoorLocked = () => {
+    // Locked door feedback: camera flash + reset transitioning so player can move
+    this.cameras.main.flash(200, 255, 0, 0, true);
+    this.transitioning = false;
+    // Use breach_alert SFX as a "denied" sound (sfx_locked doesn't exist)
+    try {
+      this.sound.play('sfx_breach_alert', { volume: 0.4 });
+    } catch (_e) {
+      // Ignore if sound not available
     }
   };
 
