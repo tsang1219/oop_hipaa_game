@@ -1,6 +1,238 @@
 {
   "rooms": [
     {
+      "id": "hospital_entrance",
+      "name": "Hospital Entrance",
+      "subtitle": "HIPAA Training Center",
+      "description": "The main lobby of Valley General Hospital. You're starting your first day.",
+      "unlockRequirement": null,
+      "alwaysUnlocked": true,
+      "width": 20,
+      "height": 15,
+      "backgroundImage": "lobby",
+      "spawnPoint": {"x": 10, "y": 12},
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
+        {"x": 3, "y": 3, "width": 3, "height": 2, "type": "desk"},
+        {"x": 14, "y": 3, "width": 3, "height": 2, "type": "plant"},
+        {"x": 2, "y": 8, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 16, "y": 8, "width": 2, "height": 1, "type": "chairs"}
+      ],
+      "npcs": [
+        {
+          "id": "riley_entrance",
+          "name": "Riley",
+          "role": "receptionist",
+          "x": 5,
+          "y": 5,
+          "sprite": "receptionist",
+          "sceneId": "riley_entrance_intro",
+          "isFinalBoss": false
+        }
+      ],
+      "interactionZones": [],
+      "educationalItems": [],
+      "completionRequirements": { "requiredNpcs": ["riley_entrance"], "requiredZones": [], "requiredItems": [] },
+      "doors": [
+        {
+          "id": "entrance_to_reception",
+          "targetRoomId": "reception",
+          "x": 19,
+          "y": 7,
+          "side": "right",
+          "label": "Reception"
+        }
+      ]
+    },
+    {
+      "id": "hallway_reception_break",
+      "name": "Hallway",
+      "subtitle": "First Floor Corridor",
+      "description": "A quiet corridor connecting Reception to the Break Room.",
+      "width": 20,
+      "height": 5,
+      "backgroundImage": "hallway",
+      "alwaysUnlocked": false,
+      "spawnPoint": {"x": 1, "y": 2},
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+      ],
+      "npcs": [],
+      "interactionZones": [],
+      "educationalItems": [],
+      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "doors": [
+        {
+          "id": "hallway_recbreak_to_reception",
+          "targetRoomId": "reception",
+          "x": 0,
+          "y": 2,
+          "side": "left",
+          "label": "Reception"
+        },
+        {
+          "id": "hallway_recbreak_to_break",
+          "targetRoomId": "break_room",
+          "x": 19,
+          "y": 2,
+          "side": "right",
+          "label": "Break Room"
+        }
+      ]
+    },
+    {
+      "id": "hallway_break_lab",
+      "name": "Hallway",
+      "subtitle": "First Floor Corridor",
+      "description": "A corridor connecting the Break Room to the Laboratory.",
+      "width": 20,
+      "height": 5,
+      "backgroundImage": "hallway",
+      "alwaysUnlocked": false,
+      "spawnPoint": {"x": 1, "y": 2},
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+      ],
+      "npcs": [],
+      "interactionZones": [],
+      "educationalItems": [],
+      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "doors": [
+        {
+          "id": "hallway_breaklab_to_break",
+          "targetRoomId": "break_room",
+          "x": 0,
+          "y": 2,
+          "side": "left",
+          "label": "Break Room"
+        },
+        {
+          "id": "hallway_breaklab_to_lab",
+          "targetRoomId": "lab",
+          "x": 19,
+          "y": 2,
+          "side": "right",
+          "label": "Laboratory"
+        }
+      ]
+    },
+    {
+      "id": "hallway_lab_records",
+      "name": "Hallway",
+      "subtitle": "Second Floor Corridor",
+      "description": "A corridor connecting the Laboratory to Medical Records.",
+      "width": 20,
+      "height": 5,
+      "backgroundImage": "hallway",
+      "alwaysUnlocked": false,
+      "spawnPoint": {"x": 1, "y": 2},
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+      ],
+      "npcs": [],
+      "interactionZones": [],
+      "educationalItems": [],
+      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "doors": [
+        {
+          "id": "hallway_labrecords_to_lab",
+          "targetRoomId": "lab",
+          "x": 0,
+          "y": 2,
+          "side": "left",
+          "label": "Laboratory"
+        },
+        {
+          "id": "hallway_labrecords_to_records",
+          "targetRoomId": "records_room",
+          "x": 19,
+          "y": 2,
+          "side": "right",
+          "label": "Medical Records"
+        }
+      ]
+    },
+    {
+      "id": "hallway_records_it",
+      "name": "Hallway",
+      "subtitle": "Second Floor Corridor",
+      "description": "A corridor connecting Medical Records to the IT Office.",
+      "width": 20,
+      "height": 5,
+      "backgroundImage": "hallway",
+      "alwaysUnlocked": false,
+      "spawnPoint": {"x": 1, "y": 2},
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+      ],
+      "npcs": [],
+      "interactionZones": [],
+      "educationalItems": [],
+      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "doors": [
+        {
+          "id": "hallway_recordsit_to_records",
+          "targetRoomId": "records_room",
+          "x": 0,
+          "y": 2,
+          "side": "left",
+          "label": "Medical Records"
+        },
+        {
+          "id": "hallway_recordsit_to_it",
+          "targetRoomId": "it_office",
+          "x": 19,
+          "y": 2,
+          "side": "right",
+          "label": "IT Office"
+        }
+      ]
+    },
+    {
+      "id": "hallway_it_er",
+      "name": "Hallway",
+      "subtitle": "Emergency Wing",
+      "description": "A corridor connecting the IT Office to the Emergency Room.",
+      "width": 20,
+      "height": 5,
+      "backgroundImage": "hallway",
+      "alwaysUnlocked": false,
+      "spawnPoint": {"x": 1, "y": 2},
+      "obstacles": [
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+      ],
+      "npcs": [],
+      "interactionZones": [],
+      "educationalItems": [],
+      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "doors": [
+        {
+          "id": "hallway_iter_to_it",
+          "targetRoomId": "it_office",
+          "x": 0,
+          "y": 2,
+          "side": "left",
+          "label": "IT Office"
+        },
+        {
+          "id": "hallway_iter_to_er",
+          "targetRoomId": "er",
+          "x": 19,
+          "y": 2,
+          "side": "right",
+          "label": "Emergency Room"
+        }
+      ]
+    },
+    {
       "id": "reception",
       "name": "Reception",
       "subtitle": "The Entry Point",
@@ -31,19 +263,19 @@
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
         {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        
+
         {"x": 7, "y": 2, "width": 6, "height": 2, "type": "desk"},
         {"x": 6, "y": 2, "width": 1, "height": 3, "type": "desk"},
         {"x": 13, "y": 2, "width": 1, "height": 3, "type": "desk"},
-        
+
         {"x": 2, "y": 6, "width": 2, "height": 1, "type": "chairs"},
         {"x": 2, "y": 8, "width": 2, "height": 1, "type": "chairs"},
         {"x": 2, "y": 10, "width": 2, "height": 1, "type": "chairs"},
-        
+
         {"x": 16, "y": 6, "width": 2, "height": 1, "type": "chairs"},
         {"x": 16, "y": 8, "width": 2, "height": 1, "type": "chairs"},
         {"x": 16, "y": 10, "width": 2, "height": 1, "type": "chairs"},
-        
+
         {"x": 2, "y": 2, "width": 2, "height": 2, "type": "plant"},
         {"x": 16, "y": 2, "width": 2, "height": 2, "type": "plant"}
       ],
@@ -98,7 +330,25 @@
           "fact": "Under HIPAA, patients aren't just bodies in beds—they have actual power. The Big 5 Patient Rights: (1) Right to Access Their Records within 30 days, (2) Right to Request Amendments to incorrect info, (3) Right to an Accounting of Disclosures for the last 6 years, (4) Right to Request Restrictions on who sees their info, (5) Right to Confidential Communications. Bottom line: Patients own their health data. We're just the janitors managing it."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12}
+      "spawnPoint": {"x": 10, "y": 12},
+      "doors": [
+        {
+          "id": "reception_to_entrance",
+          "targetRoomId": "hospital_entrance",
+          "x": 0,
+          "y": 7,
+          "side": "left",
+          "label": "Exit to Lobby"
+        },
+        {
+          "id": "reception_to_hallway_break",
+          "targetRoomId": "hallway_reception_break",
+          "x": 19,
+          "y": 7,
+          "side": "right",
+          "label": "Hallway"
+        }
+      ]
     },
     {
       "id": "er",
@@ -141,15 +391,15 @@
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
         {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        
+
         {"x": 8, "y": 5, "width": 4, "height": 3, "type": "nurse_station"},
-        
+
         {"x": 2, "y": 2, "width": 4, "height": 3, "type": "patient_bay"},
         {"x": 14, "y": 2, "width": 4, "height": 3, "type": "patient_bay"},
-        
+
         {"x": 2, "y": 9, "width": 3, "height": 2, "type": "gurney"},
         {"x": 15, "y": 9, "width": 3, "height": 2, "type": "gurney"},
-        
+
         {"x": 5, "y": 12, "width": 2, "height": 1, "type": "equipment"},
         {"x": 13, "y": 12, "width": 2, "height": 1, "type": "equipment"}
       ],
@@ -204,7 +454,17 @@
           "fact": "HIPAA isn't trying to STOP healthcare—it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (court orders, subpoenas, for suspect identification, crime on premises, or medical emergencies—a warrant isn't always required), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12}
+      "spawnPoint": {"x": 10, "y": 12},
+      "doors": [
+        {
+          "id": "er_to_hallway_it",
+          "targetRoomId": "hallway_it_er",
+          "x": 0,
+          "y": 7,
+          "side": "left",
+          "label": "Hallway"
+        }
+      ]
     },
     {
       "id": "lab",
@@ -247,12 +507,12 @@
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
         {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        
+
         {"x": 5, "y": 5, "width": 10, "height": 2, "type": "lab_bench"},
-        
+
         {"x": 2, "y": 2, "width": 3, "height": 2, "type": "microscope_station"},
         {"x": 15, "y": 2, "width": 3, "height": 2, "type": "centrifuge"},
-        
+
         {"x": 2, "y": 10, "width": 2, "height": 2, "type": "specimen_fridge"},
         {"x": 16, "y": 10, "width": 2, "height": 2, "type": "bio_cabinet"}
       ],
@@ -307,7 +567,25 @@
           "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. PHI = The Big 18 Identifiers + Health Info. Think: names, addresses, SSNs, medical records, dates of birth, phone numbers, photos, basically anything that could identify a patient AND their health status. The Golden Rule: If you can connect health data to a specific person, congrats—it's PHI. Treat it like it's your own embarrassing medical history."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12}
+      "spawnPoint": {"x": 10, "y": 12},
+      "doors": [
+        {
+          "id": "lab_to_hallway_break",
+          "targetRoomId": "hallway_break_lab",
+          "x": 0,
+          "y": 7,
+          "side": "left",
+          "label": "Hallway"
+        },
+        {
+          "id": "lab_to_hallway_records",
+          "targetRoomId": "hallway_lab_records",
+          "x": 19,
+          "y": 7,
+          "side": "right",
+          "label": "Hallway"
+        }
+      ]
     },
     {
       "id": "records_room",
@@ -352,17 +630,17 @@
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
         {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        
+
         {"x": 3, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
         {"x": 5, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
         {"x": 7, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-        
+
         {"x": 12, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
         {"x": 14, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
         {"x": 16, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-        
+
         {"x": 8, "y": 8, "width": 4, "height": 2, "type": "clerk_desk"},
-        
+
         {"x": 2, "y": 11, "width": 2, "height": 2, "type": "shredder_station"},
         {"x": 16, "y": 11, "width": 2, "height": 2, "type": "scanner_station"}
       ],
@@ -440,7 +718,25 @@
           "fact": "Think HIPAA violations are just a slap on the wrist? Think again. Civil Penalties (per violation): Tier 1 'Didn't Know' — $100-$50K. Tier 2 'Reasonable Cause' — $1K-$50K. Tier 3 'Willful Neglect, Corrected' — $10K-$50K. Tier 4 'Willful Neglect, Not Corrected' — $50K+, up to $2.13M per year per violation category. Criminal Penalties: Up to $50K and 1 year for knowing violations. Up to $100K and 5 years for violations under false pretenses. Up to $250K and 10 years for violations with intent to sell or use PHI. And yes, individuals can be personally prosecuted — your employer's insurance won't save you."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12}
+      "spawnPoint": {"x": 10, "y": 12},
+      "doors": [
+        {
+          "id": "records_to_hallway_lab",
+          "targetRoomId": "hallway_lab_records",
+          "x": 0,
+          "y": 7,
+          "side": "left",
+          "label": "Hallway"
+        },
+        {
+          "id": "records_to_hallway_it",
+          "targetRoomId": "hallway_records_it",
+          "x": 19,
+          "y": 7,
+          "side": "right",
+          "label": "Hallway"
+        }
+      ]
     },
     {
       "id": "it_office",
@@ -483,15 +779,15 @@
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
         {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        
+
         {"x": 2, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
         {"x": 5, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
-        
+
         {"x": 13, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
         {"x": 16, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
-        
+
         {"x": 8, "y": 5, "width": 4, "height": 2, "type": "workstation_cluster"},
-        
+
         {"x": 2, "y": 10, "width": 3, "height": 2, "type": "monitoring_desk"},
         {"x": 15, "y": 10, "width": 3, "height": 2, "type": "printer_station"}
       ],
@@ -562,7 +858,25 @@
           "fact": "HIPAA's Security Rule demands three types of safeguards: Administrative (policies, training, risk assessments), Physical (locks, badge access, workstation security), and Technical (encryption, access controls, audit logs). The Three A's: Authentication (prove who you are), Authorization (prove you should have access), and Audit (prove what you did). Fun detail: encryption is technically 'addressable' under HIPAA — meaning you must implement it OR document why an equivalent alternative protects the data. In practice, nearly every organization encrypts because there's no good alternative. Strong passwords, automatic logoffs, and encryption are the walls that keep the vault secure."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12}
+      "spawnPoint": {"x": 10, "y": 12},
+      "doors": [
+        {
+          "id": "it_to_hallway_records",
+          "targetRoomId": "hallway_records_it",
+          "x": 0,
+          "y": 7,
+          "side": "left",
+          "label": "Hallway"
+        },
+        {
+          "id": "it_to_hallway_er",
+          "targetRoomId": "hallway_it_er",
+          "x": 19,
+          "y": 7,
+          "side": "right",
+          "label": "Hallway"
+        }
+      ]
     },
     {
       "id": "break_room",
@@ -604,17 +918,17 @@
         {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
         {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
         {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        
+
         {"x": 8, "y": 6, "width": 4, "height": 3, "type": "lunch_table"},
-        
+
         {"x": 2, "y": 2, "width": 2, "height": 3, "type": "vending_machine"},
         {"x": 5, "y": 2, "width": 2, "height": 3, "type": "vending_machine"},
-        
+
         {"x": 15, "y": 2, "width": 3, "height": 2, "type": "coffee_station"},
-        
+
         {"x": 2, "y": 10, "width": 3, "height": 2, "type": "couch"},
         {"x": 15, "y": 10, "width": 3, "height": 2, "type": "couch"},
-        
+
         {"x": 13, "y": 6, "width": 1, "height": 2, "type": "trash_bin"}
       ],
       "npcs": [
@@ -682,7 +996,25 @@
           "fact": "Not everyone who asks for PHI gets it. Sometimes your job is to be the bouncer at Club Medical Records. Automatic NO Situations: Family Members Without Authorization, Employers asking for diagnosis (they get work notes only), Marketing Without Authorization, Anyone Via Unsecured Communication (no texting lab results!). The Script: 'I'm unable to confirm or deny any patient information without proper authorization.' Saying no to inappropriate requests is literally your job."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12}
+      "spawnPoint": {"x": 10, "y": 12},
+      "doors": [
+        {
+          "id": "break_to_hallway_reception",
+          "targetRoomId": "hallway_reception_break",
+          "x": 0,
+          "y": 7,
+          "side": "left",
+          "label": "Hallway"
+        },
+        {
+          "id": "break_to_hallway_lab",
+          "targetRoomId": "hallway_break_lab",
+          "x": 19,
+          "y": 7,
+          "side": "right",
+          "label": "Hallway"
+        }
+      ]
     }
   ]
 }
