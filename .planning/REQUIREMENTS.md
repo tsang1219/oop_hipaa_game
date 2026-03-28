@@ -40,9 +40,9 @@
 - [ ] **NARR-03**: Soft act transitions with no hard title cards — music crossfades and environmental cues signal the shift
 - [ ] **NARR-04**: Transition dialogue — NPCs reference player's earlier actions and bridge between acts (targeted: 2-3 key decisions remembered, reflected in 3-5 NPC lines)
 - [ ] **NARR-05**: Department ordering supports narrative flow (Reception/Break Room = Act 1, Lab/Records = Act 2, IT/ER = Act 3)
-- [ ] **NARR-06**: Environmental storytelling in hallway connectors (bulletin boards, ambient details that shift per act)
-- [ ] **NARR-07**: Per-department completion fanfare (visual flourish + chime + badge) when all NPCs/zones/items in a department are completed
-- [ ] **NARR-08**: Progress breadcrumb on HUD showing department completion status and current act
+- [x] **NARR-06**: Environmental storytelling in hallway connectors (bulletin boards, ambient details that shift per act)
+- [x] **NARR-07**: Per-department completion fanfare (visual flourish + chime + badge) when all NPCs/zones/items in a department are completed
+- [x] **NARR-08**: Progress breadcrumb on HUD showing department completion status and current act
 
 ## v2.1 Requirements (Deferred)
 
@@ -101,9 +101,9 @@
 | NARR-03 | Phase 14 | Pending |
 | NARR-04 | Phase 14 | Pending |
 | NARR-05 | Phase 14 | Pending |
-| NARR-06 | Phase 15 | Pending |
-| NARR-07 | Phase 15 | Pending |
-| NARR-08 | Phase 15 | Pending |
+| NARR-06 | Phase 15 | Complete |
+| NARR-07 | Phase 15 | Complete |
+| NARR-08 | Phase 15 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 27 total

@@ -172,9 +172,9 @@ Plans:
   3. The HUD always shows the player's department completion status and current act — visible during exploration without interrupting play.
 
 Plans:
-- [ ] 15-01-PLAN.md — hallwayContent.ts data file (5x3 content matrix) + ExplorationScene hallway board rendering
-- [ ] 15-02-PLAN.md — Fanfare sequence: sfx_fanfare audio + EventBridge event + ExplorationScene particle burst + door badge + PrivacyQuestPage in-room trigger
-- [ ] 15-03-PLAN.md — DepartmentBreadcrumb React component + PrivacyQuestPage mount
+- [x] 15-01-PLAN.md — hallwayContent.ts data file (5x3 content matrix) + ExplorationScene hallway board rendering
+- [x] 15-02-PLAN.md — Fanfare sequence: sfx_fanfare audio + EventBridge event + ExplorationScene particle burst + door badge + PrivacyQuestPage in-room trigger
+- [x] 15-03-PLAN.md — DepartmentBreadcrumb React component + PrivacyQuestPage mount
 
 ---
 
@@ -193,4 +193,4 @@ Plans:
 | 12. Unified Navigation | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 13. Encounter Integration | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
-| 15. Polish and Completion | v2.0 | 0/3 | Not started | - |
+| 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |

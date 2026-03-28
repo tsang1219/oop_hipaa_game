@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
-status: executing
+status: complete
 last_updated: "2026-03-28"
 progress:
   total_phases: 5
-  completed_phases: 4
+  completed_phases: 5
   total_plans: 19
-  completed_plans: 16
+  completed_plans: 19
 ---
 
 # Project State
@@ -23,18 +23,18 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 ## Current Position
 
 Phase: 15 of 15 (Polish and Completion)
-Plan: Not started
-Status: Phase 14 complete, Phase 15 ready
-Last activity: 2026-03-28 — Phase 14 executed (4 plans, all success criteria met)
+Plan: 3 of 3
+Status: Phase 15 complete — all 3 plans executed
+Last activity: 2026-03-28 — Phase 15 executed (3 plans, all success criteria met)
 
-Progress: [########░░] 84%
+Progress: [##########] 100%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 16 (v2.0)
-- Average duration: ~8m/plan
-- Total execution time: ~115m
+- Total plans completed: 19 (v2.0)
+- Average duration: ~7m/plan
+- Total execution time: ~135m
 
 **By Phase:**
 
@@ -44,6 +44,7 @@ Progress: [########░░] 84%
 | 12. Unified Navigation | 4/4 | ~67m | ~17m |
 | 13. Encounter Integration | 4/4 | ~9m | ~2m |
 | 14. Three-Act Narrative Arc | 4/4 | ~8m | ~2m |
+| 15. Polish and Completion | 3/3 | ~20m | ~7m |
 
 *Updated after each plan completion*
 
@@ -77,7 +78,12 @@ Progress: [########░░] 84%
 - [Phase 14]: Extended existing useGameState hook (not parallel hook) for act + decision state
 - [Phase 14]: Decision flags emitted via CHOICE_FLAG_SET from GameContainer, not callback chain
 - [Phase 14]: NPC variant routing via ref-based decision lookup in EventBridge callbacks
-- [Phase 14]: Music on scene init always starts music_exploration — act-correct init deferred to Phase 15
+- [Phase 14]: Music on scene init always starts music_exploration — FIXED in Phase 15 (act-aware init)
+- [Phase 15]: Hallway boards use hallwayBoard interactable type with isHallwayBoard flag to skip collection
+- [Phase 15]: Fanfare fires in-room on last requirement met (not on exit) per user decision
+- [Phase 15]: Two-beat completion flow: in-room VFX+chime then exit GameBanner
+- [Phase 15]: Music init reads current act: Act 1=music_hub, Act 2=music_exploration, Act 3=music_breach (vol 0.15)
+- [Phase 15]: DepartmentBreadcrumb bottom-center z-10 pointer-events-none, DEPARTMENT_ORDER exported
 
 ### Pending Todos
 
@@ -89,10 +95,10 @@ None.
 - RESOLVED: /breach standalone mode removed per user decision; BreachDefenseScene only runs as encounter
 - SpriteFactory.ts still active — retirement deferred to v2.1 (was v1.1)
 - RESOLVED: HubWorldScene became room data entry (Phase 12 decision)
-- Music on scene init does not respect current act — will play music_exploration even in Act 3 until next advance. Polish debt for Phase 15.
+- RESOLVED: Music on scene init now reads current act and starts the correct track (fixed in Phase 15).
 
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: Completed Phase 14 — all 4 plans executed, success criteria verified
-Resume: Run `/gsd:execute-phase 15` to begin Phase 15
+Stopped at: Completed Phase 15 — all 3 plans executed, v2.0 milestone complete
+Resume: All phases complete. v2.0 milestone shipped.
