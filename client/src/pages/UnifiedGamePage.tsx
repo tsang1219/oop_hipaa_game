@@ -241,6 +241,16 @@ export default function UnifiedGamePage() {
     }
   }, [gameState.state.completedNPCs, totalScenarios, notify]);
 
+  // ── Sync game state to QA bridge (bypasses localStorage for qa-no-save) ──
+  useEffect(() => {
+    if (window.__QA__) {
+      window.__QA__.completedRooms = gameState.state.completedRooms;
+      window.__QA__.completedNPCs = gameState.state.completedNPCs;
+      window.__QA__.completedZones = gameState.state.completedZones;
+      window.__QA__.collectedItems = gameState.state.collectedItems;
+    }
+  }, [gameState.state.completedRooms, gameState.state.completedNPCs, gameState.state.completedZones, gameState.state.collectedItems]);
+
   // ── Load gate state when room changes ─────────────────────────
   useEffect(() => {
     if (!currentRoomId) return;
@@ -924,7 +934,7 @@ export default function UnifiedGamePage() {
             }
             onAcknowledge={handleDismissIntroModal}
             type="info"
-            ctaText="Start exploring \u2192"
+            ctaText="Start exploring →"
           />
         )}
       </div>
