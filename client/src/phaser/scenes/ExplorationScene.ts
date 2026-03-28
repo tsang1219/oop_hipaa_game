@@ -1320,17 +1320,17 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
-    // Interact key
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey) && this.nearbyInteractable) {
+    // Interact key — sample once, use for NPC/item/door
+    const interactPressed = Phaser.Input.Keyboard.JustDown(this.interactKey);
+
+    if (interactPressed && this.nearbyInteractable) {
       this.triggerInteraction(this.nearbyInteractable);
     }
 
     // IT Office encounter zone check (Phase 13)
-    // Server terminal area — triggers when player walks near the workstation cluster
     if (this.room.id === 'it_office' && !this.encounterTriggered && !this.paused) {
       const alreadyDone = this.registry.get('encounterResult_td-it-office');
       if (!alreadyDone) {
-        // Workstation cluster is at tiles (8,5)-(11,6), trigger zone around (9,6)
         const dx = Math.abs(this.player.x - (9 * TILE + TILE / 2));
         const dy = Math.abs(this.player.y - (6 * TILE + TILE / 2));
         if (dx < TILE * 1.5 && dy < TILE * 1.5) {
@@ -1342,7 +1342,7 @@ export class ExplorationScene extends Phaser.Scene {
     // Door proximity detection — requires SPACE to enter (Phase 12)
     if (!this.transitioning) {
       this.checkDoorProximity();
-      if (this.nearDoor && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
+      if (this.nearDoor && interactPressed && !this.nearbyInteractable) {
         this.handleDoorInteraction(this.nearDoor);
       }
     }
