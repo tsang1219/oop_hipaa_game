@@ -1318,10 +1318,10 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
-    // Door proximity detection + auto-trigger (Phase 12)
+    // Door proximity detection — requires SPACE to enter (Phase 12)
     if (!this.transitioning) {
       this.checkDoorProximity();
-      if (this.nearDoor) {
+      if (this.nearDoor && Phaser.Input.Keyboard.JustDown(this.interactKey)) {
         this.handleDoorInteraction(this.nearDoor);
       }
     }
@@ -1835,7 +1835,14 @@ export class ExplorationScene extends Phaser.Scene {
       this.promptText.setVisible(true);
     } else {
       this.nearbyInteractable = null;
-      this.promptText.setVisible(false);
+      // Show door prompt if near a door and no other interactable
+      if (this.nearDoor) {
+        const doorLabel = this.nearDoor.label || this.nearDoor.targetRoomId.replace(/_/g, ' ');
+        this.promptText.setText(`[SPACE] Enter ${doorLabel}`);
+        this.promptText.setVisible(true);
+      } else {
+        this.promptText.setVisible(false);
+      }
     }
   }
 
