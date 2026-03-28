@@ -25,13 +25,13 @@
 
 ### Encounter Integration
 
-- [ ] **ENC-01**: Encounter trigger/return system — ExplorationScene sleeps while encounter runs, wakes on completion with player position preserved
-- [ ] **ENC-02**: Condensed inbound TD encounter — 4 waves, 3 tower types per wave tier, ~3-5 minute duration, using existing BreachDefenseScene with encounter-mode config
-- [ ] **ENC-03**: Encounter launches with narrative context card explaining why it's happening ("Dr. Patel flagged suspicious logins...")
-- [ ] **ENC-04**: Encounter results feed back to unified game state (score, pass/fail, completion flag)
-- [ ] **ENC-05**: Inbound TD encounter triggers from IT Office / Act 3 narrative moment
-- [ ] **ENC-06**: Unified compliance score aggregates across dialogue choices and encounter performance, visible in HUD during exploration
-- [ ] **ENC-07**: Encounter has clear start screen (narrative card) and end screen (recap with HIPAA takeaways)
+- [x] **ENC-01**: Encounter trigger/return system — ExplorationScene sleeps while encounter runs, wakes on completion with player position preserved
+- [x] **ENC-02**: Condensed inbound TD encounter — 4 waves, 3 tower types per wave tier, ~3-5 minute duration, using existing BreachDefenseScene with encounter-mode config
+- [x] **ENC-03**: Encounter launches with narrative context card explaining why it's happening ("Dr. Patel flagged suspicious logins...")
+- [x] **ENC-04**: Encounter results feed back to unified game state (score, pass/fail, completion flag)
+- [x] **ENC-05**: Inbound TD encounter triggers from IT Office / Act 3 narrative moment
+- [x] **ENC-06**: Unified compliance score aggregates across dialogue choices and encounter performance, visible in HUD during exploration
+- [x] **ENC-07**: Encounter has clear start screen (narrative card) and end screen (recap with HIPAA takeaways)
 
 ### Narrative Arc
 
@@ -89,13 +89,13 @@
 | NAV-06 | Phase 12 | Pending |
 | NAV-07 | Phase 12 | Pending |
 | NAV-08 | Phase 12 | Pending |
-| ENC-01 | Phase 13 | Pending |
-| ENC-02 | Phase 13 | Pending |
-| ENC-03 | Phase 13 | Pending |
-| ENC-04 | Phase 13 | Pending |
-| ENC-05 | Phase 13 | Pending |
-| ENC-06 | Phase 13 | Pending |
-| ENC-07 | Phase 13 | Pending |
+| ENC-01 | Phase 13 | Complete |
+| ENC-02 | Phase 13 | Complete |
+| ENC-03 | Phase 13 | Complete |
+| ENC-04 | Phase 13 | Complete |
+| ENC-05 | Phase 13 | Complete |
+| ENC-06 | Phase 13 | Complete |
+| ENC-07 | Phase 13 | Complete |
 | NARR-01 | Phase 14 | Pending |
 | NARR-02 | Phase 14 | Pending |
 | NARR-03 | Phase 14 | Pending |

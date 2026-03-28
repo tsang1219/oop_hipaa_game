@@ -6,9 +6,9 @@ status: executing
 last_updated: "2026-03-28"
 progress:
   total_phases: 5
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 19
-  completed_plans: 8
+  completed_plans: 12
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** The player should forget they're doing compliance training. One continuous game.
-**Current focus:** v2.0 Phase 13 — Encounter Integration
+**Current focus:** v2.0 Phase 14 — Three-Act Narrative Arc
 
 ## Current Position
 
-Phase: 13 of 15 (Encounter Integration)
+Phase: 14 of 15 (Three-Act Narrative Arc)
 Plan: Not started
-Status: Phase 12 complete, Phase 13 ready
-Last activity: 2026-03-28 — Phase 12 executed (4 plans, all success criteria met)
+Status: Phase 13 complete, Phase 14 ready
+Last activity: 2026-03-28 — Phase 13 executed (4 plans, all success criteria met)
 
-Progress: [####░░░░░░] 42%
+Progress: [######░░░░] 63%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 8 (v2.0)
-- Average duration: ~8m/plan
-- Total execution time: ~98m
+- Total plans completed: 12 (v2.0)
+- Average duration: ~9m/plan
+- Total execution time: ~107m
 
 **By Phase:**
 
@@ -42,6 +42,7 @@ Progress: [####░░░░░░] 42%
 |-------|-------|-------|----------|
 | 11. Pre-Restructure Foundation | 4/4 | ~31m | ~8m |
 | 12. Unified Navigation | 4/4 | ~67m | ~17m |
+| 13. Encounter Integration | 4/4 | ~9m | ~2m |
 
 *Updated after each plan completion*
 
@@ -65,6 +66,12 @@ Progress: [####░░░░░░] 42%
 - [Phase 12]: Spawn offset 1 tile inward from door side to prevent re-trigger
 - [Phase 12]: Room completion checked on door exit, not ESC, to support continuous flow
 - [Phase 12]: UNLOCK_ORDER hallways resolved via findPrecedingDepartment mapping
+- [Phase 13]: Fixed encounter tower set: FIREWALL, MFA, TRAINING, ACCESS (4 of 6)
+- [Phase 13]: Wave selection indices 0,2,4,7 — PHISHING, RANSOMWARE, INSIDER, multi-vector boss
+- [Phase 13]: Score contribution: Math.round((securityScore / 100) * 12) — up to +12 at perfect defense
+- [Phase 13]: React ENCOUNTER_COMPLETE handler is single source of truth for encounter score (no double-counting)
+- [Phase 13]: IT Office encounter zone at tile (9,6) near workstation cluster — auto-triggers on proximity
+- [Phase 13]: /breach route already removed in Phase 12 — confirmed no-op
 
 ### Pending Todos
 
@@ -72,13 +79,13 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 13 planning must define: unified score formula (dialogue score scale vs. BreachDefense 0-100 scale) before implementing aggregation.
-- Phase 13 planning must decide: should `/breach` standalone mode share encounter-mode config with a `standalone: true` flag in init data, or maintain a separate page config?
+- RESOLVED: Unified score formula: addScore() updates both privacyScore and unifiedScore; encounter contributes up to +12
+- RESOLVED: /breach standalone mode removed per user decision; BreachDefenseScene only runs as encounter
 - SpriteFactory.ts still active — retirement deferred to v2.1 (was v1.1)
 - RESOLVED: HubWorldScene became room data entry (Phase 12 decision)
 
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: Completed Phase 12 — all 4 plans executed, success criteria verified
-Resume: Run `/gsd:execute-phase 13` to begin Phase 13
+Stopped at: Completed Phase 13 — all 4 plans executed, success criteria verified
+Resume: Run `/gsd:execute-phase 14` to begin Phase 14
