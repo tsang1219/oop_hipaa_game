@@ -1840,8 +1840,17 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   private tileBlocked(tx: number, ty: number): boolean {
+    const doors: Array<{ x: number; y: number }> = (this.room as any).doors || [];
     for (const obs of this.room.obstacles) {
       if (tx >= obs.x && tx < obs.x + obs.width && ty >= obs.y && ty < obs.y + obs.height) {
+        // Wall tiles occupied by doors (or adjacent) are passable
+        if ((obs as any).type === 'wall' && doors.some((d: any) =>
+          (d.x === tx && d.y === ty) ||
+          (d.x === tx && Math.abs(d.y - ty) <= 1) ||
+          (d.y === ty && Math.abs(d.x - tx) <= 1)
+        )) {
+          continue;
+        }
         return true;
       }
     }
