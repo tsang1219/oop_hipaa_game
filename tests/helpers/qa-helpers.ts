@@ -126,10 +126,29 @@ export async function interactWith(
   tileX: number,
   tileY: number,
 ): Promise<void> {
-  // Move adjacent to the interactable (1 tile away)
-  await movePlayerTo(page, tileX, tileY + 1);
-  // Wait for proximity check to fire
-  await page.waitForTimeout(300);
+  // Try moving to the target tile directly first
+  await movePlayerTo(page, tileX, tileY);
+  await page.waitForTimeout(400);
+
+  // Check if we're near the interactable
+  const nearby = await page.evaluate(() => window.__QA__?.nearbyInteractable);
+  if (nearby) {
+    await pressSpace(page);
+    return;
+  }
+
+  // Try adjacent tiles if direct move didn't work (tile might be blocked)
+  for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0]]) {
+    await movePlayerTo(page, tileX + dx, tileY + dy);
+    await page.waitForTimeout(400);
+    const nearby2 = await page.evaluate(() => window.__QA__?.nearbyInteractable);
+    if (nearby2) {
+      await pressSpace(page);
+      return;
+    }
+  }
+
+  // Last resort: just press space from wherever we ended up
   await pressSpace(page);
 }
 

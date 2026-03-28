@@ -1444,7 +1444,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onQAPressSpace = () => {
-    if (!this.scene.isActive()) return;
+    if (!this.scene.isActive() || this.paused) return;
     // If near an interactable, trigger it
     if (this.nearbyInteractable) {
       this.triggerInteraction(this.nearbyInteractable);
@@ -1453,6 +1453,21 @@ export class ExplorationScene extends Phaser.Scene {
     // If near a door, enter it
     if (this.nearDoor && !this.transitioning) {
       this.handleDoorInteraction(this.nearDoor);
+      return;
+    }
+    // Fallback: find closest interactable within 2 tiles and trigger it
+    let closest: InteractableData | null = null;
+    let closestDist = Infinity;
+    for (const ia of this.interactables) {
+      const d = ia.data as { x: number; y: number };
+      const dist = Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y);
+      if (dist <= 2 && dist < closestDist) {
+        closestDist = dist;
+        closest = ia;
+      }
+    }
+    if (closest) {
+      this.triggerInteraction(closest);
     }
   };
 
@@ -1463,36 +1478,40 @@ export class ExplorationScene extends Phaser.Scene {
     const door = doors.find((d: any) => d.id === data.doorId);
     if (!door) return;
 
-    // Move to door position, then enter
-    const path = this.findPath(
-      { x: this.tileX, y: this.tileY },
-      { x: door.x, y: door.y }
-    );
-    if (path.length > 0) {
-      // Use a pending callback approach: move to door, then interact
-      this.startPathMovement(path, null);
-      // After path completes, press space
-      const checkArrival = this.time.addEvent({
-        delay: 100,
-        repeat: 100, // max 10 seconds
-        callback: () => {
-          if (this.movePath.length === 0) {
-            checkArrival.destroy();
-            // Small delay for proximity check to fire
-            this.time.delayedCall(150, () => {
-              if (this.nearDoor && this.nearDoor.id === data.doorId) {
-                this.handleDoorInteraction(this.nearDoor);
-              }
-            });
-          }
-        },
-      });
-    } else {
-      // Already at the door
+    // Directly trigger the door interaction — skip pathfinding for reliability
+    // First teleport player near the door
+    const TILE = 32;
+    let targetX = door.x;
+    let targetY = door.y;
+    // Offset 1 tile inward from door side so player is inside the room
+    if (door.side === 'left') targetX += 1;
+    else if (door.side === 'right') targetX -= 1;
+    else if (door.side === 'top') targetY += 1;
+    else if (door.side === 'bottom') targetY -= 1;
+
+    // Teleport player to adjacent tile
+    this.player.setPosition(targetX * TILE + TILE / 2, targetY * TILE + TILE / 2);
+    this.tileX = targetX;
+    this.tileY = targetY;
+    this.movePath = [];
+
+    // Small delay for proximity check to fire, then trigger door
+    this.time.delayedCall(200, () => {
+      this.checkDoorProximity();
       if (this.nearDoor && this.nearDoor.id === data.doorId) {
         this.handleDoorInteraction(this.nearDoor);
+      } else {
+        // Force it — directly emit the door event
+        this.transitioning = true;
+        this.cameras.main.fadeOut(300, 0, 0, 0);
+        this.time.delayedCall(300, () => {
+          eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
+            targetRoomId: door.targetRoomId,
+            fromDoorId: door.id,
+          });
+        });
       }
-    }
+    });
   };
 
   private onMusicVolume = (vol: number) => {
