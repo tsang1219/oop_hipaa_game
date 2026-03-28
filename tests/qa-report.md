@@ -1,6 +1,7 @@
-# QA Report -- Iteration 1
+# QA Report -- Iteration 1 (Updated after fixes)
 **Date:** 2026-03-28
-**Tests:** 13 passed, 29 failed (12/31 progression, 1/11 visual-qa)
+**Tests (latest run):** 23 passed, 11 failed, 7 skipped
+**Previous:** 13 passed, 29 failed
 
 ## BLOCKER
 
