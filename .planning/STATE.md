@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: executing
-last_updated: "2026-03-27"
+last_updated: "2026-03-28"
 progress:
   total_phases: 5
-  completed_phases: 1
+  completed_phases: 2
   total_plans: 19
-  completed_plans: 4
+  completed_plans: 8
 ---
 
 # Project State
@@ -18,29 +18,30 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** The player should forget they're doing compliance training. One continuous game.
-**Current focus:** v2.0 Phase 12 — Unified Navigation
+**Current focus:** v2.0 Phase 13 — Encounter Integration
 
 ## Current Position
 
-Phase: 12 of 15 (Unified Navigation)
+Phase: 13 of 15 (Encounter Integration)
 Plan: Not started
-Status: Phase 11 complete, Phase 12 ready
-Last activity: 2026-03-27 — Phase 11 executed (4 plans, all success criteria met)
+Status: Phase 12 complete, Phase 13 ready
+Last activity: 2026-03-28 — Phase 12 executed (4 plans, all success criteria met)
 
-Progress: [##░░░░░░░░] 21%
+Progress: [####░░░░░░] 42%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 4 (v2.0)
+- Total plans completed: 8 (v2.0)
 - Average duration: ~8m/plan
-- Total execution time: ~31m
+- Total execution time: ~98m
 
 **By Phase:**
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
 | 11. Pre-Restructure Foundation | 4/4 | ~31m | ~8m |
+| 12. Unified Navigation | 4/4 | ~67m | ~17m |
 
 *Updated after each plan completion*
 
@@ -58,6 +59,12 @@ Progress: [##░░░░░░░░] 21%
 - [Phase 11]: Module-level migrateV1toV2() runs before React render for earliest migration
 - [Phase 11]: sfx_muted standalone key still written on toggle for ExplorationScene backward compat
 - [Phase 11]: GameContainer passes finalPrivacyScore via callback instead of orphan localStorage key
+- [Phase 12]: HubWorldScene retired to room data (hospital_entrance in roomData.json) — not preserved as special intro scene
+- [Phase 12]: BootScene no longer starts any scene — just emits SCENE_READY for React to decide
+- [Phase 12]: Door auto-triggers on proximity (no key press) for smooth RPG navigation
+- [Phase 12]: Spawn offset 1 tile inward from door side to prevent re-trigger
+- [Phase 12]: Room completion checked on door exit, not ESC, to support continuous flow
+- [Phase 12]: UNLOCK_ORDER hallways resolved via findPrecedingDepartment mapping
 
 ### Pending Todos
 
@@ -65,13 +72,13 @@ None.
 
 ### Blockers/Concerns
 
-- Phase 12 planning must resolve: should HubWorldScene become a room data entry or preserve as a special Act 1 intro sequence? Affects Phase 12 scope.
 - Phase 13 planning must define: unified score formula (dialogue score scale vs. BreachDefense 0-100 scale) before implementing aggregation.
 - Phase 13 planning must decide: should `/breach` standalone mode share encounter-mode config with a `standalone: true` flag in init data, or maintain a separate page config?
 - SpriteFactory.ts still active — retirement deferred to v2.1 (was v1.1)
+- RESOLVED: HubWorldScene became room data entry (Phase 12 decision)
 
 ## Session Continuity
 
-Last session: 2026-03-27
-Stopped at: Completed Phase 11 — all 4 plans executed, success criteria verified
-Resume: Run `/gsd:plan-phase 12` or `/gsd:execute-phase 12` to begin Phase 12
+Last session: 2026-03-28
+Stopped at: Completed Phase 12 — all 4 plans executed, success criteria verified
+Resume: Run `/gsd:execute-phase 13` to begin Phase 13
