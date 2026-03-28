@@ -343,3 +343,35 @@ export const WAVES = [
     endMessage: "You ARE the security. Those 'annoying' IT policies protect real patients whose data you're responsible for."
   }
 ];
+
+// ── Encounter mode: condensed 4-wave inbound TD ─────────────────────────────
+// Used when BreachDefenseScene runs as an RPG encounter (not standalone /breach).
+// Wave selection: indices 0, 2, 4, 7 from WAVES, with enemy counts reduced ~50%.
+
+export const ENCOUNTER_WAVES_INBOUND = [
+  {
+    ...WAVES[0],
+    threats: [{ type: 'PHISHING', count: 2, interval: 3000 }],
+  },
+  {
+    ...WAVES[2],
+    threats: [{ type: 'RANSOMWARE', count: 1, interval: 4000 }],
+  },
+  {
+    ...WAVES[4],
+    threats: [{ type: 'INSIDER', count: 2, interval: 3000 }],
+  },
+  {
+    ...WAVES[7],
+    threats: [
+      { type: 'PHISHING', count: 2, interval: 2500 },
+      { type: 'RANSOMWARE', count: 1, interval: 4000 },
+      { type: 'INSIDER', count: 1, interval: 3500 },
+      { type: 'CREDENTIAL', count: 2, interval: 2000 },
+    ],
+  },
+] as const;
+
+export const ENCOUNTER_WAVE_BUDGETS = [150, 100, 120, 150] as const;
+
+export const ENCOUNTER_AVAILABLE_TOWERS = ['FIREWALL', 'MFA', 'TRAINING', 'ACCESS'] as const;

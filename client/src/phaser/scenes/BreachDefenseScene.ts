@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import {
-  GRID_COLS, GRID_ROWS, CELL_SIZE, PATHS, TOWERS, THREATS, THREAT_COLORS, WAVES, WAVE_BUDGETS
+  GRID_COLS, GRID_ROWS, CELL_SIZE, PATHS, TOWERS, THREATS, THREAT_COLORS, WAVES, WAVE_BUDGETS,
+  ENCOUNTER_WAVES_INBOUND,
 } from '../../game/breach-defense/constants';
 
 type TowerType = keyof typeof TOWERS;
@@ -54,6 +55,13 @@ interface WaveState {
 }
 
 type GameState = 'WAITING' | 'PLAYING' | 'PAUSED' | 'GAMEOVER' | 'VICTORY';
+
+export interface BreachDefenseInitData {
+  encounterId?: string;          // undefined = standalone arcade mode
+  waveSubset?: typeof ENCOUNTER_WAVES_INBOUND;  // encounter wave data; null = use full WAVES
+  availableTowerIds?: string[];  // tower type filter; null = all towers
+  budgetOverride?: readonly number[];  // per-wave budgets; null = use WAVE_BUDGETS
+}
 
 export class BreachDefenseScene extends Phaser.Scene {
   // Game state
@@ -109,6 +117,12 @@ export class BreachDefenseScene extends Phaser.Scene {
   // Onboarding cell highlights
   private onboardingHighlights: Phaser.GameObjects.Rectangle[] = [];
 
+  // Encounter mode (null = standalone)
+  private encounterId: string | null = null;
+  private encounterWaves: typeof ENCOUNTER_WAVES_INBOUND | null = null;
+  private availableTowerFilter: Set<string> | null = null;
+  private encounterBudgets: readonly number[] | null = null;
+
   // State broadcast throttle
   private lastBroadcast = 0;
 
@@ -116,13 +130,20 @@ export class BreachDefenseScene extends Phaser.Scene {
     super({ key: 'BreachDefense' });
   }
 
-  init() {
+  init(data: BreachDefenseInitData = {}) {
+    this.encounterId = data.encounterId ?? null;
+    this.encounterWaves = data.waveSubset ?? null;
+    this.availableTowerFilter = data.availableTowerIds
+      ? new Set(data.availableTowerIds)
+      : null;
+    this.encounterBudgets = data.budgetOverride ?? null;
+
     this.enemies = [];
     this.towers = [];
     this.projectiles = [];
     this.gameState = 'WAITING';
     this.securityScore = 100;
-    this.budget = WAVE_BUDGETS[0] || 150;
+    this.budget = (this.encounterBudgets?.[0] ?? WAVE_BUDGETS[0]) || 150;
     this.wave = 1;
     this.grantedStipends = new Set([1]);
     this.waveState = {
@@ -148,6 +169,10 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.dangerVignette.destroy();
       this.dangerVignette = undefined;
     }
+  }
+
+  private getActiveWaves() {
+    return this.encounterWaves ?? WAVES;
   }
 
   create() {
@@ -461,7 +486,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     // Wave counter — top-right of bottom panel (peeks through semi-transparent overlay)
     this.waveCounterText = this.add.text(
       GRID_COLS * CELL_SIZE - 10, bottomY + 10,
-      `WAVE ${this.wave}/${WAVES.length}`,
+      `WAVE ${this.wave}/${this.getActiveWaves().length}`,
       { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#00d4aa' }
     ).setOrigin(1, 0).setDepth(9).setAlpha(0.3);
 
@@ -787,9 +812,11 @@ export class BreachDefenseScene extends Phaser.Scene {
   }
 
   private onRestart() {
-    // Destroy all game objects (kill active tweens first to prevent errors mid-animation)
+    // Kill all active tweens first to prevent orphaned animations (kill streak, wave counter, etc.)
+    this.tweens.killAll();
+
+    // Destroy all game objects
     this.enemies.forEach(e => {
-      this.tweens.killTweensOf(e.sprite);
       e.sprite.destroy();
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();
@@ -802,7 +829,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     this.towers = [];
     this.projectiles = [];
     this.securityScore = 100;
-    this.budget = WAVE_BUDGETS[0] || 150;
+    this.budget = (this.encounterBudgets?.[0] ?? WAVE_BUDGETS[0]) || 150;
     this.wave = 1;
     this.grantedStipends = new Set([1]);
     this.waveState = {
@@ -840,6 +867,10 @@ export class BreachDefenseScene extends Phaser.Scene {
   private placeTowerAt(type: TowerType, gridX: number, gridY: number): boolean {
     const stats = TOWERS[type];
     if (this.budget < stats.cost) return false;
+
+    if (this.availableTowerFilter && !this.availableTowerFilter.has(type)) {
+      return false;  // Tower type not available in this encounter
+    }
 
     const isPath = PATHS[0].some(p => p.x === gridX && p.y === gridY);
     if (type !== 'FIREWALL' && isPath) return false;
@@ -1205,7 +1236,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     const dt = Math.min(delta / 1000, 0.1);
 
     // ── Phase 1: Wave spawning ─────────────────────────────────
-    const currentWaveData = WAVES[this.wave - 1];
+    const currentWaveData = this.getActiveWaves()[this.wave - 1];
     if (this.waveState.active && currentWaveData) {
       const totalThreats = currentWaveData.threats.reduce((acc, t) => acc + t.count, 0);
 
@@ -1229,7 +1260,7 @@ export class BreachDefenseScene extends Phaser.Scene {
         }
       } else if (this.enemies.length === 0) {
         // Wave complete
-        if (this.wave < WAVES.length) {
+        if (this.wave < this.getActiveWaves().length) {
           const concept = currentWaveData.concept;
           eventBridge.emit(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, {
             wave: this.wave,
@@ -1315,7 +1346,8 @@ export class BreachDefenseScene extends Phaser.Scene {
           // Grant stipend
           if (!this.grantedStipends.has(this.wave)) {
             this.grantedStipends.add(this.wave);
-            this.budget += WAVE_BUDGETS[this.wave - 1] || 100;
+            const budgets = this.encounterBudgets ?? WAVE_BUDGETS;
+            this.budget += budgets[this.wave - 1] || 100;
           }
 
           // Reset wave state
@@ -1330,7 +1362,7 @@ export class BreachDefenseScene extends Phaser.Scene {
           // Emit wave start data for next wave
           if (!this.shownWaveStartBanners.has(this.wave)) {
             this.shownWaveStartBanners.add(this.wave);
-            const nextWaveData = WAVES[this.wave - 1];
+            const nextWaveData = this.getActiveWaves()[this.wave - 1];
             if (nextWaveData) {
               eventBridge.emit(BRIDGE_EVENTS.BREACH_WAVE_START, {
                 wave: this.wave,
@@ -1927,7 +1959,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     // ── Phase 7: Broadcast state (throttled) ───────────────────
     if (this.waveCounterText) {
-      this.waveCounterText.setText(`WAVE ${this.wave}/${WAVES.length}`);
+      this.waveCounterText.setText(`WAVE ${this.wave}/${this.getActiveWaves().length}`);
     }
 
     // Dynamic header color based on threat level
