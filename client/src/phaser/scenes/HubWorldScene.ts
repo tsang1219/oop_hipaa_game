@@ -1,3 +1,12 @@
+/**
+ * @deprecated RETIRED in Phase 12 (v2.0 Unified Navigation).
+ * HubWorldScene is no longer registered in Phaser config.
+ * The hospital entrance is now the 'hospital_entrance' room in roomData.json,
+ * rendered by ExplorationScene like all other rooms.
+ * Door detection patterns here (checkDoorProximity, transitioning guard) were
+ * ported to ExplorationScene as part of Phase 12.
+ * Do not delete -- kept for historical reference.
+ */
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 
@@ -20,6 +29,7 @@ export class HubWorldScene extends Phaser.Scene {
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private nearDoor: 'privacy-quest' | 'breach-defense' | null = null;
+  private nearNPC = false;
   private promptText!: Phaser.GameObjects.Text;
   private titleText!: Phaser.GameObjects.Text;
   private bgMusic?: Phaser.Sound.BaseSound;
@@ -28,6 +38,22 @@ export class HubWorldScene extends Phaser.Scene {
   private lastFacingFrame = 0;
   private transitioning = false;
   private lastFootstepTime = 0;
+  private npcSprite!: Phaser.GameObjects.Sprite;
+
+  // NPC dialogue state
+  private npcDialogueActive = false;
+  private npcDialogueIndex = 0;
+  private dialogueBox?: Phaser.GameObjects.Rectangle;
+  private dialogueNameText?: Phaser.GameObjects.Text;
+  private dialogueText?: Phaser.GameObjects.Text;
+  private dialogueAdvanceText?: Phaser.GameObjects.Text;
+  private readonly npcDialogueLines = [
+    "Hey there! I'm Riley, the front desk lead.\nThird cup of coffee today... don't judge.",
+    "Welcome to the HIPAA Training Center!\nWe've got two programs ready for you.",
+    "Head LEFT for Privacy Quest — explore\nhospital rooms and learn about\npatient privacy rights.",
+    "Or go RIGHT for Breach Defense — defend\nour network from hackers and learn\nsecurity safeguards!",
+    "Just walk up to either door and press\nSPACE to enter. Good luck out there!",
+  ];
 
   constructor() {
     super({ key: 'HubWorld' });
@@ -125,7 +151,7 @@ export class HubWorldScene extends Phaser.Scene {
     }).setOrigin(0.5);
 
     // Dynamic hint text
-    const hintText = this.add.text(COLS * TILE_SIZE / 2, 76, 'Walk to a door and press SPACE', {
+    const hintText = this.add.text(COLS * TILE_SIZE / 2, 76, 'Talk to the receptionist or walk to a door', {
       fontFamily: '"Press Start 2P"',
       fontSize: '5px',
       color: '#999999',
@@ -182,18 +208,18 @@ export class HubWorldScene extends Phaser.Scene {
       13 * TILE_SIZE, 8 * TILE_SIZE                      // bottom-left
     );
 
-    // Receptionist NPC near center — frame 0 = idle facing down
+    // Receptionist NPC — one tile behind desk (tile 10, 7)
     // NPC shadow
     this.add.ellipse(
-      10 * TILE_SIZE + 16, 8 * TILE_SIZE + 28,
+      10 * TILE_SIZE + 16, 7 * TILE_SIZE + 28,
       24, 10, 0x000000, 0.15
     ).setDepth(0);
-    const npc = this.add.sprite(10 * TILE_SIZE, 8 * TILE_SIZE, 'npc_receptionist_sheet', 0);
-    npc.setOrigin(0, 0);
+    this.npcSprite = this.add.sprite(10 * TILE_SIZE, 7 * TILE_SIZE, 'npc_receptionist_sheet', 0);
+    this.npcSprite.setOrigin(0, 0);
 
     // Idle breathing tween for receptionist
     this.tweens.add({
-      targets: npc,
+      targets: this.npcSprite,
       scaleY: { from: 1.0, to: 1.02 },
       duration: 1500 + Math.random() * 500,
       yoyo: true,
@@ -205,22 +231,22 @@ export class HubWorldScene extends Phaser.Scene {
     this.time.addEvent({
       delay: 3000 + Math.random() * 4000,
       callback: () => {
-        if (!npc || !npc.active) return;
-        // Randomly pick a direction: 0=down, 3=left, 6=right, 9=up (frame indices)
+        if (!this.npcSprite || !this.npcSprite.active) return;
+        if (this.npcDialogueActive) return; // Face player during dialogue
         const directions = [0, 3, 6]; // Don't turn up (looks weird)
         const frame = directions[Math.floor(Math.random() * directions.length)];
-        npc.setFrame(frame);
+        this.npcSprite.setFrame(frame);
       },
       loop: true
     });
 
     // NPC speech bubble with typing effect
     const bubbleBg = this.add.rectangle(
-      10 * TILE_SIZE + 16, 7 * TILE_SIZE - 4,
+      10 * TILE_SIZE + 16, 6 * TILE_SIZE - 4,
       56, 16, 0x333333
     ).setOrigin(0.5).setDepth(8);
 
-    const welcomeText = this.add.text(10 * TILE_SIZE + 16, 7 * TILE_SIZE - 4, '', {
+    const welcomeText = this.add.text(10 * TILE_SIZE + 16, 6 * TILE_SIZE - 4, '', {
       fontFamily: '"Press Start 2P"',
       fontSize: '6px',
       color: '#ffffff',
@@ -383,11 +409,14 @@ export class HubWorldScene extends Phaser.Scene {
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
 
+    // Freeze movement during dialogue
+    const frozen = this.npcDialogueActive || this.transitioning;
+
     // Movement
-    const left = this.cursors.left.isDown || this.wasd.A.isDown;
-    const right = this.cursors.right.isDown || this.wasd.D.isDown;
-    const up = this.cursors.up.isDown || this.wasd.W.isDown;
-    const down = this.cursors.down.isDown || this.wasd.S.isDown;
+    const left = !frozen && (this.cursors.left.isDown || this.wasd.A.isDown);
+    const right = !frozen && (this.cursors.right.isDown || this.wasd.D.isDown);
+    const up = !frozen && (this.cursors.up.isDown || this.wasd.W.isDown);
+    const down = !frozen && (this.cursors.down.isDown || this.wasd.S.isDown);
 
     if (left) {
       body.setVelocityX(-MOVE_SPEED);
@@ -449,21 +478,27 @@ export class HubWorldScene extends Phaser.Scene {
       }
     }
 
-    // Check door proximity
+    // Check door + NPC proximity
     this.checkDoorProximity();
+    this.checkNPCProximity();
 
-    // Interact
-    if (Phaser.Input.Keyboard.JustDown(this.interactKey) && this.nearDoor && !this.transitioning) {
-      this.transitioning = true;
-
-      // Dramatic door enter transition
-      this.cameras.main.flash(300, 255, 255, 255, false);
-      this.cameras.main.fade(400, 0, 0, 0);
-
-      // Brief pause for the fade, then emit
-      this.time.delayedCall(350, () => {
-        eventBridge.emit(BRIDGE_EVENTS.HUB_SELECT_GAME, this.nearDoor);
-      });
+    // Interact — SPACE key
+    if (Phaser.Input.Keyboard.JustDown(this.interactKey) && !this.transitioning) {
+      if (this.npcDialogueActive) {
+        // Advance or close dialogue
+        this.advanceDialogue();
+      } else if (this.nearNPC) {
+        // Open NPC dialogue
+        this.openDialogue();
+      } else if (this.nearDoor) {
+        // Enter door
+        this.transitioning = true;
+        this.cameras.main.flash(300, 255, 255, 255, false);
+        this.cameras.main.fade(400, 0, 0, 0);
+        this.time.delayedCall(350, () => {
+          eventBridge.emit(BRIDGE_EVENTS.HUB_SELECT_GAME, this.nearDoor);
+        });
+      }
     }
   }
 
@@ -493,10 +528,157 @@ export class HubWorldScene extends Phaser.Scene {
       this.nearDoor = 'breach-defense';
       this.promptText.setText('[SPACE] Enter Breach Defense');
       this.promptText.setVisible(true);
-    } else {
+    } else if (!this.nearNPC) {
       this.nearDoor = null;
       this.promptText.setVisible(false);
     }
+  }
+
+  private checkNPCProximity() {
+    if (this.npcDialogueActive) return;
+
+    const px = this.player.x + 16;
+    const py = this.player.y + 16;
+    // NPC is at tile (10, 7), center = (10*32+16, 7*32+16)
+    const npcCx = 10 * TILE_SIZE + 16;
+    const npcCy = 7 * TILE_SIZE + 16;
+    const dx = Math.abs(px - npcCx);
+    const dy = Math.abs(py - npcCy);
+    const threshold = 2 * TILE_SIZE;
+
+    if (dx < threshold && dy < threshold) {
+      this.nearNPC = true;
+      if (!this.nearDoor) {
+        this.promptText.setText('[SPACE] Talk to Riley');
+        this.promptText.setVisible(true);
+      }
+    } else {
+      this.nearNPC = false;
+      if (!this.nearDoor) {
+        this.promptText.setVisible(false);
+      }
+    }
+  }
+
+  private openDialogue() {
+    this.npcDialogueActive = true;
+    this.npcDialogueIndex = 0;
+    this.promptText.setVisible(false);
+
+    // NPC faces player during dialogue
+    this.npcSprite.setFrame(0); // face down toward player
+
+    // Play interact sound
+    this.sound.play('sfx_interact', { volume: 0.55 });
+
+    // Dim overlay
+    const screenW = COLS * TILE_SIZE;
+    const screenH = ROWS * TILE_SIZE;
+
+    // Dialogue box at bottom of screen
+    const boxH = 90;
+    const boxY = screenH - boxH - 8;
+    const boxX = 16;
+    const boxW = screenW - 32;
+
+    this.dialogueBox = this.add.rectangle(
+      boxX + boxW / 2, boxY + boxH / 2,
+      boxW, boxH, 0x1a1a2e, 0.92
+    ).setStrokeStyle(2, 0xdaa520, 0.8).setDepth(20);
+
+    // Name tag
+    this.dialogueNameText = this.add.text(boxX + 14, boxY + 8, 'Riley', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: '#ff6b9d',
+    }).setDepth(21);
+
+    // Dialogue text
+    this.dialogueText = this.add.text(boxX + 14, boxY + 26, '', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '7px',
+      color: '#e8e8e8',
+      lineSpacing: 6,
+      wordWrap: { width: boxW - 28 },
+    }).setDepth(21);
+
+    // Advance hint
+    this.dialogueAdvanceText = this.add.text(
+      boxX + boxW - 14, boxY + boxH - 14, '[SPACE]', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '6px',
+      color: '#ffd700',
+    }).setOrigin(1, 1).setDepth(21);
+
+    this.tweens.add({
+      targets: this.dialogueAdvanceText,
+      alpha: { from: 1, to: 0.4 },
+      duration: 800,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+
+    this.showDialogueLine();
+  }
+
+  private showDialogueLine() {
+    if (!this.dialogueText) return;
+    const line = this.npcDialogueLines[this.npcDialogueIndex];
+
+    // Typing effect
+    this.dialogueText.setText('');
+    let charIdx = 0;
+    const timer = this.time.addEvent({
+      delay: 25,
+      callback: () => {
+        charIdx++;
+        this.dialogueText?.setText(line.slice(0, charIdx));
+        // Soft typing click on every few characters
+        if (charIdx % 3 === 0) {
+          this.sound.play('sfx_footstep', { volume: 0.08 });
+        }
+      },
+      repeat: line.length - 1,
+    });
+    // Store timer ref so we can skip ahead
+    (this as any)._typingTimer = timer;
+    (this as any)._typingLine = line;
+  }
+
+  private advanceDialogue() {
+    // If still typing, skip to full text
+    const timer = (this as any)._typingTimer as Phaser.Time.TimerEvent | undefined;
+    if (timer && timer.getProgress() < 1) {
+      timer.remove();
+      this.dialogueText?.setText((this as any)._typingLine);
+      return;
+    }
+
+    this.npcDialogueIndex++;
+
+    if (this.npcDialogueIndex >= this.npcDialogueLines.length) {
+      // Close dialogue
+      this.closeDialogue();
+    } else {
+      this.sound.play('sfx_interact', { volume: 0.3 });
+      this.showDialogueLine();
+    }
+  }
+
+  private closeDialogue() {
+    this.npcDialogueActive = false;
+    this.dialogueBox?.destroy();
+    this.dialogueNameText?.destroy();
+    this.dialogueText?.destroy();
+    this.dialogueAdvanceText?.destroy();
+    this.dialogueBox = undefined;
+    this.dialogueNameText = undefined;
+    this.dialogueText = undefined;
+    this.dialogueAdvanceText = undefined;
+
+    // Small dismiss sound
+    this.sound.play('sfx_interact', { volume: 0.25 });
   }
 
   private createWalls() {

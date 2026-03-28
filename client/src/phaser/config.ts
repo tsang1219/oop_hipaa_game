@@ -1,6 +1,5 @@
 import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
-import { HubWorldScene } from './scenes/HubWorldScene';
 import { ExplorationScene } from './scenes/ExplorationScene';
 import { BreachDefenseScene } from './scenes/BreachDefenseScene';
 
@@ -22,7 +21,7 @@ export function createGameConfig(options: {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       autoRound: true,
     },
-    scene: [BootScene, HubWorldScene, ExplorationScene, BreachDefenseScene],
+    scene: [BootScene, ExplorationScene, BreachDefenseScene],
     physics: {
       default: 'arcade',
       arcade: {

@@ -169,8 +169,7 @@ export class BootScene extends Phaser.Scene {
       }
     }
 
-    // Start the hub world
-    this.scene.start('HubWorld');
+    // Signal React that boot is complete — React starts the appropriate scene
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Boot');
   }
 

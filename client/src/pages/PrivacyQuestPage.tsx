@@ -8,7 +8,8 @@ import ObservationHint from '@/components/ObservationHint';
 import ChoicePrompt from '@/components/ChoicePrompt';
 import { PatientStoryReveal } from '@/components/PatientStoryReveal';
 import EndScreen from '@/components/EndScreen';
-import HallwayHub from '@/components/HallwayHub';
+// HallwayHub removed in Phase 12 — replaced by door-to-door navigation
+// import HallwayHub from '@/components/HallwayHub';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { MusicVolumeSlider } from '../components/MusicVolumeSlider';
@@ -554,25 +555,11 @@ export default function PrivacyQuestPage() {
     );
   }
 
-  // ── Room selection hub ───────────────────────────────────────
+  // ── Room selection hub (RETIRED in Phase 12 — replaced by door navigation) ──
   if (pageMode === 'hub') {
     return (
       <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4 py-8">
-        <HallwayHub
-          rooms={rooms}
-          onSelectRoom={handleSelectRoom}
-          completedRooms={completedRooms}
-          collectedStories={collectedStories}
-          onViewStory={handleViewStory}
-          privacyScore={privacyScore}
-        />
-        <button
-          onClick={() => navigate('/')}
-          className="text-[8px] text-gray-500 hover:text-gray-300 transition-colors"
-          style={{ fontFamily: '"Press Start 2P"' }}
-        >
-          Back to Hub World
-        </button>
+        <p className="text-white">This page is retired. Navigate to / instead.</p>
       </div>
     );
   }
