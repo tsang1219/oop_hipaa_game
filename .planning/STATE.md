@@ -6,9 +6,9 @@ status: executing
 last_updated: "2026-03-28"
 progress:
   total_phases: 5
-  completed_phases: 3
+  completed_phases: 4
   total_plans: 19
-  completed_plans: 12
+  completed_plans: 16
 ---
 
 # Project State
@@ -18,23 +18,23 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** The player should forget they're doing compliance training. One continuous game.
-**Current focus:** v2.0 Phase 14 — Three-Act Narrative Arc
+**Current focus:** v2.0 Phase 15 — Polish and Completion
 
 ## Current Position
 
-Phase: 14 of 15 (Three-Act Narrative Arc)
+Phase: 15 of 15 (Polish and Completion)
 Plan: Not started
-Status: Phase 13 complete, Phase 14 ready
-Last activity: 2026-03-28 — Phase 13 executed (4 plans, all success criteria met)
+Status: Phase 14 complete, Phase 15 ready
+Last activity: 2026-03-28 — Phase 14 executed (4 plans, all success criteria met)
 
-Progress: [######░░░░] 63%
+Progress: [########░░] 84%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 12 (v2.0)
-- Average duration: ~9m/plan
-- Total execution time: ~107m
+- Total plans completed: 16 (v2.0)
+- Average duration: ~8m/plan
+- Total execution time: ~115m
 
 **By Phase:**
 
@@ -43,6 +43,7 @@ Progress: [######░░░░] 63%
 | 11. Pre-Restructure Foundation | 4/4 | ~31m | ~8m |
 | 12. Unified Navigation | 4/4 | ~67m | ~17m |
 | 13. Encounter Integration | 4/4 | ~9m | ~2m |
+| 14. Three-Act Narrative Arc | 4/4 | ~8m | ~2m |
 
 *Updated after each plan completion*
 
@@ -72,6 +73,11 @@ Progress: [######░░░░] 63%
 - [Phase 13]: React ENCOUNTER_COMPLETE handler is single source of truth for encounter score (no double-counting)
 - [Phase 13]: IT Office encounter zone at tile (9,6) near workstation cluster — auto-triggers on proximity
 - [Phase 13]: /breach route already removed in Phase 12 — confirmed no-op
+- [Phase 14]: Act 3 music base volume 0.15 (breach theme reduced for RPG dialogue)
+- [Phase 14]: Extended existing useGameState hook (not parallel hook) for act + decision state
+- [Phase 14]: Decision flags emitted via CHOICE_FLAG_SET from GameContainer, not callback chain
+- [Phase 14]: NPC variant routing via ref-based decision lookup in EventBridge callbacks
+- [Phase 14]: Music on scene init always starts music_exploration — act-correct init deferred to Phase 15
 
 ### Pending Todos
 
@@ -83,9 +89,10 @@ None.
 - RESOLVED: /breach standalone mode removed per user decision; BreachDefenseScene only runs as encounter
 - SpriteFactory.ts still active — retirement deferred to v2.1 (was v1.1)
 - RESOLVED: HubWorldScene became room data entry (Phase 12 decision)
+- Music on scene init does not respect current act — will play music_exploration even in Act 3 until next advance. Polish debt for Phase 15.
 
 ## Session Continuity
 
 Last session: 2026-03-28
-Stopped at: Completed Phase 13 — all 4 plans executed, success criteria verified
-Resume: Run `/gsd:execute-phase 14` to begin Phase 14
+Stopped at: Completed Phase 14 — all 4 plans executed, success criteria verified
+Resume: Run `/gsd:execute-phase 15` to begin Phase 15

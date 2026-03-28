@@ -156,10 +156,10 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
-- [ ] 14-01-PLAN.md — Type contracts: narrative.ts (ActState, DecisionState), ACT_ADVANCE event, Choice flagKey/flagValue schema
-- [ ] 14-02-PLAN.md — React act progression: useGameState hook, checkActAdvance in handleExitRoom, decision flag capture
-- [ ] 14-03-PLAN.md — Phaser music crossfade: crossfadeToMusic in ExplorationScene, ACT_ADVANCE listener lifecycle
-- [ ] 14-04-PLAN.md — NPC variant dialogue: 4 new scenes in gameData.json, getSceneIdForNPC routing in PrivacyQuestPage
+- [x] 14-01-PLAN.md — Type contracts: narrative.ts (ActState, DecisionState), ACT_ADVANCE event, Choice flagKey/flagValue schema
+- [x] 14-02-PLAN.md — React act progression: useGameState hook, checkActAdvance in handleExitRoom, decision flag capture
+- [x] 14-03-PLAN.md — Phaser music crossfade: crossfadeToMusic in ExplorationScene, ACT_ADVANCE listener lifecycle
+- [x] 14-04-PLAN.md — NPC variant dialogue: 4 new scenes in gameData.json, getSceneIdForNPC routing in PrivacyQuestPage
 
 ### Phase 15: Polish and Completion
 **Goal**: Environmental storytelling, department completion fanfares, and a progress breadcrumb HUD make every accomplishment feel earned and the player's journey visible at all times.
@@ -192,5 +192,5 @@ Plans:
 | 11. Pre-Restructure Foundation | v2.0 | 4/4 | Complete | 2026-03-27 |
 | 12. Unified Navigation | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 13. Encounter Integration | v2.0 | 4/4 | Complete | 2026-03-28 |
-| 14. Three-Act Narrative Arc | v2.0 | 0/4 | Not started | - |
+| 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 0/3 | Not started | - |
