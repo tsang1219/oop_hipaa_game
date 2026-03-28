@@ -10,6 +10,15 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { loadSave, writeSave, type SaveDataV2 } from '@/lib/saveData';
+import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
+import {
+  type ActState,
+  type DecisionState,
+  DEFAULT_ACT_STATE,
+  DEFAULT_DECISIONS,
+  ACT_MUSIC_MAP,
+  ACT3_MUSIC_BASE_VOLUME,
+} from '../types/narrative';
 
 // ── Public types ───────────────────────────────────────────────
 
@@ -22,7 +31,10 @@ export interface UnifiedGameState {
   privacyScore: number;
   currentRoomId: string | null;
   currentAct: 1 | 2 | 3;
+  act1Complete: boolean;
+  act2Complete: boolean;
   actFlags: Record<string, boolean>;
+  decisions: DecisionState;
   encounterResults: Record<string, { completed: boolean; score: number; outcome: string }>;
   unifiedScore: number;
   gameStartTime: number;
@@ -107,7 +119,10 @@ export function useGameState() {
       privacyScore: s.privacyScore,
       currentRoomId: extended.currentRoomId ?? null,
       currentAct: extended.currentAct ?? 1,
+      act1Complete: extended.act1Complete ?? false,
+      act2Complete: extended.act2Complete ?? false,
       actFlags: extended.actFlags ?? {},
+      decisions: extended.decisions ?? { ...DEFAULT_DECISIONS },
       encounterResults: extended.encounterResults ?? {},
       unifiedScore: extended.unifiedScore ?? s.privacyScore,
       gameStartTime: s.gameStartTime,
@@ -129,7 +144,10 @@ export function useGameState() {
       // Extended v2.1 fields stored in the same blob
       currentRoomId: state.currentRoomId,
       currentAct: state.currentAct,
+      act1Complete: state.act1Complete,
+      act2Complete: state.act2Complete,
       actFlags: state.actFlags,
+      decisions: state.decisions,
       encounterResults: state.encounterResults,
       unifiedScore: state.unifiedScore,
     };
@@ -207,6 +225,61 @@ export function useGameState() {
     window.location.reload();
   }, []);
 
+  // ── Act advancement (Phase 14) ────────────────────────────────
+  // Uses a ref for stale-closure-safe reading of latest state
+  const stateRef = useRef(state);
+  useEffect(() => { stateRef.current = state; }, [state]);
+
+  /**
+   * Check if department completion triggers an act advance.
+   * Call with the UPDATED completedRooms array (including the just-completed room)
+   * because setState is async and state.completedRooms is stale at call time.
+   */
+  const checkActAdvance = useCallback((updatedCompletedRooms: string[]) => {
+    const s = stateRef.current;
+
+    // Act 1 -> 2: Reception + Break Room both completed
+    if (s.currentAct === 1 && !s.act1Complete) {
+      if (updatedCompletedRooms.includes('reception') && updatedCompletedRooms.includes('break_room')) {
+        setState(prev => ({
+          ...prev,
+          currentAct: 2,
+          act1Complete: true,
+        }));
+        eventBridge.emit(BRIDGE_EVENTS.ACT_ADVANCE, {
+          newAct: 2,
+          track: ACT_MUSIC_MAP[2],
+        });
+        return;
+      }
+    }
+
+    // Act 2 -> 3: Lab + Records both completed
+    if (s.currentAct === 2 && !s.act2Complete) {
+      if (updatedCompletedRooms.includes('lab') && updatedCompletedRooms.includes('records_room')) {
+        setState(prev => ({
+          ...prev,
+          currentAct: 3,
+          act2Complete: true,
+        }));
+        eventBridge.emit(BRIDGE_EVENTS.ACT_ADVANCE, {
+          newAct: 3,
+          track: ACT_MUSIC_MAP[3],
+          baseVolume: ACT3_MUSIC_BASE_VOLUME,
+        });
+        return;
+      }
+    }
+  }, []);
+
+  /** Set a single decision flag (e.g., from a CHOICE_FLAG_SET event). */
+  const setDecision = useCallback((flagKey: string, flagValue: string | boolean) => {
+    setState(prev => ({
+      ...prev,
+      decisions: { ...prev.decisions, [flagKey]: flagValue },
+    }));
+  }, []);
+
   return {
     state,
     completeRoom,
@@ -219,6 +292,8 @@ export function useGameState() {
     setActFlag,
     recordEncounterResult,
     resetProgress,
+    checkActAdvance,
+    setDecision,
     isDepartmentAccessible: (roomId: string) =>
       isDepartmentAccessible(roomId, state.completedRooms),
   };

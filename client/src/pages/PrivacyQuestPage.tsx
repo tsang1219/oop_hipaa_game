@@ -21,6 +21,7 @@ import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
 import { migrateV1toV2, loadSave, writeSave, type SaveDataV2 } from '@/lib/saveData';
+import { useGameState as useUnifiedGameState } from '@/hooks/useGameState';
 
 type PageMode = 'hub' | 'exploration' | 'dialogue' | 'gameover' | 'win';
 
@@ -55,6 +56,7 @@ export default function PrivacyQuestPage() {
   const { toast } = useToast();
   const { notify } = useNotification();
   const [, navigate] = useLocation();
+  const { state: unifiedState, checkActAdvance, setDecision } = useUnifiedGameState();
   const gameRef = useRef<Phaser.Game | null>(null);
   const sceneStartedForRoom = useRef<string | null>(null);
 
@@ -200,6 +202,15 @@ export default function PrivacyQuestPage() {
     if (choiceGate) setActiveChoiceGate(choiceGate);
   }, [currentRoomId]);
 
+  // ── Decision flag capture (Phase 14) ──────────────────────────
+  useEffect(() => {
+    const onFlagSet = (data: { flagKey: string; flagValue: string | boolean }) => {
+      setDecision(data.flagKey, data.flagValue);
+    };
+    eventBridge.on(BRIDGE_EVENTS.CHOICE_FLAG_SET, onFlagSet);
+    return () => { eventBridge.off(BRIDGE_EVENTS.CHOICE_FLAG_SET, onFlagSet); };
+  }, [setDecision]);
+
   // Mute toggle — apply to Phaser + persist
   useEffect(() => {
     if (gameRef.current?.sound) {
@@ -328,6 +339,9 @@ export default function PrivacyQuestPage() {
       const isComplete = checkRoomCompletion(room);
       if (isComplete && !completedRooms.includes(currentRoomId!)) {
         setCompletedRooms(prev => [...prev, currentRoomId!]);
+        // Check if this room completion triggers an act advance (Phase 14)
+        const updatedRooms = [...completedRooms, currentRoomId!];
+        checkActAdvance(updatedRooms);
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
 
         // Room completion celebration — notify + camera flash

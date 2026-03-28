@@ -4,6 +4,7 @@ import { CheckCircle2, AlertTriangle } from 'lucide-react';
 import CharacterPortrait from './CharacterPortrait';
 import BattleEncounterScreen from './BattleEncounterScreen';
 import type { Scene, Choice } from '@shared/schema';
+import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
 import nurseNinaImg from '@assets/generated_images/Nurse_Nina_pixel_portrait_6f9bfea3.png';
 
 type GamePhase = 'dialogue' | 'choices' | 'feedback';
@@ -40,6 +41,14 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
     setSelectedChoice(choice);
     const newScore = score + choice.score;
     setScore(newScore);
+
+    // Emit decision flag if this choice carries one (Phase 14 narrative flags)
+    if (choice.flagKey !== undefined && choice.flagValue !== undefined) {
+      eventBridge.emit(BRIDGE_EVENTS.CHOICE_FLAG_SET, {
+        flagKey: choice.flagKey,
+        flagValue: choice.flagValue,
+      });
+    }
 
     const privacyChange = choice.score < 0 ? choice.score : 0;
     const newPrivacyScore = Math.max(0, Math.min(100, privacyScore + privacyChange));
