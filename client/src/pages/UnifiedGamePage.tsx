@@ -544,6 +544,16 @@ export default function UnifiedGamePage() {
     }) => {
       setEncounterResult(data);
       setEncounterPhase('debrief');
+      // Feed encounter score into unified compliance score
+      if (data.scoreContribution > 0) {
+        gameState.addScore(data.scoreContribution);
+      }
+      // Record encounter result in game state
+      gameState.recordEncounterResult(data.encounterId, {
+        completed: true,
+        score: data.securityScore,
+        outcome: data.outcome,
+      });
     };
 
     eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, onEncounterTriggered);

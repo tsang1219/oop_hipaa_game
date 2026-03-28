@@ -175,6 +175,72 @@ export class BreachDefenseScene extends Phaser.Scene {
     return this.encounterWaves ?? WAVES;
   }
 
+  /** Called in encounter mode when all 4 waves are cleared. */
+  private onEncounterVictory(): void {
+    if (!this.encounterId) return;
+
+    const scoreContribution = Math.round((this.securityScore / 100) * 12);
+
+    this.registry.set(`encounterResult_${this.encounterId}`, {
+      type: 'td-inbound',
+      score: this.securityScore,
+      completed: true,
+      outcome: 'victory',
+      scoreContribution,
+    });
+
+    eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, {
+      encounterId: this.encounterId,
+      outcome: 'victory',
+      securityScore: this.securityScore,
+      scoreContribution,
+    });
+
+    this.time.delayedCall(1800, () => {
+      this.cameras.main.fadeOut(400, 0, 0, 0);
+      this.cameras.main.once(
+        Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
+        () => {
+          this.scene.stop();
+          this.scene.wake('Exploration');
+        }
+      );
+    });
+  }
+
+  /** Called in encounter mode when securityScore reaches 0 (game over). */
+  private onEncounterGameOver(): void {
+    if (!this.encounterId) return;
+
+    const scoreContribution = Math.round((this.securityScore / 100) * 12);
+
+    this.registry.set(`encounterResult_${this.encounterId}`, {
+      type: 'td-inbound',
+      score: this.securityScore,
+      completed: true,
+      outcome: 'defeat',
+      scoreContribution,
+    });
+
+    eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, {
+      encounterId: this.encounterId,
+      outcome: 'defeat',
+      securityScore: this.securityScore,
+      scoreContribution,
+    });
+
+    this.time.delayedCall(2000, () => {
+      this.cameras.main.fadeOut(400, 0, 0, 0);
+      this.cameras.main.once(
+        Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
+        () => {
+          this.scene.stop();
+          this.scene.wake('Exploration');
+        }
+      );
+    });
+  }
+
   create() {
     // ── Draw grid ──────────────────────────────────────────────
     const pathSet = new Set<string>();
@@ -1463,11 +1529,15 @@ export class BreachDefenseScene extends Phaser.Scene {
             }
           });
 
-          eventBridge.emit(BRIDGE_EVENTS.BREACH_VICTORY, {
-            securityScore: this.securityScore,
-            wavesCompleted: this.wave,
-            towersPlaced: this.towers.length
-          });
+          if (this.encounterId === null) {
+            eventBridge.emit(BRIDGE_EVENTS.BREACH_VICTORY, {
+              securityScore: this.securityScore,
+              wavesCompleted: this.wave,
+              towersPlaced: this.towers.length,
+            });
+          } else {
+            this.onEncounterVictory();
+          }
         }
       }
     }
@@ -1626,10 +1696,14 @@ export class BreachDefenseScene extends Phaser.Scene {
           }
         });
 
-        eventBridge.emit(BRIDGE_EVENTS.BREACH_GAME_OVER, {
-          wavesCompleted: this.wave - 1,
-          towersPlaced: this.towers.length
-        });
+        if (this.encounterId === null) {
+          eventBridge.emit(BRIDGE_EVENTS.BREACH_GAME_OVER, {
+            wavesCompleted: this.wave - 1,
+            towersPlaced: this.towers.length,
+          });
+        } else {
+          this.onEncounterGameOver();
+        }
       }
     }
 
