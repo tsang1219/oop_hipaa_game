@@ -28,6 +28,10 @@ import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
 import { migrateV1toV2, loadSave, writeSave } from '@/lib/saveData';
+import { NarrativeContextCard } from '../components/breach-defense/NarrativeContextCard';
+import { EncounterDebrief } from '../components/breach-defense/EncounterDebrief';
+import { EncounterHud } from '../components/EncounterHud';
+import type { BreachDefenseInitData } from '../phaser/scenes/BreachDefenseScene';
 
 interface RoomWithDoors {
   id: string;
@@ -109,6 +113,24 @@ export default function UnifiedGamePage() {
 
   // Room cleared banner
   const [roomClearedBanner, setRoomClearedBanner] = useState<{ roomName: string } | null>(null);
+
+  // ── Encounter phase state (Phase 13) ───────────────────────────
+  type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'debrief';
+  const [encounterPhase, setEncounterPhase] = useState<EncounterPhase>('idle');
+  const [narrativeCardData, setNarrativeCardData] = useState<{
+    narrativeText: string;
+    config: BreachDefenseInitData;
+    encounterId: string;
+  } | null>(null);
+  const [encounterResult, setEncounterResult] = useState<{
+    encounterId: string;
+    outcome: 'victory' | 'defeat';
+    securityScore: number;
+    scoreContribution: number;
+  } | null>(null);
+  const [encounterHudData, setEncounterHudData] = useState({
+    wave: 1, totalWaves: 4, budget: 150, securityScore: 100, gameState: 'WAITING', waveName: undefined as string | undefined,
+  });
 
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
@@ -490,6 +512,66 @@ export default function UnifiedGamePage() {
     };
   }, [currentRoomId, resolvedGates, isNpcGated, handleExitRoom, gameState, toast, notify]);
 
+  // ── Encounter lifecycle listeners (Phase 13) ────────────────────
+  useEffect(() => {
+    const onEncounterTriggered = (data: {
+      encounterId: string;
+      narrativeText: string;
+      config: BreachDefenseInitData;
+    }) => {
+      setNarrativeCardData(data);
+      setEncounterPhase('narrative-card');
+    };
+
+    const onBreachStateUpdate = (data: {
+      securityScore: number;
+      budget: number;
+      wave: number;
+      gameState: string;
+    }) => {
+      setEncounterHudData(prev => ({ ...prev, ...data }));
+    };
+
+    const onBreachWaveStart = (data: { wave: number; name: string }) => {
+      setEncounterHudData(prev => ({ ...prev, waveName: data.name }));
+    };
+
+    const onEncounterComplete = (data: {
+      encounterId: string;
+      outcome: 'victory' | 'defeat';
+      securityScore: number;
+      scoreContribution: number;
+    }) => {
+      setEncounterResult(data);
+      setEncounterPhase('debrief');
+    };
+
+    eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, onEncounterTriggered);
+    eventBridge.on(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onBreachStateUpdate);
+    eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_START, onBreachWaveStart);
+    eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, onEncounterComplete);
+
+    return () => {
+      eventBridge.off(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, onEncounterTriggered);
+      eventBridge.off(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onBreachStateUpdate);
+      eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_START, onBreachWaveStart);
+      eventBridge.off(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, onEncounterComplete);
+    };
+  }, []);
+
+  const handleConfirmNarrativeCard = useCallback(() => {
+    if (!narrativeCardData) return;
+    setEncounterPhase('encounter');
+    eventBridge.emit(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, { config: narrativeCardData.config });
+  }, [narrativeCardData]);
+
+  const handleDismissDebrief = useCallback(() => {
+    setEncounterPhase('idle');
+    setEncounterResult(null);
+    setNarrativeCardData(null);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER);
+  }, []);
+
   // ── Sync completion state to running Phaser scene ─────────────
   useEffect(() => {
     if (!sceneStartedRef.current) return;
@@ -652,13 +734,42 @@ export default function UnifiedGamePage() {
           }}
         />
 
-        {/* Room progress overlay */}
-        {currentRoom && (
+        {/* Room progress overlay — hidden during encounter */}
+        {encounterPhase === 'idle' && currentRoom && (
           <RoomProgressHUD
             room={currentRoom as any}
             completedNpcs={new Set(gameState.state.completedNPCs)}
             completedZones={new Set(gameState.state.completedZones)}
             collectedItems={new Set(gameState.state.collectedItems)}
+          />
+        )}
+
+        {/* Encounter overlays (Phase 13) */}
+        {encounterPhase === 'narrative-card' && narrativeCardData && (
+          <NarrativeContextCard
+            narrativeText={narrativeCardData.narrativeText}
+            onConfirm={handleConfirmNarrativeCard}
+          />
+        )}
+
+        {encounterPhase === 'encounter' && (
+          <EncounterHud
+            wave={encounterHudData.wave}
+            totalWaves={encounterHudData.totalWaves}
+            budget={encounterHudData.budget}
+            securityScore={encounterHudData.securityScore}
+            gameState={encounterHudData.gameState}
+            waveName={encounterHudData.waveName}
+          />
+        )}
+
+        {encounterPhase === 'debrief' && encounterResult && (
+          <EncounterDebrief
+            encounterId={encounterResult.encounterId}
+            outcome={encounterResult.outcome}
+            securityScore={encounterResult.securityScore}
+            scoreContribution={encounterResult.scoreContribution}
+            onDismiss={handleDismissDebrief}
           />
         )}
 
