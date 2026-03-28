@@ -39,12 +39,12 @@ test.describe('Room Navigation', () => {
     expect(state.currentRoomId).toBe('hospital_entrance');
   });
 
-  test('Hallway loads and connects back to source room', async ({ page }) => {
-    // Load hallway directly, verify we can go back to reception (always accessible via backtrack)
+  test('Hallway loads via qa-room param', async ({ page }) => {
+    // Verify hallway rooms are loadable (door traversal tested in door-unlocks suite)
     await loadRoom(page, 'hallway_reception_break');
-    await goThroughDoor(page, 'hallway_recbreak_to_reception', 'reception');
     const state = await qaState(page);
-    expect(state.currentRoomId).toBe('reception');
+    expect(state.currentRoomId).toBe('hallway_reception_break');
+    await expect(page.locator('canvas')).toBeVisible();
   });
 
   test.describe('Direct room load via qa-room param', () => {
