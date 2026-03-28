@@ -1052,6 +1052,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
+    eventBridge.on(BRIDGE_EVENTS.ACT_ADVANCE, this.onActAdvance, this);
 
     // Listen for correct/incorrect answer feedback from React
     eventBridge.on(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
@@ -1297,6 +1298,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
+    eventBridge.off(BRIDGE_EVENTS.ACT_ADVANCE, this.onActAdvance, this);
     // Door navigation listeners (Phase 12)
     eventBridge.off(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
@@ -1318,9 +1320,73 @@ export class ExplorationScene extends Phaser.Scene {
   private onMusicVolume = (vol: number) => {
     if (!this.scene.isActive()) return;
     if (this.bgMusic) {
-      (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.musicBaseVolume * vol;
+      (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.activeMusicBaseVolume * vol;
     }
   };
+
+  // ── Act-based music crossfade (Phase 14) ──────────────────────────
+
+  /** Current effective base volume — may differ from musicBaseVolume for Act 3 */
+  private activeMusicBaseVolume = 0.25;
+
+  private onActAdvance = (data: { newAct: number; track: string; baseVolume?: number }) => {
+    this.crossfadeToMusic(data.track, data.baseVolume);
+  };
+
+  /**
+   * Fade out current music over 2s, then fade in new track over 2s.
+   * Guards against scene shutdown mid-crossfade.
+   */
+  private crossfadeToMusic(newTrackKey: string, baseVolumeOverride?: number): void {
+    const effectiveBase = baseVolumeOverride ?? this.musicBaseVolume;
+    this.activeMusicBaseVolume = effectiveBase;
+    const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+    const targetVol = effectiveBase * userVol;
+
+    if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
+      // Fade out current track, then start new one
+      this.tweens.add({
+        targets: this.bgMusic,
+        volume: 0,
+        duration: 2000,
+        ease: 'Sine.easeOut',
+        onComplete: () => {
+          // Guard: scene may have shut down while fade was running
+          if (!this.scene || !this.scene.isActive()) return;
+          if (this.bgMusic) {
+            this.bgMusic.stop();
+            this.bgMusic.destroy();
+            this.bgMusic = undefined;
+          }
+          this.startMusicTrack(newTrackKey, targetVol);
+        },
+      });
+    } else {
+      // No current track (or not playing) — start new track immediately
+      if (this.bgMusic) {
+        this.bgMusic.stop();
+        this.bgMusic.destroy();
+        this.bgMusic = undefined;
+      }
+      this.startMusicTrack(newTrackKey, targetVol);
+    }
+  }
+
+  private startMusicTrack(key: string, targetVol: number): void {
+    if (!this.scene || !this.scene.isActive()) return;
+    try {
+      this.bgMusic = this.sound.add(key, { loop: true, volume: 0 });
+      this.bgMusic.play();
+      this.tweens.add({
+        targets: this.bgMusic,
+        volume: targetVol,
+        duration: 2000,
+        ease: 'Sine.easeIn',
+      });
+    } catch (e) {
+      console.warn(`[ExplorationScene] crossfade to ${key} failed:`, e);
+    }
+  }
 
   private onPlaySfx = (data: { key: string; volume?: number }) => {
     if (!this.scene.isActive()) return;
