@@ -39,14 +39,9 @@ test.describe('Room Navigation', () => {
     expect(state.currentRoomId).toBe('hospital_entrance');
   });
 
-  test('Navigate through hallway: reception -> hallway -> break room', async ({ page }) => {
-    // loadRoom bypasses locks; hallways are accessible if their source dept is accessible
-    // reception -> hallway_reception_break requires reception to be accessible (it is via backtrack)
-    // hallway -> break_room requires reception to be completed
-    // Since loadRoom doesn't set completedRooms, break_room may be locked
-    // Use loadRoom to test hallway connectivity only
+  test('Hallway loads and connects back to source room', async ({ page }) => {
+    // Load hallway directly, verify we can go back to reception (always accessible via backtrack)
     await loadRoom(page, 'hallway_reception_break');
-    // From hallway, going back to reception should work (backtrack)
     await goThroughDoor(page, 'hallway_recbreak_to_reception', 'reception');
     const state = await qaState(page);
     expect(state.currentRoomId).toBe('reception');
