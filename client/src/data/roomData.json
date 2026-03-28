@@ -3,33 +3,37 @@
     {
       "id": "hospital_entrance",
       "name": "Hospital Entrance",
-      "subtitle": "HIPAA Training Center",
-      "description": "The main lobby of Valley General Hospital. You're starting your first day.",
+      "subtitle": "Valley General Hospital",
+      "description": "The main lobby of Valley General Hospital. Your first day starts here.",
       "unlockRequirement": null,
       "alwaysUnlocked": true,
-      "width": 20,
-      "height": 15,
+      "width": 16,
+      "height": 12,
       "backgroundImage": "lobby",
-      "spawnPoint": {"x": 10, "y": 12},
+      "spawnPoint": {"x": 8, "y": 9},
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-        {"x": 3, "y": 3, "width": 3, "height": 2, "type": "desk"},
-        {"x": 14, "y": 3, "width": 3, "height": 2, "type": "plant"},
+        {"x": 0, "y": 0, "width": 16, "height": 1, "type": "wall"},
+        {"x": 0, "y": 11, "width": 16, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 12, "type": "wall"},
+        {"x": 15, "y": 0, "width": 1, "height": 5, "type": "wall"},
+        {"x": 15, "y": 7, "width": 1, "height": 5, "type": "wall"},
+        {"x": 5, "y": 2, "width": 5, "height": 2, "type": "desk"},
+        {"x": 2, "y": 6, "width": 2, "height": 1, "type": "chairs"},
         {"x": 2, "y": 8, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 16, "y": 8, "width": 2, "height": 1, "type": "chairs"}
+        {"x": 12, "y": 6, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 12, "y": 8, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 1, "y": 2, "width": 1, "height": 1, "type": "plant"},
+        {"x": 1, "y": 10, "width": 1, "height": 1, "type": "plant"}
       ],
       "npcs": [
         {
           "id": "riley_entrance",
           "name": "Riley",
           "role": "receptionist",
-          "x": 5,
-          "y": 5,
+          "x": 7,
+          "y": 4,
           "sprite": "receptionist",
-          "sceneId": "riley_entrance_intro",
+          "sceneId": "riley_scene1",
           "isFinalBoss": false
         }
       ],
@@ -40,8 +44,8 @@
         {
           "id": "entrance_to_reception",
           "targetRoomId": "reception",
-          "x": 19,
-          "y": 7,
+          "x": 15,
+          "y": 6,
           "side": "right",
           "label": "Reception"
         }

@@ -606,10 +606,31 @@ export class ExplorationScene extends Phaser.Scene {
         }
       }
 
-      // Physics collision body (invisible)
-      const wallRect = this.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh);
-      wallRect.setVisible(false);
-      this.walls.add(wallRect);
+      // Physics collision body (invisible) — skip tiles occupied by doors
+      const doors: Array<{ x: number; y: number }> = (room as any).doors || [];
+      if (obsType === 'wall' && doors.length > 0) {
+        // Build collision per-tile, skipping door tiles (and 1 tile adjacent inward)
+        for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
+          for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
+            const isDoorTile = doors.some((d: any) => {
+              // Skip the door tile itself and one tile of clearance
+              if (d.x === wx && d.y === wy) return true;
+              if (d.x === wx && Math.abs(d.y - wy) <= 1) return true;
+              if (d.y === wy && Math.abs(d.x - wx) <= 1) return true;
+              return false;
+            });
+            if (!isDoorTile) {
+              const wr = this.add.rectangle(wx * TILE + TILE / 2, wy * TILE + TILE / 2, TILE, TILE);
+              wr.setVisible(false);
+              this.walls.add(wr);
+            }
+          }
+        }
+      } else {
+        const wallRect = this.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh);
+        wallRect.setVisible(false);
+        this.walls.add(wallRect);
+      }
     }
 
     // ── Educational items ────────────────────────────────────────
