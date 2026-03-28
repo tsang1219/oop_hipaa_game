@@ -36,6 +36,7 @@ export const BRIDGE_EVENTS = {
   BREACH_GAME_OVER: 'breach:game-over',
   BREACH_VICTORY: 'breach:victory',
   BREACH_TOWER_PLACED: 'breach:tower-placed',
+  ENCOUNTER_TRIGGERED: 'encounter:triggered',   // ExplorationScene: encounter zone activated
 
   // React -> Phaser
   REACT_PAUSE_EXPLORATION: 'react:pause-exploration',
@@ -56,4 +57,9 @@ export const BRIDGE_EVENTS = {
   REACT_SET_MUSIC_VOLUME: 'react:set-music-volume',
   REACT_PLAY_SFX: 'react:play-sfx',
   REACT_ANSWER_FEEDBACK: 'react:answer-feedback',
+  REACT_LAUNCH_ENCOUNTER: 'react:launch-encounter',           // React: user confirmed narrative card
+  REACT_RETURN_FROM_ENCOUNTER: 'react:return-from-encounter', // React: debrief dismissed, return to RPG
+
+  // Bidirectional
+  ENCOUNTER_COMPLETE: 'encounter:complete',   // BreachDefenseScene -> React: encounter finished with result
 } as const;

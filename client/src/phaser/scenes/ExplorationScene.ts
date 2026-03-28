@@ -1,6 +1,12 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures, furnitureTextureKey, npcTextureKey, npcTypeFromId, objectTextureKey } from '../SpriteFactory';
+import {
+  ENCOUNTER_WAVES_INBOUND,
+  ENCOUNTER_WAVE_BUDGETS,
+  ENCOUNTER_AVAILABLE_TOWERS,
+} from '../../game/breach-defense/constants';
+import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 const TILE = 32;
@@ -67,6 +73,9 @@ export class ExplorationScene extends Phaser.Scene {
   // Dialogue dim overlay — anticipation beat before dialogue opens
   private dialogueDimOverlay?: Phaser.GameObjects.Rectangle;
 
+  // Encounter state
+  private encounterTriggered = false;
+
   // Door navigation state (Phase 12)
   private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
   private doorStates: Record<string, 'locked' | 'available' | 'completed'> = {};
@@ -100,6 +109,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.moveTimer = null;
     this.pendingInteraction = null;
     this.paused = false;
+    this.encounterTriggered = false;
 
     // Reset transitioning so scene restart doesn't freeze movement
     this.transitioning = false;
@@ -1050,6 +1060,11 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
 
+    // Encounter lifecycle listeners (Phase 13)
+    this.events.on(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, this.onLaunchEncounter, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, this.onReturnFromEncounter, this);
+
     // Sync mute state from localStorage before any audio plays
     if (localStorage.getItem('sfx_muted') === 'true') {
       this.sound.mute = true;
@@ -1240,6 +1255,20 @@ export class ExplorationScene extends Phaser.Scene {
       this.triggerInteraction(this.nearbyInteractable);
     }
 
+    // IT Office encounter zone check (Phase 13)
+    // Server terminal area — triggers when player walks near the workstation cluster
+    if (this.room.id === 'it_office' && !this.encounterTriggered && !this.paused) {
+      const alreadyDone = this.registry.get('encounterResult_td-it-office');
+      if (!alreadyDone) {
+        // Workstation cluster is at tiles (8,5)-(11,6), trigger zone around (9,6)
+        const dx = Math.abs(this.player.x - (9 * TILE + TILE / 2));
+        const dy = Math.abs(this.player.y - (6 * TILE + TILE / 2));
+        if (dx < TILE * 1.5 && dy < TILE * 1.5) {
+          this.triggerEncounter('td-it-office');
+        }
+      }
+    }
+
     // Door proximity detection + auto-trigger (Phase 12)
     if (!this.transitioning) {
       this.checkDoorProximity();
@@ -1271,6 +1300,10 @@ export class ExplorationScene extends Phaser.Scene {
     // Door navigation listeners (Phase 12)
     eventBridge.off(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
+    // Encounter lifecycle listeners (Phase 13)
+    this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, this.onLaunchEncounter, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, this.onReturnFromEncounter, this);
     // Clean up input handlers
     this.input.off('pointerdown');
     // Kill all tweens to prevent leaked infinite loops
@@ -1299,6 +1332,61 @@ export class ExplorationScene extends Phaser.Scene {
       // Sound manager may be in a bad state (e.g. sounds array null after
       // WebAudio context destruction). Safe to swallow here.
     }
+  };
+
+  // ── Encounter lifecycle (Phase 13) ──────────────────────────────
+
+  /** Called when the IT Office encounter zone is activated. */
+  private triggerEncounter(encounterId: string): void {
+    // Guard: only fire once per room session and only if not already completed
+    if (this.encounterTriggered) return;
+    const alreadyDone = this.registry.get(`encounterResult_${encounterId}`);
+    if (alreadyDone) return;
+
+    this.encounterTriggered = true;
+    this.paused = true;
+
+    const config: BreachDefenseInitData = {
+      encounterId,
+      waveSubset: ENCOUNTER_WAVES_INBOUND,
+      availableTowerIds: [...ENCOUNTER_AVAILABLE_TOWERS],
+      budgetOverride: ENCOUNTER_WAVE_BUDGETS,
+    };
+
+    eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, {
+      encounterId,
+      narrativeText:
+        "The security analyst just flagged suspicious login attempts on the patient records server. " +
+        "Something is actively probing your network. You need to defend the systems — now.",
+      config,
+    });
+    // React shows the narrative context card. On user confirmation,
+    // React emits REACT_LAUNCH_ENCOUNTER and ExplorationScene handles it below.
+  }
+
+  /** React confirmed the narrative card — launch BreachDefense and sleep. */
+  private onLaunchEncounter = (data: { config: BreachDefenseInitData }): void => {
+    this.cameras.main.fadeOut(400, 0, 0, 0);
+    this.cameras.main.once(
+      Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
+      () => {
+        this.scene.launch('BreachDefense', data.config);
+        this.scene.sleep();
+      }
+    );
+  };
+
+  /** React dismissed the debrief — stop BreachDefense and wake this scene. */
+  private onReturnFromEncounter = (): void => {
+    this.scene.stop('BreachDefense');
+    this.scene.wake();
+  };
+
+  /** Fires when this scene wakes from sleep (after encounter ends). */
+  private handleWakeFromEncounter = (): void => {
+    this.paused = false;
+    this.cameras.main.fadeIn(400, 0, 0, 0);
+    // encounterTriggered stays true — prevents re-triggering on same room session
   };
 
   // ── Door navigation (Phase 12) ──────────────────────────────────
