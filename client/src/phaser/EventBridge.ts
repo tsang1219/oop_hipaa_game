@@ -63,6 +63,12 @@ export const BRIDGE_EVENTS = {
   CHOICE_FLAG_SET: 'react:choice-flag-set',                   // payload: { flagKey: string, flagValue: string | boolean }
   REACT_ROOM_COMPLETE_FANFARE: 'react:room-complete-fanfare', // payload: { roomId: string; playerX: number; playerY: number }
 
+  // QA Testing
+  QA_MOVE_PLAYER_TO: 'qa:move-player-to',         // payload: { tileX: number, tileY: number }
+  QA_PRESS_SPACE: 'qa:press-space',                // no payload
+  QA_NAVIGATE_DOOR: 'qa:navigate-door',            // payload: { doorId: string }
+  EXPLORATION_STATE_UPDATE: 'exploration:state-update', // payload: ExplorationStatePayload
+
   // Bidirectional
   ENCOUNTER_COMPLETE: 'encounter:complete',   // BreachDefenseScene -> React: encounter finished with result
 } as const;

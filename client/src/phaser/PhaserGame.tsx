@@ -1,4 +1,4 @@
-import { useEffect, useRef, forwardRef, useImperativeHandle } from 'react';
+import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 'react';
 import Phaser from 'phaser';
 import { createGameConfig } from './config';
 import { eventBridge, BRIDGE_EVENTS } from './EventBridge';
@@ -13,8 +13,10 @@ export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
   ({ width = 960, height = 720, onSceneReady }, ref) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
+    // State toggle to force useImperativeHandle to re-evaluate after game creation
+    const [gameReady, setGameReady] = useState(false);
 
-    useImperativeHandle(ref, () => gameRef.current!);
+    useImperativeHandle(ref, () => gameRef.current!, [gameReady]);
 
     useEffect(() => {
       if (!containerRef.current || gameRef.current) return;
@@ -26,6 +28,8 @@ export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
       });
 
       gameRef.current = new Phaser.Game(config);
+      // Trigger re-evaluation of useImperativeHandle so parent gets the game instance
+      setGameReady(true);
 
       // Ensure crisp pixel rendering on the canvas
       const canvas = containerRef.current?.querySelector('canvas');

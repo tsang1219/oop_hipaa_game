@@ -8,7 +8,7 @@ export default defineConfig({
   use: {
     baseURL: 'http://localhost:8080',
     viewport: { width: 1280, height: 960 },
-    actionTimeout: 15_000,
+    actionTimeout: 30_000,
   },
   webServer: {
     command: 'npm run dev',

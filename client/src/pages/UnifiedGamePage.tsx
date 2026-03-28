@@ -90,6 +90,13 @@ function computeDoorStates(
 }
 
 export default function UnifiedGamePage() {
+  // QA: clear save data for clean test state (must run before useGameState)
+  const qaNoSaveRef = useRef(new URLSearchParams(window.location.search).has('qa-no-save'));
+  if (qaNoSaveRef.current) {
+    localStorage.removeItem('pq:save:v2');
+    localStorage.removeItem('pq_save');
+  }
+
   const { toast } = useToast();
   const { notify } = useNotification();
   const gameRef = useRef<Phaser.Game | null>(null);
@@ -152,7 +159,8 @@ export default function UnifiedGamePage() {
 
   // Intro modal
   const [showIntroModal, setShowIntroModal] = useState(() => {
-    if (new URLSearchParams(window.location.search).has('qa-room')) return false;
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('qa-room') || params.has('qa-skip-onboarding') || params.has('qa-no-save')) return false;
     return !initialSave.current.onboardingSeen;
   });
 
@@ -169,6 +177,7 @@ export default function UnifiedGamePage() {
 
   // ── Consolidated persistence ──────────────────────────────────
   useEffect(() => {
+    if (qaNoSaveRef.current) return;
     const currentMusicVolume = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
     writeSave({
       version: 2,
@@ -291,13 +300,24 @@ export default function UnifiedGamePage() {
     [resolvedGates, unlockedNpcs, currentRoomId],
   );
 
-  // ── QA auto-navigation ────────────────────────────────────────
+  // ── QA auto-navigation — jump directly to a room for testing ──
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const qaRoom = params.get('qa-room');
     if (qaRoom && rooms.some(r => r.id === qaRoom)) {
       const timer = setTimeout(() => {
+        const targetRoom = rooms.find(r => r.id === qaRoom);
+        if (!targetRoom) return;
         gameState.setCurrentRoom(qaRoom);
+        // Emit REACT_LOAD_ROOM to actually transition the Phaser scene
+        const doorStates = computeDoorStates(targetRoom, gameState.state.completedRooms);
+        eventBridge.emit(BRIDGE_EVENTS.REACT_LOAD_ROOM, {
+          room: targetRoom,
+          completedNPCs: gameState.state.completedNPCs,
+          completedZones: gameState.state.completedZones,
+          collectedItems: gameState.state.collectedItems,
+          doorStates,
+        });
       }, 2000);
       return () => clearTimeout(timer);
     }
@@ -305,31 +325,50 @@ export default function UnifiedGamePage() {
 
   // ── Boot → Start ExplorationScene with hospital_entrance ──────
   useEffect(() => {
-    const handleSceneReady = (sceneKey: string) => {
-      if (sceneKey === 'Boot' && gameRef.current && !sceneStartedRef.current) {
-        sceneStartedRef.current = true;
-        const resumeRoomId = gameState.state.currentRoomId ?? 'hospital_entrance';
-        const startRoom = rooms.find(r => r.id === resumeRoomId)
-          ?? rooms.find(r => r.id === 'hospital_entrance')!;
-        const doorStates = computeDoorStates(startRoom, gameState.state.completedRooms);
+    const startExploration = () => {
+      if (!gameRef.current || sceneStartedRef.current) return;
+      sceneStartedRef.current = true;
+      const resumeRoomId = gameState.state.currentRoomId ?? 'hospital_entrance';
+      const startRoom = rooms.find(r => r.id === resumeRoomId)
+        ?? rooms.find(r => r.id === 'hospital_entrance')!;
+      const doorStates = computeDoorStates(startRoom, gameState.state.completedRooms);
 
-        gameState.setCurrentRoom(startRoom.id);
+      gameState.setCurrentRoom(startRoom.id);
 
-        gameRef.current.scene.start('Exploration', {
-          room: startRoom,
-          completedNPCs: gameState.state.completedNPCs,
-          completedZones: gameState.state.completedZones,
-          collectedItems: gameState.state.collectedItems,
-          doorStates,
-        });
+      gameRef.current.scene.start('Exploration', {
+        room: startRoom,
+        completedNPCs: gameState.state.completedNPCs,
+        completedZones: gameState.state.completedZones,
+        collectedItems: gameState.state.collectedItems,
+        doorStates,
+      });
 
-        if (showIntroModal) {
-          eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
-        }
+      if (showIntroModal) {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
       }
     };
+
+    const handleSceneReady = (sceneKey: string) => {
+      if (sceneKey === 'Boot') startExploration();
+    };
     eventBridge.on(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
-    return () => { eventBridge.off(BRIDGE_EVENTS.SCENE_READY, handleSceneReady); };
+
+    // If Boot already fired before this effect registered (race condition),
+    // poll briefly for the game ref to become available
+    const bootPoll = setInterval(() => {
+      if (gameRef.current && !sceneStartedRef.current) {
+        clearInterval(bootPoll);
+        startExploration();
+      }
+    }, 50);
+    // Stop polling after 5 seconds as safety valve
+    const bootTimeout = setTimeout(() => clearInterval(bootPoll), 5000);
+
+    return () => {
+      eventBridge.off(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
+      clearInterval(bootPoll);
+      clearTimeout(bootTimeout);
+    };
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // ── Room completion check ─────────────────────────────────────
@@ -816,15 +855,17 @@ export default function UnifiedGamePage() {
 
         {/* Dialogue overlay */}
         {pageMode === 'dialogue' && currentSceneId && dialogueScenes.length > 0 && (
-          <GameContainer
-            scenes={dialogueScenes}
-            onComplete={handleDialogueComplete}
-            onGameOver={handleGameOver}
-            npcId={currentNPCId || undefined}
-            npcName={npc?.name}
-            initialPrivacyScore={gameState.state.privacyScore}
-            onPrivacyScoreChange={handlePrivacyScoreChange}
-          />
+          <div data-testid="dialogue-overlay" className="contents">
+            <GameContainer
+              scenes={dialogueScenes}
+              onComplete={handleDialogueComplete}
+              onGameOver={handleGameOver}
+              npcId={currentNPCId || undefined}
+              npcName={npc?.name}
+              initialPrivacyScore={gameState.state.privacyScore}
+              onPrivacyScoreChange={handlePrivacyScoreChange}
+            />
+          </div>
         )}
 
         {/* Educational item modal */}

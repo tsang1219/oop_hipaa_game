@@ -88,6 +88,9 @@ export class ExplorationScene extends Phaser.Scene {
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.25;
 
+  // QA state broadcast throttle
+  private lastStateBroadcastTime = 0;
+
   constructor() {
     super({ key: 'Exploration' });
   }
@@ -1210,6 +1213,11 @@ export class ExplorationScene extends Phaser.Scene {
     });
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
+
+    // QA command listeners — Playwright drives the game via these
+    eventBridge.on(BRIDGE_EVENTS.QA_MOVE_PLAYER_TO, this.onQAMoveTo, this);
+    eventBridge.on(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
+    eventBridge.on(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
   }
 
   update() {
@@ -1352,6 +1360,36 @@ export class ExplorationScene extends Phaser.Scene {
       this.sound.play('sfx_interact', { volume: 0.4 });
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, this.room.id);
     }
+
+    // QA state broadcast (throttled to 200ms)
+    if (this.time.now - this.lastStateBroadcastTime > 200) {
+      this.lastStateBroadcastTime = this.time.now;
+      eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_STATE_UPDATE, {
+        currentRoomId: this.room.id,
+        playerTileX: this.tileX,
+        playerTileY: this.tileY,
+        nearbyInteractable: this.nearbyInteractable
+          ? { type: this.nearbyInteractable.type, id: this.nearbyInteractable.id }
+          : null,
+        nearDoor: this.nearDoor
+          ? { id: this.nearDoor.id, targetRoomId: this.nearDoor.targetRoomId }
+          : null,
+        paused: this.paused,
+        interactables: this.interactables.map(ia => ({
+          type: ia.type,
+          id: ia.id,
+          x: (ia.data as any).x,
+          y: (ia.data as any).y,
+        })),
+        doors: ((this.room as any).doors || []).map((d: any) => ({
+          id: d.id,
+          targetRoomId: d.targetRoomId,
+          x: d.x,
+          y: d.y,
+          state: this.doorStates[d.id] ?? 'available',
+        })),
+      });
+    }
   }
 
   shutdown() {
@@ -1377,6 +1415,10 @@ export class ExplorationScene extends Phaser.Scene {
     this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, this.onLaunchEncounter, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, this.onReturnFromEncounter, this);
+    // QA command listeners cleanup
+    eventBridge.off(BRIDGE_EVENTS.QA_MOVE_PLAYER_TO, this.onQAMoveTo, this);
+    eventBridge.off(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
+    eventBridge.off(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     // Clean up input handlers
     this.input.off('pointerdown');
     // Kill all tweens to prevent leaked infinite loops
@@ -1387,6 +1429,71 @@ export class ExplorationScene extends Phaser.Scene {
       this.npcPulseTween = null;
     }
   }
+
+  // ── QA Testing Commands ──────────────────────────────────────────
+
+  private onQAMoveTo = (data: { tileX: number; tileY: number }) => {
+    if (!this.scene.isActive()) return;
+    const path = this.findPath(
+      { x: this.tileX, y: this.tileY },
+      { x: data.tileX, y: data.tileY }
+    );
+    if (path.length > 0) {
+      this.startPathMovement(path, null);
+    }
+  };
+
+  private onQAPressSpace = () => {
+    if (!this.scene.isActive()) return;
+    // If near an interactable, trigger it
+    if (this.nearbyInteractable) {
+      this.triggerInteraction(this.nearbyInteractable);
+      return;
+    }
+    // If near a door, enter it
+    if (this.nearDoor && !this.transitioning) {
+      this.handleDoorInteraction(this.nearDoor);
+    }
+  };
+
+  private onQANavigateDoor = (data: { doorId: string }) => {
+    if (!this.scene.isActive()) return;
+    const doors = (this.room as any).doors;
+    if (!doors) return;
+    const door = doors.find((d: any) => d.id === data.doorId);
+    if (!door) return;
+
+    // Move to door position, then enter
+    const path = this.findPath(
+      { x: this.tileX, y: this.tileY },
+      { x: door.x, y: door.y }
+    );
+    if (path.length > 0) {
+      // Use a pending callback approach: move to door, then interact
+      this.startPathMovement(path, null);
+      // After path completes, press space
+      const checkArrival = this.time.addEvent({
+        delay: 100,
+        repeat: 100, // max 10 seconds
+        callback: () => {
+          if (this.movePath.length === 0) {
+            checkArrival.destroy();
+            // Small delay for proximity check to fire
+            this.time.delayedCall(150, () => {
+              if (this.nearDoor && this.nearDoor.id === data.doorId) {
+                this.handleDoorInteraction(this.nearDoor);
+              }
+            });
+          }
+        },
+      });
+    } else {
+      // Already at the door
+      if (this.nearDoor && this.nearDoor.id === data.doorId) {
+        this.handleDoorInteraction(this.nearDoor);
+      }
+    }
+  };
 
   private onMusicVolume = (vol: number) => {
     if (!this.scene.isActive()) return;
