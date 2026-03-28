@@ -60,6 +60,14 @@ export default function PrivacyQuestPage() {
   const gameRef = useRef<Phaser.Game | null>(null);
   const sceneStartedForRoom = useRef<string | null>(null);
 
+  // Refs for stale-closure-safe reading of narrative state (Phase 14)
+  const decisionsRef = useRef(unifiedState.decisions);
+  const actStateRef = useRef({ current: unifiedState.currentAct, act1Complete: unifiedState.act1Complete });
+  useEffect(() => { decisionsRef.current = unifiedState.decisions; }, [unifiedState.decisions]);
+  useEffect(() => {
+    actStateRef.current = { current: unifiedState.currentAct, act1Complete: unifiedState.act1Complete };
+  }, [unifiedState.currentAct, unifiedState.act1Complete]);
+
   // ── State ────────────────────────────────────────────────────
   const [pageMode, setPageMode] = useState<PageMode>('hub');
   const [currentRoomId, setCurrentRoomId] = useState<string | null>(null);
@@ -357,6 +365,34 @@ export default function PrivacyQuestPage() {
     setPageMode('hub');
   }, [currentRoomId, completedRooms, completedNPCs, completedZones, collectedItems, notify]);
 
+  // ── NPC variant dialogue routing (Phase 14) ─────────────────
+  // Routes NPCs to variant scenes based on decision flags and act state.
+  // Uses refs to avoid stale closure reads inside EventBridge callbacks.
+  const getSceneIdForNPC = useCallback((npcId: string, baseSceneId: string): string => {
+    const d = decisionsRef.current;
+
+    // Security Analyst Sam — fax incident handling
+    if (npcId === 'security_analyst') {
+      if (d.faxIncidentHandled === 'reported') {
+        return 'security_analyst_variant_fax_reported';
+      }
+      if (d.faxIncidentHandled === 'delayed' || d.faxIncidentHandled === 'ignored') {
+        return 'security_analyst_variant_fax_delayed_ignored';
+      }
+      // Vendor credential sharing (secondary decision)
+      if (d.vendorAccessGranted === true) {
+        return 'security_analyst_variant_vendor_credentials';
+      }
+    }
+
+    // Records Clerk — journey acknowledgment (Act 2+)
+    if (npcId === 'records_clerk' && actStateRef.current.current >= 2) {
+      return 'records_clerk_variant_journey';
+    }
+
+    return baseSceneId;
+  }, []);
+
   // ── EventBridge listeners ────────────────────────────────────
   useEffect(() => {
     const onInteractNPC = (data: { npcId: string; npcName: string; sceneId: string; isFinalBoss?: boolean }) => {
@@ -366,13 +402,14 @@ export default function PrivacyQuestPage() {
         eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
         return;
       }
-      const sceneExists = scenes.some(s => s.id === data.sceneId);
+      const resolvedSceneId = getSceneIdForNPC(data.npcId, data.sceneId);
+      const sceneExists = scenes.some(s => s.id === resolvedSceneId);
       if (!sceneExists) {
-        toast({ title: 'Scene Not Found', description: `"${data.sceneId}" is not available yet.`, variant: 'destructive' });
+        toast({ title: 'Scene Not Found', description: `"${resolvedSceneId}" is not available yet.`, variant: 'destructive' });
         eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
         return;
       }
-      setCurrentSceneId(data.sceneId);
+      setCurrentSceneId(resolvedSceneId);
       setCurrentNPCId(data.npcId);
       setPageMode('dialogue');
     };

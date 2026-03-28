@@ -1084,6 +1084,73 @@
         }
       ],
       "isEnd": true
+    },
+    {
+      "id": "security_analyst_variant_fax_reported",
+      "character": "Security Analyst Sam",
+      "dialogue": "Word travels fast in compliance. I heard about the fax incident -- you reported it right away. That instinct? That's exactly what we need more of around here. Now, about why I called you in...",
+      "choices": [
+        {
+          "text": "Good to know the right call paid off.",
+          "score": 0,
+          "feedback": "Reporting privacy incidents immediately is exactly right. You start the clock on the 60-day breach notification window and give the organization a chance to manage the risk properly."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "security_analyst_variant_fax_delayed_ignored",
+      "character": "Security Analyst Sam",
+      "dialogue": "Look, I'm going to be straight with you. That fax situation a while back -- it wasn't handled by the book. Delays and hoping things blow over are how small incidents become federal violations. If anything like that happens again, you find me. Same day.",
+      "choices": [
+        {
+          "text": "Understood. I'll come to you immediately next time.",
+          "score": 3,
+          "feedback": "Correct instinct. Breach notification has a hard 60-day limit from discovery to patient notification, but internal reporting should happen within hours -- not days. Early reporting means more options to mitigate."
+        },
+        {
+          "text": "It wasn't that serious though, was it?",
+          "score": -5,
+          "feedback": "It was serious. An unsecured PHI disclosure to an unauthorized recipient triggers HIPAA's breach notification requirements. The severity doesn't reduce your obligation to report -- it increases it."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "security_analyst_variant_vendor_credentials",
+      "character": "Security Analyst Sam",
+      "dialogue": "I need to talk to you about something. Our access logs show your credentials were used by someone from MedTech Solutions. I know they seemed legitimate. But when you share your login, everything they do is logged as you. Every access, every file. You're on the hook.",
+      "choices": [
+        {
+          "text": "I understand. I won't do that again.",
+          "score": 5,
+          "feedback": "Good. Credential sharing violates HIPAA's access control requirements and creates an audit trail nightmare. Vendors must get their own authorized access through IT -- never yours."
+        },
+        {
+          "text": "But they were a legitimate vendor, not a hacker.",
+          "score": -5,
+          "feedback": "Legitimacy doesn't matter for access logs. Your credentials = your responsibility. Even a legitimate vendor taking one wrong action under your login is a violation traced back to you. Every. Single. Time."
+        }
+      ],
+      "isEnd": true
+    },
+    {
+      "id": "records_clerk_variant_journey",
+      "character": "Records Clerk Joanna",
+      "dialogue": "You know, I've seen a lot of new employees come through here. Most of them treat this floor like a field trip. But you've actually been asking the right questions. Riley mentioned you, the lab team mentioned you. People notice when someone's paying attention.",
+      "choices": [
+        {
+          "text": "Just trying to do right by the patients.",
+          "score": 3,
+          "feedback": "That instinct -- 'doing right by the patients' -- is the entire point of HIPAA. It's not a compliance checklist. It's a protection framework for real people. Keep that attitude."
+        },
+        {
+          "text": "Is it that obvious I'm new?",
+          "score": 0,
+          "feedback": "The questions you ask reveal what you care about. Caring about compliance from day one is exactly the right start."
+        }
+      ],
+      "isEnd": true
     }
   ]
 }
