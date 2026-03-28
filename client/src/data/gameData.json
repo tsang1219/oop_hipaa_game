@@ -443,16 +443,22 @@
         {
           "text": "Don't tell anyone and hope they just throw it away",
           "score": -20,
+          "flagKey": "faxIncidentHandled",
+          "flagValue": "ignored",
           "feedback": "Congrats, you just turned a small mistake into a reportable breach with potential fines. The cover-up is always worse than the crime. Career suicide move."
         },
         {
           "text": "Tell your supervisor but wait to see if the other office calls you first",
           "score": -15,
+          "flagKey": "faxIncidentHandled",
+          "flagValue": "delayed",
           "feedback": "Delays make it worse. This is a breach that requires immediate action: document, notify Privacy Officer, attempt retrieval, conduct risk assessment, and possibly notify the patient."
         },
         {
           "text": "Document the incident and notify your Privacy Officer immediately",
           "score": 20,
+          "flagKey": "faxIncidentHandled",
+          "flagValue": "reported",
           "feedback": "Correct! This is a BREACH. Unsecured PHI went to an unauthorized recipient. Your Privacy Officer needs to: (1) Document everything, (2) Attempt to retrieve/destroy the information, (3) Conduct risk assessment, (4) Possibly notify the patient. HIPAA has a whole process for this—use it."
         }
       ],
@@ -881,11 +887,15 @@
         {
           "text": "No. Vendors need their own authorized credentials. I can't share mine.",
           "score": 15,
+          "flagKey": "vendorAccessGranted",
+          "flagValue": false,
           "feedback": "Correct! Never share your credentials with ANYONE—especially vendors. They should have their own authorized access through your IT department. If they don't, that's their problem to solve properly."
         },
         {
           "text": "Sure, just this once. You're a legitimate vendor.",
           "score": -15,
+          "flagKey": "vendorAccessGranted",
+          "flagValue": true,
           "feedback": "Wrong! 'Just this once' is how breaches happen. When you share credentials, every action they take is logged under YOUR name. If something goes wrong, you're responsible. Vendors get their own access or no access."
         },
         {

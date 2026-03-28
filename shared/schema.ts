@@ -35,6 +35,8 @@ export const choiceSchema = z.object({
   score: z.number(),
   feedback: z.string(),
   nextSceneId: z.string().optional(),
+  flagKey: z.string().optional(),
+  flagValue: z.union([z.string(), z.boolean()]).optional(),
 });
 
 export const sceneSchema = z.object({
