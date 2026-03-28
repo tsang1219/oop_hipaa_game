@@ -6,6 +6,7 @@ import {
   ENCOUNTER_WAVE_BUDGETS,
   ENCOUNTER_AVAILABLE_TOWERS,
 } from '../../game/breach-defense/constants';
+import { getHallwayBoard } from '../../data/hallwayContent';
 import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
@@ -13,9 +14,9 @@ const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
 
 interface InteractableData {
-  type: 'npc' | 'zone' | 'item';
+  type: 'npc' | 'zone' | 'item' | 'hallwayBoard';
   id: string;
-  data: NPC | InteractionZone | EducationalItem;
+  data: NPC | InteractionZone | EducationalItem | { x: number; y: number; title: string; content: string };
   sprite: Phaser.GameObjects.Sprite;
 }
 
@@ -660,6 +661,41 @@ export class ExplorationScene extends Phaser.Scene {
       this.interactables.push({ type: 'item', id: item.id, data: item, sprite });
     }
 
+    // ── Hallway bulletin board (Phase 15) ────────────────────────
+    if (this.room.id.startsWith('hallway_')) {
+      const act = this.getCurrentAct();
+      const board = getHallwayBoard(this.room.id, act);
+      if (board) {
+        const boardX = w / 2;
+        const boardY = 64;
+
+        // Cork board backing
+        const boardBg = this.add.rectangle(boardX, boardY, 56, 40, 0x8B6914)
+          .setDepth(5);
+        // Paper overlay
+        this.add.rectangle(boardX, boardY, 48, 32, 0xF5E6C8).setDepth(6);
+        // NOTICE label
+        this.add.text(boardX, boardY - 6, 'NOTICE', {
+          fontFamily: '"Press Start 2P"',
+          fontSize: '5px',
+          color: '#8B0000',
+        }).setOrigin(0.5).setDepth(7);
+
+        // Invisible interactive sprite overlapping the board
+        const boardSprite = this.add.sprite(boardX, boardY, objectTextureKey('poster'))
+          .setAlpha(0.01) // nearly invisible; visual is the rectangle above
+          .setDepth(8)
+          .setInteractive({ cursor: 'pointer' });
+
+        this.interactables.push({
+          type: 'hallwayBoard',
+          id: `hallway_board_${this.room.id}_act${act}`,
+          data: { x: Math.floor(boardX / TILE), y: Math.floor(boardY / TILE), title: board.title, content: board.text },
+          sprite: boardSprite,
+        });
+      }
+    }
+
     // ── Interaction zones ────────────────────────────────────────
     for (const zone of room.interactionZones) {
       const texKey = objectTextureKey(zone.spriteType || 'computer');
@@ -1072,11 +1108,20 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // ── Background music — fade in gently after a beat ────────
+    // Select correct music track based on current act (Phase 14 polish fix)
+    const currentAct = this.getCurrentAct();
+    const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
+      1: { track: 'music_hub', baseVol: this.musicBaseVolume },
+      2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
+      3: { track: 'music_breach', baseVol: 0.15 },
+    };
+    const musicCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
+    this.activeMusicBaseVolume = musicCfg.baseVol;
     try {
       const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-      const targetVol = this.musicBaseVolume * userVol;
+      const targetVol = musicCfg.baseVol * userVol;
       if (userVol > 0) {
-        this.bgMusic = this.sound.add('music_exploration', { loop: true, volume: 0 });
+        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0 });
         const playMusic = () => {
           if (!this.bgMusic || !this.scene.isActive()) return;
           this.bgMusic.play();
@@ -1089,7 +1134,7 @@ export class ExplorationScene extends Phaser.Scene {
         }
       }
     } catch (e) {
-      console.warn('[ExplorationScene] music_exploration not ready, skipping BGM:', e);
+      console.warn(`[ExplorationScene] ${musicCfg.track} not ready, skipping BGM:`, e);
     }
 
     // Room entrance — fade in from black
@@ -1399,6 +1444,19 @@ export class ExplorationScene extends Phaser.Scene {
       // WebAudio context destruction). Safe to swallow here.
     }
   };
+
+  // ── Act state helper (Phase 15) ──────────────────────────────────
+
+  private getCurrentAct(): 1 | 2 | 3 {
+    try {
+      const raw = localStorage.getItem('pq:save:v2');
+      if (!raw) return 1;
+      const save = JSON.parse(raw);
+      const act = save?.actProgress;
+      if (act === 2 || act === 3) return act;
+    } catch { /* ignore */ }
+    return 1;
+  }
 
   // ── Encounter lifecycle (Phase 13) ──────────────────────────────
 
@@ -1806,6 +1864,18 @@ export class ExplorationScene extends Phaser.Scene {
         zoneName: zone.name,
         sceneId: zone.sceneId,
       });
+    } else if (ia.type === 'hallwayBoard') {
+      // Hallway bulletin board — readable, not collected (re-readable on re-entry)
+      const boardData = ia.data as { title: string; content: string };
+      eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_INTERACT_ITEM, {
+        itemId: ia.id,
+        title: boardData.title,
+        fact: boardData.content,
+        type: 'poster',
+        isHallwayBoard: true,
+      });
+      // Subtle flash — lighter than item collection
+      this.cameras.main.flash(150, 255, 255, 200, false);
     } else {
       const item = ia.data as EducationalItem;
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_INTERACT_ITEM, {

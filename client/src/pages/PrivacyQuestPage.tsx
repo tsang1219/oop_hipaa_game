@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef, useMemo } from 'react';
 import { useLocation } from 'wouter';
 import { PhaserGame } from '../phaser/PhaserGame';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
@@ -11,6 +11,7 @@ import EndScreen from '@/components/EndScreen';
 // HallwayHub removed in Phase 12 — replaced by door-to-door navigation
 // import HallwayHub from '@/components/HallwayHub';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
+import { DepartmentBreadcrumb } from '@/components/DepartmentBreadcrumb';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { MusicVolumeSlider } from '../components/MusicVolumeSlider';
 import { useNotification } from '../components/NotificationToast';
@@ -102,6 +103,47 @@ export default function PrivacyQuestPage() {
   const resolvedGatesAll = useRef<Record<string, string[]>>(initialSave.resolvedGates);
   const unlockedNpcsAll = useRef<Record<string, string[]>>(initialSave.unlockedNpcs);
   const npcPulsedRooms = useRef<string[]>(initialSave.npcPulsedRooms);
+
+  // ── Current act state (Phase 15 breadcrumb HUD) ────────────
+  const [currentAct, setCurrentAct] = useState<1 | 2 | 3>(() => {
+    try {
+      const raw = localStorage.getItem('pq:save:v2');
+      if (!raw) return 1;
+      const act = JSON.parse(raw)?.actProgress;
+      if (act === 2 || act === 3) return act as 2 | 3;
+    } catch { /* ignore */ }
+    return 1;
+  });
+
+  // Re-read act when completedRooms changes (act may advance when departments complete)
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem('pq:save:v2');
+      if (!raw) return;
+      const act = JSON.parse(raw)?.actProgress;
+      if (act === 1 || act === 2 || act === 3) setCurrentAct(act);
+    } catch { /* ignore */ }
+  }, [completedRooms]);
+
+  // Derive unlocked departments from save state or completion order
+  const unlockedRooms = useMemo(() => {
+    try {
+      const raw = localStorage.getItem('pq:save:v2');
+      if (raw) {
+        const save = JSON.parse(raw);
+        if (Array.isArray(save?.unlockedDepartments)) return save.unlockedDepartments as string[];
+      }
+    } catch { /* ignore */ }
+    // Fallback: reception always unlocked; subsequent unlock when previous is complete
+    const order = ['reception', 'break_room', 'lab', 'records', 'it', 'er'];
+    const unlocked: string[] = ['reception'];
+    for (let i = 0; i < order.length - 1; i++) {
+      if (completedRooms.includes(order[i])) {
+        unlocked.push(order[i + 1]);
+      }
+    }
+    return unlocked;
+  }, [completedRooms]);
 
   // Score milestone celebrations
   const shownMilestones = useRef<Set<number>>(new Set());
@@ -444,8 +486,10 @@ export default function PrivacyQuestPage() {
       setPageMode('dialogue');
     };
 
-    const onInteractItem = (data: { itemId: string; title: string; fact: string; type: string }) => {
+    const onInteractItem = (data: { itemId: string; title: string; fact: string; type: string; isHallwayBoard?: boolean }) => {
       setSelectedItem({ title: data.title, fact: data.fact, type: data.type as any });
+      // Hallway boards are re-readable environmental content — skip collection tracking
+      if (data.isHallwayBoard) return;
       // Functional setState to avoid stale closure
       setCollectedItems(prev => {
         if (prev.has(data.itemId)) return prev;
@@ -641,6 +685,16 @@ export default function PrivacyQuestPage() {
             completedNpcs={completedNPCs}
             completedZones={completedZones}
             collectedItems={collectedItems}
+          />
+        )}
+
+        {/* Department breadcrumb HUD — bottom-center during exploration (Phase 15) */}
+        {pageMode === 'exploration' && currentRoom && (
+          <DepartmentBreadcrumb
+            completedRooms={completedRooms}
+            currentRoomId={currentRoomId}
+            currentAct={currentAct}
+            unlockedRooms={unlockedRooms}
           />
         )}
 
