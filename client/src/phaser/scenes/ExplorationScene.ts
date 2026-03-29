@@ -1443,6 +1443,9 @@ export class ExplorationScene extends Phaser.Scene {
     this.tileY = data.tileY;
     const body = this.player.body as Phaser.Physics.Arcade.Body;
     body.setVelocity(0);
+    // Immediately update proximity so QA pressSpace can find nearby interactables
+    this.checkProximity();
+    this.checkDoorProximity();
   };
 
   private onQAMoveTo = (data: { tileX: number; tileY: number }) => {

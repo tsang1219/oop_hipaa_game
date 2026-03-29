@@ -196,30 +196,37 @@ export async function dismissDialogue(page: Page): Promise<void> {
   }
 
   if (overlayType === 'dialogue') {
-    // Click through the dialogue scenes — keep clicking "Next" until done
-    for (let i = 0; i < 30; i++) {
+    // Click through dialogue phases: dialogue → choices → feedback → complete
+    for (let i = 0; i < 20; i++) {
       const dialogueVisible = await page.locator('[data-testid="dialogue-overlay"]').isVisible().catch(() => false);
       if (!dialogueVisible) break;
 
-      // Try clicking the next-scene button
+      // Check what's currently actionable
       const nextBtn = page.locator('[data-testid="button-next-scene"]');
       if (await nextBtn.isVisible().catch(() => false)) {
         await nextBtn.click();
-        await page.waitForTimeout(400);
+        await page.waitForTimeout(500);
         continue;
       }
 
-      // Try clicking choice buttons (pick first choice)
+      // Wait briefly for choices to render, then check
       const choiceBtn = page.locator('[data-testid="choice-button-1"]');
       if (await choiceBtn.isVisible().catch(() => false)) {
         await choiceBtn.click();
-        await page.waitForTimeout(400);
+        await page.waitForTimeout(500);
         continue;
       }
 
-      // Click the container to advance typewriter/text
-      await page.locator('[data-testid="container-battle-dialogue"]').click().catch(() => {});
-      await page.waitForTimeout(400);
+      // Click dialogue container to skip typewriter / advance dialogue
+      const dialogueContainer = page.locator('[data-testid="container-battle-dialogue"]');
+      if (await dialogueContainer.isVisible().catch(() => false)) {
+        await dialogueContainer.click();
+        // Wait for React to process the phase transition
+        await page.waitForTimeout(600);
+        continue;
+      }
+
+      await page.waitForTimeout(300);
     }
     await page.waitForTimeout(300);
   }
@@ -231,41 +238,37 @@ export async function talkToNPC(
   npcX: number,
   npcY: number,
 ): Promise<void> {
-  // Try the standard approach first: move near + press space
+  // Try the standard approach first: teleport near + press space
   await interactWith(page, npcX, npcY);
 
   // Check if dialogue appeared
   const hasDialogue = await page.evaluate(() =>
     !!(document.querySelector('[data-testid="dialogue-overlay"]') ||
-       document.querySelector('[data-testid="educational-item-modal"]'))
+       document.querySelector('[data-testid="educational-item-modal"]') ||
+       document.querySelector('[data-testid="observation-hint-overlay"]'))
   );
 
   if (!hasDialogue) {
-    // Fallback: find the NPC in roomNPCs and trigger interaction directly via bridge
-    const triggered = await page.evaluate(([x, y]) => {
-      const qa = window.__QA__;
-      if (!qa) return false;
-      const npc = qa.roomNPCs?.find((n: any) => n.id && Math.abs(n.x - x) <= 0 && Math.abs(n.y - y) <= 0);
-      return !!npc;
+    // Fallback: teleport directly below NPC and press space
+    await page.evaluate(([x, y]) => {
+      window.__QA__!.commands.teleportTo(x, y + 1);
     }, [npcX, npcY] as const);
-
-    if (triggered) {
-      // Move player directly to adjacent tile via teleport
-      await page.evaluate(([x, y]) => {
-        // Emit QA_MOVE_PLAYER_TO to teleport near NPC
-        window.__QA__!.commands.movePlayerTo(x, y + 1);
-      }, [npcX, npcY] as const);
-      await page.waitForTimeout(1500);
-      await pressSpace(page);
-    }
+    await page.waitForTimeout(300);
+    await pressSpace(page);
   }
 
   // Wait for dialogue with longer timeout
   await waitForDialogue(page).catch(() => {});
   await dismissDialogue(page);
-  // Wait for scene to unpause
+  // Wait for dialogue overlay to fully disappear (confirms onComplete fired)
+  await page.waitForFunction(
+    () => !document.querySelector('[data-testid="dialogue-overlay"]') &&
+          !document.querySelector('[data-testid="educational-item-modal"]'),
+    { timeout: 5000 },
+  ).catch(() => {});
+  // Wait for scene to unpause and React state to sync to QA bridge
   await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
-  await page.waitForTimeout(300);
+  await page.waitForTimeout(500);
 }
 
 /** Interact with a zone: move, press space, dismiss */

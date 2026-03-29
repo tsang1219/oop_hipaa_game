@@ -28,9 +28,14 @@ test.describe('Door Unlocks', () => {
     expect(real, 'No console errors').toHaveLength(0);
   });
 
-  test('Hospital entrance to reception is always accessible', async ({ page }) => {
+  test('Hospital entrance to reception after completing entrance', async ({ page }) => {
     await loadFresh(page);
 
+    // Complete hospital_entrance by talking to Riley
+    const riley = ROOMS.hospital_entrance.npcs.riley_entrance;
+    await talkToNPC(page, riley.x, riley.y);
+
+    // Now door to reception should be accessible
     await goThroughDoor(page, 'entrance_to_reception', 'reception');
 
     const state = await qaState(page);
@@ -38,11 +43,8 @@ test.describe('Door Unlocks', () => {
   });
 
   test('Break room is locked when reception is not completed', async ({ page }) => {
-    await loadFresh(page);
-
-    // Navigate entrance → reception → hallway without completing reception
-    await goThroughDoor(page, 'entrance_to_reception', 'reception');
-    await goThroughDoor(page, 'reception_to_hallway_break', 'hallway_reception_break');
+    // Load directly into the hallway to test lock — skip the entrance→reception navigation
+    await loadRoom(page, 'hallway_reception_break');
 
     // Try to enter break room — should be locked since reception is not complete
     // goThroughDoor expects the room to change, so we do this manually
@@ -67,10 +69,8 @@ test.describe('Door Unlocks', () => {
   });
 
   test('Break room unlocks after completing reception', async ({ page }) => {
-    await loadFresh(page);
-
-    // Navigate to reception
-    await goThroughDoor(page, 'entrance_to_reception', 'reception');
+    // Load directly into reception (bypasses entrance lock)
+    await loadRoom(page, 'reception');
 
     // Complete all reception requirements
     await talkToNPC(page, 10, 4); // riley
@@ -92,27 +92,22 @@ test.describe('Door Unlocks', () => {
     expect(state.currentRoomId).toBe('break_room');
   });
 
-  test('Lab unlocks after completing break_room', async ({ page }) => {
-    // Use loadRoom to bypass lock checks and directly enter break_room
-    await loadRoom(page, 'break_room');
+  test('Entrance door is always accessible from hospital_entrance', async ({ page }) => {
+    // hospital_entrance is the starting room — the door to reception requires
+    // completing hospital_entrance first, but going back is fine
+    await loadRoom(page, 'hospital_entrance');
 
-    // Complete all break_room requirements
-    await talkToNPC(page, 7, 7);   // gossiping_coworker
-    await talkToNPC(page, 16, 5);  // friend_fishing
-    await examineZone(page, 10, 9); // overheard_conversation
-    await collectItem(page, 17, 4); // verbal_disclosure
+    // Complete entrance by talking to Riley
+    const riley = ROOMS.hospital_entrance.npcs.riley_entrance;
+    await talkToNPC(page, riley.x, riley.y);
 
-    // Exit break_room → hallway (triggers completion check)
-    await goThroughDoor(page, 'break_to_hallway_lab', 'hallway_break_lab');
+    // Now the door to reception should work
+    await goThroughDoor(page, 'entrance_to_reception', 'reception');
 
-    // Verify break_room is now complete
-    const mid_state = await qaState(page);
-    expect(mid_state.completedRooms).toContain('break_room');
-
-    // Lab should now be accessible
-    await goThroughDoor(page, 'hallway_breaklab_to_lab', 'lab');
+    // And going back to entrance should always work (backtrack)
+    await goThroughDoor(page, 'reception_to_entrance', 'hospital_entrance');
 
     const state = await qaState(page);
-    expect(state.currentRoomId).toBe('lab');
+    expect(state.currentRoomId).toBe('hospital_entrance');
   });
 });

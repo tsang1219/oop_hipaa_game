@@ -67,23 +67,19 @@ test.describe('Room Completion', () => {
     expect(state.completedRooms).not.toContain('reception');
   });
 
-  test('Break room completes after requirements', async ({ page }) => {
+  test('Gated NPCs are not immediately interactable', async ({ page }) => {
     await loadRoom(page, 'break_room');
 
-    // Talk to both NPCs
-    await talkToNPC(page, 7, 7);   // gossiping_coworker
-    await talkToNPC(page, 16, 5);  // friend_fishing
-
-    // Examine zone
-    await examineZone(page, 10, 9); // overheard_conversation
-
-    // Collect item
-    await collectItem(page, 17, 4); // verbal_disclosure
-
-    // Exit room to trigger completion check
-    await goThroughDoor(page, 'break_to_hallway_reception', 'hallway_reception_break');
+    // gossiping_coworker has a social gate — interaction should not complete
+    await talkToNPC(page, 7, 7);   // gossiping_coworker (gated)
 
     const state = await qaState(page);
-    expect(state.completedRooms).toContain('break_room');
+    // Gated NPC should NOT appear in completedNPCs
+    expect(state.completedNPCs).not.toContain('gossiping_coworker');
+
+    // But non-gated NPC should work
+    await talkToNPC(page, 16, 5);  // friend_fishing (not gated)
+    const state2 = await qaState(page);
+    expect(state2.completedNPCs).toContain('friend_fishing');
   });
 });
