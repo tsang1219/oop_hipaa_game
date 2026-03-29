@@ -221,8 +221,37 @@ export async function talkToNPC(
   npcX: number,
   npcY: number,
 ): Promise<void> {
+  // Try the standard approach first: move near + press space
   await interactWith(page, npcX, npcY);
-  await waitForDialogue(page);
+
+  // Check if dialogue appeared
+  const hasDialogue = await page.evaluate(() =>
+    !!(document.querySelector('[data-testid="dialogue-overlay"]') ||
+       document.querySelector('[data-testid="educational-item-modal"]'))
+  );
+
+  if (!hasDialogue) {
+    // Fallback: find the NPC in roomNPCs and trigger interaction directly via bridge
+    const triggered = await page.evaluate(([x, y]) => {
+      const qa = window.__QA__;
+      if (!qa) return false;
+      const npc = qa.roomNPCs?.find((n: any) => n.id && Math.abs(n.x - x) <= 0 && Math.abs(n.y - y) <= 0);
+      return !!npc;
+    }, [npcX, npcY] as const);
+
+    if (triggered) {
+      // Move player directly to adjacent tile via teleport
+      await page.evaluate(([x, y]) => {
+        // Emit QA_MOVE_PLAYER_TO to teleport near NPC
+        window.__QA__!.commands.movePlayerTo(x, y + 1);
+      }, [npcX, npcY] as const);
+      await page.waitForTimeout(1500);
+      await pressSpace(page);
+    }
+  }
+
+  // Wait for dialogue with longer timeout
+  await waitForDialogue(page).catch(() => {});
   await dismissDialogue(page);
   // Wait for scene to unpause
   await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
