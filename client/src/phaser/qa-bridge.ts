@@ -71,6 +71,7 @@ export interface QABridge {
     movePlayerTo(tileX: number, tileY: number): void;
     pressSpace(): void;
     navigateToDoor(doorId: string): void;
+    teleportTo(tileX: number, tileY: number): void;
   };
 
   // Promise-based waiters for Playwright
@@ -153,6 +154,9 @@ export function initQABridge() {
       },
       navigateToDoor(doorId: string): void {
         eventBridge.emit(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, { doorId });
+      },
+      teleportTo(tileX: number, tileY: number): void {
+        eventBridge.emit(BRIDGE_EVENTS.QA_TELEPORT_TO, { tileX, tileY });
       },
     },
 

@@ -67,6 +67,7 @@ export const BRIDGE_EVENTS = {
   QA_MOVE_PLAYER_TO: 'qa:move-player-to',         // payload: { tileX: number, tileY: number }
   QA_PRESS_SPACE: 'qa:press-space',                // no payload
   QA_NAVIGATE_DOOR: 'qa:navigate-door',            // payload: { doorId: string }
+  QA_TELEPORT_TO: 'qa:teleport-to',                // payload: { tileX: number, tileY: number } — instant teleport
   EXPLORATION_STATE_UPDATE: 'exploration:state-update', // payload: ExplorationStatePayload
 
   // Bidirectional

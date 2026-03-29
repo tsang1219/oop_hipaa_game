@@ -120,20 +120,25 @@ export async function navigateToDoor(page: Page, doorId: string): Promise<void> 
   await page.evaluate((id) => window.__QA__!.commands.navigateToDoor(id), doorId);
 }
 
-/** Move to an interactable and press SPACE */
+/** Move to an interactable and press SPACE.
+ * Uses QA teleport for reliable instant positioning. */
 export async function interactWith(
   page: Page,
   tileX: number,
   tileY: number,
 ): Promise<void> {
-  // Try adjacent tiles (NPC/zone sprite blocks the target tile itself)
-  for (const [dx, dy] of [[0, 1], [1, 0], [0, -1], [-1, 0], [0, 0]]) {
-    await movePlayerTo(page, tileX + dx, tileY + dy);
-    // Wait for proximity check to fire in the update loop
+  // Teleport to adjacent tiles (NPC sprite blocks the target tile)
+  for (const [dx, dy] of [[0, 1], [1, 0], [0, -1], [-1, 0]]) {
+    await page.evaluate(([x, y]) => {
+      window.__QA__!.commands.teleportTo(x, y);
+    }, [tileX + dx, tileY + dy] as const);
+
+    // Wait for proximity check in update loop (1-2 frames)
     await page.waitForFunction(
       () => window.__QA__?.nearbyInteractable !== null,
       { timeout: 1500 },
     ).catch(() => {});
+
     const nearby = await page.evaluate(() => window.__QA__?.nearbyInteractable);
     if (nearby) {
       await pressSpace(page);
@@ -141,7 +146,12 @@ export async function interactWith(
     }
   }
 
-  // Last resort: just press space from wherever we ended up
+  // Fallback: use BFS movePlayerTo
+  await movePlayerTo(page, tileX, tileY + 1);
+  await page.waitForFunction(
+    () => window.__QA__?.nearbyInteractable !== null,
+    { timeout: 2000 },
+  ).catch(() => {});
   await pressSpace(page);
 }
 

@@ -1218,6 +1218,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.QA_MOVE_PLAYER_TO, this.onQAMoveTo, this);
     eventBridge.on(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
     eventBridge.on(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
+    eventBridge.on(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
   }
 
   update() {
@@ -1419,6 +1420,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.QA_MOVE_PLAYER_TO, this.onQAMoveTo, this);
     eventBridge.off(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
     eventBridge.off(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
+    eventBridge.off(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
     // Clean up input handlers
     this.input.off('pointerdown');
     // Kill all tweens to prevent leaked infinite loops
@@ -1431,6 +1433,17 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   // ── QA Testing Commands ──────────────────────────────────────────
+
+  private onQATeleportTo = (data: { tileX: number; tileY: number }) => {
+    if (!this.scene.isActive()) return;
+    this.movePath = [];
+    if (this.moveTimer) { this.moveTimer.destroy(); this.moveTimer = null; }
+    this.player.setPosition(data.tileX * TILE + TILE / 2, data.tileY * TILE + TILE / 2);
+    this.tileX = data.tileX;
+    this.tileY = data.tileY;
+    const body = this.player.body as Phaser.Physics.Arcade.Body;
+    body.setVelocity(0);
+  };
 
   private onQAMoveTo = (data: { tileX: number; tileY: number }) => {
     if (!this.scene.isActive()) return;
