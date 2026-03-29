@@ -1833,6 +1833,10 @@ export class ExplorationScene extends Phaser.Scene {
 
   private onDoorLocked = () => {
     // Locked door feedback: camera flash + reset transitioning so player can move
+    // Fade back in first in case a fadeOut was already in progress
+    (this.cameras.main as any).fadeEffect?.reset();
+    this.cameras.main.setAlpha(1);
+    this.cameras.main.fadeIn(200, 0, 0, 0);
     this.cameras.main.flash(200, 255, 0, 0, true);
     this.transitioning = false;
     // Use breach_alert SFX as a "denied" sound (sfx_locked doesn't exist)
