@@ -16,5 +16,18 @@
     "verification_test": "visual-qa.spec.ts + progression/",
     "verification_result": "7/7 visual passed (3 skipped), 27/27 progression passed (4 skipped)",
     "notes": "Only 4 of the 8 listed files actually used 'fixed' positioning. The other 4 already used 'absolute'. Parent container in UnifiedGamePage.tsx already has 'relative' class."
+  },
+  {
+    "bug_id": "BUG-001",
+    "fix_plan": "The ValidationOverlay component in client/src/dev/ValidationOverlay.tsx already gates on import.meta.env.DEV but always shows in dev mode. Since Playwright tests run against the dev server, the DEV CHECKS panel appears in visual QA screenshots. Add a URL parameter check (?dev) so the overlay only renders when explicitly requested. Two lines changed in the existing guard conditions -- useEffect early return and render guard. Not touching UnifiedGamePage.tsx or any other file.",
+    "result": "success",
+    "files_changed": ["client/src/dev/ValidationOverlay.tsx"],
+    "diff_summary": "Added URL param check for '?dev' in useEffect setup and render guard so ValidationOverlay only shows when ?dev is in the URL",
+    "lines_added": 2,
+    "lines_removed": 1,
+    "net_delta": 1,
+    "verification_test": "visual-qa.spec.ts + progression/",
+    "verification_result": "7/7 visual passed (3 skipped), 27/27 progression passed (4 skipped)",
+    "notes": "The actual component was in client/src/dev/ValidationOverlay.tsx, not directly in UnifiedGamePage.tsx. The bug ticket's affected_files was slightly off but the component is imported from there."
   }
 ]

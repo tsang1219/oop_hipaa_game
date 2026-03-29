@@ -46,6 +46,8 @@ export function ValidationOverlay({ gameRef }: Props) {
 
   useEffect(() => {
     if (!import.meta.env.DEV) return;
+    const params = new URLSearchParams(window.location.search);
+    if (!params.has('dev')) return;
     setVisible(true);
 
     // ── Check: overlay containment (static code check approximation) ──
@@ -118,7 +120,7 @@ export function ValidationOverlay({ gameRef }: Props) {
     };
   }, []);
 
-  if (!import.meta.env.DEV || !visible) return null;
+  if (!import.meta.env.DEV || !visible || !new URLSearchParams(window.location.search).has('dev')) return null;
 
   const pass = checks.filter(c => c.status === 'pass').length;
   const fail = checks.filter(c => c.status === 'fail').length;
