@@ -148,6 +148,11 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   create() {
+    // Reset camera fade from previous room transition (fixes black screen on scene.restart)
+    // The fadeOut effect from the previous room may still be active after scene.restart()
+    (this.cameras.main as any).fadeEffect?.reset();
+    this.cameras.main.setAlpha(1);
+
     const room = this.room;
     const w = room.width * TILE;
     const h = room.height * TILE;
