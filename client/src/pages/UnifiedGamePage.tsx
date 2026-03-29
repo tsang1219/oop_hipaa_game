@@ -90,9 +90,11 @@ function computeDoorStates(
 }
 
 export default function UnifiedGamePage() {
-  // QA: clear save data for clean test state (must run before useGameState)
+  // QA: clear save data on FIRST render only for clean test state
   const qaNoSaveRef = useRef(new URLSearchParams(window.location.search).has('qa-no-save'));
-  if (qaNoSaveRef.current) {
+  const qaClearedRef = useRef(false);
+  if (qaNoSaveRef.current && !qaClearedRef.current) {
+    qaClearedRef.current = true;
     localStorage.removeItem('pq:save:v2');
     localStorage.removeItem('pq_save');
   }
