@@ -95,17 +95,17 @@ export async function movePlayerTo(page: Page, tileX: number, tileY: number): Pr
   await page.evaluate(([tx, ty]) => {
     window.__QA__!.commands.movePlayerTo(tx, ty);
   }, [tileX, tileY] as const);
-  // Wait for player to arrive (check periodically)
+  // Wait briefly for player to arrive (path may be blocked — don't wait too long)
   await page.waitForFunction(
     ([tx, ty]) => {
       const pos = window.__QA__?.playerPosition;
-      return pos && pos.tileX === tx && pos.tileY === ty;
+      if (!pos) return false;
+      // Accept within 2 tiles (path may stop short due to obstacles)
+      return Math.abs(pos.tileX - tx) + Math.abs(pos.tileY - ty) <= 2;
     },
     [tileX, tileY] as const,
-    { timeout: 15_000 },
-  ).catch(() => {
-    // Player may be 1 tile off due to obstacles — that's acceptable
-  });
+    { timeout: 3_000 },
+  ).catch(() => {});
   await page.waitForTimeout(200);
 }
 
@@ -127,12 +127,12 @@ export async function interactWith(
   tileY: number,
 ): Promise<void> {
   // Try adjacent tiles (NPC/zone sprite blocks the target tile itself)
-  for (const [dx, dy] of [[0, 1], [0, -1], [1, 0], [-1, 0], [0, 0]]) {
+  for (const [dx, dy] of [[0, 1], [1, 0], [0, -1], [-1, 0], [0, 0]]) {
     await movePlayerTo(page, tileX + dx, tileY + dy);
-    // Wait for proximity check to fire in the update loop (needs 1-2 frames)
+    // Wait for proximity check to fire in the update loop
     await page.waitForFunction(
       () => window.__QA__?.nearbyInteractable !== null,
-      { timeout: 2000 },
+      { timeout: 1500 },
     ).catch(() => {});
     const nearby = await page.evaluate(() => window.__QA__?.nearbyInteractable);
     if (nearby) {
