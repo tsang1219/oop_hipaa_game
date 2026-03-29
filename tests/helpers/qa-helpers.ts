@@ -338,9 +338,9 @@ export async function loadFresh(page: Page): Promise<void> {
 /** All department rooms with their completion requirements and interactable positions */
 export const ROOMS = {
   hospital_entrance: {
-    npcs: { riley_entrance: { x: 7, y: 4 } },
-    zones: {},
-    items: {},
+    npcs: { riley_entrance: { x: 10, y: 4 } },
+    zones: { welcome_board: { x: 5, y: 2 } },
+    items: { hipaa_brochure: { x: 15, y: 4 } },
     requirements: { npcs: ['riley_entrance'], zones: [], items: [] },
     doors: { entrance_to_reception: 'reception' },
   },

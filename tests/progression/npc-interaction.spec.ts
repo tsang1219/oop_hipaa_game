@@ -25,8 +25,8 @@ test.describe('NPC Interaction', () => {
 
   test('Dialogue overlay appears when talking to NPC', async ({ page }) => {
     await loadRoom(page, 'hospital_entrance');
-    // Teleport adjacent to Riley (7,4) and press space
-    await page.evaluate(() => window.__QA__!.commands.teleportTo(7, 5));
+    // Teleport adjacent to Riley (10,4) and press space
+    await page.evaluate(() => window.__QA__!.commands.teleportTo(10, 5));
     await page.waitForTimeout(300);
     await pressSpace(page);
     await waitForDialogue(page);

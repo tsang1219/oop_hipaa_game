@@ -18,6 +18,7 @@ import ChoicePrompt from '@/components/ChoicePrompt';
 import { PatientStoryReveal } from '@/components/PatientStoryReveal';
 import EndScreen from '@/components/EndScreen';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
+import { RoomIntroOverlay } from '@/components/RoomIntroOverlay';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
 import { MusicVolumeSlider } from '../components/MusicVolumeSlider';
 import { useNotification } from '../components/NotificationToast';
@@ -144,6 +145,8 @@ export default function UnifiedGamePage() {
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
   const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(new Set());
+  const [showRoomIntro, setShowRoomIntro] = useState(false);
+  const prevRoomIdRef = useRef<string | null>(null);
 
   // Accumulated gate state across all rooms
   const initialSave = useRef(loadSave());
@@ -265,6 +268,12 @@ export default function UnifiedGamePage() {
     const gates: Gate[] = room?.config?.gates || [];
     const choiceGate = gates.find(g => g.type === 'choice' && !new Set(gatesForRoom).has(g.id));
     if (choiceGate) setActiveChoiceGate(choiceGate);
+
+    // Show room intro title card on room change
+    if (currentRoomId !== prevRoomIdRef.current) {
+      prevRoomIdRef.current = currentRoomId;
+      setShowRoomIntro(true);
+    }
   }, [currentRoomId]);
 
   // Mute toggle
@@ -484,6 +493,22 @@ export default function UnifiedGamePage() {
     }) => {
       const gate = isNpcGated(data.npcId);
       if (gate) {
+        if (gate.type === 'social') {
+          // Social gates auto-resolve on first interaction attempt — show context, then unlock
+          const hint = gate.description || 'Something feels off here...';
+          toast({
+            title: hint,
+            description: `Talk to ${data.npcName} again to continue.`,
+          });
+          resolveGate(gate.id, gate.targetId);
+          eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+          return;
+        }
+        const hint = gate.observationHint || gate.description || 'Look around the room first...';
+        toast({
+          title: `${data.npcName} isn't ready to talk yet`,
+          description: hint,
+        });
         eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
         return;
       }
@@ -890,6 +915,16 @@ export default function UnifiedGamePage() {
               setSelectedItem(null);
               eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
             }}
+          />
+        )}
+
+        {/* Room intro title card */}
+        {showRoomIntro && currentRoom && (
+          <RoomIntroOverlay
+            roomName={currentRoom.name}
+            subtitle={currentRoom.subtitle}
+            introText={currentRoom.config?.introText}
+            onDismiss={() => setShowRoomIntro(false)}
           />
         )}
 
