@@ -74,7 +74,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
 
   return (
     <div 
-      className="fixed inset-0 bg-black/95 flex items-center justify-center z-50 p-4"
+      className="absolute inset-0 bg-black/95 flex items-center justify-center z-50 p-4"
       onClick={handleSkip}
       data-testid="patient-story-reveal"
     >

@@ -1,0 +1,20 @@
+[
+  {
+    "bug_id": "BUG-003",
+    "fix_plan": "Four overlay files use 'fixed inset-0' on their outermost wrapper div, causing them to cover the full browser viewport instead of the 640x480 canvas. The parent container in UnifiedGamePage.tsx already has 'position: relative'. Change 'fixed' to 'absolute' on the outermost wrapper in RecapModal.tsx, CodexModal.tsx, AnimatedOverlay.tsx, and PatientStoryReveal.tsx. The other files listed in the ticket (BattleEncounterScreen, ChoicePrompt, ObservationHint, EducationalItemModal, GameBanner, TutorialModal) already use 'absolute' and need no changes.",
+    "result": "success",
+    "files_changed": [
+      "client/src/components/breach-defense/RecapModal.tsx",
+      "client/src/components/breach-defense/CodexModal.tsx",
+      "client/src/components/ui/AnimatedOverlay.tsx",
+      "client/src/components/PatientStoryReveal.tsx"
+    ],
+    "diff_summary": "Changed 'fixed inset-0' to 'absolute inset-0' on outermost wrapper div in 4 overlay components",
+    "lines_added": 0,
+    "lines_removed": 0,
+    "net_delta": 0,
+    "verification_test": "visual-qa.spec.ts + progression/",
+    "verification_result": "7/7 visual passed (3 skipped), 27/27 progression passed (4 skipped)",
+    "notes": "Only 4 of the 8 listed files actually used 'fixed' positioning. The other 4 already used 'absolute'. Parent container in UnifiedGamePage.tsx already has 'relative' class."
+  }
+]

@@ -125,7 +125,7 @@ export function CodexModal({ onClose, seenThreats, seenTowers }: CodexModalProps
   };
 
   return (
-    <div className={`fixed inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-200 ${
+    <div className={`absolute inset-0 backdrop-blur-sm flex items-center justify-center z-50 p-4 transition-all duration-200 ${
       isVisible ? 'bg-black/80' : 'bg-black/0'
     }`}>
       <div className={`bg-white border-4 border-black shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-3xl w-full max-h-[80vh] flex flex-col transform transition-all duration-300 ease-out ${

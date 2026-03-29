@@ -2,7 +2,7 @@ import { useState, useEffect, type ReactNode } from 'react';
 
 interface AnimatedOverlayProps {
   children: ReactNode;
-  /** Extra classes for the fixed backdrop container */
+  /** Extra classes for the backdrop container */
   backdropClassName?: string;
   /** Extra classes for the content wrapper (default centers content) */
   contentClassName?: string;
@@ -28,7 +28,7 @@ export default function AnimatedOverlay({
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center transition-all duration-200 ${
+      className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-200 ${
         isVisible ? 'opacity-100' : 'opacity-0'
       } ${backdropClassName}`}
     >
