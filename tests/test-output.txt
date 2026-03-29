@@ -1,0 +1,814 @@
+
+Running 31 tests using 5 workers
+
+  ✘   3 tests/progression/breach-gameplay.spec.ts:13:3 › BreachDefense Gameplay › Breach defense page loads (19.1s)
+  ✓   4 tests/progression/npc-interaction.spec.ts:18:3 › NPC Interaction › Can talk to Riley in hospital entrance (23.5s)
+  ✘   1 tests/progression/room-completion.spec.ts:28:3 › Room Completion › Hospital entrance completes after talking to Riley (25.1s)
+  ✘   2 tests/progression/full-playthrough.spec.ts:18:3 › Full Playthrough › Complete hospital entrance and reception (25.7s)
+  ✘   5 tests/progression/door-unlocks.spec.ts:31:3 › Door Unlocks › Hospital entrance to reception is always accessible (35.2s)
+  ✘   6 tests/progression/breach-gameplay.spec.ts:13:3 › BreachDefense Gameplay › Breach defense page loads (retry #1) (15.4s)
+  ✘   9 tests/progression/full-playthrough.spec.ts:18:3 › Full Playthrough › Complete hospital entrance and reception (retry #1) (22.8s)
+  ✘  11 tests/progression/breach-gameplay.spec.ts:25:3 › BreachDefense Gameplay › Start Mission button begins game (15.5s)
+  ✘   7 tests/progression/npc-interaction.spec.ts:26:3 › NPC Interaction › Dialogue overlay appears when talking to NPC (32.6s)
+  ✘   8 tests/progression/room-completion.spec.ts:28:3 › Room Completion › Hospital entrance completes after talking to Riley (retry #1) (33.1s)
+  ✘  10 tests/progression/door-unlocks.spec.ts:31:3 › Door Unlocks › Hospital entrance to reception is always accessible (retry #1) (32.6s)
+  ✘  13 tests/progression/breach-gameplay.spec.ts:25:3 › BreachDefense Gameplay › Start Mission button begins game (retry #1) (16.3s)
+  ✘  17 tests/progression/breach-gameplay.spec.ts:53:3 › BreachDefense Gameplay › Game auto-start via qa-start param (15.6s)
+  ✘  14 tests/progression/npc-interaction.spec.ts:26:3 › NPC Interaction › Dialogue overlay appears when talking to NPC (retry #1) (32.8s)
+  ✘  16 tests/progression/door-unlocks.spec.ts:40:3 › Door Unlocks › Break room is locked when reception is not completed (32.0s)
+  ✘  18 tests/progression/breach-gameplay.spec.ts:53:3 › BreachDefense Gameplay › Game auto-start via qa-start param (retry #1) (16.0s)
+  ✘  21 tests/progression/breach-gameplay.spec.ts:73:3 › BreachDefense Gameplay › No console errors during breach gameplay (16.2s)
+  ✘  19 tests/progression/npc-interaction.spec.ts:38:3 › NPC Interaction › Can talk to multiple NPCs in reception (39.8s)
+  ✘  20 tests/progression/door-unlocks.spec.ts:40:3 › Door Unlocks › Break room is locked when reception is not completed (retry #1) (33.9s)
+  ✘  15 tests/progression/room-completion.spec.ts:37:3 › Room Completion › Reception completes after all requirements met (1.4m)
+  ✘  22 tests/progression/breach-gameplay.spec.ts:73:3 › BreachDefense Gameplay › No console errors during breach gameplay (retry #1) (16.5s)
+  ✓  26 tests/progression/room-navigation.spec.ts:16:3 › Room Navigation › Hospital entrance loads on fresh start (2.2s)
+  ✓  12 tests/progression/full-playthrough.spec.ts:74:3 › Full Playthrough › Screenshot at each milestone (1.6m)
+  ✘  24 tests/progression/door-unlocks.spec.ts:69:3 › Door Unlocks › Break room unlocks after completing reception (32.3s)
+  ✘  23 tests/progression/npc-interaction.spec.ts:38:3 › NPC Interaction › Can talk to multiple NPCs in reception (retry #1) (39.7s)
+  ✘  27 tests/progression/room-navigation.spec.ts:23:3 › Room Navigation › Navigate entrance -> reception via door (31.8s)
+  ✘  28 tests/progression/door-unlocks.spec.ts:69:3 › Door Unlocks › Break room unlocks after completing reception (retry #1) (32.1s)
+  ✘  29 tests/progression/npc-interaction.spec.ts:49:3 › NPC Interaction › Scene unpauses after dialogue dismissal (33.0s)
+  ✘  30 tests/progression/room-navigation.spec.ts:23:3 › Room Navigation › Navigate entrance -> reception via door (retry #1) (32.9s)
+  ✘  25 tests/progression/room-completion.spec.ts:37:3 › Room Completion › Reception completes after all requirements met (retry #1) (1.3m)
+  ✓  33 tests/progression/room-navigation.spec.ts:30:3 › Room Navigation › Navigate reception -> entrance (backtrack) (6.3s)
+  ✘  31 tests/progression/door-unlocks.spec.ts:95:3 › Door Unlocks › Lab unlocks after completing break_room (34.1s)
+  ✘  32 tests/progression/npc-interaction.spec.ts:49:3 › NPC Interaction › Scene unpauses after dialogue dismissal (retry #1) (32.7s)
+  ✓  35 tests/progression/room-completion.spec.ts:57:3 › Room Completion › Incomplete room does NOT mark as complete (23.5s)
+  ✘  34 tests/progression/room-navigation.spec.ts:37:3 › Room Navigation › Navigate through hallway: reception -> hallway -> break room (33.3s)
+  ✘  37 tests/progression/npc-interaction.spec.ts:57:3 › NPC Interaction › No console errors during NPC interactions (33.1s)
+  ✘  36 tests/progression/door-unlocks.spec.ts:95:3 › Door Unlocks › Lab unlocks after completing break_room (retry #1) (34.0s)
+  ✘  38 tests/progression/room-completion.spec.ts:70:3 › Room Completion › Break room completes after requirements (33.8s)
+  ✘  39 tests/progression/room-navigation.spec.ts:37:3 › Room Navigation › Navigate through hallway: reception -> hallway -> break room (retry #1) (33.3s)
+  ✓  42 tests/progression/room-navigation.spec.ts:47:7 › Room Navigation › Direct room load via qa-room param › loads hospital_entrance directly (1.8s)
+  ✓  43 tests/progression/room-navigation.spec.ts:47:7 › Room Navigation › Direct room load via qa-room param › loads reception directly (3.1s)
+  ✓  44 tests/progression/room-navigation.spec.ts:47:7 › Room Navigation › Direct room load via qa-room param › loads break_room directly (3.0s)
+  ✓  45 tests/progression/room-navigation.spec.ts:47:7 › Room Navigation › Direct room load via qa-room param › loads lab directly (3.0s)
+  ✓  46 tests/progression/room-navigation.spec.ts:47:7 › Room Navigation › Direct room load via qa-room param › loads records_room directly (3.0s)
+  ✓  47 tests/progression/room-navigation.spec.ts:47:7 › Room Navigation › Direct room load via qa-room param › loads it_office directly (3.3s)
+  ✘  40 tests/progression/npc-interaction.spec.ts:57:3 › NPC Interaction › No console errors during NPC interactions (retry #1) (32.7s)
+  ✓  48 tests/progression/room-navigation.spec.ts:47:7 › Room Navigation › Direct room load via qa-room param › loads er directly (3.2s)
+  ✘  41 tests/progression/room-completion.spec.ts:70:3 › Room Completion › Break room completes after requirements (retry #1) (33.8s)
+  ✘  49 tests/progression/room-navigation.spec.ts:55:3 › Room Navigation › No console errors during navigation (31.6s)
+  ✘  50 tests/progression/room-navigation.spec.ts:55:3 › Room Navigation › No console errors during navigation (retry #1) (32.4s)
+
+
+  1) tests/progression/breach-gameplay.spec.ts:13:3 › BreachDefense Gameplay › Breach defense page loads 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      15 |
+      16 |     await page.goto('/breach');
+    > 17 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      18 |
+      19 |     const canvas = page.locator('canvas');
+      20 |     await expect(canvas).toBeVisible();
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:17:16
+
+    Error Context: test-results/progression-breach-gamepla-4e99c-y-Breach-defense-page-loads/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      15 |
+      16 |     await page.goto('/breach');
+    > 17 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      18 |
+      19 |     const canvas = page.locator('canvas');
+      20 |     await expect(canvas).toBeVisible();
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:17:16
+
+    Error Context: test-results/progression-breach-gamepla-4e99c-y-Breach-defense-page-loads-retry1/error-context.md
+
+  2) tests/progression/breach-gameplay.spec.ts:25:3 › BreachDefense Gameplay › Start Mission button begins game 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      25 |   test('Start Mission button begins game', async ({ page }) => {
+      26 |     await page.goto('/breach');
+    > 27 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      28 |     await page.waitForTimeout(SETTLE_MS);
+      29 |
+      30 |     const startBtn = page.getByText('Start Mission');
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:27:16
+
+    Error Context: test-results/progression-breach-gamepla-fe590--Mission-button-begins-game/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      25 |   test('Start Mission button begins game', async ({ page }) => {
+      26 |     await page.goto('/breach');
+    > 27 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      28 |     await page.waitForTimeout(SETTLE_MS);
+      29 |
+      30 |     const startBtn = page.getByText('Start Mission');
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:27:16
+
+    Error Context: test-results/progression-breach-gamepla-fe590--Mission-button-begins-game-retry1/error-context.md
+
+  3) tests/progression/breach-gameplay.spec.ts:53:3 › BreachDefense Gameplay › Game auto-start via qa-start param 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      53 |   test('Game auto-start via qa-start param', async ({ page }) => {
+      54 |     await page.goto('/breach?qa-start');
+    > 55 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      56 |     await page.waitForTimeout(5000); // let auto-start fire
+      57 |
+      58 |     await waitForQA(page);
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:55:16
+
+    Error Context: test-results/progression-breach-gamepla-303d1-to-start-via-qa-start-param/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      53 |   test('Game auto-start via qa-start param', async ({ page }) => {
+      54 |     await page.goto('/breach?qa-start');
+    > 55 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      56 |     await page.waitForTimeout(5000); // let auto-start fire
+      57 |
+      58 |     await waitForQA(page);
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:55:16
+
+    Error Context: test-results/progression-breach-gamepla-303d1-to-start-via-qa-start-param-retry1/error-context.md
+
+  4) tests/progression/breach-gameplay.spec.ts:73:3 › BreachDefense Gameplay › No console errors during breach gameplay 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      75 |
+      76 |     await page.goto('/breach?qa-start');
+    > 77 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      78 |     await page.waitForTimeout(5000); // let auto-start and first wave begin
+      79 |
+      80 |     await waitForQA(page);
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:77:16
+
+    Error Context: test-results/progression-breach-gamepla-4d800-rors-during-breach-gameplay/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('canvas') to be visible[22m
+
+
+      75 |
+      76 |     await page.goto('/breach?qa-start');
+    > 77 |     await page.waitForSelector('canvas', { timeout: 15_000 });
+         |                ^
+      78 |     await page.waitForTimeout(5000); // let auto-start and first wave begin
+      79 |
+      80 |     await waitForQA(page);
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts:77:16
+
+    Error Context: test-results/progression-breach-gamepla-4d800-rors-during-breach-gameplay-retry1/error-context.md
+
+  5) tests/progression/door-unlocks.spec.ts:31:3 › Door Unlocks › Hospital entrance to reception is always accessible 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:34:5
+
+    Error Context: test-results/progression-door-unlocks-D-b122d-eption-is-always-accessible/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:34:5
+
+    Error Context: test-results/progression-door-unlocks-D-b122d-eption-is-always-accessible-retry1/error-context.md
+
+  6) tests/progression/door-unlocks.spec.ts:40:3 › Door Unlocks › Break room is locked when reception is not completed 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:44:5
+
+    Error Context: test-results/progression-door-unlocks-D-8cc04--reception-is-not-completed/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:44:5
+
+    Error Context: test-results/progression-door-unlocks-D-8cc04--reception-is-not-completed-retry1/error-context.md
+
+  7) tests/progression/door-unlocks.spec.ts:69:3 › Door Unlocks › Break room unlocks after completing reception 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:73:5
+
+    Error Context: test-results/progression-door-unlocks-D-37428--after-completing-reception/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:73:5
+
+    Error Context: test-results/progression-door-unlocks-D-37428--after-completing-reception-retry1/error-context.md
+
+  8) tests/progression/door-unlocks.spec.ts:95:3 › Door Unlocks › Lab unlocks after completing break_room 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:100:5
+
+    Error Context: test-results/progression-door-unlocks-D-278df-after-completing-break-room/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:100:5
+
+    Error Context: test-results/progression-door-unlocks-D-278df-after-completing-break-room-retry1/error-context.md
+
+  9) tests/progression/full-playthrough.spec.ts:18:3 › Full Playthrough › Complete hospital entrance and reception 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m"hospital_entrance"[39m
+    Received array: [31m[][39m
+
+      38 |     // Verify hospital_entrance marked complete and we are in reception
+      39 |     const stateInReception = await qaState(page);
+    > 40 |     expect(stateInReception.completedRooms).toContain('hospital_entrance');
+         |                                             ^
+      41 |     expect(stateInReception.currentRoomId).toBe('reception');
+      42 |
+      43 |     // === Reception ===
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts:40:45
+
+    Error Context: test-results/progression-full-playthrou-db04e-ital-entrance-and-reception/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m"hospital_entrance"[39m
+    Received array: [31m[][39m
+
+      38 |     // Verify hospital_entrance marked complete and we are in reception
+      39 |     const stateInReception = await qaState(page);
+    > 40 |     expect(stateInReception.completedRooms).toContain('hospital_entrance');
+         |                                             ^
+      41 |     expect(stateInReception.currentRoomId).toBe('reception');
+      42 |
+      43 |     // === Reception ===
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts:40:45
+
+    Error Context: test-results/progression-full-playthrou-db04e-ital-entrance-and-reception-retry1/error-context.md
+
+  10) tests/progression/npc-interaction.spec.ts:26:3 › NPC Interaction › Dialogue overlay appears when talking to NPC 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:31:11
+
+    Error Context: test-results/progression-npc-interactio-977d8-appears-when-talking-to-NPC/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:31:11
+
+    Error Context: test-results/progression-npc-interactio-977d8-appears-when-talking-to-NPC-retry1/error-context.md
+
+  11) tests/progression/npc-interaction.spec.ts:38:3 › NPC Interaction › Can talk to multiple NPCs in reception 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m"riley"[39m
+    Received array: [31m[][39m
+
+      43 |     await talkToNPC(page, nervousPatient.x, nervousPatient.y);
+      44 |     const state = await qaState(page);
+    > 45 |     expect(state.completedNPCs).toContain('riley');
+         |                                 ^
+      46 |     expect(state.completedNPCs).toContain('nervous_patient');
+      47 |   });
+      48 |
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:45:33
+
+    Error Context: test-results/progression-npc-interactio-a031a--multiple-NPCs-in-reception/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m"riley"[39m
+    Received array: [31m[][39m
+
+      43 |     await talkToNPC(page, nervousPatient.x, nervousPatient.y);
+      44 |     const state = await qaState(page);
+    > 45 |     expect(state.completedNPCs).toContain('riley');
+         |                                 ^
+      46 |     expect(state.completedNPCs).toContain('nervous_patient');
+      47 |   });
+      48 |
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:45:33
+
+    Error Context: test-results/progression-npc-interactio-a031a--multiple-NPCs-in-reception-retry1/error-context.md
+
+  12) tests/progression/npc-interaction.spec.ts:49:3 › NPC Interaction › Scene unpauses after dialogue dismissal 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:52:5
+
+    Error Context: test-results/progression-npc-interactio-bbc85-es-after-dialogue-dismissal/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:52:5
+
+    Error Context: test-results/progression-npc-interactio-bbc85-es-after-dialogue-dismissal-retry1/error-context.md
+
+  13) tests/progression/npc-interaction.spec.ts:57:3 › NPC Interaction › No console errors during NPC interactions 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:61:5
+
+    Error Context: test-results/progression-npc-interactio-ce31c-ors-during-NPC-interactions/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:61:5
+
+    Error Context: test-results/progression-npc-interactio-ce31c-ors-during-NPC-interactions-retry1/error-context.md
+
+  14) tests/progression/room-completion.spec.ts:28:3 › Room Completion › Hospital entrance completes after talking to Riley 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m"hospital_entrance"[39m
+    Received array: [31m[][39m
+
+      32 |
+      33 |     const state = await qaState(page);
+    > 34 |     expect(state.completedRooms).toContain('hospital_entrance');
+         |                                  ^
+      35 |   });
+      36 |
+      37 |   test('Reception completes after all requirements met', async ({ page }) => {
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:34:34
+
+    Error Context: test-results/progression-room-completio-60c13-etes-after-talking-to-Riley/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:30:5
+
+    Error Context: test-results/progression-room-completio-60c13-etes-after-talking-to-Riley-retry1/error-context.md
+
+  15) tests/progression/room-completion.spec.ts:37:3 › Room Completion › Reception completes after all requirements met 
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m"reception"[39m
+    Received array: [31m[][39m
+
+      52 |
+      53 |     const state = await qaState(page);
+    > 54 |     expect(state.completedRooms).toContain('reception');
+         |                                  ^
+      55 |   });
+      56 |
+      57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34
+
+    Error Context: test-results/progression-room-completio-aceea--after-all-requirements-met/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    Error: [2mexpect([22m[31mreceived[39m[2m).[22mtoContain[2m([22m[32mexpected[39m[2m) // indexOf[22m
+
+    Expected value: [32m"reception"[39m
+    Received array: [31m[][39m
+
+      52 |
+      53 |     const state = await qaState(page);
+    > 54 |     expect(state.completedRooms).toContain('reception');
+         |                                  ^
+      55 |   });
+      56 |
+      57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34
+
+    Error Context: test-results/progression-room-completio-aceea--after-all-requirements-met-retry1/error-context.md
+
+  16) tests/progression/room-completion.spec.ts:70:3 › Room Completion › Break room completes after requirements 
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:74:5
+
+    Error Context: test-results/progression-room-completio-912d3-ompletes-after-requirements/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForSelector: Timeout 15000ms exceeded.
+    Call log:
+    [2m  - waiting for locator('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]') to be visible[22m
+
+
+       at helpers/qa-helpers.ts:140
+
+      138 | /** Wait for dialogue overlay to appear */
+      139 | export async function waitForDialogue(page: Page, timeoutMs = EVENT_TIMEOUT): Promise<void> {
+    > 140 |   await page.waitForSelector('[data-testid="dialogue-overlay"], [data-testid="educational-item-modal"], [data-testid="observation-hint-overlay"]', {
+          |              ^
+      141 |     timeout: timeoutMs,
+      142 |   });
+      143 | }
+        at waitForDialogue (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:140:14)
+        at talkToNPC (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:213:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:74:5
+
+    Error Context: test-results/progression-room-completio-912d3-ompletes-after-requirements-retry1/error-context.md
+
+  17) tests/progression/room-navigation.spec.ts:23:3 › Room Navigation › Navigate entrance -> reception via door 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-navigation.spec.ts:25:5
+
+    Error Context: test-results/progression-room-navigatio-11a10-trance---reception-via-door/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-navigation.spec.ts:25:5
+
+    Error Context: test-results/progression-room-navigatio-11a10-trance---reception-via-door-retry1/error-context.md
+
+  18) tests/progression/room-navigation.spec.ts:37:3 › Room Navigation › Navigate through hallway: reception -> hallway -> break room 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-navigation.spec.ts:39:5
+
+    Error Context: test-results/progression-room-navigatio-70ce0-tion---hallway---break-room/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-navigation.spec.ts:39:5
+
+    Error Context: test-results/progression-room-navigatio-70ce0-tion---hallway---break-room-retry1/error-context.md
+
+  19) tests/progression/room-navigation.spec.ts:55:3 › Room Navigation › No console errors during navigation 
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-navigation.spec.ts:58:5
+
+    Error Context: test-results/progression-room-navigatio-21bee-le-errors-during-navigation/error-context.md
+
+    Retry #1 ───────────────────────────────────────────────────────────────────────────────────────
+
+    TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.
+
+       at helpers/qa-helpers.ts:56
+
+      54 | /** Wait for a specific room to appear in the QA bridge state */
+      55 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {
+    > 56 |   await page.waitForFunction(
+         |              ^
+      57 |     (id) => window.__QA__?.currentRoomId === id,
+      58 |     roomId,
+      59 |     { timeout: timeoutMs },
+        at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:56:14)
+        at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:263:9)
+        at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-navigation.spec.ts:58:5
+
+    Error Context: test-results/progression-room-navigatio-21bee-le-errors-during-navigation-retry1/error-context.md
+
+  19 failed
+    tests/progression/breach-gameplay.spec.ts:13:3 › BreachDefense Gameplay › Breach defense page loads 
+    tests/progression/breach-gameplay.spec.ts:25:3 › BreachDefense Gameplay › Start Mission button begins game 
+    tests/progression/breach-gameplay.spec.ts:53:3 › BreachDefense Gameplay › Game auto-start via qa-start param 
+    tests/progression/breach-gameplay.spec.ts:73:3 › BreachDefense Gameplay › No console errors during breach gameplay 
+    tests/progression/door-unlocks.spec.ts:31:3 › Door Unlocks › Hospital entrance to reception is always accessible 
+    tests/progression/door-unlocks.spec.ts:40:3 › Door Unlocks › Break room is locked when reception is not completed 
+    tests/progression/door-unlocks.spec.ts:69:3 › Door Unlocks › Break room unlocks after completing reception 
+    tests/progression/door-unlocks.spec.ts:95:3 › Door Unlocks › Lab unlocks after completing break_room 
+    tests/progression/full-playthrough.spec.ts:18:3 › Full Playthrough › Complete hospital entrance and reception 
+    tests/progression/npc-interaction.spec.ts:26:3 › NPC Interaction › Dialogue overlay appears when talking to NPC 
+    tests/progression/npc-interaction.spec.ts:38:3 › NPC Interaction › Can talk to multiple NPCs in reception 
+    tests/progression/npc-interaction.spec.ts:49:3 › NPC Interaction › Scene unpauses after dialogue dismissal 
+    tests/progression/npc-interaction.spec.ts:57:3 › NPC Interaction › No console errors during NPC interactions 
+    tests/progression/room-completion.spec.ts:28:3 › Room Completion › Hospital entrance completes after talking to Riley 
+    tests/progression/room-completion.spec.ts:37:3 › Room Completion › Reception completes after all requirements met 
+    tests/progression/room-completion.spec.ts:70:3 › Room Completion › Break room completes after requirements 
+    tests/progression/room-navigation.spec.ts:23:3 › Room Navigation › Navigate entrance -> reception via door 
+    tests/progression/room-navigation.spec.ts:37:3 › Room Navigation › Navigate through hallway: reception -> hallway -> break room 
+    tests/progression/room-navigation.spec.ts:55:3 › Room Navigation › No console errors during navigation 
+  12 passed (6.3m)
