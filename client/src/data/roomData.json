@@ -518,7 +518,18 @@
         {"x": 15, "y": 9, "width": 3, "height": 2, "type": "gurney"},
 
         {"x": 5, "y": 12, "width": 2, "height": 1, "type": "equipment"},
-        {"x": 13, "y": 12, "width": 2, "height": 1, "type": "equipment"}
+        {"x": 13, "y": 12, "width": 2, "height": 1, "type": "equipment"},
+
+        {"x": 6, "y": 2, "width": 1, "height": 3, "type": "curtain_partition"},
+        {"x": 13, "y": 2, "width": 1, "height": 3, "type": "curtain_partition"},
+        {"x": 6, "y": 9, "width": 1, "height": 3, "type": "curtain_partition"},
+
+        {"x": 5, "y": 5, "width": 1, "height": 1, "type": "iv_stand"},
+        {"x": 18, "y": 5, "width": 1, "height": 1, "type": "vital_monitor"},
+        {"x": 13, "y": 10, "width": 2, "height": 1, "type": "crash_cart"},
+        {"x": 1, "y": 10, "width": 1, "height": 1, "type": "iv_stand"},
+
+        {"x": 8, "y": 13, "width": 3, "height": 1, "type": "triage_desk"}
       ],
       "npcs": [
         {
