@@ -656,8 +656,16 @@
         {"x": 16, "y": 10, "width": 2, "height": 2, "type": "bio_cabinet"},
 
         {"x": 8, "y": 1, "width": 4, "height": 1, "type": "results_board"},
+        {"x": 5, "y": 1, "width": 3, "height": 1, "type": "fume_hood"},
+
+        {"x": 1, "y": 4, "width": 2, "height": 1, "type": "chemical_shelf"},
+        {"x": 17, "y": 12, "width": 2, "height": 1, "type": "chemical_shelf"},
+
         {"x": 7, "y": 10, "width": 2, "height": 1, "type": "sink_station"},
-        {"x": 12, "y": 11, "width": 2, "height": 1, "type": "sample_rack"}
+        {"x": 9, "y": 10, "width": 1, "height": 1, "type": "eyewash_station"},
+
+        {"x": 12, "y": 11, "width": 2, "height": 1, "type": "sample_rack"},
+        {"x": 14, "y": 11, "width": 2, "height": 1, "type": "autoclave"}
       ],
       "npcs": [
         {
