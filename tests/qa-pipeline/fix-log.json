@@ -1,169 +1,54 @@
 [
   {
-    "bug_id": "BUG-001",
-    "fix_plan": "Change the outer container div in RoomIntroOverlay.tsx from 'fixed inset-0' to 'absolute inset-0' so the overlay is positioned relative to the canvas container (which is position:relative) instead of the browser viewport. This is the minimum one-word CSS class change that constrains the overlay to the 640x480 game canvas area.",
+    "bug_id": "DESIGN-004",
+    "fix_plan": "Add 8 new obstacles to the ER room in roomData.json to create density and medical atmosphere: 3 curtain_partition obstacles (1x3 vertical) between patient bays to create semi-private treatment areas, medical props (2 iv_stands, 1 vital_monitor, 1 crash_cart) scattered near patient bays and gurneys, and 1 triage_desk (3x1) near the room entrance. All placements verified against existing NPCs, zones, items, doors, spawn point, and obstacles to avoid collisions.",
     "result": "success",
-    "files_changed": [
-      "client/src/components/RoomIntroOverlay.tsx"
-    ],
-    "diff_summary": "Changed 'fixed' to 'absolute' in the outer container div className",
-    "lines_added": 1,
+    "files_changed": ["client/src/data/roomData.json"],
+    "diff_summary": "Added 8 obstacle entries to ER room: 3 curtain_partition (6,2 / 13,2 / 6,9), 2 iv_stand (5,5 / 1,10), 1 vital_monitor (18,5), 1 crash_cart (13,10), 1 triage_desk (8,13)",
+    "lines_added": 12,
     "lines_removed": 1,
-    "net_delta": 0,
+    "net_delta": 11,
     "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause confirmed: 'fixed' positions relative to viewport, 'absolute' positions relative to nearest positioned ancestor (canvas container)."
+    "verification_result": "pass (no errors)",
+    "notes": "Curtain partitions divide the room into zones between patient bays. Medical props add visual density near treatment areas. Triage desk at y=13 creates a natural entry flow from spawn point at (10,12). All 8 new obstacles verified collision-free with existing entities."
   },
   {
-    "bug_id": "BUG-002",
-    "fix_plan": "Change 'fixed inset-0' to 'absolute inset-0' on the three overlay divs in BreachDefensePage.tsx (START SCREEN at line 702, GAME OVER at line 801, VICTORY at line 862). The canvas container parent is already position:relative, so absolute positioning constrains these overlays to the 640x480 canvas area. NotificationToast is intentionally fixed and is not touched.",
+    "bug_id": "DESIGN-003",
+    "fix_plan": "Redesign reception room obstacles to create functional zones: L-shaped reception counter (upper third), privacy screens as sight-line breaks between desk and waiting area, grouped waiting chairs with magazine_rack and tissue_box props, and water_dispenser + notice_board near entrance. All NPC, zone, item, and door positions unchanged.",
     "result": "success",
-    "files_changed": [
-      "client/src/pages/BreachDefensePage.tsx"
-    ],
-    "diff_summary": "Changed 'fixed' to 'absolute' on three overlay container divs (start screen, game over, victory)",
-    "lines_added": 3,
-    "lines_removed": 3,
-    "net_delta": 0,
+    "files_changed": ["client/src/data/roomData.json"],
+    "diff_summary": "Replaced 11 symmetric obstacles with 19 zone-based obstacles: L-shaped counter with filing cabinets, 2 privacy_screens at y=6, grouped waiting chairs (left cluster + right pair), magazine_rack, tissue_box, water_dispenser, notice_board near entrance, smaller corner plants",
+    "lines_added": 18,
+    "lines_removed": 9,
+    "net_delta": 9,
     "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause confirmed: 'fixed' positions relative to viewport causing full-browser-width overlays. 'absolute' constrains them to the canvas container."
+    "verification_result": "pass (no errors)",
+    "notes": "Layout creates three distinct zones: reception counter area (y=1-4), privacy buffer (y=6), and waiting area (y=8-12). Privacy screens between desk and waiting area double as visual storytelling. Entrance props (water dispenser, notice board) at y=12 near spawn. All positions verified collision-free with NPCs, zones, items, doors, and spawn point."
   },
   {
-    "bug_id": "BUG-003",
-    "fix_plan": "Update EducationalItemModal.tsx CSS classes to match the retro styling standard: change modal container to bg-white border-4 border-black with hard pixel shadow, add font-['Press_Start_2P'] to title/fact/button text elements, replace <Button> component with native <button> styled like CodexModal's retro button (pink bg, border-4, pixel shadow, active press effect), change inner card to bg-[#F0F0F0] border-black, and constrain max-width to 580px. Remove unused Button import.",
+    "bug_id": "DESIGN-005",
+    "fix_plan": "Reorganize IT Office obstacles to create a tech workspace feel. Server racks form continuous back wall (y=1-2) with gap for educational item. Add monitor_bank rows at y=6, cable_tray along walls, whiteboard_wall near breach_playbook, locked_cabinet in corner, and desk props (coffee_mug, headphones) for personality. All NPC, zone, item, door positions unchanged.",
     "result": "success",
-    "files_changed": [
-      "client/src/components/EducationalItemModal.tsx"
-    ],
-    "diff_summary": "Replaced system font/themed color classes with Press Start 2P pixel font, black borders, hard pixel shadows, and retro button styling matching existing CodexModal pattern",
-    "lines_added": 7,
+    "files_changed": ["client/src/data/roomData.json"],
+    "diff_summary": "Replaced 4 tall server_racks (2x4 each) with 4 wide server_racks (3-4x2) forming back wall. Added 2 monitor_bank, 4 cable_tray, 1 whiteboard_wall, 1 locked_cabinet, 1 coffee_mug, 1 headphones. Kept workstation_cluster, monitoring_desk, printer_station unchanged.",
+    "lines_added": 27,
     "lines_removed": 10,
-    "net_delta": -3,
+    "net_delta": 17,
     "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause confirmed: component predated retro styling standard. Matched patterns from CodexModal.tsx and PatientStoryReveal.tsx for consistency."
+    "verification_result": "pass (no errors)",
+    "notes": "Server wall at y=1-2 spans most of room width with gap at x=9-11 for security_safeguards item. Monitor banks at y=6 create SOC workstation rows flanking central cluster. Whiteboard at (3,9) near breach_playbook zone. Locked cabinet at (17,12) in lower-right corner. Cable trays along walls add infrastructure detail. Coffee mug and headphones humanize the workspace. BFS pathfinding verified from spawn to all NPCs, zones, items, and doors."
   },
   {
-    "bug_id": "BUG-004",
-    "fix_plan": "Add font-['Press_Start_2P'] to the outer container div so all text inherits the pixel font. Replace system-sized text classes (text-3xl, text-xl, text-lg, text-base, text-sm) with pixel-appropriate sizes (titles 14px, subtitles 12px, body 10px, fine print 8px). Change rounded-md to rounded-[4px]. Add shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] to the card and button. Add leading-relaxed to body text for readability with the pixel font. This is CSS-only changes in one file with zero net line delta.",
-    "result": "success",
-    "files_changed": [
-      "client/src/components/EndScreen.tsx"
-    ],
-    "diff_summary": "Applied Press Start 2P pixel font, retro text sizes, hard pixel shadows, and tight border-radius to EndScreen component",
-    "lines_added": 14,
-    "lines_removed": 14,
-    "net_delta": 0,
-    "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause confirmed: component predated retro styling standard. All changes are className-only modifications matching patterns from PatientStoryReveal.tsx and CodexModal.tsx."
-  },
-  {
-    "bug_id": "BUG-006",
-    "fix_plan": "In handleDoorInteraction(), add a volume fade tween (0 over 300ms) on bgMusic before the camera fadeOut, so the music fades in sync with the visual transition. shutdown() already stops/clears bgMusic \u2014 no change needed there since the music is already silent by the time it runs. This is minimum: 3 lines added in one method, one file.",
-    "result": "success",
-    "files_changed": [
-      "client/src/phaser/scenes/ExplorationScene.ts"
-    ],
-    "diff_summary": "Added bgMusic volume fade tween (300ms) in handleDoorInteraction() before camera fadeOut",
-    "lines_added": 3,
+    "bug_id": "DESIGN-006",
+    "fix_plan": "Reorganize records_room filing cabinets into parallel aisle rows (x=3/5 left, x=14/16 right) with middle columns (x=8,x=12). Add records_counter (4x1) at y=1, inbox_tray and outbox_tray flanking it, archive_box near shredder, and document_cart in aisle for paper-heavy density.",
+    "result": "already_applied",
+    "files_changed": ["client/src/data/roomData.json"],
+    "diff_summary": "Changes were already included in DESIGN-005 commit (3900d20). Records room has: 6 filing cabinets in aisle formation, records_counter, inbox/outbox trays, archive_box, document_cart. All collision-free with NPCs, zones, items, doors, spawn.",
+    "lines_added": 0,
     "lines_removed": 0,
-    "net_delta": 3,
-    "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause confirmed: bgMusic.stop() in shutdown() was abrupt. Now music fades during the 300ms camera transition, matching visual timing. shutdown() cleanup still works since bgMusic reference persists until stop/undefined."
-  },
-  {
-    "bug_id": "BUG-005",
-    "fix_plan": "Add this.sound.play() calls in BreachDefenseScene.ts for tower_selected (onSelectTowerType), tower_fires (after projectile push), projectile_hit (on distance check hit), and wave_cleared (wave complete celebration). Add eventBridge.emit(REACT_PLAY_SFX) calls in UnifiedGamePage.tsx for modal_open (story/help modals), modal_close (story/intro/room-intro dismiss), item_collect (onInteractItem), and choice_select (ChoicePrompt onChoice). Add door transition sound in ExplorationScene.ts handleDoorInteraction(). Update onPlaySfx handler to pass rate parameter. All 10 missing sounds reuse existing loaded keys with volume/rate variations \u2014 no new audio files needed.",
-    "result": "success",
-    "files_changed": [
-      "client/src/phaser/scenes/ExplorationScene.ts",
-      "client/src/pages/UnifiedGamePage.tsx",
-      "client/src/phaser/scenes/BreachDefenseScene.ts"
-    ],
-    "diff_summary": "Added sound.play() calls at 10 missing action points using existing sfx keys with volume/rate variations",
-    "lines_added": 21,
-    "lines_removed": 3,
-    "net_delta": 18,
-    "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Sound mapping: modal_open=sfx_interact@0.3/rate1.1, modal_close=sfx_interact@0.2/rate0.9, choice_select=sfx_interact@0.35/rate1.15, item_collect=sfx_interact@0.4/rate1.3, room transition=sfx_footstep@0.35/rate0.8, tower_selected=sfx_interact@0.2/rate1.2, tower_fires=sfx_tower_place@0.15/rate1.5, projectile_hit=sfx_enemy_death@0.12/rate1.4, wave_cleared=sfx_wave_start@0.5/rate1.2. ESC exit and room_cleared already had sounds."
-  },
-  {
-    "bug_id": "BUG-007",
-    "fix_plan": "In RoomProgressHUD.tsx, replace rounded-lg with rounded-[4px], border-2 border-[#FF6B9D] with border-4 border-black, and add shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] to the outer container div. CSS-only, one class attribute change.",
-    "result": "success",
-    "files_changed": [
-      "client/src/components/RoomProgressHUD.tsx"
-    ],
-    "diff_summary": "Replaced rounded-lg with rounded-[4px], thin pink border with border-4 border-black, added hard pixel shadow",
-    "lines_added": 1,
-    "lines_removed": 1,
     "net_delta": 0,
     "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause: component predated POLISH_STANDARD Section 6 Rule 6.2 retro UI requirements."
-  },
-  {
-    "bug_id": "BUG-008",
-    "fix_plan": "In PatientStoryReveal.tsx, replace rounded-full on the icon wrapper div with rounded-[4px], and replace rounded-lg on the story text container with rounded-[4px]. Two class attribute changes, CSS-only.",
-    "result": "success",
-    "files_changed": [
-      "client/src/components/PatientStoryReveal.tsx"
-    ],
-    "diff_summary": "Replaced rounded-full and rounded-lg with rounded-[4px] on icon wrapper and text container",
-    "lines_added": 2,
-    "lines_removed": 2,
-    "net_delta": 0,
-    "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause: rounded-full (50% radius) and rounded-lg (8px radius) both violate max 4px corner radius rule."
-  },
-  {
-    "bug_id": "BUG-009",
-    "fix_plan": "In BreachDefensePage.tsx, replace the start screen's linear-gradient background with flat bg-[#1a1a2e], removing backgroundSize and gradient-shift animation. One style object change.",
-    "result": "success",
-    "files_changed": [
-      "client/src/pages/BreachDefensePage.tsx"
-    ],
-    "diff_summary": "Replaced linear-gradient background with flat #1a1a2e color, removed gradient-shift animation",
-    "lines_added": 1,
-    "lines_removed": 3,
-    "net_delta": -2,
-    "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Root cause: start screen used animated gradient background violating POLISH_STANDARD Section 6 Rule 6.2 no-gradients rule. The gradient-shift keyframes remain in the style block but are now unused \u2014 harmless dead CSS."
-  },
-  {
-    "bug_id": "DESIGN-001",
-    "fix_plan": "Modify all 5 hallway entries in roomData.json: increase height from 5 to 7 tiles, move bottom walls from y:4 to y:6, move doors and spawn points from y:2 to y:3, shift benches to y:5. Add 2-3 unique themed obstacles per hallway (water_cooler + vending_machine for reception-break, biohazard_sign + glove_dispenser for break-lab, filing_cart + wall_clock for lab-records, server_rack + cable_tray for records-IT, defibrillator_mount + wheelchair + emergency_light for IT-ER). Add wall_sconce fixtures along top walls for corridor lighting. No code changes needed \u2014 ExplorationScene already renders obstacles from room data.",
-    "result": "success",
-    "files_changed": [
-      "client/src/data/roomData.json"
-    ],
-    "diff_summary": "Widened all 5 hallways from 5 to 7 tiles, added 2-3 unique department-themed props per hallway as obstacles, added wall sconce lighting fixtures, updated descriptions with environmental flavor text",
-    "lines_added": 172,
-    "lines_removed": 63,
-    "net_delta": 109,
-    "verification_test": "visual-qa.spec.ts -g 'Hub World'",
-    "verification_result": "1/1 passed",
-    "notes": "High net delta is expected for a DESIGN ticket adding content data entries to a JSON file. Each new obstacle is ~1 logical entry but takes a full JSON line. 20 new obstacle entries across 5 hallways plus coordinate adjustments for height change."
-  },
-  {
-    "bug_id": "DESIGN-002",
-    "fix_plan": "Add 3 new obstacles to the lab room in roomData.json to strengthen its visual identity as a medical laboratory. Place a results_board (4x1) on the top wall at (8,1) between existing microscope_station and centrifuge, a sink_station (2x1) at (7,10) in the open middle-bottom area, and a sample_rack (2x1) at (12,11) in the right-center bottom. All positions verified clear of NPCs, zones, items, doors, spawn point, and existing obstacles.",
-    "result": "success",
-    "files_changed": [
-      "client/src/data/roomData.json"
-    ],
-    "diff_summary": "Added results_board, sink_station, and sample_rack obstacles to lab room",
-    "lines_added": 5,
-    "lines_removed": 1,
-    "net_delta": 4,
-    "verification_test": "tsc --noEmit",
-    "verification_result": "passed (no type errors)",
-    "notes": "Lab already had microscope_station, centrifuge, specimen_fridge, and bio_cabinet from prior work. Added 3 more props: results_board (wall-mounted whiteboard with test results), sink_station (standard lab fixture), sample_rack (specimen storage). These fill previously empty areas and reinforce the laboratory identity."
+    "verification_result": "pass (no errors)",
+    "notes": "DESIGN-006 changes were accidentally bundled into the DESIGN-005 commit (3900d20). The records_room already has all target obstacles: filing cabinet aisles (left x=3/5, right x=14/16, middle x=8/12), records_counter at y=1, inbox/outbox trays at y=2, archive_box at (2,13) near shredder, document_cart at (6,5) in the aisle. No additional commit needed."
   }
 ]
