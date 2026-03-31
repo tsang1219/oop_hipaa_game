@@ -1740,6 +1740,10 @@ export class ExplorationScene extends Phaser.Scene {
   private handleDoorInteraction(door: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string }): void {
     if (this.transitioning) return;
     this.transitioning = true;
+    // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
+    if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
+      this.tweens.add({ targets: this.bgMusic, volume: 0, duration: 300, ease: 'Sine.easeOut' });
+    }
     this.cameras.main.fadeOut(300, 0, 0, 0);
     this.time.delayedCall(300, () => {
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
@@ -2135,13 +2139,60 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
-  // ── Answer feedback flash (correct/incorrect) ─────────────────
+  // ── Answer feedback (correct/incorrect) ────────────────────────
   private onAnswerFeedback = (data: { type: string }) => {
     if (!this.scene.isActive()) return;
+
     if (data.type === 'correct') {
-      this.cameras.main.flash(200, 100, 255, 100, false); // green flash
+      // Green tint overlay that fades out (instead of harsh camera flash)
+      const overlay = this.add.rectangle(
+        this.cameras.main.midPoint.x, this.cameras.main.midPoint.y,
+        this.cameras.main.width + 100, this.cameras.main.height + 100,
+        0x44ff88, 0.18,
+      ).setDepth(200).setScrollFactor(0);
+      this.tweens.add({
+        targets: overlay, alpha: 0, duration: 400,
+        ease: 'Sine.easeOut',
+        onComplete: () => overlay.destroy(),
+      });
+
+      // Sparkle particles at player position
+      if (this.player && this.textures.exists('particle_circle')) {
+        const emitter = this.add.particles(this.player.x, this.player.y - 8, 'particle_circle', {
+          speed: { min: 40, max: 100 },
+          angle: { min: 220, max: 320 },
+          scale: { start: 0.5, end: 0 },
+          alpha: { start: 1, end: 0 },
+          tint: [0x44ff88, 0x88ffbb, 0xffd700],
+          lifespan: 500,
+          quantity: 10,
+          depth: 99,
+          emitting: false,
+        } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
+        emitter.explode(10);
+        this.time.delayedCall(600, () => emitter.destroy());
+      }
+
+      // Subtle zoom pulse
+      this.cameras.main.zoomTo(1.02, 100, 'Sine.easeOut', false, (_cam: Phaser.Cameras.Scene2D.Camera, progress: number) => {
+        if (progress === 1) this.cameras.main.zoomTo(1, 200, 'Sine.easeIn');
+      });
+
     } else if (data.type === 'incorrect') {
-      this.cameras.main.flash(200, 255, 80, 80, false); // red flash
+      // Red tint overlay that fades out
+      const overlay = this.add.rectangle(
+        this.cameras.main.midPoint.x, this.cameras.main.midPoint.y,
+        this.cameras.main.width + 100, this.cameras.main.height + 100,
+        0xff4444, 0.15,
+      ).setDepth(200).setScrollFactor(0);
+      this.tweens.add({
+        targets: overlay, alpha: 0, duration: 350,
+        ease: 'Sine.easeOut',
+        onComplete: () => overlay.destroy(),
+      });
+
+      // Gentle shake
+      this.cameras.main.shake(200, 0.005);
     }
   };
 

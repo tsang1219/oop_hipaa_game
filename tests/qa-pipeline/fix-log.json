@@ -50,5 +50,18 @@
     "verification_test": "tsc --noEmit",
     "verification_result": "passed (no type errors)",
     "notes": "Root cause confirmed: component predated retro styling standard. All changes are className-only modifications matching patterns from PatientStoryReveal.tsx and CodexModal.tsx."
+  },
+  {
+    "bug_id": "BUG-006",
+    "fix_plan": "In handleDoorInteraction(), add a volume fade tween (0 over 300ms) on bgMusic before the camera fadeOut, so the music fades in sync with the visual transition. shutdown() already stops/clears bgMusic — no change needed there since the music is already silent by the time it runs. This is minimum: 3 lines added in one method, one file.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts"],
+    "diff_summary": "Added bgMusic volume fade tween (300ms) in handleDoorInteraction() before camera fadeOut",
+    "lines_added": 3,
+    "lines_removed": 0,
+    "net_delta": 3,
+    "verification_test": "tsc --noEmit",
+    "verification_result": "passed (no type errors)",
+    "notes": "Root cause confirmed: bgMusic.stop() in shutdown() was abrupt. Now music fades during the 300ms camera transition, matching visual timing. shutdown() cleanup still works since bgMusic reference persists until stop/undefined."
   }
 ]
