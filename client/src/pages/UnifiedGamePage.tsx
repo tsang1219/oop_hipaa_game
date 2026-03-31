@@ -536,6 +536,7 @@ export default function UnifiedGamePage() {
           gate.prerequisiteId === data.zoneId &&
           !resolvedGates.has(gate.id)
         ) {
+          gameState.completeZone(data.zoneId);
           setActiveObservationGate(gate);
           return;
         }
@@ -565,6 +566,7 @@ export default function UnifiedGamePage() {
       type: string;
     }) => {
       setSelectedItem({ title: data.title, fact: data.fact, type: data.type as any });
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4, rate: 1.3 });
       if (!gameState.state.collectedItems.includes(data.itemId)) {
         gameState.collectItem(data.itemId);
         notify(data.title, { label: 'HIPAA FACT LEARNED', type: 'discovery' });
@@ -679,6 +681,7 @@ export default function UnifiedGamePage() {
       setCurrentStoryRoom(room);
       setIsNewStory(true);
       setShowStoryModal(true);
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3, rate: 1.1 });
     }
   }, [currentRoomId, gameState]);
 
@@ -739,11 +742,13 @@ export default function UnifiedGamePage() {
 
   const handleDismissIntroModal = useCallback(() => {
     setShowIntroModal(false);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
     eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
   }, []);
 
   const handleShowHelpModal = useCallback(() => {
     setShowIntroModal(true);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3, rate: 1.1 });
     eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
   }, []);
 
@@ -764,6 +769,7 @@ export default function UnifiedGamePage() {
   const handleCloseStoryModal = () => {
     setShowStoryModal(false);
     setCurrentStoryRoom(null);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
   };
 
   const formatElapsedTime = (): string => {
@@ -924,7 +930,10 @@ export default function UnifiedGamePage() {
             roomName={currentRoom.name}
             subtitle={currentRoom.subtitle}
             introText={currentRoom.config?.introText}
-            onDismiss={() => setShowRoomIntro(false)}
+            onDismiss={() => {
+              setShowRoomIntro(false);
+              eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+            }}
           />
         )}
 
@@ -943,6 +952,7 @@ export default function UnifiedGamePage() {
           <ObservationHint
             gate={activeObservationGate}
             onAcknowledge={() => {
+              eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
               resolveGate(activeObservationGate.id, activeObservationGate.targetId);
               setActiveObservationGate(null);
               eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
@@ -955,6 +965,7 @@ export default function UnifiedGamePage() {
           <ChoicePrompt
             gate={activeChoiceGate}
             onChoice={unlockedId => {
+              eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35, rate: 1.15 });
               resolveGate(activeChoiceGate.id, unlockedId);
               setActiveChoiceGate(null);
               eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);

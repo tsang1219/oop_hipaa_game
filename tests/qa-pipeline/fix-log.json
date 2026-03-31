@@ -63,5 +63,18 @@
     "verification_test": "tsc --noEmit",
     "verification_result": "passed (no type errors)",
     "notes": "Root cause confirmed: bgMusic.stop() in shutdown() was abrupt. Now music fades during the 300ms camera transition, matching visual timing. shutdown() cleanup still works since bgMusic reference persists until stop/undefined."
+  },
+  {
+    "bug_id": "BUG-005",
+    "fix_plan": "Add this.sound.play() calls in BreachDefenseScene.ts for tower_selected (onSelectTowerType), tower_fires (after projectile push), projectile_hit (on distance check hit), and wave_cleared (wave complete celebration). Add eventBridge.emit(REACT_PLAY_SFX) calls in UnifiedGamePage.tsx for modal_open (story/help modals), modal_close (story/intro/room-intro dismiss), item_collect (onInteractItem), and choice_select (ChoicePrompt onChoice). Add door transition sound in ExplorationScene.ts handleDoorInteraction(). Update onPlaySfx handler to pass rate parameter. All 10 missing sounds reuse existing loaded keys with volume/rate variations — no new audio files needed.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts", "client/src/pages/UnifiedGamePage.tsx", "client/src/phaser/scenes/BreachDefenseScene.ts"],
+    "diff_summary": "Added sound.play() calls at 10 missing action points using existing sfx keys with volume/rate variations",
+    "lines_added": 21,
+    "lines_removed": 3,
+    "net_delta": 18,
+    "verification_test": "tsc --noEmit",
+    "verification_result": "passed (no type errors)",
+    "notes": "Sound mapping: modal_open=sfx_interact@0.3/rate1.1, modal_close=sfx_interact@0.2/rate0.9, choice_select=sfx_interact@0.35/rate1.15, item_collect=sfx_interact@0.4/rate1.3, room transition=sfx_footstep@0.35/rate0.8, tower_selected=sfx_interact@0.2/rate1.2, tower_fires=sfx_tower_place@0.15/rate1.5, projectile_hit=sfx_enemy_death@0.12/rate1.4, wave_cleared=sfx_wave_start@0.5/rate1.2. ESC exit and room_cleared already had sounds."
   }
 ]

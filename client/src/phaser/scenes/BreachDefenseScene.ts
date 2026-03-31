@@ -770,6 +770,9 @@ export class BreachDefenseScene extends Phaser.Scene {
 
   private onSelectTowerType(data: { type: TowerType | null }) {
     this.selectedTowerType = data.type;
+    if (data.type) {
+      this.sound.play('sfx_interact', { volume: 0.2, rate: 1.2 });
+    }
   }
 
   private onStartGame() {
@@ -1342,6 +1345,7 @@ export class BreachDefenseScene extends Phaser.Scene {
           this.waveKillCount = 0;
 
           // ── Wave complete celebration effects ──
+          this.sound.play('sfx_wave_start', { volume: 0.5, rate: 1.2 });
           this.cameras.main.flash(400, 100, 255, 100, false);
           this.cameras.main.shake(200, 0.008);
 
@@ -1807,6 +1811,7 @@ export class BreachDefenseScene extends Phaser.Scene {
         });
 
         tower.lastFired = time;
+        this.sound.play('sfx_tower_place', { volume: 0.15, rate: 1.5 });
         this.playRecoilTween(tower.sprite);
 
         // Brief range flash on fire
@@ -1842,6 +1847,7 @@ export class BreachDefenseScene extends Phaser.Scene {
         // Hit!
         target.hp -= proj.damage;
         target.flashUntil = time + 120;
+        this.sound.play('sfx_enemy_death', { volume: 0.12, rate: 1.4 });
         if (proj.isStrong) {
           target.strongFlashUntil = time + 120 + 150;
           target.strongFlashColor = proj.color;

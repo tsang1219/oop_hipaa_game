@@ -1606,11 +1606,11 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
-  private onPlaySfx = (data: { key: string; volume?: number }) => {
+  private onPlaySfx = (data: { key: string; volume?: number; rate?: number }) => {
     if (!this.scene.isActive()) return;
     try {
       if (this.sound && this.sound.get(data.key)) {
-        this.sound.play(data.key, { volume: data.volume ?? 0.5 });
+        this.sound.play(data.key, { volume: data.volume ?? 0.5, rate: data.rate ?? 1 });
       }
     } catch (e) {
       // Sound manager may be in a bad state (e.g. sounds array null after
@@ -1740,6 +1740,7 @@ export class ExplorationScene extends Phaser.Scene {
   private handleDoorInteraction(door: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string }): void {
     if (this.transitioning) return;
     this.transitioning = true;
+    this.sound.play('sfx_footstep', { volume: 0.35, rate: 0.8 });
     // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
     if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
       this.tweens.add({ targets: this.bgMusic, volume: 0, duration: 300, ease: 'Sine.easeOut' });
