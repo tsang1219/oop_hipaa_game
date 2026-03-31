@@ -115,5 +115,18 @@
     "verification_test": "tsc --noEmit",
     "verification_result": "passed (no type errors)",
     "notes": "Root cause: start screen used animated gradient background violating POLISH_STANDARD Section 6 Rule 6.2 no-gradients rule. The gradient-shift keyframes remain in the style block but are now unused — harmless dead CSS."
+  },
+  {
+    "bug_id": "DESIGN-001",
+    "fix_plan": "Modify all 5 hallway entries in roomData.json: increase height from 5 to 7 tiles, move bottom walls from y:4 to y:6, move doors and spawn points from y:2 to y:3, shift benches to y:5. Add 2-3 unique themed obstacles per hallway (water_cooler + vending_machine for reception-break, biohazard_sign + glove_dispenser for break-lab, filing_cart + wall_clock for lab-records, server_rack + cable_tray for records-IT, defibrillator_mount + wheelchair + emergency_light for IT-ER). Add wall_sconce fixtures along top walls for corridor lighting. No code changes needed — ExplorationScene already renders obstacles from room data.",
+    "result": "success",
+    "files_changed": ["client/src/data/roomData.json"],
+    "diff_summary": "Widened all 5 hallways from 5 to 7 tiles, added 2-3 unique department-themed props per hallway as obstacles, added wall sconce lighting fixtures, updated descriptions with environmental flavor text",
+    "lines_added": 172,
+    "lines_removed": 63,
+    "net_delta": 109,
+    "verification_test": "visual-qa.spec.ts -g 'Hub World'",
+    "verification_result": "1/1 passed",
+    "notes": "High net delta is expected for a DESIGN ticket adding content data entries to a JSON file. Each new obstacle is ~1 logical entry but takes a full JSON line. 20 new obstacle entries across 5 hallways plus coordinate adjustments for height change."
   }
 ]

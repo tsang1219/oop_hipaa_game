@@ -2,50 +2,81 @@
   "rooms": [
     {
       "id": "hospital_entrance",
-      "name": "Hospital Entrance",
-      "subtitle": "Valley General Hospital",
-      "description": "The main lobby of Valley General Hospital. Your first day starts here.",
+      "name": "Hospital Lobby",
+      "subtitle": "Welcome to Valley General",
+      "description": "The welcoming lobby of Valley General Hospital. Sunlight spills through the glass doors. Your first day starts here.",
       "unlockRequirement": null,
       "alwaysUnlocked": true,
-      "width": 16,
-      "height": 12,
+      "config": {
+        "pacing": "calm",
+        "layout": "hub",
+        "introText": "Deep breath. First day. You've got this."
+      },
+      "width": 20,
+      "height": 14,
       "backgroundImage": "lobby",
-      "spawnPoint": {"x": 8, "y": 9},
+      "spawnPoint": {"x": 10, "y": 11},
       "obstacles": [
-        {"x": 0, "y": 0, "width": 16, "height": 1, "type": "wall"},
-        {"x": 0, "y": 11, "width": 16, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 12, "type": "wall"},
-        {"x": 15, "y": 0, "width": 1, "height": 5, "type": "wall"},
-        {"x": 15, "y": 7, "width": 1, "height": 5, "type": "wall"},
-        {"x": 5, "y": 2, "width": 5, "height": 2, "type": "desk"},
-        {"x": 2, "y": 6, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 2, "y": 8, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 12, "y": 6, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 12, "y": 8, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 1, "y": 2, "width": 1, "height": 1, "type": "plant"},
-        {"x": 1, "y": 10, "width": 1, "height": 1, "type": "plant"}
+        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 13, "width": 20, "height": 1, "type": "wall"},
+        {"x": 0, "y": 0, "width": 1, "height": 14, "type": "wall"},
+        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
+        {"x": 19, "y": 8, "width": 1, "height": 6, "type": "wall"},
+
+        {"x": 7, "y": 2, "width": 6, "height": 2, "type": "desk"},
+
+        {"x": 2, "y": 7, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 2, "y": 9, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 16, "y": 7, "width": 2, "height": 1, "type": "chairs"},
+        {"x": 16, "y": 9, "width": 2, "height": 1, "type": "chairs"},
+
+        {"x": 1, "y": 2, "width": 2, "height": 2, "type": "plant"},
+        {"x": 17, "y": 2, "width": 2, "height": 2, "type": "plant"},
+        {"x": 1, "y": 11, "width": 1, "height": 1, "type": "plant"},
+        {"x": 18, "y": 11, "width": 1, "height": 1, "type": "plant"},
+
+        {"x": 6, "y": 7, "width": 2, "height": 2, "type": "table"},
+        {"x": 12, "y": 7, "width": 2, "height": 2, "type": "table"}
       ],
       "npcs": [
         {
           "id": "riley_entrance",
           "name": "Riley",
           "role": "receptionist",
-          "x": 7,
+          "x": 10,
           "y": 4,
           "sprite": "receptionist",
           "sceneId": "riley_scene1",
           "isFinalBoss": false
         }
       ],
-      "interactionZones": [],
-      "educationalItems": [],
+      "interactionZones": [
+        {
+          "id": "welcome_board",
+          "name": "Staff Directory",
+          "x": 5,
+          "y": 2,
+          "sceneId": "welcome_board_scene",
+          "spriteType": "poster"
+        }
+      ],
+      "educationalItems": [
+        {
+          "id": "hipaa_brochure",
+          "title": "What is HIPAA?",
+          "type": "document",
+          "x": 15,
+          "y": 4,
+          "fact": "HIPAA — the Health Insurance Portability and Accountability Act of 1996 — isn't just about privacy. It has five titles, but Title II is the one that matters to you: it sets national standards for protecting patient health information (PHI). Two key rules: the Privacy Rule (who can see PHI) and the Security Rule (how to protect electronic PHI). Every person in this hospital — from the CEO to the janitor — has a role in keeping patient data safe."
+        }
+      ],
       "completionRequirements": { "requiredNpcs": ["riley_entrance"], "requiredZones": [], "requiredItems": [] },
       "doors": [
         {
           "id": "entrance_to_reception",
           "targetRoomId": "reception",
-          "x": 15,
-          "y": 6,
+          "x": 19,
+          "y": 7,
           "side": "right",
           "label": "Reception"
         }
@@ -55,26 +86,42 @@
       "id": "hallway_reception_break",
       "name": "Hallway",
       "subtitle": "First Floor Corridor",
-      "description": "A quiet corridor connecting Reception to the Break Room.",
+      "description": "A quiet corridor connecting Reception to the Break Room. A water cooler hums softly near the wall.",
       "width": 20,
-      "height": 5,
+      "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 2},
+      "spawnPoint": {"x": 1, "y": 3},
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
+        {"x": 5, "y": 5, "width": 2, "height": 1, "type": "bench"},
+        {"x": 14, "y": 5, "width": 2, "height": 1, "type": "bench"},
+        {"x": 10, "y": 1, "width": 1, "height": 1, "type": "plant"},
+        {"x": 4, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 15, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 7, "y": 5, "width": 1, "height": 1, "type": "water_cooler"},
+        {"x": 12, "y": 5, "width": 1, "height": 1, "type": "vending_machine"}
       ],
       "npcs": [],
       "interactionZones": [],
-      "educationalItems": [],
+      "educationalItems": [
+        {
+          "id": "hallway1_phi_tip",
+          "title": "What Counts as PHI?",
+          "type": "poster",
+          "x": 8,
+          "y": 1,
+          "fact": "PHI includes 18 types of identifiers: names, dates, phone numbers, email, SSN, medical record numbers, health plan IDs, account numbers, license/plate numbers, device IDs, URLs, IPs, biometrics, photos, and any other unique identifier. If it can identify a patient AND relates to their health, treatment, or payment — it's PHI."
+        }
+      ],
       "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
       "doors": [
         {
           "id": "hallway_recbreak_to_reception",
           "targetRoomId": "reception",
           "x": 0,
-          "y": 2,
+          "y": 3,
           "side": "left",
           "label": "Reception"
         },
@@ -82,7 +129,7 @@
           "id": "hallway_recbreak_to_break",
           "targetRoomId": "break_room",
           "x": 19,
-          "y": 2,
+          "y": 3,
           "side": "right",
           "label": "Break Room"
         }
@@ -92,26 +139,42 @@
       "id": "hallway_break_lab",
       "name": "Hallway",
       "subtitle": "First Floor Corridor",
-      "description": "A corridor connecting the Break Room to the Laboratory.",
+      "description": "A corridor connecting the Break Room to the Laboratory. A biohazard sign marks the approach to the lab wing.",
       "width": 20,
-      "height": 5,
+      "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 2},
+      "spawnPoint": {"x": 1, "y": 3},
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
+        {"x": 6, "y": 1, "width": 1, "height": 1, "type": "plant"},
+        {"x": 13, "y": 1, "width": 1, "height": 1, "type": "plant"},
+        {"x": 9, "y": 5, "width": 2, "height": 1, "type": "bench"},
+        {"x": 4, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 16, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 15, "y": 1, "width": 1, "height": 1, "type": "biohazard_sign"},
+        {"x": 3, "y": 5, "width": 1, "height": 1, "type": "glove_dispenser"}
       ],
       "npcs": [],
       "interactionZones": [],
-      "educationalItems": [],
+      "educationalItems": [
+        {
+          "id": "hallway2_verbal_tip",
+          "title": "The Verbal Disclosure Trap",
+          "type": "poster",
+          "x": 10,
+          "y": 1,
+          "fact": "Most HIPAA breaches aren't hackers — they're conversations. Discussing patients in elevators, cafeterias, or hallways where others can overhear is a violation of the Minimum Necessary standard. Rule of thumb: if you can be overheard by someone without a need to know, find a private space."
+        }
+      ],
       "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
       "doors": [
         {
           "id": "hallway_breaklab_to_break",
           "targetRoomId": "break_room",
           "x": 0,
-          "y": 2,
+          "y": 3,
           "side": "left",
           "label": "Break Room"
         },
@@ -119,7 +182,7 @@
           "id": "hallway_breaklab_to_lab",
           "targetRoomId": "lab",
           "x": 19,
-          "y": 2,
+          "y": 3,
           "side": "right",
           "label": "Laboratory"
         }
@@ -129,26 +192,42 @@
       "id": "hallway_lab_records",
       "name": "Hallway",
       "subtitle": "Second Floor Corridor",
-      "description": "A corridor connecting the Laboratory to Medical Records.",
+      "description": "A corridor connecting the Laboratory to Medical Records. A filing cart sits against the wall, half-loaded with folders.",
       "width": 20,
-      "height": 5,
+      "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 2},
+      "spawnPoint": {"x": 1, "y": 3},
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
+        {"x": 4, "y": 5, "width": 2, "height": 1, "type": "bench"},
+        {"x": 15, "y": 5, "width": 2, "height": 1, "type": "bench"},
+        {"x": 10, "y": 1, "width": 1, "height": 1, "type": "plant"},
+        {"x": 5, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 14, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 12, "y": 5, "width": 2, "height": 1, "type": "filing_cart"},
+        {"x": 7, "y": 1, "width": 1, "height": 1, "type": "wall_clock"}
       ],
       "npcs": [],
       "interactionZones": [],
-      "educationalItems": [],
+      "educationalItems": [
+        {
+          "id": "hallway3_deidentify_tip",
+          "title": "De-identification: The Safe Harbor",
+          "type": "poster",
+          "x": 8,
+          "y": 1,
+          "fact": "HIPAA allows sharing health data freely if it's properly de-identified. The Safe Harbor method requires removing all 18 identifiers. The Expert Determination method uses a statistician to certify re-identification risk is 'very small.' De-identified data isn't PHI — and isn't subject to HIPAA rules."
+        }
+      ],
       "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
       "doors": [
         {
           "id": "hallway_labrecords_to_lab",
           "targetRoomId": "lab",
           "x": 0,
-          "y": 2,
+          "y": 3,
           "side": "left",
           "label": "Laboratory"
         },
@@ -156,7 +235,7 @@
           "id": "hallway_labrecords_to_records",
           "targetRoomId": "records_room",
           "x": 19,
-          "y": 2,
+          "y": 3,
           "side": "right",
           "label": "Medical Records"
         }
@@ -166,26 +245,42 @@
       "id": "hallway_records_it",
       "name": "Hallway",
       "subtitle": "Second Floor Corridor",
-      "description": "A corridor connecting Medical Records to the IT Office.",
+      "description": "A corridor connecting Medical Records to the IT Office. Bundled cables run along the ceiling toward IT.",
       "width": 20,
-      "height": 5,
+      "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 2},
+      "spawnPoint": {"x": 1, "y": 3},
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
+        {"x": 7, "y": 1, "width": 1, "height": 1, "type": "plant"},
+        {"x": 12, "y": 1, "width": 1, "height": 1, "type": "plant"},
+        {"x": 9, "y": 5, "width": 2, "height": 1, "type": "bench"},
+        {"x": 4, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 16, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 15, "y": 5, "width": 1, "height": 1, "type": "server_rack"},
+        {"x": 14, "y": 1, "width": 2, "height": 1, "type": "cable_tray"}
       ],
       "npcs": [],
       "interactionZones": [],
-      "educationalItems": [],
+      "educationalItems": [
+        {
+          "id": "hallway4_breach_tip",
+          "title": "Breach Notification: The 60-Day Clock",
+          "type": "poster",
+          "x": 10,
+          "y": 1,
+          "fact": "When a breach of unsecured PHI affects 500+ individuals, the covered entity must notify HHS, affected individuals, AND prominent media outlets — all within 60 days of discovery. For breaches under 500, notification to HHS can wait until the annual log, but individuals must still be notified within 60 days."
+        }
+      ],
       "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
       "doors": [
         {
           "id": "hallway_recordsit_to_records",
           "targetRoomId": "records_room",
           "x": 0,
-          "y": 2,
+          "y": 3,
           "side": "left",
           "label": "Medical Records"
         },
@@ -193,7 +288,7 @@
           "id": "hallway_recordsit_to_it",
           "targetRoomId": "it_office",
           "x": 19,
-          "y": 2,
+          "y": 3,
           "side": "right",
           "label": "IT Office"
         }
@@ -203,26 +298,41 @@
       "id": "hallway_it_er",
       "name": "Hallway",
       "subtitle": "Emergency Wing",
-      "description": "A corridor connecting the IT Office to the Emergency Room.",
+      "description": "A corridor connecting the IT Office to the Emergency Room. Red emergency lighting glows near the ER entrance.",
       "width": 20,
-      "height": 5,
+      "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 2},
+      "spawnPoint": {"x": 1, "y": 3},
       "obstacles": [
         {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 4, "width": 20, "height": 1, "type": "wall"}
+        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
+        {"x": 5, "y": 5, "width": 2, "height": 1, "type": "bench"},
+        {"x": 14, "y": 1, "width": 1, "height": 1, "type": "plant"},
+        {"x": 5, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
+        {"x": 16, "y": 1, "width": 1, "height": 1, "type": "emergency_light"},
+        {"x": 15, "y": 5, "width": 1, "height": 1, "type": "defibrillator_mount"},
+        {"x": 10, "y": 5, "width": 1, "height": 1, "type": "wheelchair"}
       ],
       "npcs": [],
       "interactionZones": [],
-      "educationalItems": [],
+      "educationalItems": [
+        {
+          "id": "hallway5_emergency_tip",
+          "title": "HIPAA in Emergencies",
+          "type": "poster",
+          "x": 10,
+          "y": 1,
+          "fact": "HIPAA doesn't disappear in emergencies — but it flexes. Providers can share PHI without authorization when necessary to treat the patient, to prevent a serious threat to health or safety, or to assist in disaster relief. The key word is 'necessary.' Even in a crisis, share only what's needed for the situation at hand."
+        }
+      ],
       "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
       "doors": [
         {
           "id": "hallway_iter_to_it",
           "targetRoomId": "it_office",
           "x": 0,
-          "y": 2,
+          "y": 3,
           "side": "left",
           "label": "IT Office"
         },
@@ -230,7 +340,7 @@
           "id": "hallway_iter_to_er",
           "targetRoomId": "er",
           "x": 19,
-          "y": 2,
+          "y": 3,
           "side": "right",
           "label": "Emergency Room"
         }
@@ -241,7 +351,7 @@
       "name": "Reception",
       "subtitle": "The Entry Point",
       "description": "Where privacy begins. The first touch. The moment someone decides to trust you.",
-      "unlockRequirement": null,
+      "unlockRequirement": "hospital_entrance",
       "patientStory": {
         "title": "Elena's Story",
         "text": "Because you ensured that sign-in sheet was private, Elena felt safe seeking treatment for addiction. Her employer in the waiting room never knew why she was there. She got help. She's recovering.",
@@ -361,7 +471,7 @@
       "name": "Emergency Room",
       "subtitle": "The Edge Cases",
       "description": "Where rules meet urgency. The hardest judgment calls happen here.",
-      "unlockRequirement": "reception",
+      "unlockRequirement": "it_office",
       "patientStory": {
         "title": "Marcus's Story",
         "text": "Because you held the line when that officer demanded records without a warrant, Marcus's mental health crisis stayed between him and his care team. He got help. He's still here.",
@@ -478,7 +588,7 @@
       "name": "Laboratory",
       "subtitle": "The Source",
       "description": "Where data is born. Test results, diagnoses, the raw material of PHI.",
-      "unlockRequirement": "er",
+      "unlockRequirement": "break_room",
       "patientStory": {
         "title": "David's Story",
         "text": "Because you questioned that researcher's access request, David's genetic test results stayed confidential. He told his family on his own terms, not theirs. His story. His timing.",
@@ -896,8 +1006,7 @@
       "name": "Break Room",
       "subtitle": "The Human Factor",
       "description": "Where people are just people. Gossip, venting, casual lapses. The hardest place to stay vigilant.",
-      "unlockRequirement": null,
-      "alwaysUnlocked": true,
+      "unlockRequirement": "reception",
       "patientStory": {
         "title": "James's Story",
         "text": "Because you changed the subject when your coworkers started gossiping, James's coworker—sitting two tables away—never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
