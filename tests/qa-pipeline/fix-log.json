@@ -24,5 +24,18 @@
     "verification_test": "tsc --noEmit",
     "verification_result": "passed (no type errors)",
     "notes": "Root cause confirmed: 'fixed' positions relative to viewport causing full-browser-width overlays. 'absolute' constrains them to the canvas container."
+  },
+  {
+    "bug_id": "BUG-003",
+    "fix_plan": "Update EducationalItemModal.tsx CSS classes to match the retro styling standard: change modal container to bg-white border-4 border-black with hard pixel shadow, add font-['Press_Start_2P'] to title/fact/button text elements, replace <Button> component with native <button> styled like CodexModal's retro button (pink bg, border-4, pixel shadow, active press effect), change inner card to bg-[#F0F0F0] border-black, and constrain max-width to 580px. Remove unused Button import.",
+    "result": "success",
+    "files_changed": ["client/src/components/EducationalItemModal.tsx"],
+    "diff_summary": "Replaced system font/themed color classes with Press Start 2P pixel font, black borders, hard pixel shadows, and retro button styling matching existing CodexModal pattern",
+    "lines_added": 7,
+    "lines_removed": 10,
+    "net_delta": -3,
+    "verification_test": "tsc --noEmit",
+    "verification_result": "passed (no type errors)",
+    "notes": "Root cause confirmed: component predated retro styling standard. Matched patterns from CodexModal.tsx and PatientStoryReveal.tsx for consistency."
   }
 ]

@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface EducationalItemModalProps {
@@ -38,7 +37,7 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
       data-testid="modal-educational-item"
     >
       <div
-        className={`bg-background border-4 border-primary max-w-2xl w-full p-6 md:p-8 transform transition-all duration-300 ease-out ${
+        className={`bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-[580px] w-full p-6 md:p-8 transform transition-all duration-300 ease-out ${
           isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
         }`}
         onClick={(e) => e.stopPropagation()}
@@ -53,16 +52,16 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
           </span>
           <h2 
             id="educational-item-title"
-            className="text-lg md:text-xl font-bold text-foreground"
+            className="font-['Press_Start_2P'] text-sm md:text-base text-black"
             data-testid="text-item-title"
           >
             {title}
           </h2>
         </div>
 
-        <div className="bg-card border-2 border-primary p-4 md:p-6 mb-6">
-          <p 
-            className="text-xs md:text-sm leading-relaxed text-foreground"
+        <div className="bg-[#F0F0F0] border-2 border-black p-4 md:p-6 mb-6">
+          <p
+            className="font-['Press_Start_2P'] text-[10px] md:text-xs leading-relaxed text-black"
             data-testid="text-item-fact"
           >
             {fact}
@@ -70,18 +69,16 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
         </div>
 
         <div className="flex justify-center">
-          <Button
+          <button
             onClick={() => {
               eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
               onClose();
             }}
-            variant="default"
-            size="lg"
-            className="min-w-[200px]"
+            className="font-['Press_Start_2P'] text-xs bg-[#FF6B9D] hover:bg-[#FF5A8A] text-white px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer"
             data-testid="button-close-modal"
           >
             GOT IT!
-          </Button>
+          </button>
         </div>
       </div>
     </div>
