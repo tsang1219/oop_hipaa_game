@@ -778,16 +778,21 @@
 
         {"x": 3, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
         {"x": 5, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-        {"x": 7, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-
-        {"x": 12, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+        {"x": 8, "y": 3, "width": 1, "height": 3, "type": "filing_cabinet"},
+        {"x": 12, "y": 3, "width": 1, "height": 3, "type": "filing_cabinet"},
         {"x": 14, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
         {"x": 16, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
+
+        {"x": 8, "y": 1, "width": 4, "height": 1, "type": "records_counter"},
+        {"x": 7, "y": 2, "width": 1, "height": 1, "type": "inbox_tray"},
+        {"x": 12, "y": 2, "width": 1, "height": 1, "type": "outbox_tray"},
 
         {"x": 8, "y": 8, "width": 4, "height": 2, "type": "clerk_desk"},
 
         {"x": 2, "y": 11, "width": 2, "height": 2, "type": "shredder_station"},
-        {"x": 16, "y": 11, "width": 2, "height": 2, "type": "scanner_station"}
+        {"x": 16, "y": 11, "width": 2, "height": 2, "type": "scanner_station"},
+        {"x": 2, "y": 13, "width": 2, "height": 1, "type": "archive_box"},
+        {"x": 6, "y": 5, "width": 1, "height": 1, "type": "document_cart"}
       ],
       "npcs": [
         {
@@ -927,16 +932,28 @@
         {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
         {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
 
-        {"x": 2, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
-        {"x": 5, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
+        {"x": 1, "y": 1, "width": 4, "height": 2, "type": "server_rack"},
+        {"x": 6, "y": 1, "width": 3, "height": 2, "type": "server_rack"},
+        {"x": 12, "y": 1, "width": 3, "height": 2, "type": "server_rack"},
+        {"x": 16, "y": 1, "width": 3, "height": 2, "type": "server_rack"},
 
-        {"x": 13, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
-        {"x": 16, "y": 2, "width": 2, "height": 4, "type": "server_rack"},
-
+        {"x": 7, "y": 5, "width": 1, "height": 1, "type": "coffee_mug"},
         {"x": 8, "y": 5, "width": 4, "height": 2, "type": "workstation_cluster"},
+        {"x": 13, "y": 5, "width": 1, "height": 1, "type": "headphones"},
+
+        {"x": 2, "y": 6, "width": 3, "height": 1, "type": "monitor_bank"},
+        {"x": 15, "y": 6, "width": 3, "height": 1, "type": "monitor_bank"},
+
+        {"x": 1, "y": 9, "width": 1, "height": 1, "type": "cable_tray"},
+        {"x": 3, "y": 9, "width": 3, "height": 1, "type": "whiteboard_wall"},
+        {"x": 18, "y": 9, "width": 1, "height": 1, "type": "cable_tray"},
 
         {"x": 2, "y": 10, "width": 3, "height": 2, "type": "monitoring_desk"},
-        {"x": 15, "y": 10, "width": 3, "height": 2, "type": "printer_station"}
+        {"x": 15, "y": 10, "width": 3, "height": 2, "type": "printer_station"},
+
+        {"x": 1, "y": 12, "width": 1, "height": 1, "type": "cable_tray"},
+        {"x": 17, "y": 12, "width": 2, "height": 1, "type": "locked_cabinet"},
+        {"x": 18, "y": 13, "width": 1, "height": 1, "type": "cable_tray"}
       ],
       "npcs": [
         {
