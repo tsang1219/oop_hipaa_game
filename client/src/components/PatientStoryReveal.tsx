@@ -88,7 +88,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
         {(phase === 'title' || phase === 'story' || phase === 'complete') && (
           <div className="space-y-6 animate-in fade-in duration-500">
             <div className="flex justify-center mb-4">
-              <div className="bg-[#FF6B9D]/20 rounded-full p-4 border-2 border-[#FF6B9D]">
+              <div className="bg-[#FF6B9D]/20 rounded-[4px] p-4 border-2 border-[#FF6B9D]">
                 <IconComponent className="w-12 h-12 text-[#FF6B9D]" />
               </div>
             </div>
@@ -103,7 +103,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
             </div>
 
             {(phase === 'story' || phase === 'complete') && (
-              <div className="bg-black/50 border-2 border-[#4ECDC4] rounded-lg p-6 mt-6">
+              <div className="bg-black/50 border-2 border-[#4ECDC4] rounded-[4px] p-6 mt-6">
                 <p className="text-white font-['Press_Start_2P'] text-[10px] leading-relaxed text-left">
                   {displayedText}
                   {phase === 'story' && <span className="animate-pulse">▌</span>}

@@ -67,7 +67,7 @@ export function RoomProgressHUD({
 
   return (
     <div
-      className="absolute top-2 right-2 bg-black/80 border-2 border-[#FF6B9D] rounded-lg p-3 text-white font-['Press_Start_2P'] text-[8px]"
+      className="absolute top-2 right-2 bg-black/80 border-4 border-black rounded-[4px] p-3 text-white font-['Press_Start_2P'] text-[8px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
       data-testid="room-progress-hud"
       style={{
         boxShadow: recentlyCompleted.has('room') ? '0 0 14px rgba(100, 255, 100, 0.7)' : 'none',

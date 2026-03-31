@@ -703,9 +703,7 @@ export default function BreachDefensePage() {
           <div
             className="relative text-center border-4 border-[#FF6B9D] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md"
             style={{
-              background: 'linear-gradient(135deg, #1a1a2e 0%, #1e2240 50%, #1a1a2e 100%)',
-              backgroundSize: '200% 200%',
-              animation: 'gradient-shift 8s ease infinite',
+              background: '#1a1a2e',
             }}
           >
             {/* Corner brackets */}
