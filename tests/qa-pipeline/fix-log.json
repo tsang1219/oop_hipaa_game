@@ -1,33 +1,15 @@
 [
   {
-    "bug_id": "BUG-003",
-    "fix_plan": "Four overlay files use 'fixed inset-0' on their outermost wrapper div, causing them to cover the full browser viewport instead of the 640x480 canvas. The parent container in UnifiedGamePage.tsx already has 'position: relative'. Change 'fixed' to 'absolute' on the outermost wrapper in RecapModal.tsx, CodexModal.tsx, AnimatedOverlay.tsx, and PatientStoryReveal.tsx. The other files listed in the ticket (BattleEncounterScreen, ChoicePrompt, ObservationHint, EducationalItemModal, GameBanner, TutorialModal) already use 'absolute' and need no changes.",
-    "result": "success",
-    "files_changed": [
-      "client/src/components/breach-defense/RecapModal.tsx",
-      "client/src/components/breach-defense/CodexModal.tsx",
-      "client/src/components/ui/AnimatedOverlay.tsx",
-      "client/src/components/PatientStoryReveal.tsx"
-    ],
-    "diff_summary": "Changed 'fixed inset-0' to 'absolute inset-0' on outermost wrapper div in 4 overlay components",
-    "lines_added": 0,
-    "lines_removed": 0,
-    "net_delta": 0,
-    "verification_test": "visual-qa.spec.ts + progression/",
-    "verification_result": "7/7 visual passed (3 skipped), 27/27 progression passed (4 skipped)",
-    "notes": "Only 4 of the 8 listed files actually used 'fixed' positioning. The other 4 already used 'absolute'. Parent container in UnifiedGamePage.tsx already has 'relative' class."
-  },
-  {
     "bug_id": "BUG-001",
-    "fix_plan": "The ValidationOverlay component in client/src/dev/ValidationOverlay.tsx already gates on import.meta.env.DEV but always shows in dev mode. Since Playwright tests run against the dev server, the DEV CHECKS panel appears in visual QA screenshots. Add a URL parameter check (?dev) so the overlay only renders when explicitly requested. Two lines changed in the existing guard conditions -- useEffect early return and render guard. Not touching UnifiedGamePage.tsx or any other file.",
+    "fix_plan": "Change the outer container div in RoomIntroOverlay.tsx from 'fixed inset-0' to 'absolute inset-0' so the overlay is positioned relative to the canvas container (which is position:relative) instead of the browser viewport. This is the minimum one-word CSS class change that constrains the overlay to the 640x480 game canvas area.",
     "result": "success",
-    "files_changed": ["client/src/dev/ValidationOverlay.tsx"],
-    "diff_summary": "Added URL param check for '?dev' in useEffect setup and render guard so ValidationOverlay only shows when ?dev is in the URL",
-    "lines_added": 2,
+    "files_changed": ["client/src/components/RoomIntroOverlay.tsx"],
+    "diff_summary": "Changed 'fixed' to 'absolute' in the outer container div className",
+    "lines_added": 1,
     "lines_removed": 1,
-    "net_delta": 1,
-    "verification_test": "visual-qa.spec.ts + progression/",
-    "verification_result": "7/7 visual passed (3 skipped), 27/27 progression passed (4 skipped)",
-    "notes": "The actual component was in client/src/dev/ValidationOverlay.tsx, not directly in UnifiedGamePage.tsx. The bug ticket's affected_files was slightly off but the component is imported from there."
+    "net_delta": 0,
+    "verification_test": "tsc --noEmit",
+    "verification_result": "passed (no type errors)",
+    "notes": "Root cause confirmed: 'fixed' positions relative to viewport, 'absolute' positions relative to nearest positioned ancestor (canvas container)."
   }
 ]
