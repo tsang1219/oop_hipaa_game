@@ -37,5 +37,18 @@
     "verification_test": "tsc --noEmit",
     "verification_result": "passed (no type errors)",
     "notes": "Root cause confirmed: component predated retro styling standard. Matched patterns from CodexModal.tsx and PatientStoryReveal.tsx for consistency."
+  },
+  {
+    "bug_id": "BUG-004",
+    "fix_plan": "Add font-['Press_Start_2P'] to the outer container div so all text inherits the pixel font. Replace system-sized text classes (text-3xl, text-xl, text-lg, text-base, text-sm) with pixel-appropriate sizes (titles 14px, subtitles 12px, body 10px, fine print 8px). Change rounded-md to rounded-[4px]. Add shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] to the card and button. Add leading-relaxed to body text for readability with the pixel font. This is CSS-only changes in one file with zero net line delta.",
+    "result": "success",
+    "files_changed": ["client/src/components/EndScreen.tsx"],
+    "diff_summary": "Applied Press Start 2P pixel font, retro text sizes, hard pixel shadows, and tight border-radius to EndScreen component",
+    "lines_added": 14,
+    "lines_removed": 14,
+    "net_delta": 0,
+    "verification_test": "tsc --noEmit",
+    "verification_result": "passed (no type errors)",
+    "notes": "Root cause confirmed: component predated retro styling standard. All changes are className-only modifications matching patterns from PatientStoryReveal.tsx and CodexModal.tsx."
   }
 ]
