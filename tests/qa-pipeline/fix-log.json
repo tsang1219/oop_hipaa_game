@@ -11,5 +11,18 @@
     "verification_test": "tsc --noEmit",
     "verification_result": "passed (no type errors)",
     "notes": "Root cause confirmed: 'fixed' positions relative to viewport, 'absolute' positions relative to nearest positioned ancestor (canvas container)."
+  },
+  {
+    "bug_id": "BUG-002",
+    "fix_plan": "Change 'fixed inset-0' to 'absolute inset-0' on the three overlay divs in BreachDefensePage.tsx (START SCREEN at line 702, GAME OVER at line 801, VICTORY at line 862). The canvas container parent is already position:relative, so absolute positioning constrains these overlays to the 640x480 canvas area. NotificationToast is intentionally fixed and is not touched.",
+    "result": "success",
+    "files_changed": ["client/src/pages/BreachDefensePage.tsx"],
+    "diff_summary": "Changed 'fixed' to 'absolute' on three overlay container divs (start screen, game over, victory)",
+    "lines_added": 3,
+    "lines_removed": 3,
+    "net_delta": 0,
+    "verification_test": "tsc --noEmit",
+    "verification_result": "passed (no type errors)",
+    "notes": "Root cause confirmed: 'fixed' positions relative to viewport causing full-browser-width overlays. 'absolute' constrains them to the canvas container."
   }
 ]
