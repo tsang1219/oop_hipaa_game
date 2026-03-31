@@ -36,7 +36,14 @@
         {"x": 18, "y": 11, "width": 1, "height": 1, "type": "plant"},
 
         {"x": 6, "y": 7, "width": 2, "height": 2, "type": "table"},
-        {"x": 12, "y": 7, "width": 2, "height": 2, "type": "table"}
+        {"x": 12, "y": 7, "width": 2, "height": 2, "type": "table"},
+
+        {"x": 3, "y": 1, "width": 2, "height": 1, "type": "bulletin_board"},
+        {"x": 14, "y": 2, "width": 1, "height": 1, "type": "flower_arrangement"},
+        {"x": 5, "y": 10, "width": 1, "height": 1, "type": "hand_sanitizer"},
+        {"x": 9, "y": 12, "width": 3, "height": 1, "type": "welcome_mat"},
+        {"x": 2, "y": 11, "width": 1, "height": 1, "type": "umbrella_stand"},
+        {"x": 15, "y": 10, "width": 2, "height": 2, "type": "info_kiosk"}
       ],
       "npcs": [
         {
