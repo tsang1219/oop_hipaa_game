@@ -257,8 +257,18 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // Resize camera/world to match room dimensions
-    this.cameras.main.setBounds(0, 0, w, h);
-    this.physics.world.setBounds(0, 0, w, h);
+    // For rooms shorter than the viewport, center them vertically via camera scroll
+    const canvasH = this.scale.height;
+    const canvasW = this.scale.width;
+    if (h < canvasH) {
+      const yOff = Math.floor((canvasH - h) / 2);
+      this.cameras.main.setBounds(0, -yOff, w, h + yOff * 2);
+      this.physics.world.setBounds(0, 0, w, h);
+      this.cameras.main.scrollY = -yOff;
+    } else {
+      this.cameras.main.setBounds(0, 0, w, h);
+      this.physics.world.setBounds(0, 0, w, h);
+    }
 
     // ── Floor — beveled hospital tiles with room-specific color variation ──
     const floor = this.add.graphics();
@@ -267,27 +277,37 @@ export class ExplorationScene extends Phaser.Scene {
     let highlightColor: number;
     let shadowColor: number;
     if (roomId.includes('er') || roomId.includes('emergency')) {
-      // Sterile/clinical blue tint
-      tileShades = [0xccd4d8, 0xc8d0d4, 0xc4ccd0, 0xd0d8dc];
-      highlightColor = 0xdce4e8;
-      shadowColor = 0xb0b8bc;
+      // Sterile clinical white-blue — high contrast, clean
+      tileShades = [0xd8e0e4, 0xd0d8de, 0xc8d2d8, 0xdce4e8];
+      highlightColor = 0xe8f0f4;
+      shadowColor = 0xa8b4bc;
     } else if (roomId.includes('lab')) {
-      // Scientific green tint
-      tileShades = [0xc8d4c8, 0xc4d0c4, 0xc0ccc0, 0xccd8cc];
-      highlightColor = 0xd8e4d8;
-      shadowColor = 0xacb8ac;
+      // Greenish-white clean room floor
+      tileShades = [0xd4e0d4, 0xccdbcc, 0xc4d4c4, 0xdce8dc];
+      highlightColor = 0xe8f4e8;
+      shadowColor = 0xa4b4a4;
     } else if (roomId.includes('it') || roomId.includes('server')) {
-      // Tech blue-grey tint
-      tileShades = [0xc8ccd4, 0xc4c8d0, 0xc0c4cc, 0xccd0d8];
-      highlightColor = 0xd8dce4;
-      shadowColor = 0xacb0b8;
+      // Dark raised-floor panels — distinctly technical
+      tileShades = [0x8890a0, 0x848c9c, 0x808898, 0x8c94a4];
+      highlightColor = 0x98a0b0;
+      shadowColor = 0x686e80;
     } else if (roomId.includes('break')) {
-      // Cozy warm tint
-      tileShades = [0xd8ccb4, 0xd4c8b0, 0xd0c4ac, 0xdcd0b8];
-      highlightColor = 0xe8dcc4;
-      shadowColor = 0xbcb098;
+      // Warm wood-tone laminate — visibly warm and cozy
+      tileShades = [0xd8c4a0, 0xd4c09c, 0xd0bc98, 0xdcc8a4];
+      highlightColor = 0xe8d8b8;
+      shadowColor = 0xb8a880;
+    } else if (roomId.includes('records')) {
+      // Low-pile commercial carpet — muted olive
+      tileShades = [0xb8b4a0, 0xb4b09c, 0xb0ac98, 0xbcb8a4];
+      highlightColor = 0xc8c4b0;
+      shadowColor = 0x989488;
+    } else if (roomId.includes('entrance') || roomId.includes('lobby')) {
+      // Polished marble-like lobby floor — bright and grand
+      tileShades = [0xe0dcd4, 0xdcd8d0, 0xd8d4cc, 0xe4e0d8];
+      highlightColor = 0xf0ece4;
+      shadowColor = 0xc0bcb4;
     } else {
-      // Default beige (reception, records, etc.)
+      // Default beige (reception, hallways)
       tileShades = [0xd4c9a8, 0xd0c5a4, 0xccc0a0, 0xd8cdb0];
       highlightColor = 0xe2d8bc;
       shadowColor = 0xb8ad94;
@@ -332,63 +352,84 @@ export class ExplorationScene extends Phaser.Scene {
         floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout
         floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout
 
-        // Room-specific floor pattern detail
+        // Room-specific floor pattern detail (boosted opacity for visibility)
         if (roomId.includes('er') || roomId.includes('emergency')) {
-          // ER: Non-slip diamond pattern
-          if ((x + y) % 3 === 0) {
-            floor.fillStyle(0xffffff, 0.04);
-            floor.fillRect(px + 12, py + 8, 8, 1);
-            floor.fillRect(px + 15, py + 5, 1, 8);
+          // ER: Non-slip diamond pattern — visible safety texture
+          if ((x + y) % 2 === 0) {
+            floor.fillStyle(0xffffff, 0.12);
+            floor.fillRect(px + 10, py + 10, 12, 1);
+            floor.fillRect(px + 15, py + 5, 1, 12);
           }
         } else if (roomId.includes('lab')) {
-          // Lab: Dotted grid pattern (clean room feel)
-          floor.fillStyle(0xffffff, 0.05);
-          floor.fillRect(px + 8, py + 8, 1, 1);
-          floor.fillRect(px + 16, py + 16, 1, 1);
-          floor.fillRect(px + 24, py + 8, 1, 1);
-          floor.fillRect(px + 8, py + 24, 1, 1);
+          // Lab: Grid dots + thin drain lines — clean room look
+          floor.fillStyle(0xffffff, 0.12);
+          floor.fillRect(px + 8, py + 8, 2, 2);
+          floor.fillRect(px + 22, py + 22, 2, 2);
+          if (y % 3 === 0) {
+            floor.fillStyle(shadowColor, 0.2);
+            floor.fillRect(px, py + TILE - 2, TILE, 1);
+          }
         } else if (roomId.includes('break')) {
-          // Break room: Warm parquet-style alternating planks
+          // Break room: Warm parquet wood planks — clearly different from tile
           if (x % 2 === 0) {
-            floor.fillStyle(highlightColor, 0.1);
-            floor.fillRect(px + 2, py + 2, 12, 28);
+            floor.fillStyle(highlightColor, 0.25);
+            floor.fillRect(px + 1, py + 1, 14, 30);
+            // Wood grain lines
+            floor.fillStyle(shadowColor, 0.12);
+            floor.fillRect(px + 4, py + 2, 1, 28);
+            floor.fillRect(px + 10, py + 2, 1, 28);
           } else {
-            floor.fillStyle(shadowColor, 0.08);
-            floor.fillRect(px + 16, py + 2, 12, 28);
+            floor.fillStyle(shadowColor, 0.15);
+            floor.fillRect(px + 16, py + 1, 14, 30);
+            floor.fillStyle(highlightColor, 0.08);
+            floor.fillRect(px + 20, py + 2, 1, 28);
+            floor.fillRect(px + 26, py + 2, 1, 28);
           }
         } else if (roomId.includes('it') || roomId.includes('server')) {
-          // Server room: Raised floor panels with ventilation holes
-          if ((x + y) % 4 === 0) {
-            floor.fillStyle(0x000000, 0.06);
+          // Server room: Raised floor panel gaps — clearly technical
+          floor.fillStyle(0x000000, 0.15);
+          floor.fillRect(px, py, TILE, 1);
+          floor.fillRect(px, py, 1, TILE);
+          // Vent holes on every 3rd panel
+          if ((x + y) % 3 === 0) {
+            floor.fillStyle(0x000000, 0.12);
             for (let vy = 0; vy < 3; vy++) {
-              floor.fillRect(px + 10, py + 8 + vy * 8, 12, 2);
+              floor.fillRect(px + 8, py + 8 + vy * 8, 16, 2);
             }
           }
         } else if (roomId.includes('records')) {
-          // Records room: Carpet-like texture (denser pattern)
-          if ((x + y) % 2 === 0) {
-            floor.fillStyle(0x000000, 0.03);
-            floor.fillRect(px + 4, py + 4, 2, 2);
-            floor.fillRect(px + 20, py + 20, 2, 2);
-            floor.fillRect(px + 12, py + 12, 2, 2);
+          // Records room: Commercial carpet weave — denser, muted
+          floor.fillStyle(0x000000, 0.06);
+          floor.fillRect(px + 4, py + 4, 2, 2);
+          floor.fillRect(px + 20, py + 20, 2, 2);
+          floor.fillRect(px + 12, py + 12, 2, 2);
+          floor.fillRect(px + 28, py + 4, 2, 2);
+          floor.fillRect(px + 4, py + 28, 2, 2);
+        } else if (roomId.includes('entrance') || roomId.includes('lobby')) {
+          // Lobby: Marble veining effect
+          if ((x + y) % 3 === 0) {
+            floor.fillStyle(0xffffff, 0.08);
+            floor.fillRect(px + 4, py + 12, 24, 1);
+            floor.fillRect(px + 8, py + 8, 1, 16);
           }
         }
       }
     }
 
-    // Room-specific ambient color overlay
-    const roomTints: Record<string, number> = {
-      reception: 0x4a90e2,     // Blue — professional
-      records_room: 0x2ecc71,  // Green — organized
-      er: 0xff6b6b,            // Red — urgent
-      lab: 0x9b59b6,           // Purple — scientific
-      break_room: 0xf39c12,    // Warm amber — relaxed
-      it_office: 0x00d4aa,     // Teal — tech
+    // Room-specific ambient color overlay — visible mood tint
+    const roomTints: Record<string, { color: number; alpha: number }> = {
+      hospital_entrance: { color: 0xf5e6d0, alpha: 0.06 },  // Warm lobby glow
+      reception: { color: 0x4a90e2, alpha: 0.06 },           // Professional blue
+      records_room: { color: 0x8faa80, alpha: 0.06 },        // Archival green
+      er: { color: 0xff6b6b, alpha: 0.05 },                  // Urgent red
+      lab: { color: 0x9b59b6, alpha: 0.06 },                 // Scientific purple
+      break_room: { color: 0xf39c12, alpha: 0.08 },          // Warm amber — strongest
+      it_office: { color: 0x4488cc, alpha: 0.06 },           // Cool tech blue
     };
-    const tintColor = roomTints[this.room.id] || 0xffffff;
-    if (tintColor !== 0xffffff) {
+    const tintCfg = roomTints[this.room.id];
+    if (tintCfg) {
       this.add.rectangle(
-        w / 2, h / 2, w, h, tintColor, 0.04
+        w / 2, h / 2, w, h, tintCfg.color, tintCfg.alpha
       ).setDepth(0);
     }
 
@@ -410,18 +451,72 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
-    // Room-specific wall decorations
+    // Room-specific wall decorations — distinct visual identity per room
     if (roomId.includes('reception')) {
-      // Welcome sign on wall
-      decorGfx.fillStyle(0x4a90e2, 0.15);
+      // Welcome sign on north wall
+      decorGfx.fillStyle(0x4a90e2, 0.2);
       decorGfx.fillRect(TILE * 2, TILE + 4, TILE * 3, TILE / 2);
-      decorGfx.lineStyle(1, 0x4a90e2, 0.25);
+      decorGfx.lineStyle(1, 0x4a90e2, 0.35);
       decorGfx.strokeRect(TILE * 2, TILE + 4, TILE * 3, TILE / 2);
+      // Clock on wall
+      decorGfx.fillStyle(0xffffff, 0.15);
+      decorGfx.fillCircle(TILE * 16, TILE + 10, 8);
+      decorGfx.lineStyle(1, 0x333333, 0.2);
+      decorGfx.strokeCircle(TILE * 16, TILE + 10, 8);
     } else if (roomId.includes('er')) {
-      // Red cross symbol on wall
-      decorGfx.fillStyle(0xff0000, 0.12);
-      decorGfx.fillRect(w / 2 - 6, TILE + 4, 12, 4);
-      decorGfx.fillRect(w / 2 - 2, TILE, 4, 12);
+      // Red cross symbol on wall — larger, more prominent
+      decorGfx.fillStyle(0xff0000, 0.18);
+      decorGfx.fillRect(w / 2 - 8, TILE + 2, 16, 6);
+      decorGfx.fillRect(w / 2 - 3, TILE - 2, 6, 16);
+      // "EMERGENCY" stripe along top
+      decorGfx.fillStyle(0xff0000, 0.08);
+      decorGfx.fillRect(TILE, TILE - 2, w - TILE * 2, 3);
+    } else if (roomId.includes('lab')) {
+      // Biohazard warning placard on north wall
+      decorGfx.fillStyle(0xf39c12, 0.2);
+      decorGfx.fillRect(TILE * 2, TILE + 4, TILE, TILE / 2);
+      decorGfx.lineStyle(1, 0xf39c12, 0.3);
+      decorGfx.strokeRect(TILE * 2, TILE + 4, TILE, TILE / 2);
+      // Safety shower sign
+      decorGfx.fillStyle(0x27ae60, 0.15);
+      decorGfx.fillRect(TILE * 15, TILE + 4, TILE, TILE / 2);
+    } else if (roomId.includes('it') || roomId.includes('server')) {
+      // Network status lights on north wall (server room feel)
+      for (let lx = 0; lx < 4; lx++) {
+        decorGfx.fillStyle(lx % 3 === 0 ? 0xff4444 : 0x44ff44, 0.2);
+        decorGfx.fillCircle(TILE * 5 + lx * TILE * 3, TILE + 8, 3);
+      }
+      // "RESTRICTED" label
+      decorGfx.fillStyle(0xff4444, 0.12);
+      decorGfx.fillRect(w - TILE * 4, TILE + 4, TILE * 2, TILE / 3);
+    } else if (roomId.includes('break')) {
+      // Menu board on north wall
+      decorGfx.fillStyle(0x2c2c2c, 0.2);
+      decorGfx.fillRect(TILE * 12, TILE + 2, TILE * 2, TILE - 4);
+      decorGfx.fillStyle(0xffffff, 0.12);
+      decorGfx.fillRect(TILE * 12 + 4, TILE + 6, TILE * 2 - 8, 3);
+      decorGfx.fillRect(TILE * 12 + 4, TILE + 12, TILE * 2 - 8, 2);
+      decorGfx.fillRect(TILE * 12 + 4, TILE + 17, TILE - 4, 2);
+    } else if (roomId.includes('records')) {
+      // "MEDICAL RECORDS" label strip on north wall
+      decorGfx.fillStyle(0x2ecc71, 0.12);
+      decorGfx.fillRect(TILE * 6, TILE + 2, TILE * 4, TILE / 3);
+      // Section labels (A, B, C indicators)
+      for (let s = 0; s < 3; s++) {
+        decorGfx.fillStyle(0xffffff, 0.1);
+        decorGfx.fillRect(TILE * (4 + s * 5), TILE + 4, TILE / 2, TILE / 3);
+      }
+    } else if (roomId.includes('entrance') || roomId.includes('lobby')) {
+      // Hospital logo placeholder on north wall
+      decorGfx.fillStyle(0x4a90e2, 0.15);
+      decorGfx.fillCircle(w / 2, TILE + 10, 10);
+      decorGfx.lineStyle(1, 0x4a90e2, 0.25);
+      decorGfx.strokeCircle(w / 2, TILE + 10, 10);
+      // "H" inside
+      decorGfx.fillStyle(0xffffff, 0.2);
+      decorGfx.fillRect(w / 2 - 4, TILE + 5, 2, 10);
+      decorGfx.fillRect(w / 2 + 2, TILE + 5, 2, 10);
+      decorGfx.fillRect(w / 2 - 4, TILE + 9, 10, 2);
     }
 
     // Room-specific floor details
@@ -606,11 +701,13 @@ export class ExplorationScene extends Phaser.Scene {
             .setDepth(1);
         } else {
           // Drop shadow beneath large furniture
-          this.add.ellipse(ox + ow / 2, oy + oh / 2 + oh / 3, ow - 4, oh / 3, 0x000000, 0.1);
-          // For multi-tile furniture, fill with a rectangle and one sprite
-          this.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh, 0x8b7355, 0.25)
-            .setStrokeStyle(1, 0x5d4e37, 0.4);
-          this.add.sprite(ox + ow / 2, oy + oh / 2, texKey);
+          this.add.ellipse(ox + ow / 2, oy + oh / 2 + oh / 3, ow - 4, oh / 3, 0x000000, 0.15);
+          // For multi-tile furniture, tile the sprite across the area
+          for (let fy = obs.y; fy < obs.y + obs.height; fy++) {
+            for (let fx = obs.x; fx < obs.x + obs.width; fx++) {
+              this.add.sprite(fx * TILE + TILE / 2, fy * TILE + TILE / 2, texKey).setDepth(3);
+            }
+          }
         }
       }
 
@@ -698,11 +795,41 @@ export class ExplorationScene extends Phaser.Scene {
         const boardX = w / 2;
         const boardY = 64;
 
-        // Cork board backing
-        const boardBg = this.add.rectangle(boardX, boardY, 56, 40, 0x8B6914)
-          .setDepth(5);
-        // Paper overlay
-        this.add.rectangle(boardX, boardY, 48, 32, 0xF5E6C8).setDepth(6);
+        // Board shadow (depth illusion)
+        this.add.rectangle(boardX + 2, boardY + 2, 60, 44, 0x000000, 0.3)
+          .setDepth(4);
+        // Cork board backing with wooden frame
+        const boardG = this.add.graphics().setDepth(5);
+        // Outer frame (dark wood)
+        boardG.fillStyle(0x5a3a1a, 1);
+        boardG.fillRect(boardX - 31, boardY - 23, 62, 46);
+        // Inner frame highlight
+        boardG.fillStyle(0x8B6914, 1);
+        boardG.fillRect(boardX - 29, boardY - 21, 58, 42);
+        // Cork texture — alternating shades
+        boardG.fillStyle(0xa07828, 1);
+        boardG.fillRect(boardX - 27, boardY - 19, 54, 38);
+        boardG.fillStyle(0x9a7020, 0.5);
+        for (let cy = 0; cy < 4; cy++) {
+          for (let cx = 0; cx < 6; cx++) {
+            if ((cx + cy) % 2 === 0) {
+              boardG.fillRect(boardX - 27 + cx * 9, boardY - 19 + cy * 10, 9, 10);
+            }
+          }
+        }
+        // Paper note — slightly tilted via offset
+        this.add.rectangle(boardX - 1, boardY + 1, 44, 28, 0xe8dcc4).setDepth(6);
+        this.add.rectangle(boardX, boardY, 44, 28, 0xF5E6C8).setDepth(6);
+        // Paper fold line
+        boardG.lineStyle(1, 0xd4c8a8, 0.4);
+        boardG.lineBetween(boardX - 20, boardY - 12, boardX - 20, boardY + 12);
+        boardG.setDepth(7);
+        // Push pins (red circles at corners)
+        this.add.circle(boardX - 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
+        this.add.circle(boardX + 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
+        // Pin highlights
+        this.add.circle(boardX - 19, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
+        this.add.circle(boardX + 17, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
         // NOTICE label
         this.add.text(boardX, boardY - 6, 'NOTICE', {
           fontFamily: '"Press Start 2P"',
@@ -790,17 +917,20 @@ export class ExplorationScene extends Phaser.Scene {
         sprite.setAlpha(0.7);
       }
 
-      // Name label below sprite
+      // Name label below sprite with dark background for readability
+      const labelX = npc.x * TILE + TILE / 2;
+      const labelY = npc.y * TILE + TILE + 2;
       const nameLabel = this.add.text(
-        npc.x * TILE + TILE / 2,
-        npc.y * TILE + TILE + 2,
+        labelX, labelY,
         npc.name,
         {
           fontFamily: '"Press Start 2P"',
           fontSize: '9px',
           color: '#ffffff',
           stroke: '#000000',
-          strokeThickness: 2,
+          strokeThickness: 3,
+          backgroundColor: '#00000066',
+          padding: { x: 2, y: 1 },
         },
       ).setOrigin(0.5, 0).setDepth(npcDepth + 1);
       if (completed) nameLabel.setAlpha(0.4);
@@ -911,11 +1041,13 @@ export class ExplorationScene extends Phaser.Scene {
     this.pendingSpawnTileY = null;
     this.tileX = spawnTileX;
     this.tileY = spawnTileY;
-    // Use programmatic player texture — spritesheet has timing issues in QA/fast scene starts
+    // Prefer spritesheet for higher quality; fall back to programmatic texture
+    const playerTex = this.textures.exists('player_sheet') ? 'player_sheet' : 'player_down';
     this.player = this.physics.add.sprite(
       spawnTileX * TILE + TILE / 2,
       spawnTileY * TILE + TILE / 2,
-      'player_down',
+      playerTex,
+      playerTex === 'player_sheet' ? 0 : undefined,
     );
     this.player.setDepth(30);
 
@@ -1056,13 +1188,13 @@ export class ExplorationScene extends Phaser.Scene {
     });
 
     // ── HUD ──────────────────────────────────────────────────────
-    this.roomNameText = this.add.text(w / 2, 8, room.name.toUpperCase(), {
+    this.roomNameText = this.add.text(canvasW / 2, 8, room.name.toUpperCase(), {
       fontFamily: '"Press Start 2P"', fontSize: '12px', color: '#ffd700',
       backgroundColor: '#1a1a2ecc', padding: { x: 10, y: 6 },
       stroke: '#000000', strokeThickness: 1,
     }).setOrigin(0.5, 0).setDepth(50).setScrollFactor(0);
 
-    this.promptText = this.add.text(w / 2, h - 12, '', {
+    this.promptText = this.add.text(canvasW / 2, canvasH - 12, '', {
       fontFamily: '"Press Start 2P"', fontSize: '8px', color: '#ffd700',
       backgroundColor: '#1a1a2e', padding: { x: 12, y: 6 },
       stroke: '#000000', strokeThickness: 1,
@@ -1115,6 +1247,7 @@ export class ExplorationScene extends Phaser.Scene {
     // ── Listen for React events — MUST be before music to survive any audio errors ──
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION, this.onResumeFromDecline, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     eventBridge.on(BRIDGE_EVENTS.ACT_ADVANCE, this.onActAdvance, this);
@@ -1139,8 +1272,7 @@ export class ExplorationScene extends Phaser.Scene {
       this.sound.mute = true;
     }
 
-    // ── Background music — fade in gently after a beat ────────
-    // Select correct music track based on current act (Phase 14 polish fix)
+    // ── Background music — continue seamlessly or fade in ────────
     const currentAct = this.getCurrentAct();
     const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
       1: { track: 'music_hub', baseVol: this.musicBaseVolume },
@@ -1152,12 +1284,29 @@ export class ExplorationScene extends Phaser.Scene {
     try {
       const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
       const targetVol = musicCfg.baseVol * userVol;
-      if (userVol > 0) {
-        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0 });
+
+      // Check if this track survived from the previous room (same act)
+      const existing = this.findPlayingTrack(musicCfg.track);
+      if (existing) {
+        // Reclaim the instance and restore volume (door fade set it to 0)
+        this.bgMusic = existing;
+        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 400, ease: 'Sine.easeIn' });
+      } else if (userVol > 0) {
+        // No existing track — clean up any orphaned sounds and start fresh.
+        // Start muted to prevent any first-frame audio leak, then unmute at
+        // volume 0 and tween up on the next tick.
+        this.sound.getAll(musicCfg.track).forEach(s => { s.stop(); s.destroy(); });
+        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0, mute: true });
         const playMusic = () => {
           if (!this.bgMusic || !this.scene.isActive()) return;
           this.bgMusic.play();
-          this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1500, ease: 'Sine.easeIn' });
+          this.time.delayedCall(0, () => {
+            if (!this.bgMusic || !this.scene.isActive()) return;
+            const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
+            ws.setMute(false);
+            ws.volume = 0;
+            this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1500, ease: 'Sine.easeIn' });
+          });
         };
         if (this.sound.locked) {
           this.sound.once('unlocked', playMusic);
@@ -1399,15 +1548,15 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   shutdown() {
-    if (this.bgMusic) {
-      this.bgMusic.stop();
-      this.bgMusic = undefined;
-    }
+    // Don't stop music — create() will reclaim it if same track is needed,
+    // or crossfadeToMusic will clean it up if the act changed.
+    this.bgMusic = undefined;
     // Clean up sound unlock listener
     this.sound.off('unlocked');
     // Clean up EventBridge listeners
     eventBridge.off(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION, this.onResumeFromDecline, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
@@ -1561,6 +1710,15 @@ export class ExplorationScene extends Phaser.Scene {
     const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
     const targetVol = effectiveBase * userVol;
 
+    // Reclaim orphaned bgMusic ref (shutdown cleared it but sound still plays)
+    if (!this.bgMusic) {
+      const playing = this.sound.getAll('music_hub')
+        .concat(this.sound.getAll('music_exploration'))
+        .concat(this.sound.getAll('music_breach'))
+        .find(s => s.isPlaying);
+      if (playing) this.bgMusic = playing;
+    }
+
     if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
       // Fade out current track, then start new one
       this.tweens.add({
@@ -1590,16 +1748,22 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
+  /** Find an already-playing sound instance on the global SoundManager by key. */
+  private findPlayingTrack(key: string): Phaser.Sound.BaseSound | undefined {
+    return this.sound.getAll(key).find(s => s.isPlaying);
+  }
+
   private startMusicTrack(key: string, targetVol: number): void {
     if (!this.scene || !this.scene.isActive()) return;
     try {
-      this.bgMusic = this.sound.add(key, { loop: true, volume: 0 });
+      this.bgMusic = this.sound.add(key, { loop: true, volume: 0, mute: true });
       this.bgMusic.play();
-      this.tweens.add({
-        targets: this.bgMusic,
-        volume: targetVol,
-        duration: 2000,
-        ease: 'Sine.easeIn',
+      this.time.delayedCall(0, () => {
+        if (!this.bgMusic || !this.scene.isActive()) return;
+        const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
+        ws.setMute(false);
+        ws.volume = 0;
+        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 2000, ease: 'Sine.easeIn' });
       });
     } catch (e) {
       console.warn(`[ExplorationScene] crossfade to ${key} failed:`, e);
@@ -1683,40 +1847,92 @@ export class ExplorationScene extends Phaser.Scene {
       budgetOverride: ENCOUNTER_WAVE_BUDGETS,
     };
 
-    eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, {
-      encounterId,
-      narrativeText:
-        "The security analyst just flagged suspicious login attempts on the patient records server. " +
-        "Something is actively probing your network. You need to defend the systems — now.",
-      config,
+    // Commandment 2: Anticipation before reward — brief screen shake + SFX before alert
+    this.cameras.main.shake(300, 0.006);
+    try { this.sound.play('sfx_breach_alert', { volume: 0.6 }); } catch (_) {}
+
+    // Delay the narrative card slightly so the shake lands first
+    this.time.delayedCall(400, () => {
+      eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, {
+        encounterId,
+        narrativeText:
+          "The security analyst just flagged suspicious login attempts on the patient records server. " +
+          "Something is actively probing your network. You need to defend the systems — now.",
+        config,
+      });
     });
     // React shows the narrative context card. On user confirmation,
     // React emits REACT_LAUNCH_ENCOUNTER and ExplorationScene handles it below.
   }
 
   /** React confirmed the narrative card — launch BreachDefense and sleep. */
+  private encounterLaunching = false;
   private onLaunchEncounter = (data: { config: BreachDefenseInitData }): void => {
-    this.cameras.main.fadeOut(400, 0, 0, 0);
-    this.cameras.main.once(
-      Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
-      () => {
-        this.scene.launch('BreachDefense', data.config);
-        this.scene.sleep();
-      }
-    );
+    // Guard against double-fire
+    if (this.encounterLaunching) return;
+    this.encounterLaunching = true;
+
+    // Kill any active music tweens before destroying to avoid null volume errors
+    if (this.bgMusic) {
+      try { this.tweens.killTweensOf(this.bgMusic); } catch (_) {}
+      try { this.bgMusic.stop(); } catch (_) {}
+      try { this.bgMusic.destroy(); } catch (_) {}
+      this.bgMusic = undefined;
+    }
+
+    // Launch directly — camera fade callbacks silently fail with scene.launch
+    this.scene.setVisible(false);
+    this.scene.launch('BreachDefense', data.config);
+    this.scene.bringToTop('BreachDefense');
+    this.scene.sleep();
   };
 
   /** React dismissed the debrief — stop BreachDefense and wake this scene. */
   private onReturnFromEncounter = (): void => {
-    this.scene.stop('BreachDefense');
-    this.scene.wake();
+    try {
+      this.scene.stop('BreachDefense');
+    } catch (_) {
+      // Scene may already be stopped
+    }
+    this.scene.setVisible(true);
+    if (!this.scene.isActive()) {
+      this.scene.wake();
+    }
   };
 
   /** Fires when this scene wakes from sleep (after encounter ends). */
   private handleWakeFromEncounter = (): void => {
     this.paused = false;
+    this.encounterLaunching = false;
     this.cameras.main.fadeIn(400, 0, 0, 0);
     // encounterTriggered stays true — prevents re-triggering on same room session
+
+    // Restore exploration music after BreachDefense ends
+    try {
+      const currentAct = this.getCurrentAct();
+      const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
+        1: { track: 'music_hub', baseVol: this.musicBaseVolume },
+        2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
+        3: { track: 'music_breach', baseVol: 0.15 },
+      };
+      const musicCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
+      this.activeMusicBaseVolume = musicCfg.baseVol;
+      const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+      const targetVol = musicCfg.baseVol * userVol;
+      if (userVol > 0) {
+        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0, mute: true });
+        this.bgMusic.play();
+        this.time.delayedCall(0, () => {
+          if (!this.bgMusic || !this.scene.isActive()) return;
+          const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
+          ws.setMute(false);
+          ws.volume = 0;
+          this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 800, ease: 'Sine.easeIn' });
+        });
+      }
+    } catch (e) {
+      // Sound manager may be in a bad state after encounter cleanup
+    }
   };
 
   // ── Door navigation (Phase 12) ──────────────────────────────────
@@ -1763,15 +1979,25 @@ export class ExplorationScene extends Phaser.Scene {
       const doorPixelY = door.y * TILE + TILE / 2;
       const state = this.doorStates[door.id] ?? 'available';
 
-      // Door frame
+      // Door frame — prominent wood frame with highlight and shadow
       const frameG = this.add.graphics().setDepth(1);
       const fx = door.x * TILE;
       const fy = door.y * TILE - TILE / 2;
-      frameG.fillStyle(0x8b7355, 0.6);
-      frameG.fillRect(fx - 2, fy, 4, TILE + TILE / 2);
-      frameG.fillRect(fx + TILE - 2, fy, 4, TILE + TILE / 2);
-      frameG.fillStyle(0x8b7355, 0.5);
-      frameG.fillRect(fx - 2, fy, TILE + 4, 4);
+      // Frame posts (solid wood)
+      frameG.fillStyle(0xa0845a, 1);
+      frameG.fillRect(fx - 3, fy, 5, TILE + TILE / 2);
+      frameG.fillRect(fx + TILE - 2, fy, 5, TILE + TILE / 2);
+      // Frame header
+      frameG.fillStyle(0xa0845a, 1);
+      frameG.fillRect(fx - 3, fy, TILE + 6, 5);
+      // Highlight (inner edge)
+      frameG.fillStyle(0xc4a870, 0.8);
+      frameG.fillRect(fx + 1, fy + 1, 1, TILE + TILE / 2 - 1);
+      frameG.fillRect(fx + TILE - 3, fy + 1, 1, TILE + TILE / 2 - 1);
+      frameG.fillRect(fx, fy + 1, TILE, 1);
+      // Shadow (outer edge)
+      frameG.fillStyle(0x5a4430, 0.7);
+      frameG.fillRect(fx - 3, fy + TILE + TILE / 2 - 1, TILE + 6, 2);
 
       if (state === 'locked') {
         // Dark overlay + lock icon
@@ -2007,10 +2233,6 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     if (closest) {
-      // Play subtle proximity cue when approaching an interactable
-      if (closest !== this.nearbyInteractable && closest) {
-        this.sound.play('sfx_interact', { volume: 0.15 });
-      }
       this.nearbyInteractable = closest;
       const label = closest.type === 'npc'
         ? `[SPACE] Talk to ${(closest.data as NPC).name}`
@@ -2233,6 +2455,12 @@ export class ExplorationScene extends Phaser.Scene {
   private onPauseFromModal = () => {
     if (!this.scene.isActive()) return;
     this.paused = true;
+  };
+
+  /** Player declined the encounter narrative card — unpause and allow re-trigger on next approach. */
+  private onResumeFromDecline = () => {
+    this.paused = false;
+    this.encounterTriggered = false;
   };
 
   // ── Stop NPC pulse on interaction ──────────────────────────────

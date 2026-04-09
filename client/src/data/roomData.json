@@ -15,35 +15,165 @@
       "width": 20,
       "height": 14,
       "backgroundImage": "lobby",
-      "spawnPoint": {"x": 10, "y": 11},
+      "spawnPoint": {
+        "x": 10,
+        "y": 11
+      },
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 13, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 14, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 19, "y": 8, "width": 1, "height": 6, "type": "wall"},
-
-        {"x": 7, "y": 2, "width": 6, "height": 2, "type": "desk"},
-
-        {"x": 2, "y": 7, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 2, "y": 9, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 16, "y": 7, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 16, "y": 9, "width": 2, "height": 1, "type": "chairs"},
-
-        {"x": 1, "y": 2, "width": 2, "height": 2, "type": "plant"},
-        {"x": 17, "y": 2, "width": 2, "height": 2, "type": "plant"},
-        {"x": 1, "y": 11, "width": 1, "height": 1, "type": "plant"},
-        {"x": 18, "y": 11, "width": 1, "height": 1, "type": "plant"},
-
-        {"x": 6, "y": 7, "width": 2, "height": 2, "type": "table"},
-        {"x": 12, "y": 7, "width": 2, "height": 2, "type": "table"},
-
-        {"x": 3, "y": 1, "width": 2, "height": 1, "type": "bulletin_board"},
-        {"x": 14, "y": 2, "width": 1, "height": 1, "type": "flower_arrangement"},
-        {"x": 5, "y": 10, "width": 1, "height": 1, "type": "hand_sanitizer"},
-        {"x": 9, "y": 12, "width": 3, "height": 1, "type": "welcome_mat"},
-        {"x": 2, "y": 11, "width": 1, "height": 1, "type": "umbrella_stand"},
-        {"x": 15, "y": 10, "width": 2, "height": 2, "type": "info_kiosk"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 13,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 14,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 8,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "width": 6,
+          "height": 2,
+          "type": "desk"
+        },
+        {
+          "x": 2,
+          "y": 7,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 2,
+          "y": 9,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 16,
+          "y": 7,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 16,
+          "y": 9,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "width": 2,
+          "height": 2,
+          "type": "plant"
+        },
+        {
+          "x": 17,
+          "y": 2,
+          "width": 2,
+          "height": 2,
+          "type": "plant"
+        },
+        {
+          "x": 1,
+          "y": 11,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 18,
+          "y": 11,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 6,
+          "y": 7,
+          "width": 2,
+          "height": 2,
+          "type": "table"
+        },
+        {
+          "x": 12,
+          "y": 7,
+          "width": 2,
+          "height": 2,
+          "type": "table"
+        },
+        {
+          "x": 3,
+          "y": 1,
+          "width": 2,
+          "height": 1,
+          "type": "bulletin_board"
+        },
+        {
+          "x": 14,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "type": "flower_arrangement"
+        },
+        {
+          "x": 5,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "type": "hand_sanitizer"
+        },
+        {
+          "x": 9,
+          "y": 12,
+          "width": 3,
+          "height": 1,
+          "type": "welcome_mat"
+        },
+        {
+          "x": 2,
+          "y": 11,
+          "width": 1,
+          "height": 1,
+          "type": "umbrella_stand"
+        },
+        {
+          "x": 15,
+          "y": 10,
+          "width": 2,
+          "height": 2,
+          "type": "info_kiosk"
+        }
       ],
       "npcs": [
         {
@@ -74,10 +204,16 @@
           "type": "document",
           "x": 15,
           "y": 4,
-          "fact": "HIPAA — the Health Insurance Portability and Accountability Act of 1996 — isn't just about privacy. It has five titles, but Title II is the one that matters to you: it sets national standards for protecting patient health information (PHI). Two key rules: the Privacy Rule (who can see PHI) and the Security Rule (how to protect electronic PHI). Every person in this hospital — from the CEO to the janitor — has a role in keeping patient data safe."
+          "fact": "HIPAA \u2014 the Health Insurance Portability and Accountability Act of 1996 \u2014 isn't just about privacy. It has five titles, but Title II is the one that matters to you: it sets national standards for protecting patient health information (PHI). Two key rules: the Privacy Rule (who can see PHI) and the Security Rule (how to protect electronic PHI). Every person in this hospital \u2014 from the CEO to the janitor \u2014 has a role in keeping patient data safe."
         }
       ],
-      "completionRequirements": { "requiredNpcs": ["riley_entrance"], "requiredZones": [], "requiredItems": [] },
+      "completionRequirements": {
+        "requiredNpcs": [
+          "riley_entrance"
+        ],
+        "requiredZones": [],
+        "requiredItems": []
+      },
       "doors": [
         {
           "id": "entrance_to_reception",
@@ -98,17 +234,74 @@
       "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 3},
+      "spawnPoint": {
+        "x": 1,
+        "y": 3
+      },
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
-        {"x": 5, "y": 5, "width": 2, "height": 1, "type": "bench"},
-        {"x": 14, "y": 5, "width": 2, "height": 1, "type": "bench"},
-        {"x": 10, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 4, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 15, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 7, "y": 5, "width": 1, "height": 1, "type": "water_cooler"},
-        {"x": 12, "y": 5, "width": 1, "height": 1, "type": "vending_machine"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 14,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 10,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 15,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 7,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "water_cooler"
+        },
+        {
+          "x": 12,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "vending_machine"
+        }
       ],
       "npcs": [],
       "interactionZones": [],
@@ -119,10 +312,14 @@
           "type": "poster",
           "x": 8,
           "y": 1,
-          "fact": "PHI includes 18 types of identifiers: names, dates, phone numbers, email, SSN, medical record numbers, health plan IDs, account numbers, license/plate numbers, device IDs, URLs, IPs, biometrics, photos, and any other unique identifier. If it can identify a patient AND relates to their health, treatment, or payment — it's PHI."
+          "fact": "PHI includes 18 types of identifiers: names, dates, phone numbers, email, SSN, medical record numbers, health plan IDs, account numbers, license/plate numbers, device IDs, URLs, IPs, biometrics, photos, and any other unique identifier. If it can identify a patient AND relates to their health, treatment, or payment \u2014 it's PHI."
         }
       ],
-      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "completionRequirements": {
+        "requiredNpcs": [],
+        "requiredZones": [],
+        "requiredItems": []
+      },
       "doors": [
         {
           "id": "hallway_recbreak_to_reception",
@@ -151,17 +348,74 @@
       "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 3},
+      "spawnPoint": {
+        "x": 1,
+        "y": 3
+      },
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
-        {"x": 6, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 13, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 9, "y": 5, "width": 2, "height": 1, "type": "bench"},
-        {"x": 4, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 16, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 15, "y": 1, "width": 1, "height": 1, "type": "biohazard_sign"},
-        {"x": 3, "y": 5, "width": 1, "height": 1, "type": "glove_dispenser"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 6,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 13,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 9,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 16,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 15,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "biohazard_sign"
+        },
+        {
+          "x": 3,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "glove_dispenser"
+        }
       ],
       "npcs": [],
       "interactionZones": [],
@@ -172,10 +426,14 @@
           "type": "poster",
           "x": 10,
           "y": 1,
-          "fact": "Most HIPAA breaches aren't hackers — they're conversations. Discussing patients in elevators, cafeterias, or hallways where others can overhear is a violation of the Minimum Necessary standard. Rule of thumb: if you can be overheard by someone without a need to know, find a private space."
+          "fact": "Most HIPAA breaches aren't hackers \u2014 they're conversations. Discussing patients in elevators, cafeterias, or hallways where others can overhear is a violation of the Minimum Necessary standard. Rule of thumb: if you can be overheard by someone without a need to know, find a private space."
         }
       ],
-      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "completionRequirements": {
+        "requiredNpcs": [],
+        "requiredZones": [],
+        "requiredItems": []
+      },
       "doors": [
         {
           "id": "hallway_breaklab_to_break",
@@ -204,17 +462,74 @@
       "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 3},
+      "spawnPoint": {
+        "x": 1,
+        "y": 3
+      },
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
-        {"x": 4, "y": 5, "width": 2, "height": 1, "type": "bench"},
-        {"x": 15, "y": 5, "width": 2, "height": 1, "type": "bench"},
-        {"x": 10, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 5, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 14, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 12, "y": 5, "width": 2, "height": 1, "type": "filing_cart"},
-        {"x": 7, "y": 1, "width": 1, "height": 1, "type": "wall_clock"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 4,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 15,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 10,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 14,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 12,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "filing_cart"
+        },
+        {
+          "x": 7,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_clock"
+        }
       ],
       "npcs": [],
       "interactionZones": [],
@@ -225,10 +540,14 @@
           "type": "poster",
           "x": 8,
           "y": 1,
-          "fact": "HIPAA allows sharing health data freely if it's properly de-identified. The Safe Harbor method requires removing all 18 identifiers. The Expert Determination method uses a statistician to certify re-identification risk is 'very small.' De-identified data isn't PHI — and isn't subject to HIPAA rules."
+          "fact": "HIPAA allows sharing health data freely if it's properly de-identified. The Safe Harbor method requires removing all 18 identifiers. The Expert Determination method uses a statistician to certify re-identification risk is 'very small.' De-identified data isn't PHI \u2014 and isn't subject to HIPAA rules."
         }
       ],
-      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "completionRequirements": {
+        "requiredNpcs": [],
+        "requiredZones": [],
+        "requiredItems": []
+      },
       "doors": [
         {
           "id": "hallway_labrecords_to_lab",
@@ -257,17 +576,74 @@
       "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 3},
+      "spawnPoint": {
+        "x": 1,
+        "y": 3
+      },
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
-        {"x": 7, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 12, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 9, "y": 5, "width": 2, "height": 1, "type": "bench"},
-        {"x": 4, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 16, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 15, "y": 5, "width": 1, "height": 1, "type": "server_rack"},
-        {"x": 14, "y": 1, "width": 2, "height": 1, "type": "cable_tray"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 7,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 12,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 9,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 16,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 15,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "server_rack"
+        },
+        {
+          "x": 14,
+          "y": 1,
+          "width": 2,
+          "height": 1,
+          "type": "cable_tray"
+        }
       ],
       "npcs": [],
       "interactionZones": [],
@@ -278,10 +654,14 @@
           "type": "poster",
           "x": 10,
           "y": 1,
-          "fact": "When a breach of unsecured PHI affects 500+ individuals, the covered entity must notify HHS, affected individuals, AND prominent media outlets — all within 60 days of discovery. For breaches under 500, notification to HHS can wait until the annual log, but individuals must still be notified within 60 days."
+          "fact": "When a breach of unsecured PHI affects 500+ individuals, the covered entity must notify HHS, affected individuals, AND prominent media outlets \u2014 all within 60 days of discovery. For breaches under 500, notification to HHS can wait until the annual log, but individuals must still be notified within 60 days."
         }
       ],
-      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "completionRequirements": {
+        "requiredNpcs": [],
+        "requiredZones": [],
+        "requiredItems": []
+      },
       "doors": [
         {
           "id": "hallway_recordsit_to_records",
@@ -310,16 +690,67 @@
       "height": 7,
       "backgroundImage": "hallway",
       "alwaysUnlocked": false,
-      "spawnPoint": {"x": 1, "y": 3},
+      "spawnPoint": {
+        "x": 1,
+        "y": 3
+      },
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 6, "width": 20, "height": 1, "type": "wall"},
-        {"x": 5, "y": 5, "width": 2, "height": 1, "type": "bench"},
-        {"x": 14, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 5, "y": 1, "width": 1, "height": 1, "type": "wall_sconce"},
-        {"x": 16, "y": 1, "width": 1, "height": 1, "type": "emergency_light"},
-        {"x": 15, "y": 5, "width": 1, "height": 1, "type": "defibrillator_mount"},
-        {"x": 10, "y": 5, "width": 1, "height": 1, "type": "wheelchair"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 6,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 14,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "wall_sconce"
+        },
+        {
+          "x": 16,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "emergency_light"
+        },
+        {
+          "x": 15,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "defibrillator_mount"
+        },
+        {
+          "x": 10,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "wheelchair"
+        }
       ],
       "npcs": [],
       "interactionZones": [],
@@ -330,10 +761,14 @@
           "type": "poster",
           "x": 10,
           "y": 1,
-          "fact": "HIPAA doesn't disappear in emergencies — but it flexes. Providers can share PHI without authorization when necessary to treat the patient, to prevent a serious threat to health or safety, or to assist in disaster relief. The key word is 'necessary.' Even in a crisis, share only what's needed for the situation at hand."
+          "fact": "HIPAA doesn't disappear in emergencies \u2014 but it flexes. Providers can share PHI without authorization when necessary to treat the patient, to prevent a serious threat to health or safety, or to assist in disaster relief. The key word is 'necessary.' Even in a crisis, share only what's needed for the situation at hand."
         }
       ],
-      "completionRequirements": { "requiredNpcs": [], "requiredZones": [], "requiredItems": [] },
+      "completionRequirements": {
+        "requiredNpcs": [],
+        "requiredZones": [],
+        "requiredItems": []
+      },
       "doors": [
         {
           "id": "hallway_iter_to_it",
@@ -372,51 +807,196 @@
         "introText": "Your first day. Take your time. Watch. Listen. Learn."
       },
       "completionRequirements": {
-        "requiredNpcs": ["riley", "nervous_patient"],
-        "requiredZones": ["sign_in_sheet"],
-        "requiredItems": ["patient_rights_poster"]
+        "requiredNpcs": [
+          "riley",
+          "nervous_patient"
+        ],
+        "requiredZones": [
+          "sign_in_sheet"
+        ],
+        "requiredItems": [
+          "patient_rights_poster"
+        ]
       },
       "width": 20,
       "height": 15,
       "backgroundImage": "reception_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
-
-        {"x": 7, "y": 2, "width": 6, "height": 1, "type": "desk"},
-        {"x": 6, "y": 2, "width": 1, "height": 2, "type": "desk"},
-        {"x": 13, "y": 2, "width": 1, "height": 2, "type": "desk"},
-        {"x": 4, "y": 1, "width": 2, "height": 1, "type": "filing_cabinet"},
-        {"x": 14, "y": 1, "width": 2, "height": 1, "type": "filing_cabinet"},
-
-        {"x": 6, "y": 6, "width": 2, "height": 1, "type": "privacy_screen"},
-        {"x": 12, "y": 6, "width": 2, "height": 1, "type": "privacy_screen"},
-
-        {"x": 2, "y": 8, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 2, "y": 10, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 5, "y": 10, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 4, "y": 8, "width": 1, "height": 1, "type": "magazine_rack"},
-        {"x": 8, "y": 10, "width": 1, "height": 1, "type": "tissue_box"},
-
-        {"x": 15, "y": 6, "width": 2, "height": 1, "type": "chairs"},
-        {"x": 15, "y": 10, "width": 2, "height": 1, "type": "chairs"},
-
-        {"x": 2, "y": 12, "width": 1, "height": 1, "type": "water_dispenser"},
-        {"x": 4, "y": 12, "width": 2, "height": 1, "type": "notice_board"},
-
-        {"x": 1, "y": 1, "width": 1, "height": 1, "type": "plant"},
-        {"x": 17, "y": 2, "width": 1, "height": 1, "type": "plant"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 14,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "width": 6,
+          "height": 1,
+          "type": "desk"
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "width": 1,
+          "height": 2,
+          "type": "desk"
+        },
+        {
+          "x": 13,
+          "y": 2,
+          "width": 1,
+          "height": 2,
+          "type": "desk"
+        },
+        {
+          "x": 4,
+          "y": 1,
+          "width": 2,
+          "height": 1,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 14,
+          "y": 1,
+          "width": 2,
+          "height": 1,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 6,
+          "y": 6,
+          "width": 2,
+          "height": 1,
+          "type": "privacy_screen"
+        },
+        {
+          "x": 12,
+          "y": 6,
+          "width": 2,
+          "height": 1,
+          "type": "privacy_screen"
+        },
+        {
+          "x": 2,
+          "y": 8,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 5,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 4,
+          "y": 8,
+          "width": 1,
+          "height": 1,
+          "type": "magazine_rack"
+        },
+        {
+          "x": 8,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "type": "tissue_box"
+        },
+        {
+          "x": 15,
+          "y": 6,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 15,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 2,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "type": "water_dispenser"
+        },
+        {
+          "x": 4,
+          "y": 12,
+          "width": 2,
+          "height": 1,
+          "type": "notice_board"
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 17,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        }
       ],
       "npcs": [
         {
           "id": "riley",
           "name": "Front Desk Coordinator",
           "x": 10,
-          "y": 4,
+          "y": 3,
           "sceneId": "riley_scene1"
         },
         {
@@ -459,10 +1039,13 @@
           "type": "computer",
           "x": 2,
           "y": 4,
-          "fact": "Under HIPAA, patients aren't just bodies in beds—they have actual power. The Big 5 Patient Rights: (1) Right to Access Their Records within 30 days, (2) Right to Request Amendments to incorrect info, (3) Right to an Accounting of Disclosures for the last 6 years, (4) Right to Request Restrictions on who sees their info, (5) Right to Confidential Communications. Bottom line: Patients own their health data. We're just the janitors managing it."
+          "fact": "Under HIPAA, patients aren't just bodies in beds\u2014they have actual power. The Big 5 Patient Rights: (1) Right to Access Their Records within 30 days, (2) Right to Request Amendments to incorrect info, (3) Right to an Accounting of Disclosures for the last 6 years, (4) Right to Request Restrictions on who sees their info, (5) Right to Confidential Communications. Bottom line: Patients own their health data. We're just the janitors managing it."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12},
+      "spawnPoint": {
+        "x": 10,
+        "y": 12
+      },
       "doors": [
         {
           "id": "reception_to_entrance",
@@ -511,41 +1094,161 @@
         ]
       },
       "completionRequirements": {
-        "requiredNpcs": ["dr_martinez", "officer"],
-        "requiredZones": ["whiteboard"],
-        "requiredItems": ["emergency_exceptions"]
+        "requiredNpcs": [
+          "dr_martinez",
+          "officer"
+        ],
+        "requiredZones": [
+          "whiteboard"
+        ],
+        "requiredItems": [
+          "emergency_exceptions"
+        ]
       },
       "width": 20,
       "height": 15,
       "backgroundImage": "er_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 15, "type": "wall"},
-
-        {"x": 8, "y": 5, "width": 4, "height": 3, "type": "nurse_station"},
-
-        {"x": 2, "y": 2, "width": 4, "height": 3, "type": "patient_bay"},
-        {"x": 14, "y": 2, "width": 4, "height": 3, "type": "patient_bay"},
-
-        {"x": 2, "y": 9, "width": 3, "height": 2, "type": "gurney"},
-        {"x": 15, "y": 9, "width": 3, "height": 2, "type": "gurney"},
-
-        {"x": 5, "y": 12, "width": 2, "height": 1, "type": "equipment"},
-        {"x": 13, "y": 12, "width": 2, "height": 1, "type": "equipment"},
-
-        {"x": 6, "y": 2, "width": 1, "height": 3, "type": "curtain_partition"},
-        {"x": 13, "y": 2, "width": 1, "height": 3, "type": "curtain_partition"},
-        {"x": 6, "y": 9, "width": 1, "height": 3, "type": "curtain_partition"},
-
-        {"x": 5, "y": 5, "width": 1, "height": 1, "type": "iv_stand"},
-        {"x": 18, "y": 5, "width": 1, "height": 1, "type": "vital_monitor"},
-        {"x": 13, "y": 10, "width": 2, "height": 1, "type": "crash_cart"},
-        {"x": 1, "y": 10, "width": 1, "height": 1, "type": "iv_stand"},
-
-        {"x": 8, "y": 13, "width": 3, "height": 1, "type": "triage_desk"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 14,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "width": 1,
+          "height": 15,
+          "type": "wall"
+        },
+        {
+          "x": 8,
+          "y": 5,
+          "width": 4,
+          "height": 3,
+          "type": "nurse_station"
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "width": 4,
+          "height": 3,
+          "type": "patient_bay"
+        },
+        {
+          "x": 14,
+          "y": 2,
+          "width": 4,
+          "height": 3,
+          "type": "patient_bay"
+        },
+        {
+          "x": 2,
+          "y": 9,
+          "width": 3,
+          "height": 2,
+          "type": "gurney"
+        },
+        {
+          "x": 15,
+          "y": 9,
+          "width": 3,
+          "height": 2,
+          "type": "gurney"
+        },
+        {
+          "x": 5,
+          "y": 12,
+          "width": 2,
+          "height": 1,
+          "type": "equipment"
+        },
+        {
+          "x": 13,
+          "y": 12,
+          "width": 2,
+          "height": 1,
+          "type": "equipment"
+        },
+        {
+          "x": 6,
+          "y": 2,
+          "width": 1,
+          "height": 3,
+          "type": "curtain_partition"
+        },
+        {
+          "x": 13,
+          "y": 2,
+          "width": 1,
+          "height": 3,
+          "type": "curtain_partition"
+        },
+        {
+          "x": 6,
+          "y": 9,
+          "width": 1,
+          "height": 3,
+          "type": "curtain_partition"
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "iv_stand"
+        },
+        {
+          "x": 18,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "vital_monitor"
+        },
+        {
+          "x": 13,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "crash_cart"
+        },
+        {
+          "x": 1,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "type": "iv_stand"
+        },
+        {
+          "x": 8,
+          "y": 13,
+          "width": 3,
+          "height": 1,
+          "type": "triage_desk"
+        }
       ],
       "npcs": [
         {
@@ -595,10 +1298,13 @@
           "type": "whiteboard",
           "x": 17,
           "y": 12,
-          "fact": "HIPAA isn't trying to STOP healthcare—it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (court orders, subpoenas, for suspect identification, crime on premises, or medical emergencies—a warrant isn't always required), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
+          "fact": "HIPAA isn't trying to STOP healthcare\u2014it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (court orders, subpoenas, for suspect identification, crime on premises, or medical emergencies\u2014a warrant isn't always required), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12},
+      "spawnPoint": {
+        "x": 10,
+        "y": 12
+      },
       "doors": [
         {
           "id": "er_to_hallway_it",
@@ -639,40 +1345,154 @@
         ]
       },
       "completionRequirements": {
-        "requiredNpcs": ["lab_tech", "researcher"],
-        "requiredZones": ["results_printout"],
-        "requiredItems": ["phi_identifiers"]
+        "requiredNpcs": [
+          "lab_tech",
+          "researcher"
+        ],
+        "requiredZones": [
+          "results_printout"
+        ],
+        "requiredItems": [
+          "phi_identifiers"
+        ]
       },
       "width": 20,
       "height": 15,
       "backgroundImage": "lab_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
-
-        {"x": 5, "y": 5, "width": 10, "height": 2, "type": "lab_bench"},
-
-        {"x": 2, "y": 2, "width": 3, "height": 2, "type": "microscope_station"},
-        {"x": 15, "y": 2, "width": 3, "height": 2, "type": "centrifuge"},
-
-        {"x": 2, "y": 10, "width": 2, "height": 2, "type": "specimen_fridge"},
-        {"x": 16, "y": 10, "width": 2, "height": 2, "type": "bio_cabinet"},
-
-        {"x": 8, "y": 1, "width": 4, "height": 1, "type": "results_board"},
-        {"x": 5, "y": 1, "width": 3, "height": 1, "type": "fume_hood"},
-
-        {"x": 1, "y": 4, "width": 2, "height": 1, "type": "chemical_shelf"},
-        {"x": 17, "y": 12, "width": 2, "height": 1, "type": "chemical_shelf"},
-
-        {"x": 7, "y": 10, "width": 2, "height": 1, "type": "sink_station"},
-        {"x": 9, "y": 10, "width": 1, "height": 1, "type": "eyewash_station"},
-
-        {"x": 12, "y": 11, "width": 2, "height": 1, "type": "sample_rack"},
-        {"x": 14, "y": 11, "width": 2, "height": 1, "type": "autoclave"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 14,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 5,
+          "y": 5,
+          "width": 10,
+          "height": 2,
+          "type": "lab_bench"
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "width": 3,
+          "height": 2,
+          "type": "microscope_station"
+        },
+        {
+          "x": 15,
+          "y": 2,
+          "width": 3,
+          "height": 2,
+          "type": "centrifuge"
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "width": 2,
+          "height": 2,
+          "type": "specimen_fridge"
+        },
+        {
+          "x": 16,
+          "y": 10,
+          "width": 2,
+          "height": 2,
+          "type": "bio_cabinet"
+        },
+        {
+          "x": 8,
+          "y": 1,
+          "width": 4,
+          "height": 1,
+          "type": "results_board"
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "width": 3,
+          "height": 1,
+          "type": "fume_hood"
+        },
+        {
+          "x": 1,
+          "y": 4,
+          "width": 2,
+          "height": 1,
+          "type": "chemical_shelf"
+        },
+        {
+          "x": 17,
+          "y": 12,
+          "width": 2,
+          "height": 1,
+          "type": "chemical_shelf"
+        },
+        {
+          "x": 7,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "sink_station"
+        },
+        {
+          "x": 9,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "type": "eyewash_station"
+        },
+        {
+          "x": 12,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "type": "sample_rack"
+        },
+        {
+          "x": 14,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "type": "autoclave"
+        }
       ],
       "npcs": [
         {
@@ -722,10 +1542,13 @@
           "type": "manual",
           "x": 2,
           "y": 8,
-          "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. PHI = The Big 18 Identifiers + Health Info. Think: names, addresses, SSNs, medical records, dates of birth, phone numbers, photos, basically anything that could identify a patient AND their health status. The Golden Rule: If you can connect health data to a specific person, congrats—it's PHI. Treat it like it's your own embarrassing medical history."
+          "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. PHI = The Big 18 Identifiers + Health Info. Think: names, addresses, SSNs, medical records, dates of birth, phone numbers, photos, basically anything that could identify a patient AND their health status. The Golden Rule: If you can connect health data to a specific person, congrats\u2014it's PHI. Treat it like it's your own embarrassing medical history."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12},
+      "spawnPoint": {
+        "x": 10,
+        "y": 12
+      },
       "doors": [
         {
           "id": "lab_to_hallway_break",
@@ -769,45 +1592,173 @@
             "description": "Two people need help. Who do you assist first?",
             "targetId": "patient_request",
             "choiceOptions": [
-              {"text": "Help the patient first", "unlocksId": "patient_request"},
-              {"text": "Deal with the attorney first", "unlocksId": "attorney"}
+              {
+                "text": "Help the patient first",
+                "unlocksId": "patient_request"
+              },
+              {
+                "text": "Deal with the attorney first",
+                "unlocksId": "attorney"
+              }
             ]
           }
         ]
       },
       "completionRequirements": {
-        "requiredNpcs": ["records_clerk"],
-        "requiredZones": ["unlocked_cabinet"],
-        "requiredItems": ["minimum_necessary_manual"]
+        "requiredNpcs": [
+          "records_clerk"
+        ],
+        "requiredZones": [
+          "unlocked_cabinet"
+        ],
+        "requiredItems": [
+          "minimum_necessary_manual"
+        ]
       },
       "width": 20,
       "height": 15,
       "backgroundImage": "records_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
-
-        {"x": 3, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-        {"x": 5, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-        {"x": 8, "y": 3, "width": 1, "height": 3, "type": "filing_cabinet"},
-        {"x": 12, "y": 3, "width": 1, "height": 3, "type": "filing_cabinet"},
-        {"x": 14, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-        {"x": 16, "y": 2, "width": 1, "height": 5, "type": "filing_cabinet"},
-
-        {"x": 8, "y": 1, "width": 4, "height": 1, "type": "records_counter"},
-        {"x": 7, "y": 2, "width": 1, "height": 1, "type": "inbox_tray"},
-        {"x": 12, "y": 2, "width": 1, "height": 1, "type": "outbox_tray"},
-
-        {"x": 8, "y": 8, "width": 4, "height": 2, "type": "clerk_desk"},
-
-        {"x": 2, "y": 11, "width": 2, "height": 2, "type": "shredder_station"},
-        {"x": 16, "y": 11, "width": 2, "height": 2, "type": "scanner_station"},
-        {"x": 2, "y": 13, "width": 2, "height": 1, "type": "archive_box"},
-        {"x": 6, "y": 5, "width": 1, "height": 1, "type": "document_cart"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 14,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 3,
+          "y": 2,
+          "width": 1,
+          "height": 5,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "width": 1,
+          "height": 5,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 8,
+          "y": 3,
+          "width": 1,
+          "height": 3,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 12,
+          "y": 3,
+          "width": 1,
+          "height": 3,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 14,
+          "y": 2,
+          "width": 1,
+          "height": 5,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 16,
+          "y": 2,
+          "width": 1,
+          "height": 5,
+          "type": "filing_cabinet"
+        },
+        {
+          "x": 8,
+          "y": 1,
+          "width": 4,
+          "height": 1,
+          "type": "records_counter"
+        },
+        {
+          "x": 7,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "type": "inbox_tray"
+        },
+        {
+          "x": 12,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "type": "outbox_tray"
+        },
+        {
+          "x": 8,
+          "y": 8,
+          "width": 4,
+          "height": 2,
+          "type": "clerk_desk"
+        },
+        {
+          "x": 2,
+          "y": 11,
+          "width": 2,
+          "height": 2,
+          "type": "shredder_station"
+        },
+        {
+          "x": 16,
+          "y": 11,
+          "width": 2,
+          "height": 2,
+          "type": "scanner_station"
+        },
+        {
+          "x": 2,
+          "y": 13,
+          "width": 2,
+          "height": 1,
+          "type": "archive_box"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "document_cart"
+        }
       ],
       "npcs": [
         {
@@ -880,10 +1831,13 @@
           "type": "poster",
           "x": 10,
           "y": 4,
-          "fact": "Think HIPAA violations are just a slap on the wrist? Think again. Civil Penalties (per violation): Tier 1 'Didn't Know' — $100-$50K. Tier 2 'Reasonable Cause' — $1K-$50K. Tier 3 'Willful Neglect, Corrected' — $10K-$50K. Tier 4 'Willful Neglect, Not Corrected' — $50K+, up to $2.13M per year per violation category. Criminal Penalties: Up to $50K and 1 year for knowing violations. Up to $100K and 5 years for violations under false pretenses. Up to $250K and 10 years for violations with intent to sell or use PHI. And yes, individuals can be personally prosecuted — your employer's insurance won't save you."
+          "fact": "Think HIPAA violations are just a slap on the wrist? Think again. Civil Penalties (per violation): Tier 1 'Didn't Know' \u2014 $100-$50K. Tier 2 'Reasonable Cause' \u2014 $1K-$50K. Tier 3 'Willful Neglect, Corrected' \u2014 $10K-$50K. Tier 4 'Willful Neglect, Not Corrected' \u2014 $50K+, up to $2.13M per year per violation category. Criminal Penalties: Up to $50K and 1 year for knowing violations. Up to $100K and 5 years for violations under false pretenses. Up to $250K and 10 years for violations with intent to sell or use PHI. And yes, individuals can be personally prosecuted \u2014 your employer's insurance won't save you."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12},
+      "spawnPoint": {
+        "x": 10,
+        "y": 12
+      },
       "doors": [
         {
           "id": "records_to_hallway_lab",
@@ -932,43 +1886,231 @@
         ]
       },
       "completionRequirements": {
-        "requiredNpcs": ["security_analyst", "vendor"],
-        "requiredZones": ["password_note"],
-        "requiredItems": ["security_safeguards"]
+        "requiredNpcs": [
+          "security_analyst",
+          "vendor"
+        ],
+        "requiredZones": [
+          "password_note"
+        ],
+        "requiredItems": [
+          "security_safeguards"
+        ]
       },
       "width": 20,
       "height": 15,
       "backgroundImage": "it_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
-
-        {"x": 1, "y": 1, "width": 4, "height": 2, "type": "server_rack"},
-        {"x": 6, "y": 1, "width": 3, "height": 2, "type": "server_rack"},
-        {"x": 12, "y": 1, "width": 3, "height": 2, "type": "server_rack"},
-        {"x": 16, "y": 1, "width": 3, "height": 2, "type": "server_rack"},
-
-        {"x": 7, "y": 5, "width": 1, "height": 1, "type": "coffee_mug"},
-        {"x": 8, "y": 5, "width": 4, "height": 2, "type": "workstation_cluster"},
-        {"x": 13, "y": 5, "width": 1, "height": 1, "type": "headphones"},
-
-        {"x": 2, "y": 6, "width": 3, "height": 1, "type": "monitor_bank"},
-        {"x": 15, "y": 6, "width": 3, "height": 1, "type": "monitor_bank"},
-
-        {"x": 1, "y": 9, "width": 1, "height": 1, "type": "cable_tray"},
-        {"x": 3, "y": 9, "width": 3, "height": 1, "type": "whiteboard_wall"},
-        {"x": 18, "y": 9, "width": 1, "height": 1, "type": "cable_tray"},
-
-        {"x": 2, "y": 10, "width": 3, "height": 2, "type": "monitoring_desk"},
-        {"x": 15, "y": 10, "width": 3, "height": 2, "type": "printer_station"},
-
-        {"x": 1, "y": 12, "width": 1, "height": 1, "type": "cable_tray"},
-        {"x": 17, "y": 12, "width": 2, "height": 1, "type": "locked_cabinet"},
-        {"x": 18, "y": 13, "width": 1, "height": 1, "type": "cable_tray"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 14,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 1,
+          "y": 1,
+          "width": 3,
+          "height": 2,
+          "type": "server_rack"
+        },
+        {
+          "x": 5,
+          "y": 1,
+          "width": 3,
+          "height": 2,
+          "type": "server_rack"
+        },
+        {
+          "x": 12,
+          "y": 1,
+          "width": 3,
+          "height": 2,
+          "type": "server_rack"
+        },
+        {
+          "x": 16,
+          "y": 1,
+          "width": 3,
+          "height": 2,
+          "type": "server_rack"
+        },
+        {
+          "x": 4,
+          "y": 3,
+          "width": 1,
+          "height": 1,
+          "type": "cable_tray"
+        },
+        {
+          "x": 15,
+          "y": 3,
+          "width": 1,
+          "height": 1,
+          "type": "cable_tray"
+        },
+        {
+          "x": 8,
+          "y": 5,
+          "width": 4,
+          "height": 1,
+          "type": "monitoring_desk"
+        },
+        {
+          "x": 7,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "coffee_mug"
+        },
+        {
+          "x": 12,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "headphones"
+        },
+        {
+          "x": 2,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "workstation_cluster"
+        },
+        {
+          "x": 1,
+          "y": 4,
+          "width": 1,
+          "height": 1,
+          "type": "cable_tray"
+        },
+        {
+          "x": 16,
+          "y": 5,
+          "width": 2,
+          "height": 1,
+          "type": "workstation_cluster"
+        },
+        {
+          "x": 18,
+          "y": 4,
+          "width": 1,
+          "height": 1,
+          "type": "cable_tray"
+        },
+        {
+          "x": 1,
+          "y": 6,
+          "width": 3,
+          "height": 1,
+          "type": "monitor_bank"
+        },
+        {
+          "x": 16,
+          "y": 6,
+          "width": 3,
+          "height": 1,
+          "type": "monitor_bank"
+        },
+        {
+          "x": 2,
+          "y": 9,
+          "width": 3,
+          "height": 1,
+          "type": "whiteboard_wall"
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chair"
+        },
+        {
+          "x": 15,
+          "y": 9,
+          "width": 3,
+          "height": 2,
+          "type": "printer_station"
+        },
+        {
+          "x": 17,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "type": "locked_cabinet"
+        },
+        {
+          "x": 1,
+          "y": 11,
+          "width": 1,
+          "height": 1,
+          "type": "cable_tray"
+        },
+        {
+          "x": 1,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 18,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "trash"
+        },
+        {
+          "x": 7,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "type": "table"
+        },
+        {
+          "x": 11,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "type": "table"
+        }
       ],
       "npcs": [
         {
@@ -1034,10 +2176,13 @@
           "type": "whiteboard",
           "x": 10,
           "y": 2,
-          "fact": "HIPAA's Security Rule demands three types of safeguards: Administrative (policies, training, risk assessments), Physical (locks, badge access, workstation security), and Technical (encryption, access controls, audit logs). The Three A's: Authentication (prove who you are), Authorization (prove you should have access), and Audit (prove what you did). Fun detail: encryption is technically 'addressable' under HIPAA — meaning you must implement it OR document why an equivalent alternative protects the data. In practice, nearly every organization encrypts because there's no good alternative. Strong passwords, automatic logoffs, and encryption are the walls that keep the vault secure."
+          "fact": "HIPAA's Security Rule demands three types of safeguards: Administrative (policies, training, risk assessments), Physical (locks, badge access, workstation security), and Technical (encryption, access controls, audit logs). The Three A's: Authentication (prove who you are), Authorization (prove you should have access), and Audit (prove what you did). Fun detail: encryption is technically 'addressable' under HIPAA \u2014 meaning you must implement it OR document why an equivalent alternative protects the data. In practice, nearly every organization encrypts because there's no good alternative. Strong passwords, automatic logoffs, and encryption are the walls that keep the vault secure."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12},
+      "spawnPoint": {
+        "x": 10,
+        "y": 12
+      },
       "doors": [
         {
           "id": "it_to_hallway_records",
@@ -1065,7 +2210,7 @@
       "unlockRequirement": "reception",
       "patientStory": {
         "title": "James's Story",
-        "text": "Because you changed the subject when your coworkers started gossiping, James's coworker—sitting two tables away—never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
+        "text": "Because you changed the subject when your coworkers started gossiping, James's coworker\u2014sitting two tables away\u2014never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
         "icon": "users"
       },
       "config": {
@@ -1084,39 +2229,154 @@
         ]
       },
       "completionRequirements": {
-        "requiredNpcs": ["gossiping_coworker", "friend_fishing"],
-        "requiredZones": ["overheard_conversation"],
-        "requiredItems": ["verbal_disclosure"]
+        "requiredNpcs": [
+          "gossiping_coworker",
+          "friend_fishing"
+        ],
+        "requiredZones": [
+          "overheard_conversation"
+        ],
+        "requiredItems": [
+          "verbal_disclosure"
+        ]
       },
       "width": 20,
       "height": 15,
       "backgroundImage": "break_bg",
       "obstacles": [
-        {"x": 0, "y": 0, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 14, "width": 20, "height": 1, "type": "wall"},
-        {"x": 0, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 0, "y": 8, "width": 1, "height": 7, "type": "wall"},
-        {"x": 19, "y": 0, "width": 1, "height": 6, "type": "wall"},
-        {"x": 19, "y": 8, "width": 1, "height": 7, "type": "wall"},
-
-        {"x": 8, "y": 6, "width": 4, "height": 3, "type": "lunch_table"},
-
-        {"x": 2, "y": 2, "width": 2, "height": 3, "type": "vending_machine"},
-        {"x": 5, "y": 2, "width": 2, "height": 3, "type": "vending_machine"},
-
-        {"x": 15, "y": 2, "width": 3, "height": 2, "type": "coffee_station"},
-
-        {"x": 2, "y": 10, "width": 3, "height": 2, "type": "couch"},
-        {"x": 15, "y": 10, "width": 3, "height": 2, "type": "couch"},
-
-        {"x": 13, "y": 6, "width": 1, "height": 2, "type": "trash_bin"},
-
-        {"x": 14, "y": 2, "width": 1, "height": 1, "type": "microwave"},
-        {"x": 8, "y": 2, "width": 2, "height": 2, "type": "open_fridge"},
-        {"x": 10, "y": 1, "width": 2, "height": 1, "type": "notice_board"},
-        {"x": 5, "y": 12, "width": 1, "height": 1, "type": "lost_and_found_box"},
-        {"x": 7, "y": 10, "width": 2, "height": 1, "type": "tv_stand"},
-        {"x": 1, "y": 6, "width": 1, "height": 1, "type": "coat_rack"}
+        {
+          "x": 0,
+          "y": 0,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 14,
+          "width": 20,
+          "height": 1,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 0,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 0,
+          "width": 1,
+          "height": 6,
+          "type": "wall"
+        },
+        {
+          "x": 19,
+          "y": 8,
+          "width": 1,
+          "height": 7,
+          "type": "wall"
+        },
+        {
+          "x": 8,
+          "y": 6,
+          "width": 4,
+          "height": 3,
+          "type": "lunch_table"
+        },
+        {
+          "x": 2,
+          "y": 2,
+          "width": 2,
+          "height": 3,
+          "type": "vending_machine"
+        },
+        {
+          "x": 5,
+          "y": 2,
+          "width": 2,
+          "height": 3,
+          "type": "vending_machine"
+        },
+        {
+          "x": 15,
+          "y": 2,
+          "width": 3,
+          "height": 2,
+          "type": "coffee_station"
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "width": 3,
+          "height": 2,
+          "type": "couch"
+        },
+        {
+          "x": 15,
+          "y": 10,
+          "width": 3,
+          "height": 2,
+          "type": "couch"
+        },
+        {
+          "x": 13,
+          "y": 6,
+          "width": 1,
+          "height": 2,
+          "type": "trash_bin"
+        },
+        {
+          "x": 14,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "type": "microwave"
+        },
+        {
+          "x": 8,
+          "y": 2,
+          "width": 2,
+          "height": 2,
+          "type": "open_fridge"
+        },
+        {
+          "x": 10,
+          "y": 1,
+          "width": 2,
+          "height": 1,
+          "type": "notice_board"
+        },
+        {
+          "x": 5,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "type": "lost_and_found_box"
+        },
+        {
+          "x": 7,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "tv_stand"
+        },
+        {
+          "x": 1,
+          "y": 6,
+          "width": 1,
+          "height": 1,
+          "type": "coat_rack"
+        }
       ],
       "npcs": [
         {
@@ -1183,7 +2443,10 @@
           "fact": "Not everyone who asks for PHI gets it. Sometimes your job is to be the bouncer at Club Medical Records. Automatic NO Situations: Family Members Without Authorization, Employers asking for diagnosis (they get work notes only), Marketing Without Authorization, Anyone Via Unsecured Communication (no texting lab results!). The Script: 'I'm unable to confirm or deny any patient information without proper authorization.' Saying no to inappropriate requests is literally your job."
         }
       ],
-      "spawnPoint": {"x": 10, "y": 12},
+      "spawnPoint": {
+        "x": 10,
+        "y": 12
+      },
       "doors": [
         {
           "id": "break_to_hallway_reception",

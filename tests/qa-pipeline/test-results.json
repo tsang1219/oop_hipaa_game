@@ -1,0 +1,1162 @@
+{
+  "config": {
+    "configFile": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/playwright.config.ts",
+    "rootDir": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+    "globalTimeout": 0,
+    "grep": {},
+    "grepInvert": null,
+    "maxFailures": 0,
+    "metadata": {},
+    "preserveOutput": "always",
+    "projects": [
+      {
+        "outputDir": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results",
+        "repeatEach": 1,
+        "retries": 1,
+        "metadata": {},
+        "id": "",
+        "name": "",
+        "testDir": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests",
+        "testIgnore": [],
+        "testMatch": [
+          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+        ],
+        "timeout": 60000
+      }
+    ],
+    "quiet": false,
+    "reporter": [
+      [
+        "html",
+        {
+          "open": "never"
+        }
+      ],
+      [
+        "list",
+        null
+      ],
+      [
+        "json",
+        {
+          "outputFile": "tests/qa-pipeline/test-results.json"
+        }
+      ]
+    ],
+    "reportSlowTests": {
+      "max": 5,
+      "threshold": 300000
+    },
+    "runAgents": "none",
+    "shard": null,
+    "tags": [],
+    "updateSnapshots": "missing",
+    "updateSourceMethod": "patch",
+    "version": "1.58.2",
+    "workers": 1,
+    "webServer": {
+      "command": "npm run dev",
+      "port": 8080,
+      "reuseExistingServer": true,
+      "timeout": 30000
+    }
+  },
+  "suites": [
+    {
+      "title": "progression/breach-gameplay.spec.ts",
+      "file": "progression/breach-gameplay.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "BreachDefense Gameplay",
+          "file": "progression/breach-gameplay.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Breach defense page loads",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                        "line": 18,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5e1c580557fe8afacc91-aaeba23de31df44ef280",
+              "file": "progression/breach-gameplay.spec.ts",
+              "line": 18,
+              "column": 8
+            },
+            {
+              "title": "Start Mission button begins game",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                        "line": 22,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5e1c580557fe8afacc91-fc3003f41f8eca22db77",
+              "file": "progression/breach-gameplay.spec.ts",
+              "line": 22,
+              "column": 8
+            },
+            {
+              "title": "Game auto-start via qa-start param",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                        "line": 26,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5e1c580557fe8afacc91-e3b15269b7299e1bdaca",
+              "file": "progression/breach-gameplay.spec.ts",
+              "line": 26,
+              "column": 8
+            },
+            {
+              "title": "No console errors during breach gameplay",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [
+                    {
+                      "type": "skip",
+                      "location": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                        "line": 30,
+                        "column": 8
+                      }
+                    }
+                  ],
+                  "expectedStatus": "skipped",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "5e1c580557fe8afacc91-4b566ea3421540c41b03",
+              "file": "progression/breach-gameplay.spec.ts",
+              "line": 30,
+              "column": 8
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "progression/door-unlocks.spec.ts",
+      "file": "progression/door-unlocks.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Door Unlocks",
+          "file": "progression/door-unlocks.spec.ts",
+          "line": 17,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Hospital entrance to reception after completing entrance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-b12240683f62683eab70",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 31,
+              "column": 3
+            },
+            {
+              "title": "Break room is locked when reception is not completed",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-599e20ce16c9e37162ff",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 45,
+              "column": 3
+            },
+            {
+              "title": "Break room unlocks after completing reception",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-3ec92c42f9600adfd611",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 71,
+              "column": 3
+            },
+            {
+              "title": "Lab unlocks after completing break room",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-da59fae822a3f7828c58",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 95,
+              "column": 3
+            },
+            {
+              "title": "Records room unlocks after completing lab",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-d0cd18f6f1fda3cbad2c",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 123,
+              "column": 3
+            },
+            {
+              "title": "IT office unlocks after completing records room",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-e5a6bed0bed2e1066993",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 142,
+              "column": 3
+            },
+            {
+              "title": "ER unlocks after completing IT office",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-254e7cc5afab8f4cdfe7",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 170,
+              "column": 3
+            },
+            {
+              "title": "Entrance door is always accessible from hospital_entrance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "3ad502fa7408326ec0f1-1d5616f3d1d08175ebcc",
+              "file": "progression/door-unlocks.spec.ts",
+              "line": 189,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "progression/full-playthrough.spec.ts",
+      "file": "progression/full-playthrough.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Full Playthrough",
+          "file": "progression/full-playthrough.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Complete hospital entrance and reception",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2bfb80d3c40e2a656f1a-5e91cef178f3acbfddd4",
+              "file": "progression/full-playthrough.spec.ts",
+              "line": 18,
+              "column": 3
+            },
+            {
+              "title": "Screenshot at each milestone",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 180000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "2bfb80d3c40e2a656f1a-3bb13b8a825bf6fa1c4a",
+              "file": "progression/full-playthrough.spec.ts",
+              "line": 74,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "progression/npc-interaction.spec.ts",
+      "file": "progression/npc-interaction.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "NPC Interaction",
+          "file": "progression/npc-interaction.spec.ts",
+          "line": 15,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Can talk to Riley in hospital entrance",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "005ada3f36d72ed697a3-9e0c88633cb45b3ba5f5",
+              "file": "progression/npc-interaction.spec.ts",
+              "line": 18,
+              "column": 3
+            },
+            {
+              "title": "Dialogue overlay appears when talking to NPC",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "005ada3f36d72ed697a3-8a28f9ea0cf9b75a00fd",
+              "file": "progression/npc-interaction.spec.ts",
+              "line": 26,
+              "column": 3
+            },
+            {
+              "title": "Can talk to multiple NPCs in reception",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "005ada3f36d72ed697a3-a152fa79992941c3fc79",
+              "file": "progression/npc-interaction.spec.ts",
+              "line": 39,
+              "column": 3
+            },
+            {
+              "title": "Scene unpauses after dialogue dismissal",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "005ada3f36d72ed697a3-a37d348aa10fbe1b5ad0",
+              "file": "progression/npc-interaction.spec.ts",
+              "line": 50,
+              "column": 3
+            },
+            {
+              "title": "No console errors during NPC interactions",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 60000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "005ada3f36d72ed697a3-6d71b3e03e967d66f26f",
+              "file": "progression/npc-interaction.spec.ts",
+              "line": 58,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "progression/room-completion.spec.ts",
+      "file": "progression/room-completion.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Room Completion",
+          "file": "progression/room-completion.spec.ts",
+          "line": 14,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Hospital entrance completes after talking to Riley",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "cd2f9af4161352775043-d4ef7e8f57231b74ade7",
+              "file": "progression/room-completion.spec.ts",
+              "line": 28,
+              "column": 3
+            },
+            {
+              "title": "Reception completes after all requirements met",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "cd2f9af4161352775043-cd33e4d014b637780c5b",
+              "file": "progression/room-completion.spec.ts",
+              "line": 37,
+              "column": 3
+            },
+            {
+              "title": "Incomplete room does NOT mark as complete",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "cd2f9af4161352775043-b5f2bd84fbcdbf344cdd",
+              "file": "progression/room-completion.spec.ts",
+              "line": 57,
+              "column": 3
+            },
+            {
+              "title": "Social-gated NPC becomes interactable after gate resolves",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 120000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "cd2f9af4161352775043-31c571c102fcbeedf3f4",
+              "file": "progression/room-completion.spec.ts",
+              "line": 70,
+              "column": 3
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "progression/room-navigation.spec.ts",
+      "file": "progression/room-navigation.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [],
+      "suites": [
+        {
+          "title": "Room Navigation",
+          "file": "progression/room-navigation.spec.ts",
+          "line": 13,
+          "column": 6,
+          "specs": [
+            {
+              "title": "Hospital entrance loads on fresh start",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7de6de0e276c92e06065-a548ff06e2849cc03c89",
+              "file": "progression/room-navigation.spec.ts",
+              "line": 16,
+              "column": 3
+            },
+            {
+              "title": "Navigate entrance -> reception via door (after completing entrance)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7de6de0e276c92e06065-a7a5a2346b22f9c80708",
+              "file": "progression/room-navigation.spec.ts",
+              "line": 23,
+              "column": 3
+            },
+            {
+              "title": "Navigate reception -> entrance (backtrack always allowed)",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7de6de0e276c92e06065-1167c1b70872d589661e",
+              "file": "progression/room-navigation.spec.ts",
+              "line": 34,
+              "column": 3
+            },
+            {
+              "title": "Hallway loads via qa-room param",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7de6de0e276c92e06065-bb2e288647d8351a4abb",
+              "file": "progression/room-navigation.spec.ts",
+              "line": 42,
+              "column": 3
+            },
+            {
+              "title": "No console errors during navigation",
+              "ok": true,
+              "tags": [],
+              "tests": [
+                {
+                  "timeout": 90000,
+                  "annotations": [],
+                  "expectedStatus": "passed",
+                  "projectId": "",
+                  "projectName": "",
+                  "results": [],
+                  "status": "skipped"
+                }
+              ],
+              "id": "7de6de0e276c92e06065-d072d03e60997aa99ac7",
+              "file": "progression/room-navigation.spec.ts",
+              "line": 60,
+              "column": 3
+            }
+          ],
+          "suites": [
+            {
+              "title": "Direct room load via qa-room param",
+              "file": "progression/room-navigation.spec.ts",
+              "line": 50,
+              "column": 8,
+              "specs": [
+                {
+                  "title": "loads hospital_entrance directly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7de6de0e276c92e06065-8ef699ebea77e616309a",
+                  "file": "progression/room-navigation.spec.ts",
+                  "line": 52,
+                  "column": 7
+                },
+                {
+                  "title": "loads reception directly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7de6de0e276c92e06065-bf0d855c310a4180069a",
+                  "file": "progression/room-navigation.spec.ts",
+                  "line": 52,
+                  "column": 7
+                },
+                {
+                  "title": "loads break_room directly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7de6de0e276c92e06065-93cb3ca90ee22101cdc7",
+                  "file": "progression/room-navigation.spec.ts",
+                  "line": 52,
+                  "column": 7
+                },
+                {
+                  "title": "loads lab directly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7de6de0e276c92e06065-9e9ea1f9f194a6b72633",
+                  "file": "progression/room-navigation.spec.ts",
+                  "line": 52,
+                  "column": 7
+                },
+                {
+                  "title": "loads records_room directly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7de6de0e276c92e06065-070ea3a7f03a67439a75",
+                  "file": "progression/room-navigation.spec.ts",
+                  "line": 52,
+                  "column": 7
+                },
+                {
+                  "title": "loads it_office directly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7de6de0e276c92e06065-9317e6b0ab92da8bd0a9",
+                  "file": "progression/room-navigation.spec.ts",
+                  "line": 52,
+                  "column": 7
+                },
+                {
+                  "title": "loads er directly",
+                  "ok": true,
+                  "tags": [],
+                  "tests": [
+                    {
+                      "timeout": 90000,
+                      "annotations": [],
+                      "expectedStatus": "passed",
+                      "projectId": "",
+                      "projectName": "",
+                      "results": [],
+                      "status": "skipped"
+                    }
+                  ],
+                  "id": "7de6de0e276c92e06065-a650522b3a08a169d626",
+                  "file": "progression/room-navigation.spec.ts",
+                  "line": 52,
+                  "column": 7
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "visual-qa.spec.ts",
+      "file": "visual-qa.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Hub World",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-05cb6113e2ea036a3c40",
+          "file": "visual-qa.spec.ts",
+          "line": 30,
+          "column": 1
+        },
+        {
+          "title": "PrivacyQuest — Room: reception",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-927037e8a651b85905cd",
+          "file": "visual-qa.spec.ts",
+          "line": 54,
+          "column": 3
+        },
+        {
+          "title": "PrivacyQuest — Room: er",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-d9c9ad0c9eb76aee58db",
+          "file": "visual-qa.spec.ts",
+          "line": 54,
+          "column": 3
+        },
+        {
+          "title": "PrivacyQuest — Room: lab",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-ce7e9d80770a7ea0e1da",
+          "file": "visual-qa.spec.ts",
+          "line": 54,
+          "column": 3
+        },
+        {
+          "title": "PrivacyQuest — Room: records_room",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-29c76762a2c9e974cee1",
+          "file": "visual-qa.spec.ts",
+          "line": 54,
+          "column": 3
+        },
+        {
+          "title": "PrivacyQuest — Room: it_office",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-016b5733f26407d05645",
+          "file": "visual-qa.spec.ts",
+          "line": 54,
+          "column": 3
+        },
+        {
+          "title": "PrivacyQuest — Room: break_room",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-8a12cfd3f9c70397a7fa",
+          "file": "visual-qa.spec.ts",
+          "line": 54,
+          "column": 3
+        },
+        {
+          "title": "BreachDefense — Start Screen",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "location": {
+                    "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/visual-qa.spec.ts",
+                    "line": 87,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-e1764c2524bd26648a46",
+          "file": "visual-qa.spec.ts",
+          "line": 87,
+          "column": 6
+        },
+        {
+          "title": "BreachDefense — Game Active",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "location": {
+                    "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/visual-qa.spec.ts",
+                    "line": 97,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-6709c663ea7f7042af8e",
+          "file": "visual-qa.spec.ts",
+          "line": 97,
+          "column": 6
+        },
+        {
+          "title": "BreachDefense — Onboarding Flow",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [
+                {
+                  "type": "skip",
+                  "location": {
+                    "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/visual-qa.spec.ts",
+                    "line": 111,
+                    "column": 6
+                  }
+                }
+              ],
+              "expectedStatus": "skipped",
+              "projectId": "",
+              "projectName": "",
+              "results": [],
+              "status": "skipped"
+            }
+          ],
+          "id": "acd366a2e83d4ab68325-b7c8904a8f9bbb3eb087",
+          "file": "visual-qa.spec.ts",
+          "line": 111,
+          "column": 6
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "stats": {
+    "startTime": "2026-03-31T16:55:38.647Z",
+    "duration": 39.46600000000001,
+    "expected": 0,
+    "skipped": 45,
+    "unexpected": 0,
+    "flaky": 0
+  }
+}

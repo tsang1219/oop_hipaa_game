@@ -28,10 +28,11 @@ import { ValidationOverlay } from '../dev/ValidationOverlay';
 import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
-import { migrateV1toV2, loadSave, writeSave } from '@/lib/saveData';
+import { migrateV1toV2, loadSave, writeSave, hasSaveData } from '@/lib/saveData';
+import { TitleScreen } from '../components/TitleScreen';
 import { NarrativeContextCard } from '../components/breach-defense/NarrativeContextCard';
 import { EncounterDebrief } from '../components/breach-defense/EncounterDebrief';
-import { EncounterHud } from '../components/EncounterHud';
+import { EncounterGameUI } from '../components/breach-defense/EncounterGameUI';
 import type { BreachDefenseInitData } from '../phaser/scenes/BreachDefenseScene';
 
 interface RoomWithDoors {
@@ -62,7 +63,7 @@ interface RoomWithDoors {
   }>;
 }
 
-type PageMode = 'exploration' | 'dialogue' | 'gameover' | 'win';
+type PageMode = 'title' | 'exploration' | 'dialogue' | 'gameover' | 'win';
 
 const rooms = roomDataJson.rooms as RoomWithDoors[];
 const scenes = (gameDataJson as any).scenes as Scene[];
@@ -107,7 +108,18 @@ export default function UnifiedGamePage() {
   const sceneStartedRef = useRef(false);
 
   // ── Local UI state (not persisted) ────────────────────────────
-  const [pageMode, setPageMode] = useState<PageMode>('exploration');
+  const [pageMode, setPageMode] = useState<PageMode>(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.has('qa-room') || params.has('qa-skip-onboarding') || params.has('qa-no-save')) {
+      return 'exploration';
+    }
+    const skip = sessionStorage.getItem('pq:skip-title');
+    if (skip) {
+      sessionStorage.removeItem('pq:skip-title');
+      return 'exploration';
+    }
+    return 'title';
+  });
   const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
   const [currentNPCId, setCurrentNPCId] = useState<string | null>(null);
 
@@ -138,10 +150,6 @@ export default function UnifiedGamePage() {
     securityScore: number;
     scoreContribution: number;
   } | null>(null);
-  const [encounterHudData, setEncounterHudData] = useState({
-    wave: 1, totalWaves: 4, budget: 150, securityScore: 100, gameState: 'WAITING', waveName: undefined as string | undefined,
-  });
-
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
   const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(new Set());
@@ -371,6 +379,10 @@ export default function UnifiedGamePage() {
 
     const handleSceneReady = (sceneKey: string) => {
       if (sceneKey === 'Boot') startExploration();
+      if (sceneKey === 'BreachDefense') {
+        // BreachDefense scene is ready — tell it to start the game
+        eventBridge.emit(BRIDGE_EVENTS.REACT_START_BREACH);
+      }
     };
     eventBridge.on(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
 
@@ -601,19 +613,6 @@ export default function UnifiedGamePage() {
       setEncounterPhase('narrative-card');
     };
 
-    const onBreachStateUpdate = (data: {
-      securityScore: number;
-      budget: number;
-      wave: number;
-      gameState: string;
-    }) => {
-      setEncounterHudData(prev => ({ ...prev, ...data }));
-    };
-
-    const onBreachWaveStart = (data: { wave: number; name: string }) => {
-      setEncounterHudData(prev => ({ ...prev, waveName: data.name }));
-    };
-
     const onEncounterComplete = (data: {
       encounterId: string;
       outcome: 'victory' | 'defeat';
@@ -635,14 +634,10 @@ export default function UnifiedGamePage() {
     };
 
     eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, onEncounterTriggered);
-    eventBridge.on(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onBreachStateUpdate);
-    eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_START, onBreachWaveStart);
     eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, onEncounterComplete);
 
     return () => {
       eventBridge.off(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, onEncounterTriggered);
-      eventBridge.off(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onBreachStateUpdate);
-      eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_START, onBreachWaveStart);
       eventBridge.off(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, onEncounterComplete);
     };
   }, []);
@@ -652,6 +647,13 @@ export default function UnifiedGamePage() {
     setEncounterPhase('encounter');
     eventBridge.emit(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, { config: narrativeCardData.config });
   }, [narrativeCardData]);
+
+  const handleDeclineNarrativeCard = useCallback(() => {
+    setEncounterPhase('idle');
+    setNarrativeCardData(null);
+    // Unpause ExplorationScene so the player can keep exploring
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION);
+  }, []);
 
   const handleDismissDebrief = useCallback(() => {
     setEncounterPhase('idle');
@@ -752,6 +754,16 @@ export default function UnifiedGamePage() {
     eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
   }, []);
 
+  const handleNewGame = useCallback(() => {
+    localStorage.clear();
+    sessionStorage.setItem('pq:skip-title', '1');
+    window.location.reload();
+  }, []);
+
+  const handleResume = useCallback(() => {
+    setPageMode('exploration');
+  }, []);
+
   const handlePlayAgain = () => {
     localStorage.clear();
     window.location.reload();
@@ -781,6 +793,17 @@ export default function UnifiedGamePage() {
     if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
     return `${seconds}s`;
   };
+
+  // ── Title screen ──────────────────────────────────────────────
+  if (pageMode === 'title') {
+    return (
+      <TitleScreen
+        hasSave={hasSaveData()}
+        onNewGame={handleNewGame}
+        onResume={handleResume}
+      />
+    );
+  }
 
   // ── Win / GameOver screens ────────────────────────────────────
   if (pageMode === 'gameover' || pageMode === 'win') {
@@ -841,17 +864,13 @@ export default function UnifiedGamePage() {
           <NarrativeContextCard
             narrativeText={narrativeCardData.narrativeText}
             onConfirm={handleConfirmNarrativeCard}
+            onDecline={handleDeclineNarrativeCard}
           />
         )}
 
-        {encounterPhase === 'encounter' && (
-          <EncounterHud
-            wave={encounterHudData.wave}
-            totalWaves={encounterHudData.totalWaves}
-            budget={encounterHudData.budget}
-            securityScore={encounterHudData.securityScore}
-            gameState={encounterHudData.gameState}
-            waveName={encounterHudData.waveName}
+        {encounterPhase === 'encounter' && narrativeCardData && (
+          <EncounterGameUI
+            availableTowerIds={narrativeCardData.config.availableTowerIds ?? []}
           />
         )}
 

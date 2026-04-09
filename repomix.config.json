@@ -1,0 +1,28 @@
+{
+  "include": [
+    "CLAUDE.md",
+    ".planning/POLISH_STANDARD.md",
+    ".planning/DESIGN_STANDARD.md",
+    ".planning/GAME_DESIGN_PRINCIPLES.md",
+    ".planning/ENHANCEMENT_BRIEF.md",
+    ".planning/ROADMAP.md",
+    ".planning/codebase/ARCHITECTURE.md",
+    ".planning/codebase/STRUCTURE.md",
+    ".planning/codebase/CONVENTIONS.md",
+    ".planning/codebase/TESTING.md",
+    ".planning/codebase/CONCERNS.md",
+    ".planning/codebase/INTEGRATIONS.md",
+    ".planning/research/SUMMARY.md",
+    ".planning/research/PITFALLS.md",
+    "client/src/phaser/EventBridge.ts",
+    "client/src/phaser/qa-bridge.ts",
+    "client/src/hooks/useGameState.ts",
+    "client/src/lib/saveData.ts",
+    "tests/helpers/qa-helpers.ts",
+    "tests/RALPH_PROGRESSION.md",
+    "playwright.config.ts"
+  ],
+  "output": {
+    "filePath": "tests/qa-pipeline/codebase-context.txt"
+  }
+}

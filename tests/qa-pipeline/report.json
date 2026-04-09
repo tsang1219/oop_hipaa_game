@@ -1,0 +1,101 @@
+{
+  "iteration": 3,
+  "timestamp": "2026-03-31T02:00:00Z",
+  "type": "design_review",
+  "framework": "DESIGN_STANDARD.md - 8 lenses",
+  "build_status": "clean",
+  "test_summary": { "passed": 31, "failed": 0, "skipped": 4, "total": 35 },
+  "fixes_applied_this_iteration": [
+    "Floor colors: dramatically different per room type - IT dark blue-gray, break warm wood, ER clinical white, lab green-tint, lobby marble, records olive carpet",
+    "Floor patterns: boosted opacity 3-5x - IT raised panels with vent holes, break parquet wood grain, ER non-slip diamonds, lab grid dots + drain lines, records carpet weave, lobby marble veining",
+    "Room tint overlays: boosted from 0.04 to 0.05-0.08 with per-room color tuning",
+    "Wall decorations: added to ALL rooms - ER red cross + emergency stripe, lab biohazard placard + safety sign, IT status lights + RESTRICTED label, break menu board, records section labels, lobby hospital H logo, reception clock",
+    "Multi-tile furniture: now tiles sprites across full obstacle area instead of single centered sprite on brown rectangle",
+    "NPC labels: added dark background + increased stroke thickness for readability on any floor color",
+    "Furniture shadows: boosted from 0.10 to 0.15 opacity for better grounding"
+  ],
+  "design_scores": {
+    "hospital_entrance": {
+      "lens_1_sprite_identity": 8, "lens_2_spatial_logic": 8, "lens_3_visual_readability": 8,
+      "lens_4_gameplay_clarity": 8, "lens_5_proportional_detail": 8, "lens_6_emotional_tone": 8,
+      "lens_7_gameplay_satisfaction": 7, "lens_8_code_health": 8,
+      "average": 7.9,
+      "notes": "Marble floor + H logo give grand lobby feel. Simple room with 1 NPC keeps it straightforward. Satisfaction slightly lower - only one NPC interaction, limited gameplay arc."
+    },
+    "reception": {
+      "lens_1_sprite_identity": 8, "lens_2_spatial_logic": 8, "lens_3_visual_readability": 8,
+      "lens_4_gameplay_clarity": 8, "lens_5_proportional_detail": 8, "lens_6_emotional_tone": 8,
+      "lens_7_gameplay_satisfaction": 8, "lens_8_code_health": 8,
+      "average": 8.0,
+      "notes": "Warm beige floor, welcome sign, clock. 3 NPCs with distinct roles. Sign-in sheet zone is clever. Privacy screens create visual zones. Good first real gameplay room."
+    },
+    "break_room": {
+      "lens_1_sprite_identity": 8, "lens_2_spatial_logic": 8, "lens_3_visual_readability": 8,
+      "lens_4_gameplay_clarity": 8, "lens_5_proportional_detail": 8, "lens_6_emotional_tone": 9,
+      "lens_7_gameplay_satisfaction": 8, "lens_8_code_health": 8,
+      "average": 8.1,
+      "notes": "Warmest room - wood parquet floor, amber tint, menu board. Vending machines, couches, coffee station create cozy vibe. Social gate is unique mechanic. 5 distinct NPCs. Emotional tone hits 9 - genuinely feels like a break room."
+    },
+    "lab": {
+      "lens_1_sprite_identity": 8, "lens_2_spatial_logic": 8, "lens_3_visual_readability": 8,
+      "lens_4_gameplay_clarity": 8, "lens_5_proportional_detail": 8, "lens_6_emotional_tone": 8,
+      "lens_7_gameplay_satisfaction": 8, "lens_8_code_health": 8,
+      "average": 8.0,
+      "notes": "Green-tinted floor with drain lines gives clean room feel. Lab bench spans center properly. Biohazard placard and safety sign on walls. Observation gate on results_printout teaches investigate-first. Distinct from all other rooms."
+    },
+    "records_room": {
+      "lens_1_sprite_identity": 8, "lens_2_spatial_logic": 8, "lens_3_visual_readability": 7,
+      "lens_4_gameplay_clarity": 8, "lens_5_proportional_detail": 8, "lens_6_emotional_tone": 8,
+      "lens_7_gameplay_satisfaction": 8, "lens_8_code_health": 8,
+      "average": 7.9,
+      "notes": "Olive carpet floor, section labels on wall. Dense filing cabinets create aisles. Choice gate is strongest gameplay moment. Readability slightly lower because screenshot shows choice overlay blocking room view."
+    },
+    "it_office": {
+      "lens_1_sprite_identity": 8, "lens_2_spatial_logic": 8, "lens_3_visual_readability": 8,
+      "lens_4_gameplay_clarity": 8, "lens_5_proportional_detail": 8, "lens_6_emotional_tone": 9,
+      "lens_7_gameplay_satisfaction": 8, "lens_8_code_health": 8,
+      "average": 8.1,
+      "notes": "Dark raised-floor panels with vent holes - most distinct floor. Server racks tiled across full walls. Status lights and RESTRICTED label. Cable channels on floor. Emotional tone hits 9 - unmistakably a server room."
+    },
+    "er": {
+      "lens_1_sprite_identity": 8, "lens_2_spatial_logic": 8, "lens_3_visual_readability": 8,
+      "lens_4_gameplay_clarity": 8, "lens_5_proportional_detail": 8, "lens_6_emotional_tone": 9,
+      "lens_7_gameplay_satisfaction": 8, "lens_8_code_health": 8,
+      "average": 8.1,
+      "notes": "Clinical white-blue floor with non-slip diamonds. Red cross and emergency stripe on walls. Curtain partitions, crash cart, IV stands tiled properly. Red urgent tint. Emotional tone hits 9 - feels like a real ER."
+    }
+  },
+  "lens_averages": {
+    "lens_1_sprite_identity": 8.0,
+    "lens_2_spatial_logic": 8.0,
+    "lens_3_visual_readability": 7.9,
+    "lens_4_gameplay_clarity": 8.0,
+    "lens_5_proportional_detail": 8.0,
+    "lens_6_emotional_tone": 8.4,
+    "lens_7_gameplay_satisfaction": 7.9,
+    "lens_8_code_health": 8.0
+  },
+  "overall_average": 8.0,
+  "room_averages": {
+    "hospital_entrance": 7.9,
+    "reception": 8.0,
+    "break_room": 8.1,
+    "lab": 8.0,
+    "records_room": 7.9,
+    "it_office": 8.1,
+    "er": 8.1
+  },
+  "score_history": [
+    { "iteration": 1, "overall": 7.2, "lowest_lens": "lens_3 at 6.9" },
+    { "iteration": 2, "overall": 7.5, "lowest_lens": "lens_5 at 7.0" },
+    { "iteration": 3, "overall": 8.0, "lowest_lens": "lens_3 and lens_7 at 7.9" }
+  ],
+  "remaining_to_reach_9": [
+    "Lens 3: records_room readability - choice overlay blocks room view in screenshots, less of a gameplay issue",
+    "Lens 7: hospital_entrance gameplay satisfaction - only 1 NPC, limited gameplay arc",
+    "Lens 7: per-room 'moment' — each room needs one standout memorable interaction beyond just talking",
+    "Per-room polish: more ambient detail props that tell micro-stories without gameplay function",
+    "Audio: room-specific ambient sounds and interaction audio feedback still missing"
+  ],
+  "assessment": "Major jump from 7.5 to 8.0. Every room is now visually distinct - you could identify each room from the floor alone. IT office and ER floors are dramatically different from reception and break room. Multi-tile furniture fills space properly. NPC labels are readable on any background. Wall decorations give each room identity. Three rooms hit 9 on emotional tone (break room, IT office, ER). Reaching 9 across all lenses would require content/gameplay additions beyond visual improvements."
+}

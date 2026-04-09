@@ -195,17 +195,8 @@ export class BreachDefenseScene extends Phaser.Scene {
       securityScore: this.securityScore,
       scoreContribution,
     });
-
-    this.time.delayedCall(1800, () => {
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.cameras.main.once(
-        Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
-        () => {
-          this.scene.stop();
-          this.scene.wake('Exploration');
-        }
-      );
-    });
+    // React shows the debrief screen; user clicks "Return to Hospital"
+    // which emits REACT_RETURN_FROM_ENCOUNTER → ExplorationScene handles cleanup.
   }
 
   /** Called in encounter mode when securityScore reaches 0 (game over). */
@@ -228,17 +219,8 @@ export class BreachDefenseScene extends Phaser.Scene {
       securityScore: this.securityScore,
       scoreContribution,
     });
-
-    this.time.delayedCall(2000, () => {
-      this.cameras.main.fadeOut(400, 0, 0, 0);
-      this.cameras.main.once(
-        Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE,
-        () => {
-          this.scene.stop();
-          this.scene.wake('Exploration');
-        }
-      );
-    });
+    // React shows the debrief screen; user clicks "Return to Hospital"
+    // which emits REACT_RETURN_FROM_ENCOUNTER → ExplorationScene handles cleanup.
   }
 
   create() {
@@ -269,29 +251,29 @@ export class BreachDefenseScene extends Phaser.Scene {
         const cx = x * CELL_SIZE + CELL_SIZE / 2;
         const cy = y * CELL_SIZE + CELL_SIZE / 2;
 
-        // Cell fill: brighter tech-themed colors
+        // Cell fill: tech-themed colors — path cells distinctly purple, non-path blue-gray
         let shade: number;
         if (isPath) {
-          shade = (x + y) % 2 === 0 ? 0x3d2d5e : 0x352855;
+          shade = (x + y) % 2 === 0 ? 0x503d78 : 0x483870;
         } else {
-          shade = (x + y) % 2 === 0 ? 0x2a2d4e : 0x252845;
+          shade = (x + y) % 2 === 0 ? 0x1e2240 : 0x1a1e3a;
         }
 
         gridGfx.fillStyle(shade, 1);
         gridGfx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
 
         // 1px grid lines between cells
-        gridGfx.lineStyle(1, 0x3a3d6e, 0.6);
+        gridGfx.lineStyle(1, 0x4a4d8e, 0.7);
         gridGfx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
 
         // Path cells get extra visual treatment
         if (isPath) {
           // Subtle inner border to highlight the path lane
-          gridGfx.lineStyle(1, 0x6b5b95, 0.3);
+          gridGfx.lineStyle(1, 0x7b6ba5, 0.4);
           gridGfx.strokeRect(x * CELL_SIZE + 3, y * CELL_SIZE + 3, CELL_SIZE - 6, CELL_SIZE - 6);
 
           // Path channel glow — lighter center strip
-          gridGfx.fillStyle(0x5b4b7e, 0.15);
+          gridGfx.fillStyle(0x6b5b8e, 0.2);
           gridGfx.fillRect(cx - 20, cy - 20, 40, 40);
 
           // Directional dot: larger and brighter so the path route is obvious
@@ -635,9 +617,9 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     // ── Input handlers ─────────────────────────────────────────
     this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
-      if (this.gameState !== 'PLAYING' && this.gameState !== 'WAITING') return;
-      const gridX = Math.floor(pointer.x / CELL_SIZE);
-      const gridY = Math.floor(pointer.y / CELL_SIZE);
+      if (this.gameState === 'GAMEOVER' || this.gameState === 'VICTORY') return;
+      const gridX = Math.floor(pointer.worldX / CELL_SIZE);
+      const gridY = Math.floor(pointer.worldY / CELL_SIZE);
 
       if (gridX < 0 || gridX >= GRID_COLS || gridY < 0 || gridY >= GRID_ROWS) {
         this.hoverRect.setVisible(false);
@@ -689,11 +671,11 @@ export class BreachDefenseScene extends Phaser.Scene {
     });
 
     this.input.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (this.gameState !== 'PLAYING' && this.gameState !== 'WAITING') return;
+      if (this.gameState === 'GAMEOVER' || this.gameState === 'VICTORY') return;
       if (!this.selectedTowerType) return;
 
-      const gridX = Math.floor(pointer.x / CELL_SIZE);
-      const gridY = Math.floor(pointer.y / CELL_SIZE);
+      const gridX = Math.floor(pointer.worldX / CELL_SIZE);
+      const gridY = Math.floor(pointer.worldY / CELL_SIZE);
 
       if (gridX < 0 || gridX >= GRID_COLS || gridY < 0 || gridY >= GRID_ROWS) return;
 
@@ -714,18 +696,24 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.sound.mute = true;
     }
 
-    // Stop any lingering audio from other scenes (e.g., hub world music)
-    this.sound.stopAll();
+    // ExplorationScene now fades out its own music before launching this scene,
+    // so no need for stopAll() (which would kill SFX too).
 
     // Background music — fade in gently after a beat
     const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
     const targetVol = this.musicBaseVolume * userVol;
     if (userVol > 0) {
-      this.bgMusic = this.sound.add('music_breach', { loop: true, volume: 0 });
+      this.bgMusic = this.sound.add('music_breach', { loop: true, volume: 0, mute: true });
       const playMusic = () => {
         if (!this.bgMusic || !this.scene.isActive()) return;
         this.bgMusic.play();
-        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1500, ease: 'Sine.easeIn' });
+        this.time.delayedCall(0, () => {
+          if (!this.bgMusic || !this.scene.isActive()) return;
+          const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
+          ws.setMute(false);
+          ws.volume = 0;
+          this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1500, ease: 'Sine.easeIn' });
+        });
       };
       if (this.sound.locked) {
         this.sound.once('unlocked', playMusic);
@@ -735,6 +723,21 @@ export class BreachDefenseScene extends Phaser.Scene {
     }
 
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
+
+    // Center the grid in the camera viewport
+    {
+      const gw = GRID_COLS * CELL_SIZE;
+      const gh = GRID_ROWS * CELL_SIZE;
+      const cw = this.cameras.main.width;
+      const ch = this.cameras.main.height;
+      this.cameras.main.scrollX = -(cw - gw) / 2;
+      this.cameras.main.scrollY = -(ch - gh) / 2;
+
+      // Fill the area outside the grid with a dark tech background
+      const bgGfx = this.add.graphics().setDepth(-1);
+      bgGfx.fillStyle(0x0a0c1a, 1);
+      bgGfx.fillRect(-200, -200, gw + 400, gh + 400);
+    }
 
     // Emit ready
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'BreachDefense');
@@ -1173,6 +1176,7 @@ export class BreachDefenseScene extends Phaser.Scene {
   // ── VFX Helpers ────────────────────────────────────────────────
 
   private spawnDeathParticles(x: number, y: number, color: number): void {
+    if (!this.scene.isActive()) return;
     const emitter = this.add.particles(x, y, 'particle_circle', {
       speed: { min: 40, max: 110 },
       angle: { min: 0, max: 360 },
@@ -1190,9 +1194,13 @@ export class BreachDefenseScene extends Phaser.Scene {
   }
 
   private playRecoilTween(sprite: Phaser.GameObjects.Sprite): void {
+    // Use relative scale — tower PNGs are 1024x1024, displayed at 56x56
+    const baseX = sprite.scaleX;
+    const baseY = sprite.scaleY;
     this.tweens.add({
       targets: sprite,
-      scale: [1.0, 1.15, 0.95, 1.0],
+      scaleX: [baseX, baseX * 1.15, baseX * 0.95, baseX],
+      scaleY: [baseY, baseY * 1.15, baseY * 0.95, baseY],
       duration: 200,
       ease: 'Quad.easeOut'
     });
@@ -1300,6 +1308,12 @@ export class BreachDefenseScene extends Phaser.Scene {
   // ── Main game loop ─────────────────────────────────────────────
 
   update(time: number, delta: number) {
+    // Broadcast state even when not PLAYING so React HUD shows correct budget/wave
+    if (time - this.lastBroadcast > 200) {
+      this.broadcastState();
+      this.lastBroadcast = time;
+    }
+
     if (this.gameState !== 'PLAYING') return;
 
     const dt = Math.min(delta / 1000, 0.1);
@@ -1445,7 +1459,8 @@ export class BreachDefenseScene extends Phaser.Scene {
           }
 
           // Check for wave with educational lesson (triggered by React after recap)
-          if ([3, 5, 7, 9].includes(this.wave) && !this.shownWaveSplashes.has(this.wave)) {
+          // Skip educational pause in encounter mode — EncounterGameUI doesn't have tutorial modals
+          if (!this.encounterId && [3, 5, 7, 9].includes(this.wave) && !this.shownWaveSplashes.has(this.wave)) {
             this.shownWaveSplashes.add(this.wave);
             this.gameState = 'PAUSED';
             // React will trigger the tutorial after the recap modal is dismissed
@@ -1488,6 +1503,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
           // Second round of confetti after a beat — extended celebration
           this.time.delayedCall(1500, () => {
+            if (!this.scene.isActive()) return;
             for (let i = 0; i < 3; i++) {
               const rx = Math.random() * GRID_COLS * CELL_SIZE;
               const ry = Math.random() * GRID_ROWS * CELL_SIZE * 0.5;
@@ -2078,10 +2094,6 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.bgMusic.volume = newVol;
     }
 
-    if (time - this.lastBroadcast > 200) {
-      this.broadcastState();
-      this.lastBroadcast = time;
-    }
   }
 
   private onMusicVolume = (vol: number) => {

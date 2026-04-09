@@ -157,6 +157,13 @@
       "isEnd": true
     },
     {
+      "id": "welcome_board_scene",
+      "character": "Observation",
+      "dialogue": "A framed staff directory hangs on the wall. 'Valley General Hospital — Where Every Patient's Privacy is Our Priority.' Below it, department names are listed: Reception, Break Room, Laboratory, Medical Records, IT Office, Emergency Room. A sticky note reads: 'New hires: see Riley at the front desk!'",
+      "choices": [],
+      "isEnd": true
+    },
+    {
       "id": "riley_scene1",
       "character": "Receptionist Riley",
       "dialogue": "I'm on the phone with a patient's employer who's asking about their appointment time. They need to verify the employee was here. Should I confirm?",

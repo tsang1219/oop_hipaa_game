@@ -453,3 +453,20 @@
   0%, 100% { box-shadow: 0 0 5px rgba(255, 107, 157, 0.2); }
   50% { box-shadow: 0 0 15px rgba(255, 107, 157, 0.4); }
 }
+
+/* ── Title screen animations ─────────────────────────────────── */
+
+@keyframes title-glow {
+  0%, 100% { text-shadow: 0 0 20px rgba(255, 107, 157, 0.6), 0 0 40px rgba(255, 107, 157, 0.3); color: #FF6B9D; }
+  50% { text-shadow: 0 0 20px rgba(0, 212, 170, 0.6), 0 0 40px rgba(0, 212, 170, 0.3); color: #00d4aa; }
+}
+
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.2; }
+  50% { opacity: 0.8; }
+}

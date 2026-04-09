@@ -30,7 +30,8 @@ export function filterBenignErrors(errors: string[]): string[] {
     !e.includes('404') &&
     !e.includes('net::ERR') &&
     !e.includes('ResizeObserver') &&
-    !e.includes('WebAudio')
+    !e.includes('WebAudio') &&
+    !e.includes('WebSocket')
   );
 }
 
@@ -186,10 +187,10 @@ export async function dismissDialogue(page: Page): Promise<void> {
   }
 
   if (overlayType === 'observation') {
-    // Click acknowledge button
-    const ackBtn = page.locator('[data-testid="observation-hint-overlay"] button');
-    if (await ackBtn.isVisible()) {
-      await ackBtn.click();
+    // Observation hints dismiss on click anywhere (no button)
+    const overlay = page.locator('[data-testid="observation-hint-overlay"]');
+    if (await overlay.isVisible()) {
+      await overlay.click();
       await page.waitForTimeout(300);
       return;
     }
@@ -279,7 +280,11 @@ export async function examineZone(
 ): Promise<void> {
   await interactWith(page, zoneX, zoneY);
   // Zones may trigger dialogue, observation hint, or choice prompt
-  await page.waitForTimeout(500);
+  // Observation hints have a 100ms render delay, so wait a bit longer
+  await page.waitForSelector(
+    '[data-testid="dialogue-overlay"], [data-testid="observation-hint-overlay"], [data-testid="choice-prompt-overlay"]',
+    { timeout: 2000 },
+  ).catch(() => {});
   const hasOverlay = await page.evaluate(() =>
     !!(document.querySelector('[data-testid="dialogue-overlay"]') ||
        document.querySelector('[data-testid="observation-hint-overlay"]') ||

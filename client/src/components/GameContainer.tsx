@@ -30,7 +30,10 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
 
   const currentScene = scenes[currentSceneIndex];
   const maxScore = scenes.reduce(
-    (total, scene) => total + Math.max(...scene.choices.map(c => c.score)),
+    (total, scene) => {
+      if (!scene.choices || scene.choices.length === 0) return total;
+      return total + Math.max(...scene.choices.map(c => c.score));
+    },
     0
   );
 
@@ -68,6 +71,11 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
   };
 
   const handleDialogueAdvance = () => {
+    // Observation-only scenes (no choices) — advance directly
+    if (!currentScene.choices || currentScene.choices.length === 0) {
+      handleNextScene();
+      return;
+    }
     setGamePhase('choices');
   };
 
@@ -178,7 +186,7 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
     }
   };
 
-  const battleChoices = currentScene.choices.map((choice, idx) => ({
+  const battleChoices = (currentScene.choices || []).map((choice, idx) => ({
     text: choice.text,
     index: idx,
   }));

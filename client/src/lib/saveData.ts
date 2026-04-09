@@ -171,6 +171,14 @@ export function loadSave(): SaveDataV2 {
 }
 
 /**
+ * Check whether the player has meaningful saved progress.
+ */
+export function hasSaveData(): boolean {
+  const save = loadSave();
+  return save.completedNPCs.length > 0 || save.completedRooms.length > 0 || save.onboardingSeen;
+}
+
+/**
  * Atomically replace the v2 save object.
  */
 export function writeSave(data: SaveDataV2): void {

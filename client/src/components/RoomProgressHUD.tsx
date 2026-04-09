@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { Room, CompletionRequirements } from '@shared/schema';
 import { CheckCircle, Circle, User, MapPin, BookOpen } from 'lucide-react';
 
@@ -33,6 +33,18 @@ export function RoomProgressHUD({
   const totalDone = npcsDone + zonesDone + itemsDone;
   const totalRequired = npcsTotal + zonesTotal + itemsTotal;
   const isComplete = totalDone >= totalRequired;
+
+  // Fade in after room entry so HUD doesn't block the initial view
+  const [visible, setVisible] = useState(false);
+  const roomIdRef = useRef(room.id);
+  useEffect(() => {
+    if (room.id !== roomIdRef.current) {
+      setVisible(false);
+      roomIdRef.current = room.id;
+    }
+    const timer = setTimeout(() => setVisible(true), 1200);
+    return () => clearTimeout(timer);
+  }, [room.id]);
 
   // Track recently completed categories for glow pulse
   const [recentlyCompleted, setRecentlyCompleted] = useState<Set<string>>(new Set());
@@ -70,8 +82,10 @@ export function RoomProgressHUD({
       className="absolute top-2 right-2 bg-black/80 border-4 border-black rounded-[4px] p-3 text-white font-['Press_Start_2P'] text-[8px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
       data-testid="room-progress-hud"
       style={{
+        opacity: visible ? 1 : 0,
         boxShadow: recentlyCompleted.has('room') ? '0 0 14px rgba(100, 255, 100, 0.7)' : 'none',
-        transition: 'box-shadow 300ms ease-out'
+        transition: 'opacity 600ms ease-out, box-shadow 300ms ease-out',
+        pointerEvents: visible ? 'auto' : 'none',
       }}
     >
       <div className="flex items-center gap-2 mb-2">

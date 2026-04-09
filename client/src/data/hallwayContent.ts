@@ -12,7 +12,7 @@ export interface HallwayBoardEntry {
 }
 
 export const HALLWAY_CONTENT: Record<string, Record<1 | 2 | 3, HallwayBoardEntry>> = {
-  hallway_reception_breakroom: {
+  hallway_reception_break: {
     1: {
       title: 'WELCOME!',
       text: 'Orientation today at 2pm\nBadges required after lobby\nHave a great first day!',
@@ -30,7 +30,7 @@ export const HALLWAY_CONTENT: Record<string, Record<1 | 2 | 3, HallwayBoardEntry
     },
   },
 
-  hallway_breakroom_lab: {
+  hallway_break_lab: {
     1: {
       title: 'STAFF ONLY',
       text: 'Patient info stays in\npatient areas. Public\nhallways are public.',

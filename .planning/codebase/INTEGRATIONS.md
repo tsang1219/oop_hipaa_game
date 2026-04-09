@@ -117,38 +117,55 @@ This is the only external network dependency at runtime.
 
 ## State Persistence
 
-All game state is persisted to **`localStorage`** in the browser. There is no server-side persistence.
+All game state is persisted to **`localStorage`** in the browser under a single versioned key. There is no server-side persistence.
 
-### PrivacyQuest localStorage Keys
+### V2 Save Schema (`pq:save:v2`)
 
-Managed in `client/src/pages/PrivacyQuestPage.tsx`:
+Phase 11 consolidated 14+ fragmented V1 localStorage keys into a single JSON object. All read/write goes through `client/src/lib/saveData.ts`:
 
-| Key | Type | Purpose |
-|-----|------|---------|
-| `completedRooms` | `string[]` (JSON) | Room IDs the player has fully completed |
-| `collectedStories` | `string[]` (JSON) | Room IDs whose patient stories have been revealed |
-| `completedNPCs` | `string[]` (JSON) | NPC IDs the player has finished dialogues with |
-| `completedZones` | `string[]` (JSON) | Interaction zone IDs the player has visited |
-| `collectedEducationalItems` | `string[]` (JSON) | Educational item IDs the player has collected |
-| `current-privacy-score` | `string` (number) | Current privacy/trust meter value (0-100) |
-| `final-privacy-score` | `string` (number) | Score snapshot for end screen |
-| `gameStartTime` | `string` (timestamp) | Session start time for elapsed time display |
-| `resolvedGates_{roomId}` | `string[]` (JSON) | Per-room gate IDs that have been resolved |
-| `unlockedNpcs_{roomId}` | `string[]` (JSON) | Per-room NPC IDs unlocked via gates |
+| Function | Purpose |
+|----------|---------|
+| `loadSave(): SaveDataV2` | Read and parse `pq:save:v2` from localStorage (returns defaults if absent) |
+| `writeSave(data: SaveDataV2)` | Atomically replace `pq:save:v2` |
+| `migrateV1toV2(roomIds)` | One-time migration: reads old V1 keys, writes `pq:save:v2`, clears old keys. Idempotent. |
 
-Managed in `client/src/components/KnowledgeTracker.tsx`:
-- Reads `collectedEducationalItems` to display privacy principles learned (polls every 500ms)
+**SaveDataV2 fields** (managed by `useGameState` hook in `client/src/hooks/useGameState.ts`):
 
-Managed in `client/src/components/GameContainer.tsx`:
-- Reads/writes `final-privacy-score` and `current-privacy-score` during dialogue encounters
+| Field | Type | Purpose |
+|-------|------|---------|
+| `completedRooms` | `string[]` | Room IDs fully completed |
+| `completedNPCs` | `string[]` | NPC IDs with finished dialogues |
+| `completedZones` | `string[]` | Interaction zone IDs visited |
+| `collectedItems` | `string[]` | Educational item IDs collected |
+| `collectedStories` | `string[]` | Patient story room IDs revealed |
+| `privacyScore` | `number` | Compliance knowledge score (0-100) |
+| `currentRoomId` | `string \| null` | Last room for resume |
+| `currentAct` | `1 \| 2 \| 3` | Current narrative act |
+| `act1Complete` | `boolean` | Act 1 completion flag |
+| `act2Complete` | `boolean` | Act 2 completion flag |
+| `actFlags` | `Record<string, boolean>` | Narrative decision flags |
+| `decisions` | `DecisionState` | Player choice memory for NPC variant dialogue |
+| `encounterResults` | `Record<string, { completed, score, outcome }>` | BreachDefense encounter results |
+| `unifiedScore` | `number` | Combined score across all encounter types |
+| `gameStartTime` | `number` | Session start timestamp |
 
-### BreachDefense localStorage Keys
+### BreachDefense State
 
-**None.** BreachDefense game state is entirely in-memory React state (`client/src/pages/BreachDefensePage.tsx`). Progress resets when leaving the page. State includes: security score, budget, wave number, selected tower, seen threats/towers, tutorial progression.
+BreachDefense encounter state is in-memory only (managed by `BreachDefenseScene`). Encounter results are written back to `pq:save:v2.encounterResults` when the encounter completes.
 
 ### Reset Behavior
 
-PrivacyQuest provides a "Play Again" button that calls `localStorage.clear()` followed by `window.location.reload()`, wiping all persisted state across both games.
+"Play Again" clears only `pq:save:v2` (not all localStorage).
+
+### QA Test Parameters
+
+URL parameters for test automation (checked in `UnifiedGamePage.tsx`):
+
+| Parameter | Effect |
+|-----------|--------|
+| `?qa-no-save` | Prevents localStorage writes during the session (clean test state). Only clears on first render, not every render. |
+| `?qa-room=reception` | Auto-navigates to a specific room on load (bypasses normal progression) |
+| `?qa-skip-onboarding` | Skips the intro/onboarding modal |
 
 ## React-Phaser Communication
 

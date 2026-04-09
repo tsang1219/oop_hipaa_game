@@ -80,6 +80,9 @@ export interface QABridge {
     roomLoad(roomId: string, timeoutMs?: number): Promise<void>;
     sceneReady(sceneKey: string, timeoutMs?: number): Promise<void>;
   };
+
+  // Direct EventBridge access for testing
+  emit(event: string, data?: any): void;
 }
 
 declare global {
@@ -158,6 +161,11 @@ export function initQABridge() {
       teleportTo(tileX: number, tileY: number): void {
         eventBridge.emit(BRIDGE_EVENTS.QA_TELEPORT_TO, { tileX, tileY });
       },
+    },
+
+    // Direct EventBridge emit for testing
+    emit(event: string, data?: any): void {
+      eventBridge.emit(event, data);
     },
 
     // Waiters

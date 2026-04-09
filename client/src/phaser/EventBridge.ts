@@ -40,6 +40,7 @@ export const BRIDGE_EVENTS = {
 
   // React -> Phaser
   REACT_PAUSE_EXPLORATION: 'react:pause-exploration',
+  REACT_RESUME_EXPLORATION: 'react:resume-exploration',
   REACT_DIALOGUE_COMPLETE: 'react:dialogue-complete',
   // REACT_LOAD_ROOM payload: { room: RoomData, spawnDoorId?: string, completedNPCs: string[], completedZones: string[], collectedItems: string[], doorStates: Record<string, 'locked' | 'available' | 'completed'> }
   REACT_LOAD_ROOM: 'react:load-room',

@@ -92,6 +92,100 @@ test.describe('Door Unlocks', () => {
     expect(state.currentRoomId).toBe('break_room');
   });
 
+  test('Lab unlocks after completing break room', async ({ page }) => {
+    // Load directly into break_room
+    await loadRoom(page, 'break_room');
+
+    // Complete all break_room requirements:
+    // gossiping_coworker (social gate — first call resolves gate, second opens dialogue)
+    await talkToNPC(page, ROOMS.break_room.npcs.gossiping_coworker.x, ROOMS.break_room.npcs.gossiping_coworker.y);
+    // friend_fishing
+    await talkToNPC(page, ROOMS.break_room.npcs.friend_fishing.x, ROOMS.break_room.npcs.friend_fishing.y);
+    // overheard_conversation zone
+    await examineZone(page, ROOMS.break_room.zones.overheard_conversation.x, ROOMS.break_room.zones.overheard_conversation.y);
+    // verbal_disclosure item
+    await collectItem(page, ROOMS.break_room.items.verbal_disclosure.x, ROOMS.break_room.items.verbal_disclosure.y);
+
+    // Exit break_room → hallway_break_lab (triggers completion check)
+    await goThroughDoor(page, 'break_to_hallway_lab', 'hallway_break_lab');
+
+    // Verify break_room is complete
+    const mid_state = await qaState(page);
+    expect(mid_state.completedRooms).toContain('break_room');
+
+    // Now lab should be accessible
+    await goThroughDoor(page, 'hallway_breaklab_to_lab', 'lab');
+
+    const state = await qaState(page);
+    expect(state.currentRoomId).toBe('lab');
+  });
+
+  test('Records room unlocks after completing lab', async ({ page }) => {
+    await loadRoom(page, 'lab');
+
+    // Observation gate: must examine results_printout BEFORE talking to lab_tech
+    await examineZone(page, ROOMS.lab.zones.results_printout.x, ROOMS.lab.zones.results_printout.y);
+    await talkToNPC(page, ROOMS.lab.npcs.lab_tech.x, ROOMS.lab.npcs.lab_tech.y);
+    await talkToNPC(page, ROOMS.lab.npcs.researcher.x, ROOMS.lab.npcs.researcher.y);
+    await collectItem(page, ROOMS.lab.items.phi_identifiers.x, ROOMS.lab.items.phi_identifiers.y);
+
+    // Exit lab → hallway → records_room
+    await goThroughDoor(page, 'lab_to_hallway_records', 'hallway_lab_records');
+    const mid_state = await qaState(page);
+    expect(mid_state.completedRooms).toContain('lab');
+
+    await goThroughDoor(page, 'hallway_labrecords_to_records', 'records_room');
+    const state = await qaState(page);
+    expect(state.currentRoomId).toBe('records_room');
+  });
+
+  test('IT office unlocks after completing records room', async ({ page }) => {
+    await loadRoom(page, 'records_room');
+
+    // Choice gate auto-shows on room entry — dismiss it to unlock patient_request NPC
+    // Options have a 500ms render delay, so wait for the button to appear
+    await page.waitForSelector('[data-testid="button-choice-0"]', { timeout: 5000 }).catch(() => {});
+    const choiceBtn = page.locator('[data-testid="button-choice-0"]');
+    if (await choiceBtn.isVisible().catch(() => false)) {
+      await choiceBtn.click();
+      await page.waitForTimeout(500);
+    }
+    await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
+
+    // Complete records_room requirements
+    await talkToNPC(page, ROOMS.records_room.npcs.records_clerk.x, ROOMS.records_room.npcs.records_clerk.y);
+    await examineZone(page, ROOMS.records_room.zones.unlocked_cabinet.x, ROOMS.records_room.zones.unlocked_cabinet.y);
+    await collectItem(page, ROOMS.records_room.items.minimum_necessary_manual.x, ROOMS.records_room.items.minimum_necessary_manual.y);
+
+    // Exit records → hallway → it_office
+    await goThroughDoor(page, 'records_to_hallway_it', 'hallway_records_it');
+    const mid_state = await qaState(page);
+    expect(mid_state.completedRooms).toContain('records_room');
+
+    await goThroughDoor(page, 'hallway_recordsit_to_it', 'it_office');
+    const state = await qaState(page);
+    expect(state.currentRoomId).toBe('it_office');
+  });
+
+  test('ER unlocks after completing IT office', async ({ page }) => {
+    await loadRoom(page, 'it_office');
+
+    // Gate: must examine password_note BEFORE talking to security_analyst (observation gate)
+    await examineZone(page, ROOMS.it_office.zones.password_note.x, ROOMS.it_office.zones.password_note.y);
+    await talkToNPC(page, ROOMS.it_office.npcs.security_analyst.x, ROOMS.it_office.npcs.security_analyst.y);
+    await talkToNPC(page, ROOMS.it_office.npcs.vendor.x, ROOMS.it_office.npcs.vendor.y);
+    await collectItem(page, ROOMS.it_office.items.security_safeguards.x, ROOMS.it_office.items.security_safeguards.y);
+
+    // Exit it_office → hallway → er
+    await goThroughDoor(page, 'it_to_hallway_er', 'hallway_it_er');
+    const mid_state = await qaState(page);
+    expect(mid_state.completedRooms).toContain('it_office');
+
+    await goThroughDoor(page, 'hallway_iter_to_er', 'er');
+    const state = await qaState(page);
+    expect(state.currentRoomId).toBe('er');
+  });
+
   test('Entrance door is always accessible from hospital_entrance', async ({ page }) => {
     // hospital_entrance is the starting room — the door to reception requires
     // completing hospital_entrance first, but going back is fine

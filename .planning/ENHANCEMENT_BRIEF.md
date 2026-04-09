@@ -4,6 +4,8 @@
 **Date:** 2026-03-26
 **Scope:** Restructure PrivacyQuest + BreachDefense from two separate games into one cohesive RPG with integrated encounter mechanics
 
+> **V2.0 Scope Note (2026-03-29):** V2.0 delivered Phases 11-15 (stabilization, unified navigation, inbound TD encounter integration, three-act narrative, polish). Sections 4.1 (PHI Sorting), 4.3 (Outbound TD), and 4.4 (Breach Triage) describe encounter types **deferred to V2.1+**. Section 4.2 (Inbound TD) is the only new encounter type implemented in V2.0. Implementation phases in Section 10 use the original numbering (0-7); the actual V2.0 execution used Phases 11-15 in the ROADMAP.
+
 ---
 
 ## 1. Problem Statement
@@ -86,7 +88,7 @@ Something goes wrong. The hospital is under active cyber attack. Everything the 
 
 ## 4. Encounter Mechanics
 
-### 4.1 PHI Sorting
+### 4.1 PHI Sorting — DEFERRED TO V2.1
 
 **What it teaches:** Privacy Rule — identifying PHI, the 18 identifiers, minimum necessary
 
@@ -132,7 +134,7 @@ Something goes wrong. The hospital is under active cyber attack. Everything the 
 
 **Estimated occurrences:** 1 (Act 3 climax), possibly 1 smaller intro encounter in Act 2
 
-### 4.3 Security Defense (Tower Defense — Outbound)
+### 4.3 Security Defense (Tower Defense — Outbound) — DEFERRED TO V2.1
 
 **What it teaches:** Privacy Rule in action — preventing inappropriate disclosures through cultural and administrative safeguards
 
@@ -168,7 +170,7 @@ Something goes wrong. The hospital is under active cyber attack. Everything the 
 
 **Estimated occurrences:** 1 (Act 2)
 
-### 4.4 Breach Triage (TBD — Pinned for Design)
+### 4.4 Breach Triage (TBD — Pinned for Design) — DEFERRED TO V2.1
 
 **What it teaches:** Breach Notification Rule — identifying reportable breaches, notification timelines, chain of reporting
 
@@ -534,7 +536,7 @@ The enhancement is successful when:
 1. **One game, not two.** A player starts and finishes one continuous experience. No game selection menu.
 2. **Under 60 minutes.** A typical playthrough completes in 45-60 minutes.
 3. **All existing content accessible.** No NPC, dialogue, patient story, or educational item is lost.
-4. **Three encounter types work.** PHI sorting, inbound TD, and outbound TD all trigger from the RPG world and return the player to exploration seamlessly.
+4. **Encounter integration works.** Inbound TD triggers from the RPG world and returns the player to exploration seamlessly. (PHI sorting and outbound TD deferred to V2.1.)
 5. **The Nintendo Test.** A playtester says "that was actually fun" without being prompted. The game feels like a game, not a compliance module.
 6. **HIPAA coverage maintained.** All topics rated STRONG or ADEQUATE in the Training Framework retain their rating. No coverage regression.
 7. **Audio on every interaction.** No silent actions in the shipped game.

@@ -3,11 +3,13 @@ import React, { useState, useEffect } from 'react';
 interface NarrativeContextCardProps {
   narrativeText: string;
   onConfirm: () => void;
+  onDecline?: () => void;
 }
 
 export const NarrativeContextCard: React.FC<NarrativeContextCardProps> = ({
   narrativeText,
   onConfirm,
+  onDecline,
 }) => {
   const [visible, setVisible] = useState(false);
 
@@ -55,7 +57,7 @@ export const NarrativeContextCard: React.FC<NarrativeContextCardProps> = ({
         </div>
 
         {/* Action */}
-        <div className="px-5 pb-5">
+        <div className="px-5 pb-5 space-y-2">
           <button
             onClick={onConfirm}
             className="w-full py-3 bg-green-700 hover:bg-green-600 border-2 border-green-500/60 text-white transition-colors"
@@ -63,6 +65,15 @@ export const NarrativeContextCard: React.FC<NarrativeContextCardProps> = ({
           >
             DEFEND THE NETWORK
           </button>
+          {onDecline && (
+            <button
+              onClick={onDecline}
+              className="w-full py-2 bg-transparent hover:bg-gray-800 border border-gray-600/40 text-gray-500 hover:text-gray-400 transition-colors"
+              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
+            >
+              NOT RIGHT NOW
+            </button>
+          )}
         </div>
       </div>
     </div>
