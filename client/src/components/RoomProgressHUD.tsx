@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { Room, CompletionRequirements } from '@shared/schema';
+import { useState, useEffect, useRef } from 'react';
+import { Room } from '@shared/schema';
 import { CheckCircle, Circle, User, MapPin, BookOpen } from 'lucide-react';
 
 interface RoomProgressHUDProps {
@@ -15,24 +15,28 @@ export function RoomProgressHUD({
   completedZones,
   collectedItems
 }: RoomProgressHUDProps) {
-  const requirements = room.completionRequirements;
+  // Count ALL interactables in the room (not just completionRequirements)
+  // so the HUD reflects the full checklist of things to discover.
+  const npcIds = (room.npcs || []).map(n => n.id);
+  const zoneIds = (room.interactionZones || []).map(z => z.id);
+  const itemIds = (room.educationalItems || []).map(i => i.id);
 
-  if (!requirements) {
-    return null;
-  }
+  const npcsDone = npcIds.filter(id => completedNpcs.has(id)).length;
+  const npcsTotal = npcIds.length;
 
-  const npcsDone = requirements.requiredNpcs.filter(id => completedNpcs.has(id)).length;
-  const npcsTotal = requirements.requiredNpcs.length;
+  const zonesDone = zoneIds.filter(id => completedZones.has(id)).length;
+  const zonesTotal = zoneIds.length;
 
-  const zonesDone = requirements.requiredZones.filter(id => completedZones.has(id)).length;
-  const zonesTotal = requirements.requiredZones.length;
-
-  const itemsDone = requirements.requiredItems.filter(id => collectedItems.has(id)).length;
-  const itemsTotal = requirements.requiredItems.length;
+  const itemsDone = itemIds.filter(id => collectedItems.has(id)).length;
+  const itemsTotal = itemIds.length;
 
   const totalDone = npcsDone + zonesDone + itemsDone;
   const totalRequired = npcsTotal + zonesTotal + itemsTotal;
-  const isComplete = totalDone >= totalRequired;
+  const isComplete = totalRequired > 0 && totalDone >= totalRequired;
+
+  if (totalRequired === 0) {
+    return null;
+  }
 
   // Fade in after room entry so HUD doesn't block the initial view
   const [visible, setVisible] = useState(false);

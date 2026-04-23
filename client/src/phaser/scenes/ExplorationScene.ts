@@ -80,6 +80,7 @@ export class ExplorationScene extends Phaser.Scene {
   // Door navigation state (Phase 12)
   private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
   private doorStates: Record<string, 'locked' | 'available' | 'completed'> = {};
+  private doorVisuals: Phaser.GameObjects.GameObject[] = [];
   private pendingSpawnTileX: number | null = null;
   private pendingSpawnTileY: number | null = null;
   private transitioning = false;
@@ -1261,6 +1262,7 @@ export class ExplorationScene extends Phaser.Scene {
     // Door navigation listeners (Phase 12)
     eventBridge.on(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, this.onUpdateDoorStates, this);
 
     // Encounter lifecycle listeners (Phase 13)
     this.events.on(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this);
@@ -1566,6 +1568,7 @@ export class ExplorationScene extends Phaser.Scene {
     // Door navigation listeners (Phase 12)
     eventBridge.off(BRIDGE_EVENTS.REACT_LOAD_ROOM, this.onLoadRoom, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, this.onUpdateDoorStates, this);
     // Encounter lifecycle listeners (Phase 13)
     this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, this.onLaunchEncounter, this);
@@ -1974,6 +1977,12 @@ export class ExplorationScene extends Phaser.Scene {
     const doors = (this.room as any).doors;
     if (!doors || doors.length === 0) return;
 
+    // Clear existing door visuals so we can re-render cleanly
+    for (const v of this.doorVisuals) {
+      v.destroy();
+    }
+    this.doorVisuals = [];
+
     for (const door of doors) {
       const doorPixelX = door.x * TILE + TILE / 2;
       const doorPixelY = door.y * TILE + TILE / 2;
@@ -1981,6 +1990,7 @@ export class ExplorationScene extends Phaser.Scene {
 
       // Door frame — prominent wood frame with highlight and shadow
       const frameG = this.add.graphics().setDepth(1);
+      this.doorVisuals.push(frameG);
       const fx = door.x * TILE;
       const fy = door.y * TILE - TILE / 2;
       // Frame posts (solid wood)
@@ -2004,13 +2014,14 @@ export class ExplorationScene extends Phaser.Scene {
         const overlay = this.add.graphics().setDepth(2);
         overlay.fillStyle(0x000000, 0.55);
         overlay.fillRect(door.x * TILE - TILE / 2, door.y * TILE - TILE, TILE * 2, TILE * 3);
-        this.add.text(doorPixelX, doorPixelY, '[X]', {
+        const lockText = this.add.text(doorPixelX, doorPixelY, '[X]', {
           fontFamily: '"Press Start 2P"',
           fontSize: '10px',
           color: '#ff4444',
           stroke: '#000000',
           strokeThickness: 2,
         }).setOrigin(0.5).setDepth(3);
+        this.doorVisuals.push(overlay, lockText);
 
       } else if (state === 'available') {
         // Pulsing glow ring
@@ -2026,28 +2037,32 @@ export class ExplorationScene extends Phaser.Scene {
           repeat: -1,
           ease: 'Sine.easeInOut',
         });
+        this.doorVisuals.push(glow);
 
       } else if (state === 'completed') {
         // Gold checkmark badge above door (Phase 15 upgrade — persistent fanfare badge)
-        this.add.circle(doorPixelX, doorPixelY - TILE, 9, 0x2a6a2a, 1)
+        const badge = this.add.circle(doorPixelX, doorPixelY - TILE, 9, 0x2a6a2a, 1)
           .setDepth(3);
-        this.add.text(doorPixelX, doorPixelY - TILE, '\u2713', {
+        this.doorVisuals.push(badge);
+        const check = this.add.text(doorPixelX, doorPixelY - TILE, '\u2713', {
           fontFamily: '"Press Start 2P"',
           fontSize: '9px',
           color: '#ffd700',
           stroke: '#000000',
           strokeThickness: 2,
         }).setOrigin(0.5).setDepth(4);
+        this.doorVisuals.push(check);
       }
 
       // Door label (always shown)
-      this.add.text(doorPixelX, doorPixelY + TILE, door.label, {
+      const labelText = this.add.text(doorPixelX, doorPixelY + TILE, door.label, {
         fontFamily: '"Press Start 2P"',
         fontSize: '6px',
         color: state === 'locked' ? '#888888' : '#ffffff',
         stroke: '#000000',
         strokeThickness: 1,
       }).setOrigin(0.5).setDepth(3);
+      this.doorVisuals.push(labelText);
     }
   }
 
@@ -2060,6 +2075,11 @@ export class ExplorationScene extends Phaser.Scene {
     doorStates: Record<string, 'locked' | 'available' | 'completed'>;
   }) => {
     this.scene.restart(data);
+  };
+
+  private onUpdateDoorStates = (data: { doorStates: Record<string, 'locked' | 'available' | 'completed'> }) => {
+    this.doorStates = data.doorStates;
+    this.renderDoorStates();
   };
 
   private onDoorLocked = () => {

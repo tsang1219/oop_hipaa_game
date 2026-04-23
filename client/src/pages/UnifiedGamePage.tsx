@@ -423,6 +423,31 @@ export default function UnifiedGamePage() {
     [gameState.state.completedNPCs, gameState.state.completedZones, gameState.state.collectedItems],
   );
 
+  // ── Auto-complete current room + refresh door visuals ─────────
+  // When the player satisfies all requirements mid-exploration, mark the room complete
+  // and push fresh door states to Phaser so doors update in place (no stale red X).
+  useEffect(() => {
+    if (!currentRoom || !currentRoomId) return;
+    const justCompleted =
+      checkRoomCompletion(currentRoom) && !completedRooms.includes(currentRoomId);
+    const effectiveCompleted = justCompleted
+      ? [...completedRooms, currentRoomId]
+      : completedRooms;
+    if (justCompleted) {
+      gameState.completeRoom(currentRoomId);
+    }
+    const doorStates = computeDoorStates(currentRoom, effectiveCompleted);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, { doorStates });
+  }, [
+    currentRoomId,
+    currentRoom,
+    completedRooms,
+    gameState.state.completedNPCs,
+    gameState.state.completedZones,
+    gameState.state.collectedItems,
+    checkRoomCompletion,
+  ]);
+
   // ── Door navigation handler (EXPLORATION_EXIT_ROOM) ───────────
   const handleExitRoom = useCallback(
     (payload: string | { targetRoomId: string; fromDoorId: string }) => {

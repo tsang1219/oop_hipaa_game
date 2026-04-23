@@ -46,6 +46,8 @@ export const BRIDGE_EVENTS = {
   REACT_LOAD_ROOM: 'react:load-room',
   // REACT_DOOR_LOCKED: React tells scene the door is locked (play locked SFX + visual)
   REACT_DOOR_LOCKED: 'react:door-locked',
+  // REACT_UPDATE_DOOR_STATES payload: { doorStates: Record<string, 'locked' | 'available' | 'completed'> }
+  REACT_UPDATE_DOOR_STATES: 'react:update-door-states',
   REACT_PLACE_TOWER: 'react:place-tower',
   REACT_START_BREACH: 'react:start-breach-defense',
   REACT_RETURN_TO_HUB: 'react:return-to-hub',
