@@ -4,7 +4,8 @@
 
 - v1.0 **Polish** — Phases 1-5 (shipped 2026-03-01) — [archive](milestones/v1.0-ROADMAP.md)
 - v1.1 **Sprite Overhaul** — Phases 6-10 (archived partial) — [archive](milestones/v1.1-ROADMAP.md)
-- v2.0 **One Game** — Phases 11-15 (in progress)
+- v2.0 **One Game** — Phases 11-15 (shipped 2026-03-28)
+- v2.1 **Full Vision** — Phases 16-17 (in progress)
 
 ## Phases
 
@@ -80,7 +81,7 @@ Plans:
 
 ---
 
-### v2.0 One Game (In Progress)
+### v2.0 One Game (Shipped 2026-03-28)
 
 **Milestone Goal:** Transform PrivacyQuest + BreachDefense from two separate games into one cohesive hospital RPG with continuous navigation, integrated tower defense encounters, and a three-act narrative arc.
 
@@ -178,9 +179,53 @@ Plans:
 
 ---
 
+### v2.1 Full Vision (In Progress)
+
+**Milestone Goal:** Round out the encounter library with the two highest-value mini-games deferred from v2.0 — a PHI Sorter that teaches "Is this PHI?" through play, and a whack-a-mole Breach Triage that drills the Breach Notification Rule under time pressure. Both reuse the Phase 13 encounter trigger infrastructure (sleep/wake, NarrativeContextCard, EncounterDebrief, unified compliance score).
+
+**Sequencing:** PHI Sorter → Breach Triage. Outbound Tower Defense (ENHANCEMENT_BRIEF §4.3) is deprioritized for this milestone — revisit after these two ship.
+
+**Why this order:** PHI Sorter is the lower-engineering-risk new mechanic (no new grid engine; drag/drop + keyboard) and lands in Act 1 where the player needs an early "I get it" moment. Breach Triage tests a different muscle (keyboard reflex + classification under time) and shores up the THIN-rated Breach Notification coverage in the Training Framework.
+
+---
+
+### Phase 16: PHI Sorter Encounter
+**Goal**: A new "Is this PHI?" sorting encounter triggers from in-world narrative moments, runs as a 30-60 second drag-or-keyboard mini-game with scaling difficulty, and feeds results into the unified compliance score.
+**Depends on**: Phase 13 (encounter trigger infrastructure), Phase 14 (act state)
+**Requirements**: SORT-01, SORT-02, SORT-03, SORT-04, SORT-05, SORT-06
+**Plans:** 4 plans
+**Success Criteria** (what must be TRUE):
+  1. Reaching a designated narrative trigger (Reception NPC handoff in Act 1, plus Lab/Records triggers in Act 2) launches the PHI Sorter encounter — ExplorationScene pauses in place and the sorting overlay opens via the existing encounter lifecycle.
+  2. The encounter opens with a NarrativeContextCard explaining why this sort is happening (e.g., "Riley needs help redacting these intake forms before they go to the auditor") before the first item appears.
+  3. Players can sort items into "PHI" / "Not PHI" buckets using either drag-and-drop OR keyboard (arrow keys to select, Enter/Space to commit) — both input modes work end-to-end with no fallback gaps.
+  4. Each item produces audio + visual feedback on bucket drop: correct = green flash + chime, incorrect = red shake + thud, completion = fanfare (Commandments 1, 8).
+  5. At least 3 document sets exist with scaling difficulty: Act 1 obvious (full name, SSN vs. room temperature), Act 2 subtle (diagnosis codes without names, IP addresses, biometric data), Act 3 edge cases (de-identified vs. limited data sets).
+  6. Encounter completes in 30-60 seconds with an EncounterDebrief showing sorting accuracy + 1-2 HIPAA takeaways. The unified compliance score updates proportionally to accuracy on encounter completion.
+
+Plans:
+- [ ] 16-01-PLAN.md — Foundation: SORT-01..06 in REQUIREMENTS.md, sorterData.ts (3 document sets, types, getSorterDocumentSet), CONTENT_MANIFEST.md indexing
+- [ ] 16-02-PLAN.md — Contracts + audio: ENCOUNTER_TRIGGERED + REACT_RETURN_FROM_ENCOUNTER payload JSDoc extensions, BootScene SFX preload (sfx_sorter_correct, sfx_sorter_wrong)
+- [ ] 16-03-PLAN.md — UI overlay: SorterContextCard + PHISorterOverlay + SorterItem + BucketZone components, flash-green/shake-red CSS keyframes, drag-and-drop + keyboard state machine
+- [ ] 16-04-PLAN.md — Integration: ExplorationScene Reception+Lab proximity triggers, UnifiedGamePage encounterPhase 'phi-sorter' branch + handleSorterComplete + registry-write round trip; live verification checkpoint
+
+### Phase 17: Breach Triage Encounter (Whack-a-Mole)
+**Goal**: A timed Breach Notification Rule encounter uses whack-a-mole pacing — incidents pop up, the player classifies reportable vs not and selects notification timeline — driven primarily by keyboard, triggered from the Act 3 ER narrative arc.
+**Depends on**: Phase 13 (encounter trigger infrastructure), Phase 14 (Act 3 state), Phase 16 (encounter UI patterns established)
+**Requirements**: TRIA-01, TRIA-02, TRIA-03, TRIA-04, TRIA-05, TRIA-06 (TBD during /gsd:plan-phase)
+**Success Criteria** (what must be TRUE):
+  1. Reaching the Act 3 ER narrative trigger launches the Breach Triage encounter — ExplorationScene pauses in place and the triage overlay opens via the existing encounter lifecycle.
+  2. Incidents pop up at whack-a-mole pacing (multiple visible at once, time-pressured) and the player classifies each as reportable / not-reportable using number keys or hotkeys — keyboard-only completion is fully supported with no required mouse input.
+  3. For incidents classified reportable, a follow-up prompt asks who to notify (patient / OCR / media) and within what timeframe ("without unreasonable delay" up to 60 days, immediate media notice for >500 records, annual log for <500) — wrong answers explain the rule per 45 CFR §164.404-410.
+  4. Each interaction produces audio + visual feedback (Commandments 1, 8): correct = ding + green pulse, miss/wrong = buzz + red flash, time-up = urgency cue. Tension escalates as incidents accumulate.
+  5. At least 6 incident scenarios exist covering reportable vs non-reportable edge cases (lost laptop encrypted vs unencrypted, fax to wrong number, HR snooping, vendor breach, deceased patient records, internal misuse) with mixed difficulty.
+  6. Encounter completes in 60-120 seconds with an EncounterDebrief showing classification accuracy, average response time, and 1-2 Breach Notification takeaways. The unified compliance score updates proportionally; this encounter raises Breach Notification coverage in the HIPAA Training Framework from THIN to ADEQUATE.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 17`)
+
+---
+
 ## Progress
 
-**Execution Order:** 11 → 12 → 13 → 14 → 15
+**Execution Order:** 11 → 12 → 13 → 14 → 15 → 16 → 17
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -194,3 +239,5 @@ Plans:
 | 13. Encounter Integration | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |
+| 16. PHI Sorter Encounter | v2.1 | 0/4 | Planned | - |
+| 17. Breach Triage Encounter | v2.1 | 0/0 | Pending | - |
