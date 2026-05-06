@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 ## Current Position
 
 Phase: 16 of 16 (PHI Sorter Encounter)
-Plan: 3 of 4
-Status: Phase 16 in progress — plans 01 and 02 executed
-Last activity: 2026-05-01 — Phase 16 Plan 01 executed (sorterData.ts types + 3 document sets + REQUIREMENTS.md SORT-01..06 + CONTENT_MANIFEST.md indexing)
+Plan: 4 of 4
+Status: Phase 16 in progress — plans 01, 02, and 03 executed
+Last activity: 2026-05-01 — Phase 16 Plan 03 executed (PHISorterOverlay + SorterContextCard + SorterItem + BucketZone UI components + CSS keyframes)
 
-Progress: [##########] 96%
+Progress: [##########] 98%
 
 ## Performance Metrics
 
@@ -90,6 +90,10 @@ Progress: [##########] 96%
 - [Phase 16-02]: Discriminator approach: extend ENCOUNTER_TRIGGERED payload with optional type field — no new BRIDGE_EVENTS constants (smaller diff, matches Phase 13 payload-extension precedent)
 - [Phase 16-02]: Registry write strategy: extend REACT_RETURN_FROM_ENCOUNTER with optional encounterId — ExplorationScene's onReturnFromEncounter writes proximity guard for pure-React encounters
 - [Phase 16-02]: SFX keys for sorter: sfx_sorter_correct (confirmation_001.ogg chime) + sfx_sorter_wrong (error_001.ogg soft thud) — Commandment 8 proportional feedback
+- [Phase 16-03]: PHISorterOverlay starts in sorting phase directly — SorterContextCard owned by UnifiedGamePage (BLOCKER 2 fix, single render path)
+- [Phase 16-03]: draggingOverBucket state separate from hoveredBucket — per-bucket drag-enter handlers prevent dual highlight (W2 fix)
+- [Phase 16-03]: takeaways passed through in onComplete from docSet.takeaways directly (W4 — avoids redundant re-fetch in Plan 04)
+- [Phase 16-03]: SorterContextCard uses calm blue/teal palette (#1a2a3e + #4FB3D9) — distinct from NarrativeContextCard red SECURITY ALERT
 
 ### Pending Todos
 
@@ -106,5 +110,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-01
-Stopped at: Completed Phase 16 Plan 01 — sorterData.ts types + document sets, REQUIREMENTS.md SORT-01..06, CONTENT_MANIFEST.md indexing
-Resume: Phase 16 Plan 03 (PHI Sorter overlay UI) and Plan 04 (Phaser triggers + UnifiedGamePage routing) ready to execute.
+Stopped at: Completed Phase 16 Plan 03 — PHISorterOverlay + SorterContextCard + SorterItem + BucketZone components + CSS keyframes
+Resume: Phase 16 Plan 04 (Phaser triggers + UnifiedGamePage routing) ready to execute.
