@@ -36,6 +36,18 @@ export const BRIDGE_EVENTS = {
   BREACH_GAME_OVER: 'breach:game-over',
   BREACH_VICTORY: 'breach:victory',
   BREACH_TOWER_PLACED: 'breach:tower-placed',
+  /**
+   * Phaser → React: an encounter has been triggered (proximity zone or NPC handoff).
+   *
+   * Payload shape:
+   *   {
+   *     encounterId: string;          // 'td-it-office' | 'phi-sort-reception' | 'phi-sort-lab' | 'phi-sort-records'
+   *     narrativeText: string;        // Body text for the NarrativeContextCard / SorterContextCard
+   *     type?: 'td' | 'phi-sorter';   // Discriminator — defaults to 'td' for legacy/backward-compat (Phase 13)
+   *     config?: BreachDefenseInitData;            // Present when type === 'td' (Phase 13)
+   *     sorterConfig?: { documentSetId: string };  // Present when type === 'phi-sorter' (Phase 16)
+   *   }
+   */
   ENCOUNTER_TRIGGERED: 'encounter:triggered',   // ExplorationScene: encounter zone activated
 
   // React -> Phaser
@@ -61,6 +73,17 @@ export const BRIDGE_EVENTS = {
   REACT_PLAY_SFX: 'react:play-sfx',
   REACT_ANSWER_FEEDBACK: 'react:answer-feedback',
   REACT_LAUNCH_ENCOUNTER: 'react:launch-encounter',           // React: user confirmed narrative card
+  /**
+   * React → Phaser: dismiss the encounter overlay and resume ExplorationScene.
+   *
+   * Payload shape (optional — undefined for legacy TD callers, populated for Phase 16 sorter):
+   *   { encounterId?: string }
+   *
+   * When encounterId is present, ExplorationScene's onReturnFromEncounter handler must write
+   * `this.registry.set('encounterResult_' + encounterId, true)` to suppress proximity re-trigger.
+   * (Phase 16 needs this because the PHI Sorter is pure React with no Phaser scene to write the
+   * registry directly — unlike BreachDefenseScene which writes its own registry guard.)
+   */
   REACT_RETURN_FROM_ENCOUNTER: 'react:return-from-encounter', // React: debrief dismissed, return to RPG
   ACT_ADVANCE: 'react:act-advance',                           // payload: { newAct: 1|2|3, track: string, baseVolume?: number }
   CHOICE_FLAG_SET: 'react:choice-flag-set',                   // payload: { flagKey: string, flagValue: string | boolean }
