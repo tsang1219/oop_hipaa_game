@@ -275,9 +275,29 @@ All previously unassigned scenes have been connected to rooms:
 
 ---
 
+---
+
+## PHI Sorter Encounter — Document Sets
+
+All document sets live in: **`client/src/data/sorterData.ts`** → `SORTER_DOCUMENT_SETS` constant
+
+Each set has: `id`, `act`, `triggerLocation`, `npcId`, `contextCard`, `items[]`, `passingAccuracy`, `takeaways[2]`
+
+Format: PHI Sorter document set
+HIPAA topic tags: "PHI Definition", "18 Identifiers (45 CFR §164.514(b)(2))", "Safe Harbor De-identification"
+
+| ID | File | Act | Trigger Location | NPC | Items | PHI Items | Not PHI | Coverage | Summary |
+|----|------|-----|-----------------|-----|-------|-----------|---------|----------|---------|
+| `phi-sorter-set-1` | `client/src/data/sorterData.ts` | 1 | reception | `receptionist_riley` | 6 | 4 | 2 | ADEQUATE | Obvious identifiers: name, SSN, DOB, home address vs. hospital address and room temp. Teaches the implied health-care connection in intake forms. |
+| `phi-sorter-set-2` | `client/src/data/sorterData.ts` | 2 | lab | `lab_tech` | 8 | 5 | 3 | ADEQUATE | Subtle identifiers: device serial, IP address, biometric, MRN+diagnosis pair, license plate vs. bare ICD-10 code, test type, sample volume. Teaches the two-part PHI rule. |
+| `phi-sorter-set-3` | `client/src/data/sorterData.ts` | 3 | medical_records | `records_clerk` | 5 | 3 | 2 | ADEQUATE | Edge cases: ZIP5 vs. ZIP3 prefix, admission month+year vs. year-only, age 90+ as identifier. Teaches Safe Harbor nuance for de-identification. |
+
+---
+
 ## Revision History
 
 | Date | Change | Author |
 |------|--------|--------|
 | 2026-03-01 | Initial manifest created from full content audit | Claude |
 | 2026-03-11 | Wired all unassigned scenes into rooms. Added new scenes: npp_notice, social_media_slip, vendor_baa. Added hipaa_penalties educational item. Fixed privacy_notice zone link. Updated all tables. | Claude |
+| 2026-05-01 | Added 3 PHI Sorter document sets (Phase 16) — phi-sorter-set-1..3 covering PHI Definition, 18 Identifiers, and Safe Harbor De-identification. | Claude |
