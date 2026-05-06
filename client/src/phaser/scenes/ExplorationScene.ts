@@ -13,6 +13,14 @@ import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@sha
 const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
 
+// PHI Sorter trigger tile coordinates (Phase 16)
+// Reception: tile (10,6) — open floor in front of Riley's desk; verified no NPC/zone/obstacle at this tile
+const RECEPTION_TRIGGER_X = 10;
+const RECEPTION_TRIGGER_Y = 6;
+// Lab: tile (9,7) — adjacent to lab_tech (10,7); (7,7) conflicts with sample_labels zone so shifted right
+const LAB_TRIGGER_X = 9;
+const LAB_TRIGGER_Y = 7;
+
 interface InteractableData {
   type: 'npc' | 'zone' | 'item' | 'hallwayBoard';
   id: string;
@@ -1504,6 +1512,30 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // PHI Sorter trigger — Reception (Act 1) (Phase 16)
+    if (this.room.id === 'reception' && !this.encounterTriggered && !this.paused) {
+      const alreadyDone = this.registry.get('encounterResult_phi-sort-reception');
+      if (!alreadyDone) {
+        const dx = Math.abs(this.player.x - (RECEPTION_TRIGGER_X * TILE + TILE / 2));
+        const dy = Math.abs(this.player.y - (RECEPTION_TRIGGER_Y * TILE + TILE / 2));
+        if (dx < TILE * 1.5 && dy < TILE * 1.5) {
+          this.triggerPHISorterEncounter('phi-sort-reception', 'phi-sorter-set-1');
+        }
+      }
+    }
+
+    // PHI Sorter trigger — Lab (Act 2) (Phase 16)
+    if (this.room.id === 'lab' && !this.encounterTriggered && !this.paused) {
+      const alreadyDone = this.registry.get('encounterResult_phi-sort-lab');
+      if (!alreadyDone) {
+        const dx = Math.abs(this.player.x - (LAB_TRIGGER_X * TILE + TILE / 2));
+        const dy = Math.abs(this.player.y - (LAB_TRIGGER_Y * TILE + TILE / 2));
+        if (dx < TILE * 1.5 && dy < TILE * 1.5) {
+          this.triggerPHISorterEncounter('phi-sort-lab', 'phi-sorter-set-2');
+        }
+      }
+    }
+
     // Door proximity detection — requires SPACE to enter (Phase 12)
     if (!this.transitioning) {
       this.checkDoorProximity();
@@ -1868,6 +1900,50 @@ export class ExplorationScene extends Phaser.Scene {
     // React emits REACT_LAUNCH_ENCOUNTER and ExplorationScene handles it below.
   }
 
+  /** PHI Sorter encounter trigger (Phase 16). Pure-React overlay — does NOT call scene.sleep(). */
+  private triggerPHISorterEncounter(encounterId: string, documentSetId: string): void {
+    if (this.encounterTriggered) return;
+    const alreadyDone = this.registry.get(`encounterResult_${encounterId}`);
+    if (alreadyDone) return;
+
+    this.encounterTriggered = true;
+    this.paused = true;
+    // INTENTIONAL: do NOT call this.scene.sleep() here. The PHI Sorter is a pure-React overlay.
+    // ExplorationScene stays active and visible (just paused) behind the React overlay's backdrop.
+    // Because we never sleep, scene.wake() cannot fire handleWakeFromEncounter on return —
+    // onReturnFromEncounter must explicitly reset paused/encounterTriggered for the sorter path
+    // (see onReturnFromEncounter BLOCKER 1 fix).
+
+    // Anticipation beat (Commandment 2) — calm flash, NOT the breach-alert red
+    this.cameras.main.flash(200, 255, 255, 150, true);
+    try { this.sound.play('sfx_interact', { volume: 0.5 }); } catch (_) {}
+
+    const NARRATIVE: Record<string, string> = {
+      'phi-sort-reception':
+        "Riley slides a stack of intake forms across the desk.\n\n" +
+        "\"Before these go to the auditor, we need to redact anything that " +
+        "could identify patients. Can you sort what counts as PHI?\"",
+      'phi-sort-lab':
+        "The lab tech looks up from the centrifuge.\n\n" +
+        "\"I need a second pair of eyes. Some of these sample labels — " +
+        "I'm not sure which details we're allowed to include on the external " +
+        "manifest. PHI or not PHI?\"",
+      'phi-sort-records':
+        "The records clerk taps a folder on the counter.\n\n" +
+        "\"Research request came in. They want a de-identified set, but " +
+        "Safe Harbor has some edges I want a second opinion on.\"",
+    };
+
+    this.time.delayedCall(250, () => {
+      eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, {
+        encounterId,
+        narrativeText: NARRATIVE[encounterId] ?? 'Time to sort some records.',
+        type: 'phi-sorter',
+        sorterConfig: { documentSetId },
+      });
+    });
+  }
+
   /** React confirmed the narrative card — launch BreachDefense and sleep. */
   private encounterLaunching = false;
   private onLaunchEncounter = (data: { config: BreachDefenseInitData }): void => {
@@ -1891,7 +1967,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   /** React dismissed the debrief — stop BreachDefense and wake this scene. */
-  private onReturnFromEncounter = (): void => {
+  private onReturnFromEncounter = (data?: { encounterId?: string }): void => {
     try {
       this.scene.stop('BreachDefense');
     } catch (_) {
@@ -1899,7 +1975,18 @@ export class ExplorationScene extends Phaser.Scene {
     }
     this.scene.setVisible(true);
     if (!this.scene.isActive()) {
-      this.scene.wake();
+      this.scene.wake();   // TD path: fires handleWakeFromEncounter which resets paused
+    }
+
+    // Phase 16 (BLOCKER 1): for pure-React encounters (PHI Sorter), the scene was never slept,
+    // so scene.wake() above is a no-op and handleWakeFromEncounter never fires. We must
+    // explicitly reset the paused/encounterTriggered flags AND write the persistent registry guard.
+    // This branch is gated by data?.encounterId — TD encounters call onReturnFromEncounter() with
+    // no payload, so this block is skipped for them (they go through the wake path as before).
+    if (data?.encounterId) {
+      this.paused = false;
+      this.encounterTriggered = false;
+      this.registry.set(`encounterResult_${data.encounterId}`, true);
     }
   };
 
