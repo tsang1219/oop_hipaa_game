@@ -203,8 +203,8 @@ Plans:
   6. Encounter completes in 30-60 seconds with an EncounterDebrief showing sorting accuracy + 1-2 HIPAA takeaways. The unified compliance score updates proportionally to accuracy on encounter completion.
 
 Plans:
-- [ ] 16-01-PLAN.md — Foundation: SORT-01..06 in REQUIREMENTS.md, sorterData.ts (3 document sets, types, getSorterDocumentSet), CONTENT_MANIFEST.md indexing
-- [ ] 16-02-PLAN.md — Contracts + audio: ENCOUNTER_TRIGGERED + REACT_RETURN_FROM_ENCOUNTER payload JSDoc extensions, BootScene SFX preload (sfx_sorter_correct, sfx_sorter_wrong)
+- [x] 16-01-PLAN.md — Foundation: SORT-01..06 in REQUIREMENTS.md, sorterData.ts (3 document sets, types, getSorterDocumentSet), CONTENT_MANIFEST.md indexing
+- [x] 16-02-PLAN.md — Contracts + audio: ENCOUNTER_TRIGGERED + REACT_RETURN_FROM_ENCOUNTER payload JSDoc extensions, BootScene SFX preload (sfx_sorter_correct, sfx_sorter_wrong)
 - [ ] 16-03-PLAN.md — UI overlay: SorterContextCard + PHISorterOverlay + SorterItem + BucketZone components, flash-green/shake-red CSS keyframes, drag-and-drop + keyboard state machine
 - [ ] 16-04-PLAN.md — Integration: ExplorationScene Reception+Lab proximity triggers, UnifiedGamePage encounterPhase 'phi-sorter' branch + handleSorterComplete + registry-write round trip; live verification checkpoint
 
@@ -239,5 +239,5 @@ Plans:
 | 13. Encounter Integration | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |
-| 16. PHI Sorter Encounter | v2.1 | 0/4 | Planned | - |
+| 16. PHI Sorter Encounter | v2.1 | 2/4 | In Progress | - |
 | 17. Breach Triage Encounter | v2.1 | 0/0 | Pending | - |

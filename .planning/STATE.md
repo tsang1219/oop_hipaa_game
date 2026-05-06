@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.0
-milestone_name: One Game
-status: complete
-last_updated: "2026-03-28"
+milestone: v2.1
+milestone_name: PHI Sorter Encounter
+status: in-progress
+last_updated: "2026-05-01"
 progress:
-  total_phases: 5
+  total_phases: 6
   completed_phases: 5
-  total_plans: 19
-  completed_plans: 19
+  total_plans: 23
+  completed_plans: 21
 ---
 
 # Project State
@@ -18,16 +18,16 @@ progress:
 See: .planning/PROJECT.md (updated 2026-03-26)
 
 **Core value:** The player should forget they're doing compliance training. One continuous game.
-**Current focus:** v2.0 Phase 15 — Polish and Completion
+**Current focus:** v2.1 Phase 16 — PHI Sorter Encounter
 
 ## Current Position
 
-Phase: 15 of 15 (Polish and Completion)
-Plan: 3 of 3
-Status: Phase 15 complete — all 3 plans executed
-Last activity: 2026-03-28 — Phase 15 executed (3 plans, all success criteria met)
+Phase: 16 of 16 (PHI Sorter Encounter)
+Plan: 2 of 4
+Status: Phase 16 in progress — plans 01 and 02 executed
+Last activity: 2026-05-01 — Phase 16 Plan 02 executed (contracts locked, SFX preloaded)
 
-Progress: [##########] 100%
+Progress: [##########] 91%
 
 ## Performance Metrics
 
@@ -84,6 +84,9 @@ Progress: [##########] 100%
 - [Phase 15]: Two-beat completion flow: in-room VFX+chime then exit GameBanner
 - [Phase 15]: Music init reads current act: Act 1=music_hub, Act 2=music_exploration, Act 3=music_breach (vol 0.15)
 - [Phase 15]: DepartmentBreadcrumb bottom-center z-10 pointer-events-none, DEPARTMENT_ORDER exported
+- [Phase 16-02]: Discriminator approach: extend ENCOUNTER_TRIGGERED payload with optional type field — no new BRIDGE_EVENTS constants (smaller diff, matches Phase 13 payload-extension precedent)
+- [Phase 16-02]: Registry write strategy: extend REACT_RETURN_FROM_ENCOUNTER with optional encounterId — ExplorationScene's onReturnFromEncounter writes proximity guard for pure-React encounters
+- [Phase 16-02]: SFX keys for sorter: sfx_sorter_correct (confirmation_001.ogg chime) + sfx_sorter_wrong (error_001.ogg soft thud) — Commandment 8 proportional feedback
 
 ### Pending Todos
 
@@ -99,6 +102,6 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-03-28
-Stopped at: Completed Phase 15 — all 3 plans executed, v2.0 milestone complete
-Resume: All phases complete. v2.0 milestone shipped.
+Last session: 2026-05-01
+Stopped at: Completed Phase 16 Plan 02 — contracts locked, SFX preloaded
+Resume: Phase 16 Plan 03 (PHI Sorter overlay UI) and Plan 04 (Phaser triggers + UnifiedGamePage routing) ready to execute.
