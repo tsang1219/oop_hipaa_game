@@ -8,7 +8,7 @@ progress:
   total_phases: 6
   completed_phases: 5
   total_plans: 23
-  completed_plans: 21
+  completed_plans: 22
 ---
 
 # Project State
@@ -23,11 +23,11 @@ See: .planning/PROJECT.md (updated 2026-03-26)
 ## Current Position
 
 Phase: 16 of 16 (PHI Sorter Encounter)
-Plan: 2 of 4
+Plan: 3 of 4
 Status: Phase 16 in progress — plans 01 and 02 executed
-Last activity: 2026-05-01 — Phase 16 Plan 02 executed (contracts locked, SFX preloaded)
+Last activity: 2026-05-01 — Phase 16 Plan 01 executed (sorterData.ts types + 3 document sets + REQUIREMENTS.md SORT-01..06 + CONTENT_MANIFEST.md indexing)
 
-Progress: [##########] 91%
+Progress: [##########] 96%
 
 ## Performance Metrics
 
@@ -84,6 +84,9 @@ Progress: [##########] 91%
 - [Phase 15]: Two-beat completion flow: in-room VFX+chime then exit GameBanner
 - [Phase 15]: Music init reads current act: Act 1=music_hub, Act 2=music_exploration, Act 3=music_breach (vol 0.15)
 - [Phase 15]: DepartmentBreadcrumb bottom-center z-10 pointer-events-none, DEPARTMENT_ORDER exported
+- [Phase 16-01]: sorterData.ts exports SorterItem + SorterDocumentSet types and 3 document sets keyed by ID
+- [Phase 16-01]: Set 3 uses triggerLocation 'medical_records' + act 3 (better narrative fit for de-id edge cases vs lab)
+- [Phase 16-01]: identifierType 'other' for ages 90+ per 45 CFR §164.514(b)(2) explicit clause
 - [Phase 16-02]: Discriminator approach: extend ENCOUNTER_TRIGGERED payload with optional type field — no new BRIDGE_EVENTS constants (smaller diff, matches Phase 13 payload-extension precedent)
 - [Phase 16-02]: Registry write strategy: extend REACT_RETURN_FROM_ENCOUNTER with optional encounterId — ExplorationScene's onReturnFromEncounter writes proximity guard for pure-React encounters
 - [Phase 16-02]: SFX keys for sorter: sfx_sorter_correct (confirmation_001.ogg chime) + sfx_sorter_wrong (error_001.ogg soft thud) — Commandment 8 proportional feedback
@@ -103,5 +106,5 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-01
-Stopped at: Completed Phase 16 Plan 02 — contracts locked, SFX preloaded
+Stopped at: Completed Phase 16 Plan 01 — sorterData.ts types + document sets, REQUIREMENTS.md SORT-01..06, CONTENT_MANIFEST.md indexing
 Resume: Phase 16 Plan 03 (PHI Sorter overlay UI) and Plan 04 (Phaser triggers + UnifiedGamePage routing) ready to execute.

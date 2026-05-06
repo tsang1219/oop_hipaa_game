@@ -52,7 +52,7 @@
 - [ ] **SORT-02**: NarrativeContextCard (or sorter-specific SorterContextCard) opens before the first item appears, explaining why this sort is happening.
 - [ ] **SORT-03**: Items sortable via drag-and-drop OR keyboard (↑↓ cycle items, ←→ choose bucket, Enter/Space commit). Both modes work end-to-end with no fallback gaps.
 - [x] **SORT-04**: Each drop produces audio + visual feedback (correct = green flash + chime, incorrect = red shake + thud, completion = fanfare). No silent interactions (Commandment 1).
-- [ ] **SORT-05**: At least 3 document sets with scaling difficulty: Act 1 obvious, Act 2 subtle, Act 3 edge cases.
+- [x] **SORT-05**: At least 3 document sets with scaling difficulty: Act 1 obvious, Act 2 subtle, Act 3 edge cases.
 - [ ] **SORT-06**: Encounter completes in 30-60 seconds with EncounterDebrief showing accuracy + 1-2 HIPAA takeaways. Unified compliance score updates proportionally to accuracy.
 
 > **Note:** PHI-01 (original placeholder) is superseded by SORT-01..SORT-06 above — these six IDs reflect the full crystallized spec for the PHI Sorter encounter (Phase 16).
@@ -116,7 +116,7 @@
 | SORT-02 | Phase 16 | Pending |
 | SORT-03 | Phase 16 | Pending |
 | SORT-04 | Phase 16 | Complete |
-| SORT-05 | Phase 16 | Pending |
+| SORT-05 | Phase 16 | Complete |
 | SORT-06 | Phase 16 | Pending |
 
 **Coverage:**

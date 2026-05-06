@@ -193,7 +193,7 @@ Plans:
 **Goal**: A new "Is this PHI?" sorting encounter triggers from in-world narrative moments, runs as a 30-60 second drag-or-keyboard mini-game with scaling difficulty, and feeds results into the unified compliance score.
 **Depends on**: Phase 13 (encounter trigger infrastructure), Phase 14 (act state)
 **Requirements**: SORT-01, SORT-02, SORT-03, SORT-04, SORT-05, SORT-06
-**Plans:** 4 plans
+**Plans:** 2/4 plans executed
 **Success Criteria** (what must be TRUE):
   1. Reaching a designated narrative trigger (Reception NPC handoff in Act 1, plus Lab/Records triggers in Act 2) launches the PHI Sorter encounter — ExplorationScene pauses in place and the sorting overlay opens via the existing encounter lifecycle.
   2. The encounter opens with a NarrativeContextCard explaining why this sort is happening (e.g., "Riley needs help redacting these intake forms before they go to the auditor") before the first item appears.
@@ -239,5 +239,5 @@ Plans:
 | 13. Encounter Integration | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |
-| 16. PHI Sorter Encounter | v2.1 | 2/4 | In Progress | - |
+| 16. PHI Sorter Encounter | 2/4 | In Progress|  | - |
 | 17. Breach Triage Encounter | v2.1 | 0/0 | Pending | - |
