@@ -34,6 +34,10 @@ import { NarrativeContextCard } from '../components/breach-defense/NarrativeCont
 import { EncounterDebrief } from '../components/breach-defense/EncounterDebrief';
 import { EncounterGameUI } from '../components/breach-defense/EncounterGameUI';
 import type { BreachDefenseInitData } from '../phaser/scenes/BreachDefenseScene';
+import { PHISorterOverlay } from '@/components/phi-sorter/PHISorterOverlay';
+import { SorterContextCard } from '@/components/phi-sorter/SorterContextCard';
+import { SorterTakeawaysPanel } from '@/components/phi-sorter/SorterTakeawaysPanel';
+import { getSorterDocumentSet } from '@/data/sorterData';
 
 interface RoomWithDoors {
   id: string;
@@ -136,19 +140,22 @@ export default function UnifiedGamePage() {
   // Room cleared banner
   const [roomClearedBanner, setRoomClearedBanner] = useState<{ roomName: string } | null>(null);
 
-  // ── Encounter phase state (Phase 13) ───────────────────────────
-  type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'debrief';
+  // ── Encounter phase state (Phase 13 + 16) ──────────────────────
+  type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'phi-sorter' | 'debrief';
   const [encounterPhase, setEncounterPhase] = useState<EncounterPhase>('idle');
   const [narrativeCardData, setNarrativeCardData] = useState<{
     narrativeText: string;
-    config: BreachDefenseInitData;
+    config?: BreachDefenseInitData;         // optional — only TD encounters carry it
     encounterId: string;
+    type: 'td' | 'phi-sorter';             // discriminator (Phase 16)
+    sorterConfig?: { documentSetId: string }; // present when type === 'phi-sorter'
   } | null>(null);
   const [encounterResult, setEncounterResult] = useState<{
     encounterId: string;
     outcome: 'victory' | 'defeat';
     securityScore: number;
     scoreContribution: number;
+    takeaways?: string[];  // populated by handleSorterComplete (BLOCKER 4 — sibling SorterTakeawaysPanel reads this)
   } | null>(null);
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
@@ -629,12 +636,14 @@ export default function UnifiedGamePage() {
 
   // ── Encounter lifecycle listeners (Phase 13) ────────────────────
   useEffect(() => {
-    const onEncounterTriggered = (data: {
-      encounterId: string;
-      narrativeText: string;
-      config: BreachDefenseInitData;
-    }) => {
-      setNarrativeCardData(data);
+    const onEncounterTriggered = (data: any) => {
+      setNarrativeCardData({
+        narrativeText: data.narrativeText,
+        config: data.config,
+        encounterId: data.encounterId,
+        type: data.type ?? 'td',        // default 'td' for Phase 13 backward compat
+        sorterConfig: data.sorterConfig,
+      });
       setEncounterPhase('narrative-card');
     };
 
@@ -669,8 +678,15 @@ export default function UnifiedGamePage() {
 
   const handleConfirmNarrativeCard = useCallback(() => {
     if (!narrativeCardData) return;
-    setEncounterPhase('encounter');
-    eventBridge.emit(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, { config: narrativeCardData.config });
+    if (narrativeCardData.type === 'phi-sorter') {
+      setEncounterPhase('phi-sorter');
+      // Pure React encounter — do NOT emit REACT_LAUNCH_ENCOUNTER
+    } else {
+      setEncounterPhase('encounter');
+      if (narrativeCardData.config) {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, { config: narrativeCardData.config });
+      }
+    }
   }, [narrativeCardData]);
 
   const handleDeclineNarrativeCard = useCallback(() => {
@@ -681,11 +697,48 @@ export default function UnifiedGamePage() {
   }, []);
 
   const handleDismissDebrief = useCallback(() => {
+    // BLOCKER 3: capture encounterId BEFORE state setters so async setState ordering doesn't lose it.
+    const encounterId = encounterResult?.encounterId;
     setEncounterPhase('idle');
     setEncounterResult(null);
     setNarrativeCardData(null);
-    eventBridge.emit(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER);
-  }, []);
+    eventBridge.emit(
+      BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER,
+      encounterId ? { encounterId } : undefined,
+    );
+  }, [encounterResult]);
+
+  // PHI Sorter encounter completion handler (Phase 16)
+  const handleSorterComplete = useCallback((result: {
+    encounterId: string;
+    correctCount: number;
+    totalCount: number;
+    scoreContribution: number;
+    takeaways: [string, string];
+  }) => {
+    const docSet = getSorterDocumentSet(narrativeCardData?.sorterConfig?.documentSetId ?? '');
+    const accuracy = result.totalCount > 0 ? result.correctCount / result.totalCount : 0;
+    const passingAccuracy = docSet?.passingAccuracy ?? 0.7;
+    const outcome: 'victory' | 'defeat' = accuracy >= passingAccuracy ? 'victory' : 'defeat';
+
+    setEncounterResult({
+      encounterId: result.encounterId,
+      outcome,
+      securityScore: Math.round(accuracy * 100),
+      scoreContribution: result.scoreContribution,
+      takeaways: result.takeaways.filter((t: string) => t && t.length > 0),
+    });
+    setEncounterPhase('debrief');
+
+    if (result.scoreContribution > 0) {
+      gameState.addScore(result.scoreContribution);
+    }
+    gameState.recordEncounterResult(result.encounterId, {
+      completed: true,
+      score: result.correctCount,
+      outcome,
+    });
+  }, [narrativeCardData, gameState]);
 
   // ── Sync completion state to running Phaser scene ─────────────
   useEffect(() => {
@@ -886,27 +939,53 @@ export default function UnifiedGamePage() {
 
         {/* Encounter overlays (Phase 13) */}
         {encounterPhase === 'narrative-card' && narrativeCardData && (
-          <NarrativeContextCard
-            narrativeText={narrativeCardData.narrativeText}
-            onConfirm={handleConfirmNarrativeCard}
-            onDecline={handleDeclineNarrativeCard}
+          narrativeCardData.type === 'phi-sorter' && narrativeCardData.sorterConfig
+            ? (() => {
+                const docSet = getSorterDocumentSet(narrativeCardData.sorterConfig.documentSetId);
+                return docSet ? (
+                  <SorterContextCard
+                    title={docSet.contextCard.title}
+                    body={docSet.contextCard.body}
+                    onConfirm={handleConfirmNarrativeCard}
+                  />
+                ) : null;
+              })()
+            : (
+              <NarrativeContextCard
+                narrativeText={narrativeCardData.narrativeText}
+                onConfirm={handleConfirmNarrativeCard}
+                onDecline={handleDeclineNarrativeCard}
+              />
+            )
+        )}
+
+        {encounterPhase === 'encounter' && narrativeCardData?.config && (
+          <EncounterGameUI
+            availableTowerIds={narrativeCardData?.config?.availableTowerIds ?? []}
           />
         )}
 
-        {encounterPhase === 'encounter' && narrativeCardData && (
-          <EncounterGameUI
-            availableTowerIds={narrativeCardData.config.availableTowerIds ?? []}
+        {encounterPhase === 'phi-sorter' && narrativeCardData?.sorterConfig && (
+          <PHISorterOverlay
+            documentSetId={narrativeCardData.sorterConfig.documentSetId}
+            encounterId={narrativeCardData.encounterId}
+            onComplete={handleSorterComplete}
           />
         )}
 
         {encounterPhase === 'debrief' && encounterResult && (
-          <EncounterDebrief
-            encounterId={encounterResult.encounterId}
-            outcome={encounterResult.outcome}
-            securityScore={encounterResult.securityScore}
-            scoreContribution={encounterResult.scoreContribution}
-            onDismiss={handleDismissDebrief}
-          />
+          <>
+            <EncounterDebrief
+              encounterId={encounterResult.encounterId}
+              outcome={encounterResult.outcome}
+              securityScore={encounterResult.securityScore}
+              scoreContribution={encounterResult.scoreContribution}
+              onDismiss={handleDismissDebrief}
+            />
+            {encounterResult.takeaways && encounterResult.takeaways.length > 0 && (
+              <SorterTakeawaysPanel takeaways={encounterResult.takeaways} />
+            )}
+          </>
         )}
 
         {/* Floating score delta indicator */}
