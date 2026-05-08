@@ -19,6 +19,7 @@ import {
   ACT_MUSIC_MAP,
   ACT3_MUSIC_BASE_VOLUME,
 } from '../types/narrative';
+import { isDemoActive, DEMO_ROOM_ORDER } from '@/lib/demoSession';
 
 // ── Public types ───────────────────────────────────────────────
 
@@ -75,8 +76,21 @@ export function isDepartmentUnlocked(roomId: string, completedRooms: string[]): 
 
 /**
  * Returns true if the room is accessible — either unlocked or already completed (backtrack).
+ *
+ * Phase 18 (DEMO-03): when a demo session is active, the four demo rooms plus
+ * `hospital_entrance` (the lobby hub) and any `hallway_*` connectors are all
+ * accessible from the start. Rooms outside the curated demo path (e.g., `lab`,
+ * `it_office`) remain locked. The full-game branch below is unchanged.
  */
 export function isDepartmentAccessible(roomId: string, completedRooms: string[]): boolean {
+  if (isDemoActive()) {
+    if (roomId === 'hospital_entrance') return true;
+    if ((DEMO_ROOM_ORDER as readonly string[]).includes(roomId)) return true;
+    // Hallway connectors: always passable in demo mode so the player can
+    // physically traverse from one demo room to the next via the lobby hub.
+    if (roomId.startsWith('hallway_')) return true;
+    return false;
+  }
   if (completedRooms.includes(roomId)) return true; // backtrack always allowed
   return isDepartmentUnlocked(roomId, completedRooms);
 }
@@ -131,6 +145,10 @@ export function useGameState() {
 
   // Persist to localStorage whenever state changes
   useEffect(() => {
+    // Phase 18 (DEMO-06): demo activity is fully isolated from the full-game
+    // save key. Skip the writeSave round-trip entirely when a demo session is
+    // active so pq:save:v2 is never touched during demo play.
+    if (isDemoActive()) return;
     const currentSave = loadSave();
     const merged: SaveDataV2 & Record<string, unknown> = {
       ...currentSave,

@@ -31,7 +31,7 @@ import roomDataJson from '@/data/roomData.json';
 import { migrateV1toV2, loadSave, writeSave, hasSaveData } from '@/lib/saveData';
 import { TitleScreen } from '../components/TitleScreen';
 import { StartMenu } from '../components/StartMenu';
-import { startDemo } from '@/lib/demoSession';
+import { startDemo, endDemo, isDemoActive } from '@/lib/demoSession';
 import { NarrativeContextCard } from '../components/breach-defense/NarrativeContextCard';
 import { EncounterDebrief } from '../components/breach-defense/EncounterDebrief';
 import { EncounterGameUI } from '../components/breach-defense/EncounterGameUI';
@@ -185,6 +185,9 @@ export default function UnifiedGamePage() {
   const [showIntroModal, setShowIntroModal] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.has('qa-room') || params.has('qa-skip-onboarding') || params.has('qa-no-save')) return false;
+    // Phase 18: demo mode skips the full-game onboarding modal — the start
+    // menu already framed the experience and the demo path is curated.
+    if (isDemoActive()) return false;
     return !initialSave.current.onboardingSeen;
   });
 
@@ -202,6 +205,11 @@ export default function UnifiedGamePage() {
   // ── Consolidated persistence ──────────────────────────────────
   useEffect(() => {
     if (qaNoSaveRef.current) return;
+    // Phase 18 (DEMO-06): skip the writeSave call entirely when a demo session
+    // is active. Combined with the same guard in useGameState's persistence
+    // effect, this guarantees pq:save:v2 is byte-identical before and after a
+    // demo session.
+    if (isDemoActive()) return;
     const currentMusicVolume = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
     writeSave({
       version: 2,
@@ -368,7 +376,12 @@ export default function UnifiedGamePage() {
     const startExploration = () => {
       if (!gameRef.current || sceneStartedRef.current) return;
       sceneStartedRef.current = true;
-      const resumeRoomId = gameState.state.currentRoomId ?? 'hospital_entrance';
+      // Phase 18 (DEMO-04): demo sessions always boot the player into Reception
+      // (the first curated demo room) regardless of any persisted currentRoomId.
+      // Full-game flow is unchanged — resume room or hospital_entrance fallback.
+      const resumeRoomId = isDemoActive()
+        ? 'reception'
+        : (gameState.state.currentRoomId ?? 'hospital_entrance');
       const startRoom = rooms.find(r => r.id === resumeRoomId)
         ?? rooms.find(r => r.id === 'hospital_entrance')!;
       const doorStates = computeDoorStates(startRoom, gameState.state.completedRooms);
@@ -897,6 +910,30 @@ export default function UnifiedGamePage() {
     setCurrentStoryRoom(null);
     eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
   };
+
+  // ── Demo Esc-to-start-menu (Phase 18 — DEMO-07) ────────────────
+  // While in an active demo session and currently exploring (not in dialogue,
+  // encounter, gameover, etc.), the Esc key closes the demo and returns the
+  // player to the start menu. We end the demo session and reload the page so
+  // useGameState rehydrates from the unchanged save (DEMO-06 guarantees the
+  // save key was never written during the demo, so reload restores the
+  // pre-demo full-game state cleanly). This matches the existing
+  // handleNewGame / handlePlayAgain reload pattern used elsewhere in this file.
+  useEffect(() => {
+    if (!isDemoActive()) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (pageMode !== 'exploration') return;
+      endDemo();
+      // Force a clean reload so all in-memory state (Phaser scene, gameState,
+      // resolvedGates, encounter overlays) returns to a fresh boot. The
+      // start menu is the new default cold-boot screen, so the player lands
+      // back there automatically.
+      window.location.reload();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [pageMode]);
 
   const formatElapsedTime = (): string => {
     const elapsed = Date.now() - gameState.state.gameStartTime;
