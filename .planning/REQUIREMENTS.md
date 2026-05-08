@@ -67,6 +67,40 @@
 - **POLISH-03**: Expanded sound effects for new encounter types
 - **POLISH-04**: Per-area ambient audio
 
+## v2.2 Requirements (Active — Sponsor Demo)
+
+Curation + polish milestone for sponsor pitch. Reuses all existing room data, NPCs, dialogue. No new content authored.
+
+### Demo Mode
+
+- [ ] **DEMO-01**: Start menu shows three primary buttons: "Demo", "Tower Defense", "Full Game"
+- [ ] **DEMO-02**: "Full Game" button enters the existing full game flow with current progression behavior unchanged
+- [ ] **DEMO-03**: "Demo" button enters a curated 4-room demo flow with all 4 rooms accessible from start, gated off from the full game's unlock-progression system
+- [ ] **DEMO-04**: Demo flow rooms appear in this order: Reception → Emergency Room → Break Room → Medical Records
+- [ ] **DEMO-05**: Demo rooms reuse existing scenarios, NPCs, dialogue from `roomData.json` with no new content authored
+- [ ] **DEMO-06**: Demo progress is isolated from full game save data — playing the demo does not modify or read full-game localStorage state
+- [ ] **DEMO-07**: Player can exit the demo at any time and return to the start menu
+
+### Tower Defense Standalone
+
+- [ ] **TD-01**: "Tower Defense" start menu button launches BreachDefenseScene directly without narrative wrapper or encounter trigger context
+- [ ] **TD-02**: Standalone TD returns to the start menu on win or lose with no encounter result feedback or score persistence
+- [ ] **TD-03**: Standalone TD does not modify full-game or demo save state
+
+### First-Impression Polish
+
+- [ ] **FIX-01**: Player sprite renders correctly (animated/textured) on initial load before any player movement (V1 fix)
+- [ ] **FIX-02**: HUD/progress bar does not overlay or block view on room entry in the demo path (V4 fix)
+- [ ] **FIX-03**: Loud honk sound near NPCs is removed or replaced with an appropriate cue in the demo path (V7 fix)
+- [ ] **FIX-04**: All three fixes apply in the 4 demo rooms without regressing full-game behavior
+
+### Completion + Sponsor Hook
+
+- [ ] **CERT-01**: After exiting Medical Records as the final demo room, a completion sequence plays in this order: dim → beat → fanfare → certificate animation → sponsor code reveal
+- [ ] **CERT-02**: Completion certificate displays the configured sponsor name and a code block in monospace font with a copy-to-clipboard button
+- [ ] **CERT-03**: An end NPC in the Medical Records closer uses the configured sponsor's character sprite and two configured dialogue lines to hand the prize
+- [ ] **CERT-04**: Sponsor data is read from a single config file with shape `{ name, character_sprite, two_dialogue_lines, code }` — swapping sponsors requires only a config file edit, no source-code changes
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -80,6 +114,14 @@
 | Skip/fast-forward encounter | Bypasses the teaching moment — encounters are short enough (3-5 min) |
 | Full branching narrative | 23 NPCs x full branching = unmaintainable; targeted choice memory (2-3 decisions) achieves the feel at 5% cost |
 | Save-to-cloud / progress sync | localStorage sufficient for desktop single-user |
+| Hallway redesign / overworld map (v2.2) | Pinned 2026-05-06 — not the lever for the sponsor demo |
+| Character select + image-to-8bit pipeline (v2.2) | Pinned 2026-05-06 — defer to v2.3 if sponsor bites |
+| Breach decision scenario (v2.2) | Not built; out of demo scope |
+| Internal escalation / "levels per room" (v2.2) | Rejected — use existing scenarios as-is |
+| New scenarios, new NPCs, new dialogue (v2.2) | Pure curation milestone |
+| V2/V3/V5/V6 visual bugs (v2.2) | Out of 1-2 day budget — chat icon, NPC positioning, hallway centering, notice boards |
+| Easter eggs / Out-of-Pocket cameo NPC (v2.2) | Defer to v2.3 if sponsor bites |
+| Room-7 navigation bug (v2.2) | Out of demo path; deprioritized |
 
 ## Traceability
 
@@ -118,11 +160,30 @@
 | SORT-04 | Phase 16 | Complete |
 | SORT-05 | Phase 16 | Complete |
 | SORT-06 | Phase 16 | Complete |
+| DEMO-01 | TBD | Pending |
+| DEMO-02 | TBD | Pending |
+| DEMO-03 | TBD | Pending |
+| DEMO-04 | TBD | Pending |
+| DEMO-05 | TBD | Pending |
+| DEMO-06 | TBD | Pending |
+| DEMO-07 | TBD | Pending |
+| TD-01 | TBD | Pending |
+| TD-02 | TBD | Pending |
+| TD-03 | TBD | Pending |
+| FIX-01 | TBD | Pending |
+| FIX-02 | TBD | Pending |
+| FIX-03 | TBD | Pending |
+| FIX-04 | TBD | Pending |
+| CERT-01 | TBD | Pending |
+| CERT-02 | TBD | Pending |
+| CERT-03 | TBD | Pending |
+| CERT-04 | TBD | Pending |
 
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0
 - v2.1 requirements (Phase 16 portion): 6 total, mapped: 6, unmapped: 0
+- v2.2 requirements: 18 total, mapped: 0, unmapped: 18 (roadmapper to map)
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-05-01 — Added SORT-01..SORT-06 (Phase 16, PHI Sorter encounter). PHI-01 placeholder superseded.*
+*Last updated: 2026-05-07 — Added v2.2 Sponsor Demo requirements: DEMO-01..07, TD-01..03, FIX-01..04, CERT-01..04 (18 reqs).*
