@@ -100,5 +100,21 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Phase B design improvement (not a bug). All 3 orchestrator items shipped within budget (1 file, +29 net lines, well under max 3 files / 50 lines). Targets ER's flat-affect problem: room now has a pulsing red urgency cue (panel), a sense-of-life moving NPC (nurse), and differentiated idle states on the two pressure-source NPCs (officer + family). Commandment 1 (every action needs a response) and Commandment 7 (peaks need texture) both addressed. DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets. DID NOT touch existing NPC dialogue/scenarios/IDs/zones (only added new decorative tweens + a non-interactable patrolling sprite + 3 graphics primitives)."
+  },
+  {
+    "bug_id": "DESIGN-003",
+    "agent": "fix-agent",
+    "phase": "B-design-improvement",
+    "room": "break_room",
+    "fix_plan": "Implement all 3 orchestrator items inside ExplorationScene's room render path, gated by `if (this.room.id === 'break_room')` block placed after the NPC pulse logic (just before the Player section). (1) Vending machine LEDs: iterate room.obstacles, for each vending_machine obstacle place a 2x2 pixel rectangle at the upper-right of the unit and color-cycle it every 700ms through 4 retro-arcade hues (red/yellow/green/blue) using a Phaser time event. (2) Microwave beep cycle: locate the single microwave obstacle, every 9 seconds play sfx_interact at volume 0.12 + rate 1.6 (subtle high-pitched ding) and spawn a transient 24x24 cream-yellow flash rectangle that fades out over 350ms. Volume well under the 0.15 cap. (3) Gossip ellipsis bubble: locate the gossiping_coworker NPC by id from this.interactables, every 4.5 seconds spawn a Press Start 2P text bubble (8px '...', '!', or '?' randomly) above-right of the sprite with dark rounded background, fade-in/hold/fade-out via yoyo tween. Uses only existing sfx_interact key + existing tween/time infra. No new files, no roomData changes, no NPC dialogue/scenarios/IDs/zones changes.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts"],
+    "changes_implemented": ["vending_machine_led_blink", "microwave_beep_cycle", "gossip_ellipsis_bubble"],
+    "lines_added": 30,
+    "lines_removed": 0,
+    "net_delta": 30,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "Phase B design improvement (not a bug). All 3 orchestrator items shipped within budget (1 file, +30 net lines, under max 3 files / 50 lines). Targets Break Room's lowest dimension (moment_of_joy: 6) by adding three layers of comedic life: pixel LEDs cycling on the vending machines (texture), a microwave that periodically dings (inhabited feel), and the Gossiping Coworker visibly gossiping with no actual dialogue (overheard-conversation flair). Commandment 4 (NPCs are people, not rule-delivery systems — gossip bubbles humanize without exposition) and Commandment 10 (surprise creates memories — the LED color shift, the unexpected microwave ding, the bubble glyph that catches your eye). Microwave volume capped at 0.12 (under the 0.15 max). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets — sfx_interact only. DID NOT touch existing NPC dialogue/scenarios/IDs/zones (only added decorative time events + transient graphics + a transient text bubble; no interaction targets, no completion gates, no zone changes)."
   }
 ]
