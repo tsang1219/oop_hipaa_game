@@ -84,5 +84,21 @@
     "verification_test": "npx tsc --noEmit && npx playwright test tests/progression/door-unlocks.spec.ts --workers=1",
     "verification_result": "tsc clean. door-unlocks: 6/8 passing, 2 still failing (Break room unlocks after completing reception, Records room unlocks after completing lab). HOWEVER: pre-fix error-context showed the FULL PHISorterOverlay UI ('NOT PHI', 'Safe to Share', drag items) blocking — that is now GONE. Post-fix error-context shows only the standard HUD with NPCs 1/3 — meaning the second NPC interaction (nervous_patient at 5,8 / researcher at 3,5) silently fails for an unrelated reason after the first NPC succeeds. Both failing rooms have the sorter trigger; the residual failure is plausibly an interaction race between the abort path (which resets encounterTriggered=false and unpauses) and the next interactWith teleport+space, but the overlay itself no longer blocks interactions.",
     "notes": "BUG-006 fix as specified is APPLIED and confirmed working: the PHI Sorter overlay no longer blocks subsequent interactions. The remaining 2 failures are a residual issue beyond the ticket scope — recommend follow-up bug for the encounterTriggered=false re-trigger race condition. Test infra only; no production code touched. DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx, nor revert the !isDemoActive() gate."
+  },
+  {
+    "bug_id": "DESIGN-001",
+    "agent": "fix-agent",
+    "phase": "B-design-improvement",
+    "room": "er",
+    "fix_plan": "Implement all 3 of the orchestrator's improvement plan items inside ExplorationScene's room render path, gated by `if (this.room.id === 'er')` block placed after the NPC loop. (1) Wall-mounted EMERGENCY status panel: dark backing rectangle + red glow rectangle + 'EMERGENCY' Press Start 2P label, with a yoyo alpha tween (0.6s, Sine.easeInOut, repeat -1) on the glow + label so it pulses red. Positioned tile-relative at (10, 1) just below the top wall, so it doesn't overlap the whiteboard at (10, 2). (2) Walking nurse: non-interactive Phaser sprite using the existing npc_nurse texture (via npcTextureKey('nurse_chen')), patrolling x=8.5 → x=11.5 at y=4.5 (above the nurse_station at obstacles 8,5,4,3). 1.8s yoyo tween with onYoyo/onRepeat flipX so the nurse faces the direction of travel. Adds a small drop shadow + a fast scaleY oscillation to read as walking footstep bob. (3) Officer + frantic_family fidget: locates the existing NPC interactables by id and adds a subtle angle wobble (-1.5° to +1.5°, 1.1s yoyo, slight per-NPC duration jitter) on top of the existing breathing tween from the standard NPC pipeline. Uses only existing textures + existing tween infra. No new files. No NPC dialogue/scenarios/IDs/zones changed. No SFX added.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts"],
+    "changes_implemented": ["flashing_emergency_panel", "walking_nurse_npc", "officer_and_family_idle_fidget"],
+    "lines_added": 29,
+    "lines_removed": 0,
+    "net_delta": 29,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "Phase B design improvement (not a bug). All 3 orchestrator items shipped within budget (1 file, +29 net lines, well under max 3 files / 50 lines). Targets ER's flat-affect problem: room now has a pulsing red urgency cue (panel), a sense-of-life moving NPC (nurse), and differentiated idle states on the two pressure-source NPCs (officer + family). Commandment 1 (every action needs a response) and Commandment 7 (peaks need texture) both addressed. DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets. DID NOT touch existing NPC dialogue/scenarios/IDs/zones (only added new decorative tweens + a non-interactable patrolling sprite + 3 graphics primitives)."
   }
 ]

@@ -1036,6 +1036,35 @@ export class ExplorationScene extends Phaser.Scene {
       this.interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
     }
 
+    // ── ER urgency cues (DESIGN-001) ────────────────────────────
+    if (this.room.id === 'er') {
+      // Flashing EMERGENCY status panel — wall-mounted near the top center
+      const panelX = 10 * TILE + TILE / 2;
+      const panelY = 1 * TILE + TILE / 2 + 4;
+      const panelBack = this.add.rectangle(panelX, panelY, 64, 18, 0x1a0000).setStrokeStyle(1, 0x4a0000).setDepth(4);
+      const panelGlow = this.add.rectangle(panelX, panelY, 64, 18, 0xff2222, 0.55).setDepth(4);
+      const panelLabel = this.add.text(panelX, panelY, 'EMERGENCY', {
+        fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#ffe6e6', stroke: '#660000', strokeThickness: 2,
+      }).setOrigin(0.5).setDepth(5);
+      this.tweens.add({ targets: [panelGlow, panelLabel], alpha: { from: 1, to: 0.35 }, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      void panelBack;
+
+      // Walking nurse — patrols horizontally between tile x=8 and x=11 at y=4
+      const nurseY = 4 * TILE + TILE / 2;
+      const nurseStartX = 8 * TILE + TILE / 2;
+      const nurseEndX = 11 * TILE + TILE / 2;
+      this.add.ellipse(nurseStartX, nurseY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
+      const nurseSprite = this.add.sprite(nurseStartX, nurseY, npcTextureKey('nurse_chen')).setDepth(5 + 4);
+      this.tweens.add({ targets: nurseSprite, x: nurseEndX, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => nurseSprite.setFlipX(true), onRepeat: () => nurseSprite.setFlipX(false) });
+      this.tweens.add({ targets: nurseSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 360, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+
+      // Idle fidget for officer + frantic family — subtle angle wobble
+      for (const fidgetId of ['officer', 'frantic_family']) {
+        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
+        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.5, to: 1.5 }, duration: 1100 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
+    }
+
     // Pulse first NPC if this room hasn't been pulsed yet
     const firstNpc = this.interactables.find(ia => ia.type === 'npc');
     const roomPulseKey = `pq:room:${this.room.id}:npcPulsed`;
@@ -1050,6 +1079,36 @@ export class ExplorationScene extends Phaser.Scene {
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
+    }
+
+    // ── Break Room comedic life (DESIGN-003) ─────────────────────
+    if (this.room.id === 'break_room') {
+      const ledColors = [0xff4444, 0xffdd44, 0x44ff66, 0x44ccff];
+      for (const obs of room.obstacles) {
+        if ((obs as any).type !== 'vending_machine') continue;
+        const led = this.add.rectangle(obs.x * TILE + obs.width * TILE - 6, obs.y * TILE + 6, 2, 2, ledColors[0]).setDepth(20);
+        let li = 0;
+        this.time.addEvent({ delay: 700, loop: true, callback: () => { li = (li + 1) % ledColors.length; led.setFillStyle(ledColors[li]); } });
+      }
+      const mw = room.obstacles.find((o: any) => o.type === 'microwave');
+      if (mw) {
+        const mx = mw.x * TILE + TILE / 2, my = mw.y * TILE + TILE / 2;
+        this.time.addEvent({ delay: 9000, loop: true, callback: () => {
+          try { this.sound.play('sfx_interact', { volume: 0.12, rate: 1.6 }); } catch (_) {}
+          const f = this.add.rectangle(mx, my, TILE - 8, TILE - 8, 0xffeeaa, 0.5).setDepth(20);
+          this.tweens.add({ targets: f, alpha: 0, duration: 350, onComplete: () => f.destroy() });
+        } });
+      }
+      const gossip = this.interactables.find(ia => ia.type === 'npc' && ia.id === 'gossiping_coworker');
+      if (gossip) {
+        const glyphs = ['...', '!', '?'];
+        this.time.addEvent({ delay: 4500, loop: true, callback: () => {
+          const b = this.add.text(gossip.sprite.x + 10, gossip.sprite.y - 24, glyphs[Math.floor(Math.random() * glyphs.length)], {
+            fontFamily: '"Press Start 2P"', fontSize: '8px', color: '#ffffff', backgroundColor: '#222222cc', padding: { x: 3, y: 2 },
+          }).setOrigin(0.5).setDepth(gossip.sprite.depth + 3).setAlpha(0);
+          this.tweens.add({ targets: b, alpha: 1, y: b.y - 4, duration: 250, yoyo: true, hold: 900, onComplete: () => b.destroy() });
+        } });
+      }
     }
 
     // ── Player ───────────────────────────────────────────────────
