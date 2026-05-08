@@ -69,7 +69,21 @@ interface RoomWithDoors {
   }>;
 }
 
-type PageMode = 'start-menu' | 'title' | 'exploration' | 'dialogue' | 'gameover' | 'win';
+type PageMode =
+  | 'start-menu'
+  | 'title'
+  | 'exploration'
+  | 'dialogue'
+  | 'gameover'
+  | 'win'
+  | 'tower-defense-standalone';
+
+// Phase 19 — standalone TD round result. Distinct from EncounterResult (which carries
+// scoreContribution / outcome semantics tied to the unified compliance score).
+// Standalone mode is score-isolated by design (TD-02 / TD-03).
+type TDStandaloneResult =
+  | { outcome: 'victory'; securityScore: number; wavesCompleted: number; towersPlaced: number }
+  | { outcome: 'defeat'; wavesCompleted: number; towersPlaced: number };
 
 const rooms = roomDataJson.rooms as RoomWithDoors[];
 const scenes = (gameDataJson as any).scenes as Scene[];
@@ -143,6 +157,13 @@ export default function UnifiedGamePage() {
 
   // Room cleared banner
   const [roomClearedBanner, setRoomClearedBanner] = useState<{ roomName: string } | null>(null);
+
+  // ── Standalone Tower Defense state (Phase 19 — TD-01..03) ─────
+  // Result is null while the round is in progress, populated when BreachDefenseScene
+  // emits BREACH_VICTORY or BREACH_GAME_OVER. The standalone path NEVER updates
+  // gameState (no score, no encounter registry, no save write) — this is enforced by
+  // the handlers below not calling any gameState mutator.
+  const [tdStandaloneResult, setTdStandaloneResult] = useState<TDStandaloneResult | null>(null);
 
   // ── Encounter phase state (Phase 13 + 16) ──────────────────────
   type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'phi-sorter' | 'debrief';
@@ -651,6 +672,110 @@ export default function UnifiedGamePage() {
     };
   }, [currentRoomId, resolvedGates, isNpcGated, handleExitRoom, gameState, toast, notify]);
 
+  // ── Standalone Tower Defense handlers (Phase 19 — TD-01..03) ──
+  // Declared here (above the dependent useEffects) so the Esc effect can list
+  // handleTdBackToMenu in its dep array without a TDZ error. handleSelectDemo /
+  // handleSelectFullGame remain alongside the other start-menu handlers further
+  // down for grouping symmetry.
+
+  // TOWER DEFENSE: launches BreachDefenseScene as a standalone mini-game. The
+  // actual scene.start() call lives in a useEffect keyed on pageMode because the
+  // Phaser canvas only mounts when the standalone branch renders below — gameRef
+  // is null while the StartMenu is showing.
+  const handleSelectTowerDefense = useCallback(() => {
+    setTdStandaloneResult(null);
+    setPageMode('tower-defense-standalone');
+  }, []);
+
+  // Restart the round in place — emit RESTART (resets scene state) then START
+  // (re-arms wave 1). No save mutation; no encounter registry write.
+  const handleTdPlayAgain = useCallback(() => {
+    setTdStandaloneResult(null);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RESTART_BREACH);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_START_BREACH);
+  }, []);
+
+  // Return to the start menu via full reload. Matches the demo-Esc pattern: since
+  // standalone TD never wrote to localStorage (TD-03), reload restores the
+  // pre-TD state cleanly and the cold-boot StartMenu reappears.
+  const handleTdBackToMenu = useCallback(() => {
+    window.location.reload();
+  }, []);
+
+  // ── Standalone Tower Defense scene launch (Phase 19 — TD-01) ───
+  // When entering 'tower-defense-standalone' mode, stop any other Phaser scene and
+  // boot BreachDefenseScene with no init data — encounterId stays undefined, which
+  // the scene already treats as "standalone arcade mode" (full WAVES, full
+  // WAVE_BUDGETS, all TOWERS, BREACH_VICTORY/BREACH_GAME_OVER events instead of
+  // ENCOUNTER_COMPLETE). The existing handleSceneReady listener emits
+  // REACT_START_BREACH on 'BreachDefense' scene-ready, so the wave loop arms itself.
+  useEffect(() => {
+    if (pageMode !== 'tower-defense-standalone') return;
+    let cancelled = false;
+    const launch = () => {
+      if (cancelled || !gameRef.current) return;
+      const game = gameRef.current;
+      if (game.scene.isActive('Exploration')) game.scene.stop('Exploration');
+      if (game.scene.isActive('BreachDefense')) game.scene.stop('BreachDefense');
+      game.scene.start('BreachDefense');
+    };
+    if (gameRef.current) {
+      launch();
+      return () => { cancelled = true; };
+    }
+    // gameRef populates after PhaserGame mounts in the JSX branch — poll briefly.
+    const poll = setInterval(() => {
+      if (gameRef.current) {
+        clearInterval(poll);
+        launch();
+      }
+    }, 50);
+    const timeout = setTimeout(() => clearInterval(poll), 5000);
+    return () => { cancelled = true; clearInterval(poll); clearTimeout(timeout); };
+  }, [pageMode]);
+
+  // ── Standalone TD result listeners (Phase 19 — TD-02) ──────────
+  // Only listens while the player is in standalone TD mode. NEVER calls
+  // gameState.addScore or gameState.recordEncounterResult — that's the encounter
+  // path. Standalone mode is score-isolated.
+  useEffect(() => {
+    if (pageMode !== 'tower-defense-standalone') return;
+    const onVictory = (data: { securityScore: number; wavesCompleted: number; towersPlaced: number }) => {
+      setTdStandaloneResult({ outcome: 'victory', ...data });
+    };
+    const onGameOver = (data: { wavesCompleted: number; towersPlaced: number }) => {
+      setTdStandaloneResult({ outcome: 'defeat', ...data });
+    };
+    // BreachDefenseScene's standalone (encounterId===null) branch PAUSES the wave
+    // loop on waves 3/5/7/9 and waits for REACT_DISMISS_TUTORIAL — the legacy
+    // BreachDefensePage used to surface a TutorialModal here. Since standalone TD
+    // is now a self-contained sponsor-pitch mini-game (no educational lessons), we
+    // immediately re-emit DISMISS_TUTORIAL on wave-complete so the loop never stalls.
+    const onWaveComplete = () => {
+      eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
+    };
+    eventBridge.on(BRIDGE_EVENTS.BREACH_VICTORY, onVictory);
+    eventBridge.on(BRIDGE_EVENTS.BREACH_GAME_OVER, onGameOver);
+    eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, onWaveComplete);
+    return () => {
+      eventBridge.off(BRIDGE_EVENTS.BREACH_VICTORY, onVictory);
+      eventBridge.off(BRIDGE_EVENTS.BREACH_GAME_OVER, onGameOver);
+      eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, onWaveComplete);
+    };
+  }, [pageMode]);
+
+  // ── Standalone TD Esc-to-menu (Phase 19) ───────────────────────
+  // Mirrors the demo-Esc pattern: reload returns the player to the cold-boot
+  // StartMenu cleanly. The save key is untouched (TD-03), so this is safe.
+  useEffect(() => {
+    if (pageMode !== 'tower-defense-standalone') return;
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') handleTdBackToMenu();
+    };
+    window.addEventListener('keydown', onEsc);
+    return () => window.removeEventListener('keydown', onEsc);
+  }, [pageMode, handleTdBackToMenu]);
+
   // ── Encounter lifecycle listeners (Phase 13) ────────────────────
   useEffect(() => {
     const onEncounterTriggered = (data: any) => {
@@ -883,13 +1008,10 @@ export default function UnifiedGamePage() {
     setPageMode('exploration');
   }, []);
 
-  // TOWER DEFENSE: Phase 19 will wire the standalone-launch path. Plan 18-03
-  // leaves this as a no-op placeholder so the start menu still surfaces three
-  // buttons today (DEMO-01) without launching anything for TD yet.
-  const handleSelectTowerDefense = useCallback(() => {
-    // Intentional no-op — Phase 19 replaces this handler with a TD scene launch.
-    // Keeping the button visible satisfies DEMO-01's "three primary buttons" rule.
-  }, []);
+  // Phase 19 — Tower Defense standalone handlers were declared earlier in the
+  // component (above the standalone-TD useEffects) so they could be referenced as
+  // effect dependencies without a "used before declaration" TS error. Keeping this
+  // anchor comment here for grep discoverability.
 
   const handlePlayAgain = () => {
     localStorage.clear();
@@ -959,6 +1081,58 @@ export default function UnifiedGamePage() {
         onTowerDefense={handleSelectTowerDefense}
         onFullGame={handleSelectFullGame}
       />
+    );
+  }
+
+  // ── Standalone Tower Defense (Phase 19 — TD-01..03) ───────────
+  // Mounts the Phaser canvas + EncounterGameUI HUD with no exploration overlays,
+  // no narrative card, no ITS-Office encounter context. Win/lose surfaces a minimal
+  // result overlay with PLAY AGAIN (in-place restart) and BACK TO MENU (full reload).
+  // The reload pattern guarantees the StartMenu reappears with localStorage
+  // untouched (TD-03 — no writeSave call ever fires from this code path).
+  if (pageMode === 'tower-defense-standalone') {
+    return (
+      <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4">
+        <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+          <PhaserGame ref={gameRef} width={960} height={720} />
+
+          {/* CRT scanline overlay (matches the rest of the app) */}
+          <div
+            className="absolute inset-0 pointer-events-none"
+            style={{
+              background:
+                'repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px)',
+              mixBlendMode: 'multiply',
+            }}
+          />
+
+          {/* In-game HUD: tower panel + score/budget/wave readouts. Standalone
+              mode surfaces all 6 tower types from the start (the scene's
+              wave-based unlocking still gates *placement* via the budget +
+              unlockWave logic, but for the sponsor-pitch arcade flow we let the
+              player see the full toolkit on the panel from frame one). */}
+          {!tdStandaloneResult && (
+            <EncounterGameUI
+              availableTowerIds={['MFA', 'PATCH', 'FIREWALL', 'ENCRYPTION', 'TRAINING', 'ACCESS']}
+            />
+          )}
+
+          {/* Win / lose overlay — minimal, no compliance-score wiring. */}
+          {tdStandaloneResult && (
+            <StandaloneTDResultOverlay
+              result={tdStandaloneResult}
+              onPlayAgain={handleTdPlayAgain}
+              onBackToMenu={handleTdBackToMenu}
+            />
+          )}
+        </div>
+        <p
+          className="text-[8px] text-gray-500"
+          style={{ fontFamily: '"Press Start 2P"' }}
+        >
+          TOWER DEFENSE &bull; STANDALONE MODE &bull; ESC TO RETURN TO MENU
+        </p>
+      </div>
     );
   }
 
@@ -1229,6 +1403,88 @@ export default function UnifiedGamePage() {
       </div>
 
       <ValidationOverlay gameRef={gameRef} />
+    </div>
+  );
+}
+
+// ── Standalone TD result overlay (Phase 19) ────────────────────────
+// Minimal end-of-round screen for the standalone Tower Defense path. Distinct from
+// EncounterDebrief because that component carries score-contribution + "return to
+// hospital" semantics; standalone TD is score-isolated by design (TD-02). Two
+// buttons only: PLAY AGAIN (in-place restart) and BACK TO MENU (full reload to
+// the cold-boot StartMenu). No score, no compliance bar, no encounter takeaways.
+interface StandaloneTDResultOverlayProps {
+  result: TDStandaloneResult;
+  onPlayAgain: () => void;
+  onBackToMenu: () => void;
+}
+
+function StandaloneTDResultOverlay({
+  result,
+  onPlayAgain,
+  onBackToMenu,
+}: StandaloneTDResultOverlayProps): JSX.Element {
+  const isWin = result.outcome === 'victory';
+  return (
+    <div
+      className="absolute inset-0 bg-black/85 flex items-center justify-center z-50"
+      data-testid="td-standalone-result"
+    >
+      <div
+        className={`text-center border-4 ${
+          isWin ? 'border-[#2ECC71]' : 'border-red-500'
+        } bg-[#1a1a2e] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md`}
+        style={{ fontFamily: '"Press Start 2P", monospace' }}
+      >
+        <h1
+          className={`text-xl font-bold mb-3 ${
+            isWin ? 'text-[#2ECC71]' : 'text-red-400'
+          }`}
+        >
+          {isWin ? 'NETWORK SECURED' : 'NETWORK BREACHED'}
+        </h1>
+        <p className="text-[8px] text-gray-400 mb-4 leading-relaxed">
+          {isWin
+            ? 'You held the line through every wave. The patient data is safe today.'
+            : 'The attackers got through. Try again — every restart is more practice.'}
+        </p>
+        <div className="bg-[#2a2a3e] border-2 border-gray-600 p-3 rounded mb-6">
+          {result.outcome === 'victory' && (
+            <p className="text-[8px] text-gray-300">
+              Security:{' '}
+              <span className="text-green-400">{result.securityScore}%</span>
+            </p>
+          )}
+          <p className="text-[8px] text-gray-300">
+            Waves Cleared:{' '}
+            <span className="text-yellow-400">{result.wavesCompleted}</span>
+          </p>
+          <p className="text-[8px] text-gray-300">
+            Towers Placed:{' '}
+            <span className="text-blue-400">{result.towersPlaced}</span>
+          </p>
+        </div>
+        <div className="flex gap-3 justify-center">
+          <button
+            onClick={onPlayAgain}
+            data-testid="td-standalone-play-again"
+            className={`${
+              isWin
+                ? 'bg-[#2ECC71] hover:bg-[#27AE60] text-black'
+                : 'bg-[#FF6B9D] hover:bg-[#FF5A8A] text-white'
+            } font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]`}
+          >
+            PLAY AGAIN
+          </button>
+          <button
+            onClick={onBackToMenu}
+            data-testid="td-standalone-back-to-menu"
+            className="bg-gray-600 hover:bg-gray-500 text-white font-bold px-6 py-2 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer text-[10px]"
+          >
+            BACK TO MENU
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
