@@ -1892,7 +1892,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Commandment 2: Anticipation before reward — brief screen shake + SFX before alert
     this.cameras.main.shake(300, 0.006);
-    try { this.sound.play('sfx_breach_alert', { volume: 0.6 }); } catch (_) {}
+    // FIX-03 (Phase 20): drop volume from 0.6 → 0.35 — the alert was a jarring honk
+    // when the player simply walked near the IT Office workstation cluster. The shake
+    // already conveys urgency; the SFX should be a soft cue, not a horn (Commandment 8).
+    try { this.sound.play('sfx_breach_alert', { volume: 0.35 }); } catch (_) {}
 
     // Delay the narrative card slightly so the shake lands first
     this.time.delayedCall(400, () => {
@@ -1924,7 +1927,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Anticipation beat (Commandment 2) — calm flash, NOT the breach-alert red
     this.cameras.main.flash(200, 255, 255, 150, true);
-    try { this.sound.play('sfx_interact', { volume: 0.5 }); } catch (_) {}
+    // FIX-03 (Phase 20): drop from 0.5 → 0.3 — the trigger zone sits next to the
+    // Reception NPCs, so a 0.5-volume cue read as a "honk near NPCs". A soft
+    // 0.3 entry chime is proportional (Commandment 8) — the flash carries the rest.
+    try { this.sound.play('sfx_interact', { volume: 0.3 }); } catch (_) {}
 
     const NARRATIVE: Record<string, string> = {
       'phi-sort-reception':
@@ -2188,8 +2194,11 @@ export class ExplorationScene extends Phaser.Scene {
     this.cameras.main.flash(200, 255, 0, 0, true);
     this.transitioning = false;
     // Use breach_alert SFX as a "denied" sound (sfx_locked doesn't exist)
+    // FIX-03 (Phase 20): drop from 0.4 → 0.25 — even at 0.4 the breach alert read
+    // as a jarring honk when bumping a locked door during exploration. The red
+    // camera flash carries the rejection feedback; SFX is just a soft accent.
     try {
-      this.sound.play('sfx_breach_alert', { volume: 0.4 });
+      this.sound.play('sfx_breach_alert', { volume: 0.25 });
     } catch (_e) {
       // Ignore if sound not available
     }
