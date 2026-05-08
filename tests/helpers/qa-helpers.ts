@@ -134,11 +134,16 @@ export async function interactWith(
       window.__QA__!.commands.teleportTo(x, y);
     }, [tileX + dx, tileY + dy] as const);
 
-    // Wait for proximity check in update loop (1-2 frames)
+    // Wait for either: nearby interactable detected, OR the Phase 16 PHI Sorter
+    // context card to appear (auto-triggers near Reception/Lab trigger tiles).
     await page.waitForFunction(
-      () => window.__QA__?.nearbyInteractable !== null,
+      () => window.__QA__?.nearbyInteractable !== null ||
+            !!document.querySelector('[data-testid="sorter-context-card"]'),
       { timeout: 1500 },
     ).catch(() => {});
+
+    // If the sorter card popped up, dismiss it and retry this teleport so we can re-check proximity.
+    await dismissSorterIfPresent(page);
 
     const nearby = await page.evaluate(() => window.__QA__?.nearbyInteractable);
     if (nearby) {
@@ -149,6 +154,7 @@ export async function interactWith(
 
   // Fallback: use BFS movePlayerTo
   await movePlayerTo(page, tileX, tileY + 1);
+  await dismissSorterIfPresent(page);
   await page.waitForFunction(
     () => window.__QA__?.nearbyInteractable !== null,
     { timeout: 2000 },
@@ -320,6 +326,32 @@ export async function goThroughDoor(
 ): Promise<void> {
   await navigateToDoor(page, doorId);
   await waitForRoom(page, expectedRoomId);
+  await dismissSorterIfPresent(page);
+}
+
+/** Dismiss the Phase 16 PHI Sorter context card if it auto-triggered on room entry.
+ * Reception and Lab gate the encounter to non-demo mode; in QA runs the card
+ * blocks NPC/zone interactions until confirmed. Returns silently if not present.
+ * Waits up to 800ms for the card to appear (trigger has a 250ms delayedCall + render),
+ * but only when the scene is paused — keeps cost near-zero on the happy path. */
+export async function dismissSorterIfPresent(page: Page): Promise<void> {
+  const card = page.locator('[data-testid="sorter-context-card"]');
+  let visible = await card.isVisible().catch(() => false);
+  if (!visible) {
+    // If scene is paused, an overlay is mounting — wait briefly for the sorter card.
+    const paused = await page.evaluate(() => window.__QA__?.paused).catch(() => false);
+    if (paused) {
+      await page.waitForSelector('[data-testid="sorter-context-card"]', { timeout: 800 }).catch(() => {});
+      visible = await card.isVisible().catch(() => false);
+    }
+  }
+  if (!visible) return;
+  const confirmBtn = page.locator('[data-testid="button-sorter-context-confirm"]');
+  await confirmBtn.click().catch(() => {});
+  // Wait for card to unmount and scene to unpause before continuing.
+  await page.waitForSelector('[data-testid="sorter-context-card"]', { state: 'detached', timeout: 5000 }).catch(() => {});
+  await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
+  await page.waitForTimeout(300);
 }
 
 /** Load the game with clean state directly into a room */
@@ -328,6 +360,7 @@ export async function loadRoom(page: Page, roomId: string): Promise<void> {
   await page.waitForSelector('canvas', { timeout: 15_000 });
   await waitForExploration(page);
   await waitForRoom(page, roomId);
+  await dismissSorterIfPresent(page);
 }
 
 /** Load the game from scratch with clean state */
@@ -336,6 +369,7 @@ export async function loadFresh(page: Page): Promise<void> {
   await page.waitForSelector('canvas', { timeout: 15_000 });
   await waitForExploration(page);
   await waitForRoom(page, 'hospital_entrance');
+  await dismissSorterIfPresent(page);
 }
 
 // ── Room Data Reference ────────────────────────────────────────
