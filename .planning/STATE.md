@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-05-08T02:22:15.242Z"
+last_updated: "2026-05-08T03:00:00.000Z"
 progress:
-  total_phases: 13
-  completed_phases: 12
-  total_plans: 38
-  completed_plans: 37
+  total_phases: 14
+  completed_phases: 13
+  total_plans: 39
+  completed_plans: 38
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 19 — Tower Defense Standalone (Complete)
-Plan: 19-01 (Complete)
-Status: Shipped — TD-01..03 verified by build + type check; manual verification deferred to user.
-Last activity: 2026-05-08 — Phase 19 shipped. Standalone TD launches BreachDefenseScene directly from start menu; win/lose returns to menu via reload; no save mutation. EncounterGameUI reused with all 6 tower IDs; React-side wave-complete handler unsticks the scene's mid-game educational pauses since standalone is self-contained.
+Phase: Phase 21 — Completion + Sponsor Hook (Complete)
+Plan: 21-01 (Complete)
+Status: Shipped — CERT-01..03 verified by build + type check; manual verification deferred to user. CAPSTONE LANDED.
+Last activity: 2026-05-08 — Phase 21 shipped. Sponsor demo capstone overlay (CertificateOverlay) wires the deliberate dim → 500ms silent beat → fanfare → end-NPC handoff (sprite + 2 dialogue lines) → certificate body reveal (sponsor name + monospace code box + COPY CODE button + RETURN TO MENU) sequence. Trigger lives in UnifiedGamePage.handleExitRoom door-nav branch and fires only when isDemoActive() && currentRoomId === 'records_room' && all 4 demo rooms marked complete. Demo-only path; full-game EndScreen flow untouched. Sponsor swap test passes by construction — overlay reads name/code/character_sprite/two_dialogue_lines straight from SPONSOR_CONFIG with no hardcoded fallbacks.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -103,6 +103,12 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 19]: Standalone TD reuses EncounterGameUI HUD with all 6 tower IDs passed in. Educational pauses at waves 3/5/7/9 are unstuck via React-side onWaveComplete → REACT_DISMISS_TUTORIAL — keeps the sponsor-pitch flow unbroken without scene-side flag refactoring.
 - [Phase 19]: Win/lose "Back to Menu" path uses window.location.reload() — same pattern as demo Esc. Guarantees clean teardown of Phaser scene + React state and brings the player to the cold-boot StartMenu.
 - [Phase 19]: Save isolation (TD-03) achieved by NOT calling any gameState mutator from the standalone code path — no addScore, no recordEncounterResult, no completeRoom. Persistence useEffect only fires when gameState.state changes, which it doesn't here.
+- [Phase 21]: End-NPC handoff lives INSIDE the React CertificateOverlay (not as a Phaser-world spawn) per user guidance — keeps the moment cohesive, demo-only by construction, no roomData.json edit needed.
+- [Phase 21]: NPC sprite rendered via CSS `background-image` cropping of the same spritesheet BootScene preloads (frame 0 = idle-down, top-left of 3×4 grid), upscaled 4× with `image-rendering: pixelated`. Path resolved through `spriteAssetPaths.ts` — small parallel map mirroring BootScene's 9 NPC preload paths.
+- [Phase 21]: 500ms anticipatory beat is genuinely silent (Commandment 2). Phase machine transitions: dim (400ms ease) → beat (500ms void) → fanfare (sfx_fanfare + 600ms gold flash) → npc → line2 → cert. Player advances dialogue with click/Space/Enter; Esc returns to menu at any point.
+- [Phase 21]: Capstone trigger gated by `isDemoActive() && currentRoomId === 'records_room' && DEMO_ROOM_ORDER.every(id => getCompletedDemoRooms().includes(id))`. `markRoomComplete` called for each demo room as it completes on exit, so all 4 must have been actually cleared (not just walked through).
+- [Phase 21]: Sponsor swap test passes by construction — overlay consumes name/code/character_sprite/two_dialogue_lines straight from SPONSOR_CONFIG with no hardcoded fallbacks except defensive sprite-path lookup that falls back to npc_staff_sheet for typo'd keys.
+- [Phase 21]: Reload-to-menu pattern (window.location.reload after endDemo) reused from Phase 18/19 — guarantees clean Phaser teardown + fresh StartMenu boot.
 
 ### Pending Todos
 
@@ -120,7 +126,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-08
-Stopped at: Phase 19 shipped — Tower Defense standalone launch wired in UnifiedGamePage. TD-01..03 traceability updated.
-Resume: Phase 20 (First-Impression Polish) — fix V1 sprite, V4 HUD overlay, V7 honk in the 4 demo rooms.
+Stopped at: Phase 21 shipped — sponsor demo CAPSTONE LANDED. CertificateOverlay wires the full dim → beat → fanfare → cert + handoff sequence; demo-only; sponsor swap via single config edit. v2.2 Sponsor Demo milestone is now functionally complete (Phases 18/19/20/21 all shipped).
+Resume: v2.2 audit + sponsor outreach (Out-of-Pocket / Nikhil pitch). Then resume v2.1 Phase 16 Plan 04 + Phase 17.
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.

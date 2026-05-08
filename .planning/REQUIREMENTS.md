@@ -96,9 +96,9 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 
 ### Completion + Sponsor Hook
 
-- [ ] **CERT-01**: After exiting Medical Records as the final demo room, a completion sequence plays in this order: dim → beat → fanfare → certificate animation → sponsor code reveal
-- [ ] **CERT-02**: Completion certificate displays the configured sponsor name and a code block in monospace font with a copy-to-clipboard button
-- [ ] **CERT-03**: An end NPC in the Medical Records closer uses the configured sponsor's character sprite and two configured dialogue lines to hand the prize
+- [x] **CERT-01**: After exiting Medical Records as the final demo room, a completion sequence plays in this order: dim → beat → fanfare → certificate animation → sponsor code reveal
+- [x] **CERT-02**: Completion certificate displays the configured sponsor name and a code block in monospace font with a copy-to-clipboard button
+- [x] **CERT-03**: An end NPC in the Medical Records closer uses the configured sponsor's character sprite and two configured dialogue lines to hand the prize
 - [ ] **CERT-04**: Sponsor data is read from a single config file with shape `{ name, character_sprite, two_dialogue_lines, code }` — swapping sponsors requires only a config file edit, no source-code changes
 
 ## Out of Scope
@@ -174,10 +174,10 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | FIX-02 | Phase 20 | Pending |
 | FIX-03 | Phase 20 | Pending |
 | FIX-04 | Phase 20 | Pending |
-| CERT-01 | Phase 21 | Pending |
-| CERT-02 | Phase 21 | Pending |
-| CERT-03 | Phase 21 | Pending |
-| CERT-04 | Phase 18 | Pending |
+| CERT-01 | Phase 21 | Complete |
+| CERT-02 | Phase 21 | Complete |
+| CERT-03 | Phase 21 | Complete |
+| CERT-04 | Phase 18 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0
@@ -186,4 +186,4 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-05-08 — Phase 19 shipped: TD-01..03 complete. Standalone TD launches via start menu, returns to menu on win/lose, no save mutation.*
+*Last updated: 2026-05-08 — Phase 21 shipped: CERT-01..03 complete. Sponsor demo capstone (dim → 500ms beat → fanfare → certificate + sponsor handoff) wired in CertificateOverlay; demo-only path; sponsor swap test passes by construction (overlay reads sponsorConfig.ts directly).*

@@ -272,12 +272,15 @@ Plans:
 **Goal**: Exiting Medical Records as the final demo room triggers a deliberate dim → beat → fanfare → certificate reveal sequence with copy-to-clipboard sponsor code, and an end NPC hands the prize using the sponsor sprite + dialogue lines from the Phase 18 config file.
 **Depends on**: Phase 18 (demo flow + sponsor config scaffold), Phase 20 (demo rooms polished)
 **Requirements**: CERT-01, CERT-02, CERT-03
+**Plans:** 1/1 plans complete
 **Success Criteria** (what must be TRUE):
   1. Exiting Medical Records as the fourth and final demo room triggers a deliberate sequence in this exact order: screen dim, brief anticipatory beat (~500ms silence), fanfare (audio + VFX), certificate animation in, then sponsor code reveal — pacing follows Commandment 2 (anticipation before reward).
   2. The completion certificate displays the configured sponsor's name and shows the sponsor code in monospace font with a clearly labeled copy-to-clipboard button that gives audio + visual confirmation when pressed (Commandment 1).
   3. An end NPC in the Medical Records closer renders using the sponsor's `character_sprite` and speaks the two configured `two_dialogue_lines` from the sponsor config — handing the prize feels like an in-world Zelda item-get moment (Commandment 6).
   4. Editing only the sponsor config file (no source-code changes) changes the certificate name, code, end-NPC sprite, and end-NPC dialogue lines on the next launch — verified by a swap test with a second sponsor config.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 21`)
+
+Plans:
+- [x] 21-01-PLAN.md — Capstone wiring: CertificateOverlay (sequence machine + NPC handoff + cert card + copy button) + spriteAssetPaths.ts (9-key NPC path map) + UnifiedGamePage trigger in handleExitRoom records_room exit branch
 
 ---
 
@@ -302,4 +305,4 @@ Plans:
 | 18. Demo Mode + Start Menu | v2.2 | Complete    | 2026-05-08 | - |
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 0/0 | Not started | - |
-| 21. Completion + Sponsor Hook | v2.2 | 0/0 | Not started | - |
+| 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
