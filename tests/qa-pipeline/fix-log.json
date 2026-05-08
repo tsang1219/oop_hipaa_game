@@ -245,5 +245,20 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Phase B design improvement (DESIGN-HALLWAY-001 — two flattest connectors at 5.3 avg). Within budget: 1 file (cap 2), +29 net lines (cap 60). Both hallways covered by one shared gated block. Targets the two weakest dimensions: moment_of_joy 4 (sconce flicker + walking NPC give the previously-empty corridors visible life and motion — Commandment 1 every prop earns its space, Commandment 10 surprise creates memories) and design 5 (act-tinted ribbon makes the bulletin board feel context-aware to where the player is in the narrative arc, hinting at Act 1 / 2 / 3 mood shifts — Commandment 9 show progress). The IT→ER hallway sits directly on the demo path between Break Room and Records Room per orchestrator note. DID NOT modify roomData.json (visual additions only, all in code). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets (visual-only — kept change tight, no audio direction). DID NOT touch existing NPC dialogue/scenarios/IDs/zones — only added decorative graphics + tweens + one non-interactable patrolling sprite. The walking employee uses npc_doctor texture (already in BootScene preload + SpriteFactory map for dr_martinez/researcher), no new assets sourced."
+  },
+  {
+    "bug_id": "BUG-009",
+    "agent": "fix-agent",
+    "severity": "MAJOR",
+    "title": "PHI Sorter encounter races talkToNPC in Reception/Lab — progression tests fail",
+    "fix_plan": "Add a `qa_no_encounter=1` URL parameter gate in ExplorationScene.ts that suppresses the three auto-firing encounter triggers (PHI Sorter Reception, PHI Sorter Lab, td-it-office) when present. Implementation: module-level cached `isQANoEncounter()` helper reads `new URLSearchParams(window.location.search).get('qa_no_encounter') === '1'` once per page load. The check is added as `&& !isQANoEncounter()` to all three trigger guards in update() — additive to the existing `!isDemoActive()` gate, never replacing it. Tests/helpers/qa-helpers.ts loadRoom + loadFresh append `qa_no_encounter=1` to the goto URL so every progression test launches with the gate active. Production has no such URL param so behavior is unchanged.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts", "tests/helpers/qa-helpers.ts"],
+    "lines_added": 19,
+    "lines_removed": 5,
+    "net_delta": 14,
+    "verification_test": "npx tsc --noEmit && npx playwright test tests/progression/door-unlocks.spec.ts --workers=1 --reporter=list",
+    "verification_result": "tsc clean. door-unlocks: 7/8 passing (was 0/8 baseline per orchestrator). Remaining failure ('Break room unlocks after completing reception') is unrelated to sorter race — page snapshot shows NPCs 1/3 progress not blocked by overlay, suggests separate flake in talkToNPC retry logic.",
+    "notes": "BUG-009 ticket scoped 2 files / ~15-20 lines net — actual: 2 files, +14 net lines. Within budget. The new gate is strictly additive — production checks (!isDemoActive()) preserved. DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the existing !isDemoActive() gate. Also gated td-it-office encounter (Phase 13) for thoroughness per ticket step 6. Module-level cached helper avoids reading URLSearchParams every game tick. Behavior verified: prior to fix, talkToNPC's BFS path would re-cross trigger tiles (Reception 10,6 / Lab 9,7) mid-walk and the encounter would re-fire, blocking subsequent interactions even after dismissSorterIfPresent ran at loadRoom. With the gate active, the sorter never auto-triggers under tests, so the BFS walk completes uninterrupted."
   }
 ]

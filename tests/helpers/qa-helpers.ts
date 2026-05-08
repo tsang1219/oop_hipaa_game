@@ -389,18 +389,21 @@ export async function dismissSorterIfPresent(page: Page): Promise<void> {
   await page.waitForTimeout(300);
 }
 
-/** Load the game with clean state directly into a room */
+/** Load the game with clean state directly into a room.
+ * BUG-009: appends `qa_no_encounter=1` so PHI Sorter / TD encounter triggers
+ * don't race interactions while progression tests walk through trigger tiles. */
 export async function loadRoom(page: Page, roomId: string): Promise<void> {
-  await page.goto(`/?qa-room=${roomId}&qa-no-save`);
+  await page.goto(`/?qa-room=${roomId}&qa-no-save&qa_no_encounter=1`);
   await page.waitForSelector('canvas', { timeout: 15_000 });
   await waitForExploration(page);
   await waitForRoom(page, roomId);
   await dismissSorterIfPresent(page);
 }
 
-/** Load the game from scratch with clean state */
+/** Load the game from scratch with clean state.
+ * BUG-009: appends `qa_no_encounter=1` (see loadRoom for rationale). */
 export async function loadFresh(page: Page): Promise<void> {
-  await page.goto('/?qa-no-save&qa-skip-onboarding');
+  await page.goto('/?qa-no-save&qa-skip-onboarding&qa_no_encounter=1');
   await page.waitForSelector('canvas', { timeout: 15_000 });
   await waitForExploration(page);
   await waitForRoom(page, 'hospital_entrance');

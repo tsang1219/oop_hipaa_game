@@ -22,6 +22,22 @@ const RECEPTION_TRIGGER_Y = 6;
 const LAB_TRIGGER_X = 9;
 const LAB_TRIGGER_Y = 7;
 
+// QA test gate (BUG-009): when `?qa_no_encounter=1` is on the URL, suppress
+// auto-firing encounter triggers (PHI Sorter Reception/Lab + IT Office TD) so
+// progression tests can walk through trigger tiles without the sorter racing
+// talkToNPC's BFS path. Production has no such param — behavior unchanged.
+// Module-level cache: read once per page load (tests reload between specs).
+let __qaNoEncounter: boolean | null = null;
+function isQANoEncounter(): boolean {
+  if (__qaNoEncounter !== null) return __qaNoEncounter;
+  try {
+    __qaNoEncounter = new URLSearchParams(window.location.search).get('qa_no_encounter') === '1';
+  } catch {
+    __qaNoEncounter = false;
+  }
+  return __qaNoEncounter;
+}
+
 interface InteractableData {
   type: 'npc' | 'zone' | 'item' | 'hallwayBoard';
   id: string;
@@ -1758,7 +1774,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // IT Office encounter zone check (Phase 13)
-    if (this.room.id === 'it_office' && !this.encounterTriggered && !this.paused) {
+    if (this.room.id === 'it_office' && !this.encounterTriggered && !this.paused && !isQANoEncounter()) {
       const alreadyDone = this.registry.get('encounterResult_td-it-office');
       if (!alreadyDone) {
         const dx = Math.abs(this.player.x - (9 * TILE + TILE / 2));
@@ -1771,7 +1787,8 @@ export class ExplorationScene extends Phaser.Scene {
 
     // PHI Sorter trigger — Reception (Act 1) (Phase 16)
     // Gated off in demo mode — Phase 16 Plan 04 wiring is paused; demo flow must not snag on it.
-    if (this.room.id === 'reception' && !this.encounterTriggered && !this.paused && !isDemoActive()) {
+    // Also gated by qa_no_encounter URL param (BUG-009) so progression tests can cross the trigger tile.
+    if (this.room.id === 'reception' && !this.encounterTriggered && !this.paused && !isDemoActive() && !isQANoEncounter()) {
       const alreadyDone = this.registry.get('encounterResult_phi-sort-reception');
       if (!alreadyDone) {
         const dx = Math.abs(this.player.x - (RECEPTION_TRIGGER_X * TILE + TILE / 2));
@@ -1783,7 +1800,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // PHI Sorter trigger — Lab (Act 2) (Phase 16)
-    if (this.room.id === 'lab' && !this.encounterTriggered && !this.paused && !isDemoActive()) {
+    if (this.room.id === 'lab' && !this.encounterTriggered && !this.paused && !isDemoActive() && !isQANoEncounter()) {
       const alreadyDone = this.registry.get('encounterResult_phi-sort-lab');
       if (!alreadyDone) {
         const dx = Math.abs(this.player.x - (LAB_TRIGGER_X * TILE + TILE / 2));
