@@ -1065,6 +1065,31 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // ── Reception life pass (DESIGN-005) ────────────────────────
+    if (this.room.id === 'reception') {
+      // Busy desk props — clipboard, coffee mug, papers stack riding on the desk surface
+      const deskSurfaceY = 2 * TILE + TILE / 2 - 6;
+      const clipboard = this.add.sprite(8 * TILE + TILE / 2, deskSurfaceY, objectTextureKey('manual')).setScale(0.55).setDepth(5).setAngle(-8);
+      const mug = this.add.sprite(9 * TILE + TILE / 2 + 6, deskSurfaceY + 2, furnitureTextureKey('coffee_mug')).setScale(0.6).setDepth(5);
+      const papers = this.add.sprite(11 * TILE + TILE / 2, deskSurfaceY, furnitureTextureKey('inbox_tray')).setScale(0.55).setDepth(5);
+      this.tweens.add({ targets: mug, y: mug.y - 1, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      void clipboard; void papers;
+
+      // Vary chair groupings — add a conversation pair facing each other (decorative, no collision)
+      const pairY = 11 * TILE + TILE / 2;
+      const chairA = this.add.sprite(10 * TILE + TILE / 2, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(15);
+      const chairB = this.add.sprite(11 * TILE + TILE / 2 + 4, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(-15).setFlipX(true);
+      // Angled corner chair near the right cluster, suggesting someone sat askew
+      const chairC = this.add.sprite(14 * TILE + TILE / 2, 8 * TILE + TILE / 2, furnitureTextureKey('chair')).setDepth(3).setAngle(-25);
+      void chairA; void chairB; void chairC;
+
+      // Interactable pulse — subtle scale yoyo on items + zones to signpost interactivity
+      for (const ia of this.interactables) {
+        if (ia.type !== 'zone' && ia.type !== 'item') continue;
+        this.tweens.add({ targets: ia.sprite, scaleX: { from: 1.0, to: 1.04 }, scaleY: { from: 1.0, to: 1.04 }, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
+    }
+
     // Pulse first NPC if this room hasn't been pulsed yet
     const firstNpc = this.interactables.find(ia => ia.type === 'npc');
     const roomPulseKey = `pq:room:${this.room.id}:npcPulsed`;
@@ -1079,6 +1104,37 @@ export class ExplorationScene extends Phaser.Scene {
         repeat: -1,
         ease: 'Sine.easeInOut',
       });
+    }
+
+    // ── Hospital Lobby first-frame polish (DESIGN-004) ────────────
+    if (this.room.id === 'hospital_entrance') {
+      // (1) Coffee cart prop — non-interactable, rendered directly in scene
+      const cartTileX = 5, cartTileY = 5;
+      const cartCx = cartTileX * TILE + TILE / 2, cartCy = cartTileY * TILE + TILE / 2;
+      this.add.ellipse(cartCx, cartCy + 12, TILE - 4, 8, 0x000000, 0.18).setDepth(2);
+      this.add.sprite(cartCx, cartCy, furnitureTextureKey('coffee_station')).setDepth(3);
+      // Tiny steam puff every ~2.6s above the cart
+      this.time.addEvent({ delay: 2600, loop: true, callback: () => {
+        const puff = this.add.ellipse(cartCx + (Math.random() * 4 - 2), cartCy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
+        this.tweens.add({ targets: puff, y: puff.y - 12, alpha: 0, scaleX: 1.5, scaleY: 1.5, duration: 1400, ease: 'Sine.easeOut', onComplete: () => puff.destroy() });
+      } });
+      // (2) Riley idle micro-animation — subtle angle sway on top of breathing tween
+      const riley = this.interactables.find(ia => ia.type === 'npc' && ia.id === 'riley_entrance');
+      if (riley) {
+        this.tweens.add({ targets: riley.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
+      // Plant leaf-sway — translucent green oval on each plant, gently rocking
+      for (const obs of room.obstacles) {
+        if ((obs as any).type !== 'plant') continue;
+        const px = obs.x * TILE + (obs.width * TILE) / 2;
+        const py = obs.y * TILE + 4;
+        const leaf = this.add.ellipse(px, py, 14, 6, 0x4a8a3a, 0.45).setDepth(4);
+        this.tweens.add({ targets: leaf, angle: { from: -6, to: 6 }, duration: 1900 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
+      // (3) Ambient lobby chatter — single subtle blip every 9-12s, max volume 0.08
+      this.time.addEvent({ delay: 10500, loop: true, callback: () => {
+        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.55 + Math.random() * 0.2 }); } catch (_) {}
+      } });
     }
 
     // ── Break Room comedic life (DESIGN-003) ─────────────────────

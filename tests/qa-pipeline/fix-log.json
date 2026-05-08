@@ -116,5 +116,21 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Phase B design improvement (not a bug). All 3 orchestrator items shipped within budget (1 file, +30 net lines, under max 3 files / 50 lines). Targets Break Room's lowest dimension (moment_of_joy: 6) by adding three layers of comedic life: pixel LEDs cycling on the vending machines (texture), a microwave that periodically dings (inhabited feel), and the Gossiping Coworker visibly gossiping with no actual dialogue (overheard-conversation flair). Commandment 4 (NPCs are people, not rule-delivery systems — gossip bubbles humanize without exposition) and Commandment 10 (surprise creates memories — the LED color shift, the unexpected microwave ding, the bubble glyph that catches your eye). Microwave volume capped at 0.12 (under the 0.15 max). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets — sfx_interact only. DID NOT touch existing NPC dialogue/scenarios/IDs/zones (only added decorative time events + transient graphics + a transient text bubble; no interaction targets, no completion gates, no zone changes)."
+  },
+  {
+    "bug_id": "DESIGN-005",
+    "agent": "fix-agent",
+    "phase": "B-design-improvement",
+    "room": "reception",
+    "fix_plan": "Implement all 3 orchestrator items inside ExplorationScene's room render path, gated by `if (this.room.id === 'reception')` placed after the ER block (and before the existing NPC pulse logic). (1) Busy desk props: render three small decorative sprites on the desk surface row (y=2) — a tilted clipboard (obj_manual @ scale 0.55, angle -8), a coffee mug (furn_coffee_mug @ scale 0.6) with a 1px steam-bob yoyo tween, and a papers stack (furn_inbox_tray @ scale 0.55). All non-collision Phaser sprites, depth 5, riding 6px above the desk top so they read as tabletop items. (2) Vary chair groupings: add three decorative chair sprites that break the uniform waiting-area look — a 'conversation pair' at (10.0, 11) and (11.5, 11) angled inward toward each other (one flipX), plus an angled 'sat-askew' chair at (14, 8) leaning -25°. Pure decoration (no collision, no roomData edit). (3) Interactable pulse: iterate this.interactables and apply a subtle scale-yoyo (1.0 → 1.04, 1.5s, Sine.easeInOut, repeat -1) to every zone + item sprite in the room, signposting which objects the player can interact with. Uses only existing textures (obj_manual, furn_coffee_mug, furn_inbox_tray, furn_chair) + existing tween infra. No new files, no roomData changes, no NPC dialogue/scenarios/IDs/zones changes.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts"],
+    "changes_implemented": ["busy_desk_props", "varied_chair_groupings", "interactable_pulse_tween"],
+    "lines_added": 25,
+    "lines_removed": 0,
+    "net_delta": 25,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "Phase B design improvement (not a bug). All 3 orchestrator items shipped within budget (1 file, +25 net lines, half the 50-line cap). Targets Reception's moment_of_joy: 6 — the FIRST room a demo player enters and where they form a snap judgment. Desk props give the room an 'inhabited' feel (someone works here, they have coffee, paperwork is in motion). Chair variety breaks the grid-aligned uniform look that reads 'spreadsheet' rather than 'place where humans sit'. The interactable pulse addresses Commandment 1 (every action needs a response — and signposts where actions ARE possible) plus Commandment 9 (show progress — the pulse invites attention to incomplete zones/items). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets. DID NOT touch existing NPC dialogue/scenarios/IDs/zones — all six new sprites are non-interactable decoration; the pulse tween is layered on top of the existing zone/item sprites without altering interaction logic, completion gates, or roomData."
   }
 ]
