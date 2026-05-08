@@ -1167,6 +1167,40 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // ── Records Room final-demo polish (DESIGN-006) ──────────────
+    if (this.room.id === 'records_room') {
+      // (1) Flickering fluorescent tube + dust motes in the upper filing aisle
+      const tubeCx = 10 * TILE + TILE / 2, tubeCy = 1 * TILE + TILE - 4;
+      const tube = this.add.rectangle(tubeCx, tubeCy, TILE * 3, 3, 0xfff7d8, 0.85).setDepth(4);
+      const tubeHalo = this.add.rectangle(tubeCx, tubeCy + 10, TILE * 4, 22, 0xfff2b8, 0.10).setDepth(3);
+      this.time.addEvent({ delay: 3200, loop: true, callback: () => {
+        // Brief flicker — dim then snap back
+        this.tweens.add({ targets: [tube, tubeHalo], alpha: { from: tube.alpha, to: 0.25 }, duration: 80, yoyo: true, repeat: 1, ease: 'Linear' });
+      } });
+      // Dust motes drifting in the light beam below the tube
+      this.time.addEvent({ delay: 1400, loop: true, callback: () => {
+        const mote = this.add.circle(tubeCx + (Math.random() * 80 - 40), tubeCy + 6, 1, 0xfff5c8, 0.7).setDepth(20);
+        this.tweens.add({ targets: mote, y: mote.y + 18, alpha: 0, duration: 4200, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
+      } });
+      // (2) Idle fidget on the two strongest NPCs — CCO and Attorney
+      for (const fidgetId of ['compliance_officer', 'attorney']) {
+        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
+        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1300 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
+      // (3) Subpoena envelope prop next to Attorney — small obj_manual sprite, signals "official document"
+      const attorney = this.interactables.find(i => i.type === 'npc' && i.id === 'attorney');
+      if (attorney) {
+        const env = this.add.sprite(attorney.sprite.x + 14, attorney.sprite.y + 4, objectTextureKey('manual')).setScale(0.5).setDepth(attorney.sprite.depth - 1).setAngle(12);
+        this.tweens.add({ targets: env, y: env.y - 1, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
+      // (4) Decorative document cart drifting slowly down the central aisle (separate from the static cart at (6,5))
+      const cartY = 9 * TILE + TILE / 2;
+      const cartStartX = 13 * TILE + TILE / 2, cartEndX = 16 * TILE + TILE / 2;
+      this.add.ellipse(cartStartX, cartY + 10, TILE - 6, 6, 0x000000, 0.18).setDepth(2);
+      const cart = this.add.sprite(cartStartX, cartY, furnitureTextureKey('document_cart')).setDepth(3).setScale(0.85);
+      this.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    }
+
     // ── Player ───────────────────────────────────────────────────
     // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
     // PLAYER_IDLE_FRAMES: down=0, left=3, right=6, up=9 (row * 3 + 0)
