@@ -3,7 +3,12 @@
  *
  * Positioned bottom-center of the canvas during exploration.
  * Completed = green checkmark, Current = gold pulse, Available = white, Locked = dim.
+ *
+ * FIX-02 (Phase 20): Fades in on room change so the HUD does not block the room view
+ * during the intro beat. Pairs with RoomProgressHUD's existing fade-in.
  */
+
+import { useEffect, useRef, useState } from 'react';
 
 export const DEPARTMENT_ORDER = [
   { id: 'reception',  shortName: 'REC', fullName: 'Reception',   act: 1 as const },
@@ -27,10 +32,30 @@ export function DepartmentBreadcrumb({
   currentAct,
   unlockedRooms,
 }: DepartmentBreadcrumbProps) {
+  // FIX-02 (Phase 20): fade in on room change so the HUD eases into view rather
+  // than slamming on at full opacity during the intro card beat.
+  const [visible, setVisible] = useState(false);
+  const lastRoomRef = useRef<string | null>(null);
+  useEffect(() => {
+    if (currentRoomId !== lastRoomRef.current) {
+      setVisible(false);
+      lastRoomRef.current = currentRoomId;
+    }
+    const t = setTimeout(() => setVisible(true), 900);
+    return () => clearTimeout(t);
+  }, [currentRoomId]);
+
   return (
     <div
       className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 bg-black/70 border border-[#333] px-2 py-1 pointer-events-none"
-      style={{ fontFamily: '"Press Start 2P"', fontSize: '6px', zIndex: 10 }}
+      style={{
+        fontFamily: '"Press Start 2P"',
+        fontSize: '6px',
+        zIndex: 10,
+        opacity: visible ? 1 : 0,
+        transform: `translate(-50%, ${visible ? '0' : '8px'})`,
+        transition: 'opacity 600ms ease-out, transform 600ms ease-out',
+      }}
       data-testid="department-breadcrumb"
     >
       {/* Act label */}

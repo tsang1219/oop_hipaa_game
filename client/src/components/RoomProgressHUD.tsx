@@ -86,9 +86,12 @@ export function RoomProgressHUD({
       className="absolute top-2 right-2 bg-black/80 border-4 border-black rounded-[4px] p-3 text-white font-['Press_Start_2P'] text-[8px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
       data-testid="room-progress-hud"
       style={{
+        // FIX-02 (Phase 20): slide in from the right as it fades, so the HUD eases
+        // into view rather than blocking the room on entry.
         opacity: visible ? 1 : 0,
+        transform: visible ? 'translateX(0)' : 'translateX(20px)',
         boxShadow: recentlyCompleted.has('room') ? '0 0 14px rgba(100, 255, 100, 0.7)' : 'none',
-        transition: 'opacity 600ms ease-out, box-shadow 300ms ease-out',
+        transition: 'opacity 600ms ease-out, transform 600ms ease-out, box-shadow 300ms ease-out',
         pointerEvents: visible ? 'auto' : 'none',
       }}
     >
