@@ -277,6 +277,10 @@ export class HubWorldScene extends Phaser.Scene {
       0, // frame 0 = idle facing down
     );
     this.player.setOrigin(0, 0);
+    // FIX-01 (Phase 20): Explicit setFrame so the sprite renders the idle-down pose
+    // before any movement input. Mirrors the fix in ExplorationScene.
+    this.player.setFrame(0);
+    this.lastFacingFrame = 0;
 
     // Player shadow
     this.playerShadow = this.add.ellipse(

@@ -1059,6 +1059,14 @@ export class ExplorationScene extends Phaser.Scene {
       playerTex === 'player_sheet' ? 0 : undefined,
     );
     this.player.setDepth(30);
+    // FIX-01 (Phase 20): Force the idle-down frame to render before any movement input.
+    // Without this explicit setFrame, Phaser sometimes draws the raw spritesheet atlas
+    // (all 12 frames at once) until anims.play() is first called. Locking frame 0 here
+    // ensures the player sprite mounts with the correct idle-down pose.
+    if (playerTex === 'player_sheet') {
+      this.player.setFrame(0); // IDLE_DOWN
+      this.lastFacingFrame = 0;
+    }
 
     // Idle breathing tween — continuous subtle vertical scale oscillation
     this.tweens.add({
