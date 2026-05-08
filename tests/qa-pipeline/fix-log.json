@@ -70,5 +70,19 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "POLISH_STANDARD Section 4 Rule 4.1 / Commandment 1: every player-initiated action now produces audio feedback. Used only existing SFX (sfx_interact) per BUG-004a constraint; new SFX sourcing deferred to BUG-004b. Volumes kept subtle (0.2-0.4 range) so micro-feedbacks don't compete with music or fanfare moments. ChoicePrompt and the existing dialogue-choice select pathway were already wired in prior commits and were intentionally left untouched."
+  },
+  {
+    "bug_id": "BUG-006",
+    "agent": "fix-agent",
+    "fix_plan": "Extend dismissSorterIfPresent() to also dismiss the PHISorterOverlay that auto-opens after the SorterContextCard is confirmed. After the existing card-confirm step, poll for [data-testid=\"phi-sorter-overlay\"] (full poll only when we just dismissed a card; otherwise a cheap visibility check) and click [data-testid=\"button-sorter-close\"] (falls back to keyboard Escape). Wait for overlay detach + scene unpause. Also added dismissSorterIfPresent calls at the END of talkToNPC/examineZone/collectItem so the post-dialogue re-trigger (abort path resets encounterTriggered=false) can be cleared without leaving the sorter UI to block subsequent interactions.",
+    "result": "needs_review",
+    "files_changed": ["tests/helpers/qa-helpers.ts"],
+    "diff_summary": "1) dismissSorterIfPresent: keeps the existing context-card branch (now non-early-return), then polls for phi-sorter-overlay, dismisses via close button (or Escape fallback), waits for detach. Smart cost: only pays the 1s overlay poll when we just dismissed a card. 2) talkToNPC, examineZone, collectItem: added dismissSorterIfPresent call after dialogue closes / pause clears, to handle re-triggers caused by abort path resetting encounterTriggered.",
+    "lines_added": 28,
+    "lines_removed": 5,
+    "net_delta": 23,
+    "verification_test": "npx tsc --noEmit && npx playwright test tests/progression/door-unlocks.spec.ts --workers=1",
+    "verification_result": "tsc clean. door-unlocks: 6/8 passing, 2 still failing (Break room unlocks after completing reception, Records room unlocks after completing lab). HOWEVER: pre-fix error-context showed the FULL PHISorterOverlay UI ('NOT PHI', 'Safe to Share', drag items) blocking — that is now GONE. Post-fix error-context shows only the standard HUD with NPCs 1/3 — meaning the second NPC interaction (nervous_patient at 5,8 / researcher at 3,5) silently fails for an unrelated reason after the first NPC succeeds. Both failing rooms have the sorter trigger; the residual failure is plausibly an interaction race between the abort path (which resets encounterTriggered=false and unpauses) and the next interactWith teleport+space, but the overlay itself no longer blocks interactions.",
+    "notes": "BUG-006 fix as specified is APPLIED and confirmed working: the PHI Sorter overlay no longer blocks subsequent interactions. The remaining 2 failures are a residual issue beyond the ticket scope — recommend follow-up bug for the encounterTriggered=false re-trigger race condition. Test infra only; no production code touched. DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx, nor revert the !isDemoActive() gate."
   }
 ]

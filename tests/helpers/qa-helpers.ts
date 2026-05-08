@@ -275,6 +275,9 @@ export async function talkToNPC(
   ).catch(() => {});
   // Wait for scene to unpause and React state to sync to QA bridge
   await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
+  // BUG-006: Sorter trigger may re-fire after dialogue closes if player is still
+  // within range of the trigger tile (abort resets encounterTriggered). Dismiss again.
+  await dismissSorterIfPresent(page);
   await page.waitForTimeout(500);
 }
 
@@ -300,6 +303,8 @@ export async function examineZone(
     await dismissDialogue(page);
   }
   await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
+  // BUG-006: Sorter may re-trigger post-interaction; dismiss if it does.
+  await dismissSorterIfPresent(page);
   await page.waitForTimeout(300);
 }
 
@@ -313,6 +318,8 @@ export async function collectItem(
   await page.waitForSelector('[data-testid="educational-item-modal"]', { timeout: 5000 }).catch(() => {});
   await dismissDialogue(page);
   await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
+  // BUG-006: Sorter may re-trigger post-interaction; dismiss if it does.
+  await dismissSorterIfPresent(page);
   await page.waitForTimeout(300);
 }
 
@@ -333,23 +340,51 @@ export async function goThroughDoor(
  * Reception and Lab gate the encounter to non-demo mode; in QA runs the card
  * blocks NPC/zone interactions until confirmed. Returns silently if not present.
  * Waits up to 800ms for the card to appear (trigger has a 250ms delayedCall + render),
- * but only when the scene is paused — keeps cost near-zero on the happy path. */
+ * but only when the scene is paused — keeps cost near-zero on the happy path.
+ *
+ * BUG-006: After confirming the context card, the PHISorterOverlay (the actual
+ * sort UI) auto-opens and continues blocking the scene. Polls for the overlay
+ * for ~1s and dismisses it via the close button (or Escape) before returning. */
 export async function dismissSorterIfPresent(page: Page): Promise<void> {
   const card = page.locator('[data-testid="sorter-context-card"]');
-  let visible = await card.isVisible().catch(() => false);
-  if (!visible) {
+  let cardVisible = await card.isVisible().catch(() => false);
+  if (!cardVisible) {
     // If scene is paused, an overlay is mounting — wait briefly for the sorter card.
     const paused = await page.evaluate(() => window.__QA__?.paused).catch(() => false);
     if (paused) {
       await page.waitForSelector('[data-testid="sorter-context-card"]', { timeout: 800 }).catch(() => {});
-      visible = await card.isVisible().catch(() => false);
+      cardVisible = await card.isVisible().catch(() => false);
     }
   }
-  if (!visible) return;
-  const confirmBtn = page.locator('[data-testid="button-sorter-context-confirm"]');
-  await confirmBtn.click().catch(() => {});
-  // Wait for card to unmount and scene to unpause before continuing.
-  await page.waitForSelector('[data-testid="sorter-context-card"]', { state: 'detached', timeout: 5000 }).catch(() => {});
+  const cardWasDismissed = cardVisible;
+  if (cardVisible) {
+    const confirmBtn = page.locator('[data-testid="button-sorter-context-confirm"]');
+    await confirmBtn.click().catch(() => {});
+    // Wait for card to unmount before continuing.
+    await page.waitForSelector('[data-testid="sorter-context-card"]', { state: 'detached', timeout: 5000 }).catch(() => {});
+  }
+
+  // BUG-006: After context card confirms, the sort overlay auto-opens. Poll briefly
+  // for it and dismiss via the close button (falls back to Escape). Only pay the
+  // full poll cost if we just dismissed a card or the scene is paused — otherwise
+  // a cheap visibility check keeps the happy path fast.
+  const overlay = page.locator('[data-testid="phi-sorter-overlay"]');
+  let overlayVisible = await overlay.isVisible().catch(() => false);
+  if (!overlayVisible && cardWasDismissed) {
+    await page.waitForSelector('[data-testid="phi-sorter-overlay"]', { timeout: 1000 }).catch(() => {});
+    overlayVisible = await overlay.isVisible().catch(() => false);
+  }
+  if (overlayVisible) {
+    const closeBtn = page.locator('[data-testid="button-sorter-close"]');
+    const clicked = await closeBtn.click({ timeout: 1000 }).then(() => true).catch(() => false);
+    if (!clicked) {
+      // Fallback: keyboard Escape (PHISorterOverlay binds Escape -> onAbort)
+      await page.keyboard.press('Escape').catch(() => {});
+    }
+    await page.waitForSelector('[data-testid="phi-sorter-overlay"]', { state: 'detached', timeout: 5000 }).catch(() => {});
+  }
+
+  // Wait for scene to unpause before continuing — covers both card and overlay paths.
   await page.waitForFunction(() => !window.__QA__?.paused, { timeout: 5000 }).catch(() => {});
   await page.waitForTimeout(300);
 }
