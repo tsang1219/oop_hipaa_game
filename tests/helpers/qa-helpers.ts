@@ -422,7 +422,7 @@ export const ROOMS = {
     doors: { entrance_to_reception: 'reception' },
   },
   reception: {
-    npcs: { riley: { x: 10, y: 4 }, nervous_patient: { x: 5, y: 8 }, chatty_visitor: { x: 15, y: 8 } },
+    npcs: { riley: { x: 10, y: 3 }, nervous_patient: { x: 5, y: 8 }, chatty_visitor: { x: 15, y: 8 } },
     zones: { sign_in_sheet: { x: 8, y: 4 }, privacy_notice: { x: 12, y: 4 } },
     items: { patient_rights_poster: { x: 2, y: 4 } },
     requirements: { npcs: ['riley', 'nervous_patient'], zones: ['sign_in_sheet'], items: ['patient_rights_poster'] },
