@@ -181,5 +181,21 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Phase B design improvement (capstone polish — the LAST sponsor demo beat). Within budget: 1 file (cap 2), +30 net lines (cap 50). All 3 keyframes defined inline in the component's existing <style> block — index.css NOT touched (per DO-NOT-TOUCH list). No new SFX assets; reused sfx_interact (vol 0.4 ≤ cap) for advance and existing sfx_sorter_correct (vol 0.6) for copy. DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the !isDemoActive() PHI sorter gate. Targeted the moderate dimensions (gameplay 7, gameplay_mechanic 7) by giving every player input a crunchier physical response (dialogue pulse, copy bounce) and giving the static moment more life (NPC bob)."
+  },
+  {
+    "bug_id": "DESIGN-002",
+    "agent": "fix-agent",
+    "phase": "B-design-improvement",
+    "room": "lab",
+    "fix_plan": "Implement 3 orchestrator-suggested directions inside ExplorationScene's room render path, gated by `if (this.room.id === 'lab')` placed after the records_room block (and before the Player section). (1) Microscope eyepiece glow: a small color-cycling circle centered on the microscope_station obstacle at (2,2) — 4 hues (icy blue / amber / magenta / mint) cycling every 1.2s, with a synchronized scale+alpha yoyo tween (0.8→1.3, 0.5→1.0 alpha) so it pulses like an active eyepiece. Hint of activity in an otherwise still corner. (2) Idle fidgets on lab_tech and courier NPCs: angle wobble (-1.4°/+1.4°, 1.2s+jitter yoyo, Sine.easeInOut) layered on top of the standard breathing tween — same pattern as ER officer/family and Records CCO/Attorney. Makes both NPCs feel alive while waiting. (3) Beaker bubble particles: iterate room.obstacles, for each chemical_shelf obstacle spawn 4 small light-cyan bubbles every 6.5–8s, each rising 14px upward over 1.1–1.6s with alpha fade and slight horizontal jitter, then auto-destroy. Reads as live chemistry on the shelves. Uses only existing helpers (TILE, this.add.circle, time.addEvent, tweens) + existing room.obstacles. No new textures, no SFX, no roomData changes, no NPC dialogue/scenarios/IDs/zones touched.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts"],
+    "changes_implemented": ["microscope_eyepiece_color_cycling_glow", "lab_tech_and_courier_idle_fidget", "beaker_bubble_particles_from_chemical_shelves"],
+    "lines_added": 27,
+    "lines_removed": 0,
+    "net_delta": 27,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "Phase B design improvement (lab — lowest scoring screen at 6.7 avg). Lab is full-game only (NOT in demo path) but still needs >=8.0 lift for milestone termination. 3 changes shipped within budget (1 file, +27 net lines, well under 50-line cap). Targets the two weakest dimensions (moment_of_joy 6, polish 6): the microscope glow gives a previously-static prop a 'science is happening' presence (moment_of_joy + Commandment 1: every prop earns its space); fidgets on the two non-researcher NPCs make the room feel inhabited rather than posed (polish + Commandment 4); bubble particles from the chemical shelves add ambient texture to the lab's silent edges (polish + aesthetics, Commandment 7 pacing). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets. DID NOT touch existing NPC dialogue/scenarios/IDs/zones — all additions are decorative graphics + tweens layered on top of the existing scene; researcher NPC intentionally left untouched (already animated by standard pulse on first NPC); interaction proximity unaffected since interactables resolve via i.data.x/y tile coords, not sprite pixel position."
   }
 ]

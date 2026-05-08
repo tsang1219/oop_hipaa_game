@@ -1201,6 +1201,33 @@ export class ExplorationScene extends Phaser.Scene {
       this.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
 
+    // ── Laboratory life pass (DESIGN-002) ────────────────────────
+    if (this.room.id === 'lab') {
+      // (1) Microscope eyepiece glow — pulsing color-cycling circle on the microscope station (2,2)
+      const scopeCx = 2 * TILE + (3 * TILE) / 2, scopeCy = 2 * TILE + 6;
+      const eyepiece = this.add.circle(scopeCx, scopeCy, 4, 0x88ddff, 0.85).setDepth(5);
+      const scopeColors = [0x88ddff, 0xffe888, 0xff88dd, 0x88ffaa];
+      let sci = 0;
+      this.time.addEvent({ delay: 1200, loop: true, callback: () => { sci = (sci + 1) % scopeColors.length; eyepiece.setFillStyle(scopeColors[sci]); } });
+      this.tweens.add({ targets: eyepiece, scaleX: { from: 0.8, to: 1.3 }, scaleY: { from: 0.8, to: 1.3 }, alpha: { from: 0.5, to: 1 }, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      // (2) Idle fidget on lab_tech + courier — angle wobble matching ER pattern
+      for (const fidgetId of ['lab_tech', 'courier']) {
+        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
+        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.4, to: 1.4 }, duration: 1200 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
+      // (3) Beaker bubble particles — periodic rising bubbles from chemical_shelf positions
+      for (const obs of room.obstacles) {
+        if ((obs as any).type !== 'chemical_shelf') continue;
+        const bx = obs.x * TILE + (obs.width * TILE) / 2, by = obs.y * TILE + 4;
+        this.time.addEvent({ delay: 6500 + Math.random() * 1500, loop: true, callback: () => {
+          for (let i = 0; i < 4; i++) {
+            const bubble = this.add.circle(bx + (Math.random() * 14 - 7), by, 1 + Math.random(), 0x88eeff, 0.8).setDepth(20);
+            this.tweens.add({ targets: bubble, y: bubble.y - 14, alpha: 0, duration: 1100 + i * 120, ease: 'Sine.easeOut', onComplete: () => bubble.destroy() });
+          }
+        } });
+      }
+    }
+
     // ── Player ───────────────────────────────────────────────────
     // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
     // PLAYER_IDLE_FRAMES: down=0, left=3, right=6, up=9 (row * 3 + 0)
