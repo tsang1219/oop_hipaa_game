@@ -1261,6 +1261,35 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // ── Hallway life pass (DESIGN-HALLWAY-001) ──────────────────
+    if (this.room.id === 'hallway_break_lab' || this.room.id === 'hallway_it_er') {
+      // (1) Flickering ceiling sconces — warm halo + irregular alpha drop on each wall_sconce
+      for (const obs of room.obstacles) {
+        if ((obs as any).type !== 'wall_sconce') continue;
+        const sx = obs.x * TILE + (obs.width * TILE) / 2;
+        const sy = obs.y * TILE + TILE - 2;
+        const halo = this.add.ellipse(sx, sy + 4, 22, 10, 0xffe6a8, 0.55).setDepth(4);
+        const cone = this.add.ellipse(sx, sy + 14, 30, 18, 0xfff2c8, 0.18).setDepth(3);
+        const flickerDelay = 2400 + Math.random() * 1800;
+        this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
+          this.tweens.add({ targets: [halo, cone], alpha: { from: 1, to: 0.35 }, duration: 70, yoyo: true, repeat: 1, ease: 'Linear' });
+        } });
+      }
+      // (2) Walking employee NPC — non-interactable, patrols the corridor
+      const empY = 4 * TILE + TILE / 2;
+      const empStartX = 7 * TILE + TILE / 2;
+      const empEndX = 13 * TILE + TILE / 2;
+      this.add.ellipse(empStartX, empY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
+      const empSprite = this.add.sprite(empStartX, empY, 'npc_doctor').setDepth(5 + 4);
+      this.tweens.add({ targets: empSprite, x: empEndX, duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => empSprite.setFlipX(true), onRepeat: () => empSprite.setFlipX(false) });
+      this.tweens.add({ targets: empSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      // (3) Act-aware poster accent — colored ribbon stamp on the existing bulletin board
+      const act = this.getCurrentAct();
+      const actTint = act === 1 ? 0x4a90e2 : act === 2 ? 0xe2a04a : 0xc83a3a;
+      const ribbon = this.add.rectangle(this.cameras.main.width / 2 + 18, 64 - 16, 10, 4, actTint, 1).setDepth(8).setAngle(-12);
+      this.tweens.add({ targets: ribbon, alpha: { from: 1, to: 0.65 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    }
+
     // ── Player ───────────────────────────────────────────────────
     // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
     // PLAYER_IDLE_FRAMES: down=0, left=3, right=6, up=9 (row * 3 + 0)
