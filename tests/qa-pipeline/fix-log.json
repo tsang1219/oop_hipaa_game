@@ -132,5 +132,22 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Phase B design improvement (not a bug). All 3 orchestrator items shipped within budget (1 file, +25 net lines, half the 50-line cap). Targets Reception's moment_of_joy: 6 — the FIRST room a demo player enters and where they form a snap judgment. Desk props give the room an 'inhabited' feel (someone works here, they have coffee, paperwork is in motion). Chair variety breaks the grid-aligned uniform look that reads 'spreadsheet' rather than 'place where humans sit'. The interactable pulse addresses Commandment 1 (every action needs a response — and signposts where actions ARE possible) plus Commandment 9 (show progress — the pulse invites attention to incomplete zones/items). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets. DID NOT touch existing NPC dialogue/scenarios/IDs/zones — all six new sprites are non-interactable decoration; the pulse tween is layered on top of the existing zone/item sprites without altering interaction logic, completion gates, or roomData."
+  },
+  {
+    "bug_id": "DESIGN-004",
+    "agent": "fix-agent",
+    "phase": "B-design-improvement",
+    "room": "hospital_entrance",
+    "fix_plan": "Three concrete changes per ticket — (1) coffee cart / info kiosk prop near entrance, (2) Riley + plant idle micro-animations, (3) ambient lobby chatter audio at very low volume (0.05-0.1) using existing sfx_interact. All gated by `if (this.room.id === 'hospital_entrance')` after the existing room-block chain in ExplorationScene.create().",
+    "result": "needs_review",
+    "files_changed": [],
+    "changes_implemented": ["coffee_cart_prop_with_steam_puff", "riley_angle_sway_idle", "plant_leaf_sway_overlay", "ambient_chatter_blip"],
+    "lines_added": 0,
+    "lines_removed": 0,
+    "net_delta": 0,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "commit": "f72fb21 (already shipped — bundled with the DESIGN-005 commit)",
+    "notes": "DESIGN-004 work is ALREADY PRESENT in HEAD. The full `if (this.room.id === 'hospital_entrance')` block lives at ExplorationScene.ts lines 1109-1138 and contains all three ticketed changes plus a steam-puff bonus: (a) coffee_station sprite at tile (5,5) with drop shadow + periodic steam puff every 2.6s; (b) Riley angle wobble (-1.2°/+1.2°, 1700ms yoyo) on top of the standard breathing tween, and translucent green leaf-sway oval (-6°/+6°, ~1.9-2.3s yoyo with per-plant jitter) on each plant obstacle; (c) ambient lobby chatter via sfx_interact at volume 0.06 (well under the 0.1 cap) every 10.5s with rate 0.55-0.75 for variety. All constraints satisfied: no new SFX assets, no roomData edits, no NPC dialogue/scenarios/IDs/zones touched, did not modify StartMenu/TitleScreen/index.css/PixelComputerLogo, did not revert the !isDemoActive() PHI sorter gate. Block was added in commit f72fb21 (titled DESIGN-005 Reception) but the previous fix-agent run only logged DESIGN-005 in fix-log.json — leaving DESIGN-004 unrecorded despite being shipped. tsc clean against current HEAD with the existing block in place. No new commit created: the work is done, all 3 orchestrator items satisfied, and a duplicate commit would be churn. Recommend: design-review re-rates hospital_entrance against the existing implementation to confirm the >=8.0 lift."
   }
 ]
