@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "iteration": 1,
+    "bug_id": "BUG-001",
+    "agent": "fix-agent",
+    "commit": "00b6992",
+    "files_changed": ["tests/helpers/qa-helpers.ts"],
+    "result": "applied",
+    "verification": "code matches documented fix_approach; full playwright re-run deferred to iteration 2 orchestrator",
+    "notes": "Added dismissSorterIfPresent() helper. Called from loadRoom, loadFresh, goThroughDoor, interactWith. Test infra only — no production code touched."
+  },
+  {
+    "bug_id": "BUG-005",
+    "agent": "fix-agent",
+    "fix_plan": "Replace `font-sans` className with inline `style={{ fontFamily: '\"Press Start 2P\", monospace' }}` on the two body-text <p> tags (WelcomeStep line 85, TowerPlacedStep line 163) in OnboardingOverlay.tsx. Drop text-sm/text-xs to text-[9px] so the pixel font remains readable inside the existing card sizes. Typewriter effect untouched — it operates on React state (displayedText) and is independent of font styling. Not modifying the SelectTowerStep / PlaceTowerStep components or the MISSION BRIEF / TOWER PLACED! header lines because those already use Press Start 2P correctly.",
+    "result": "success",
+    "files_changed": ["client/src/components/breach-defense/OnboardingOverlay.tsx"],
+    "diff_summary": "Replaced `font-sans text-sm/text-xs` with `text-[9px]` + inline Press Start 2P font on the two body <p> tags. Typewriter logic and step structure unchanged.",
+    "lines_added": 4,
+    "lines_removed": 2,
+    "net_delta": 2,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "POLISH_STANDARD Section 6 Rule 6.1 satisfied: all visible UI text now renders in Press Start 2P. Two body paragraphs were the only remaining font-sans offenders in this file."
+  }
+]

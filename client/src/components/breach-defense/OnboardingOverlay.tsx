@@ -82,7 +82,8 @@ function WelcomeStep({ onAdvance }: { onAdvance: () => void }) {
            style={{ fontFamily: '"Press Start 2P", monospace' }}>
           MISSION BRIEF
         </p>
-        <p className="text-sm text-gray-200 leading-relaxed font-sans">
+        <p className="text-[9px] text-gray-200 leading-relaxed"
+           style={{ fontFamily: '"Press Start 2P", monospace' }}>
           {displayedText}
           {isTyping && <span className="animate-pulse text-[#00d4aa]">|</span>}
         </p>
@@ -160,7 +161,8 @@ function TowerPlacedStep({ onAdvance }: { onAdvance: () => void }) {
            style={{ fontFamily: '"Press Start 2P", monospace' }}>
           TOWER PLACED!
         </p>
-        <p className="text-xs text-gray-300 leading-relaxed font-sans max-w-xs">
+        <p className="text-[9px] text-gray-300 leading-relaxed max-w-xs"
+           style={{ fontFamily: '"Press Start 2P", monospace' }}>
           {displayedText}
           {isTyping && <span className="animate-pulse text-[#2ECC71]">|</span>}
         </p>
