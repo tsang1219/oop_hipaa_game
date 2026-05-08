@@ -38,6 +38,8 @@ export interface CertificateOverlayProps {
 export function CertificateOverlay({ onReturn }: CertificateOverlayProps): JSX.Element {
   const [phase, setPhase] = useState<CapstonePhase>('dim');
   const [copied, setCopied] = useState(false);
+  // Used as a key to retrigger the dialogue-box scale-pulse animation on each advance.
+  const [advanceTick, setAdvanceTick] = useState(0);
   const fanfareFiredRef = useRef(false);
 
   // ── Sequence pacing (CERT-01) ─────────────────────────────────
@@ -75,12 +77,17 @@ export function CertificateOverlay({ onReturn }: CertificateOverlayProps): JSX.E
   }, [phase]);
 
   // ── Advance dialogue / cert reveal ────────────────────────────
+  // Each player-driven advance now (1) plays the soft chime, (2) bumps advanceTick
+  // so the dialogue box re-runs its scale-pulse keyframe — Commandment 1 (every
+  // action needs a response) + Commandment 8 (proportional feedback).
   const advance = useCallback(() => {
     if (phase === 'npc') {
       eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+      setAdvanceTick((t) => t + 1);
       setPhase('line2');
     } else if (phase === 'line2') {
       eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+      setAdvanceTick((t) => t + 1);
       setPhase('cert');
     }
   }, [phase]);
@@ -194,6 +201,20 @@ export function CertificateOverlay({ onReturn }: CertificateOverlayProps): JSX.E
           0%, 100% { text-shadow: 0 0 8px rgba(255, 220, 80, 0.4); }
           50%      { text-shadow: 0 0 16px rgba(255, 220, 80, 0.8); }
         }
+        @keyframes cert-dialogue-pulse {
+          0%   { transform: scale(1); }
+          40%  { transform: scale(1.025); }
+          100% { transform: scale(1); }
+        }
+        @keyframes cert-npc-bob {
+          0%, 100% { transform: translateY(0); }
+          50%      { transform: translateY(-2px); }
+        }
+        @keyframes cert-copy-bounce {
+          0%   { transform: scale(1); }
+          40%  { transform: scale(1.06); }
+          100% { transform: scale(1); }
+        }
       `}</style>
 
       {/* Content stage — only renders from 'npc' onward */}
@@ -223,12 +244,18 @@ export function CertificateOverlay({ onReturn }: CertificateOverlayProps): JSX.E
                 backgroundRepeat: 'no-repeat',
                 imageRendering: 'pixelated',
                 filter: 'drop-shadow(0 0 12px rgba(255, 220, 80, 0.55))',
+                // Subtle "alive while speaking" idle bob — Commandment 4 (NPCs are people).
+                animation: 'cert-npc-bob 1.6s ease-in-out infinite',
               }}
             />
 
-            {/* JRPG-style dialogue box — speech bubble below the NPC */}
+            {/* JRPG-style dialogue box — speech bubble below the NPC.
+                The `key={advanceTick}` retriggers cert-dialogue-pulse on each advance,
+                giving the box a tactile bump that confirms the input landed. */}
             <div
+              key={advanceTick}
               className="border-4 border-[#FFD23F] bg-[#1a1a2e]/95 px-5 py-4 max-w-[420px] shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+              style={{ animation: 'cert-dialogue-pulse 220ms ease-out' }}
               data-testid="cert-dialogue"
             >
               {showLine1 && (
@@ -292,6 +319,9 @@ export function CertificateOverlay({ onReturn }: CertificateOverlayProps): JSX.E
                     handleCopy();
                   }}
                   data-testid="cert-copy"
+                  // Brief scale-bounce when COPIED flips true — proportional feedback
+                  // for a meaningful action (Commandment 8).
+                  style={copied ? { animation: 'cert-copy-bounce 260ms ease-out' } : undefined}
                   className={`text-[9px] px-4 py-2 border-4 border-black shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] active:translate-y-0.5 active:shadow-none transition-colors ${
                     copied
                       ? 'bg-[#2ECC71] text-black'

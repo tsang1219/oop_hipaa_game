@@ -165,5 +165,21 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Phase B design improvement (not a bug). Records Room is the FINAL demo body room before the capstone — last impression before the certificate. 4 changes shipped within budget (1 file, +34 net lines, under the 50-line cap). Targets all three weak dimensions (moment_of_joy 7, polish 7, aesthetics 7): the flickering tube + dust motes give the archive a quiet, lived-in 'old records' atmosphere (aesthetics + polish); CCO + Attorney fidget makes the two highest-stakes NPCs feel alive while they wait for the player's decision (moment_of_joy + polish); the subpoena envelope is a tiny but immediately-readable visual signal that this NPC is here on official business (polish — Commandment 8: feedback scales with moment size); the drifting cart adds horizontal life across the otherwise-static lower aisle (moment_of_joy + Commandment 7 pacing texture). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets (chose to skip the audio direction — visual-only kept the change tight and avoided new asset sourcing). DID NOT touch existing NPC dialogue/scenarios/IDs/zones — all additions are decorative tweens + transient graphics + non-interactable sprites; the existing static document_cart obstacle at (6,5) was left untouched and a SEPARATE decorative cart sprite was added in the open lower aisle so collision/completion logic is unaffected."
+  },
+  {
+    "bug_id": "DESIGN-010",
+    "agent": "fix-agent",
+    "phase": "B-design-improvement",
+    "screen": "capstone_certificate_overlay",
+    "fix_plan": "Capstone is the LAST sponsor moment (current 7.8 avg, gameplay/gameplay_mechanic both 7). Picked 3 polish items inside CertificateOverlay.tsx — no new SFX, no index.css edits, all keyframes inline. (1) Dialogue advance feedback: added local advanceTick state bumped on each advance(); applied as React `key` on the speech-box div + new `cert-dialogue-pulse` keyframe (1.0 → 1.025 → 1.0, 220ms ease-out) so the bubble re-mounts and re-runs the pulse on every SPACE/ENTER/click. The existing sfx_interact (vol 0.4) chime stays. Crunchier, tactile confirmation that input landed. (2) NPC sprite breathing: added `cert-npc-bob` keyframe (translateY 0 → -2px → 0, 1.6s ease-in-out infinite) on the inline-style sprite div. Applied directly to the inner sprite div so it doesn't conflict with the parent column's one-shot translateX 'cert-npc-in' entry tween. Reads as 'NPC is alive while speaking' — Commandment 4. (3) Copy button bounce: added `cert-copy-bounce` keyframe (scale 1 → 1.06 → 1, 260ms ease-out) and applied conditionally via inline style when copied===true. Layers on top of the existing color-change + sfx_sorter_correct chime + COPIED ✓ label, giving the meaningful sponsor-code copy a proportional moment of feedback (Commandment 8).",
+    "result": "success",
+    "files_changed": ["client/src/components/CertificateOverlay.tsx"],
+    "changes_implemented": ["dialogue_box_scale_pulse_on_advance", "npc_sprite_breathing_bob", "copy_button_scale_bounce"],
+    "lines_added": 31,
+    "lines_removed": 1,
+    "net_delta": 30,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "Phase B design improvement (capstone polish — the LAST sponsor demo beat). Within budget: 1 file (cap 2), +30 net lines (cap 50). All 3 keyframes defined inline in the component's existing <style> block — index.css NOT touched (per DO-NOT-TOUCH list). No new SFX assets; reused sfx_interact (vol 0.4 ≤ cap) for advance and existing sfx_sorter_correct (vol 0.6) for copy. DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the !isDemoActive() PHI sorter gate. Targeted the moderate dimensions (gameplay 7, gameplay_mechanic 7) by giving every player input a crunchier physical response (dialogue pulse, copy bounce) and giving the static moment more life (NPC bob)."
   }
 ]
