@@ -30,6 +30,8 @@ import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
 import { migrateV1toV2, loadSave, writeSave, hasSaveData } from '@/lib/saveData';
 import { TitleScreen } from '../components/TitleScreen';
+import { StartMenu } from '../components/StartMenu';
+import { startDemo } from '@/lib/demoSession';
 import { NarrativeContextCard } from '../components/breach-defense/NarrativeContextCard';
 import { EncounterDebrief } from '../components/breach-defense/EncounterDebrief';
 import { EncounterGameUI } from '../components/breach-defense/EncounterGameUI';
@@ -67,7 +69,7 @@ interface RoomWithDoors {
   }>;
 }
 
-type PageMode = 'title' | 'exploration' | 'dialogue' | 'gameover' | 'win';
+type PageMode = 'start-menu' | 'title' | 'exploration' | 'dialogue' | 'gameover' | 'win';
 
 const rooms = roomDataJson.rooms as RoomWithDoors[];
 const scenes = (gameDataJson as any).scenes as Scene[];
@@ -122,7 +124,9 @@ export default function UnifiedGamePage() {
       sessionStorage.removeItem('pq:skip-title');
       return 'exploration';
     }
-    return 'title';
+    // Phase 18: cold-boot players land on the StartMenu (3-button mode selector).
+    // FULL GAME button transitions to 'title' (then existing TitleScreen → exploration path).
+    return 'start-menu';
   });
   const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
   const [currentNPCId, setCurrentNPCId] = useState<string | null>(null);
@@ -851,6 +855,29 @@ export default function UnifiedGamePage() {
     setPageMode('exploration');
   }, []);
 
+  // ── Start menu (Phase 18) ──────────────────────────────────────
+  // FULL GAME: replicate the original cold-boot path — go to TitleScreen if a
+  // save exists (Resume / New Game prompt), otherwise straight into exploration.
+  const handleSelectFullGame = useCallback(() => {
+    setPageMode(hasSaveData() ? 'title' : 'exploration');
+  }, []);
+
+  // DEMO: start a fresh demo session (in-memory, isolated from full-game save)
+  // and route to exploration. Plan 18-04 wires the runtime gating that uses
+  // isDemoActive() to bypass UNLOCK_ORDER and skip writeSave calls.
+  const handleSelectDemo = useCallback(() => {
+    startDemo();
+    setPageMode('exploration');
+  }, []);
+
+  // TOWER DEFENSE: Phase 19 will wire the standalone-launch path. Plan 18-03
+  // leaves this as a no-op placeholder so the start menu still surfaces three
+  // buttons today (DEMO-01) without launching anything for TD yet.
+  const handleSelectTowerDefense = useCallback(() => {
+    // Intentional no-op — Phase 19 replaces this handler with a TD scene launch.
+    // Keeping the button visible satisfies DEMO-01's "three primary buttons" rule.
+  }, []);
+
   const handlePlayAgain = () => {
     localStorage.clear();
     window.location.reload();
@@ -880,6 +907,23 @@ export default function UnifiedGamePage() {
     if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
     return `${seconds}s`;
   };
+
+  // ── Start menu (Phase 18 — DEMO-01) ──────────────────────────
+  // First screen the player sees on `/`. Three buttons route to:
+  //   DEMO          → curated 4-room sponsor pitch (handleSelectDemo)
+  //   TOWER DEFENSE → standalone TD scene (Phase 19 will wire)
+  //   FULL GAME     → existing TitleScreen / exploration flow (unchanged)
+  // Phaser is NOT mounted while in this mode — the canvas div renders only in
+  // the main game view branch below. QA bypass paths still skip this screen.
+  if (pageMode === 'start-menu') {
+    return (
+      <StartMenu
+        onDemo={handleSelectDemo}
+        onTowerDefense={handleSelectTowerDefense}
+        onFullGame={handleSelectFullGame}
+      />
+    );
+  }
 
   // ── Title screen ──────────────────────────────────────────────
   if (pageMode === 'title') {
