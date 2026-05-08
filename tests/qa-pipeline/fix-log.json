@@ -22,5 +22,36 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "POLISH_STANDARD Section 6 Rule 6.1 satisfied: all visible UI text now renders in Press Start 2P. Two body paragraphs were the only remaining font-sans offenders in this file."
+  },
+  {
+    "bug_id": "BUG-002",
+    "agent": "fix-agent",
+    "fix_plan": "The bug ticket states that 'fixed inset-0' (full viewport) must be replaced with 'absolute inset-0' (canvas-relative) in three places: SorterContextCard.tsx:33, PHISorterOverlay.tsx:46 (error fallback), and PHISorterOverlay.tsx:228 (main overlay). The wrong-feedback toast at PHISorterOverlay.tsx:316 also uses 'fixed bottom-6' which anchors to viewport — convert to 'absolute bottom-6' so it anchors to the canvas-relative overlay parent. Both files mount inside the 'relative' canvas container in UnifiedGamePage.tsx (line 1236), so 'absolute' resolves to canvas bounds (960x720). Minimum changes: 4 className edits across 2 files; not changing any logic, props, or structure.",
+    "result": "success",
+    "files_changed": [
+      "client/src/components/phi-sorter/SorterContextCard.tsx",
+      "client/src/components/phi-sorter/PHISorterOverlay.tsx"
+    ],
+    "diff_summary": "Replaced 'fixed' with 'absolute' positioning in 4 places (1 in SorterContextCard, 3 in PHISorterOverlay) so PHI Sorter overlays render canvas-relative within the 960x720 game container instead of viewport-relative.",
+    "lines_added": 4,
+    "lines_removed": 4,
+    "net_delta": 0,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "POLISH_STANDARD Section 1 Rule 1.1: modals must be canvas-relative. Mount context confirmed: UnifiedGamePage.tsx line 1236 wraps PhaserGame + overlays in <div className='relative ...'>, so 'absolute inset-0' anchors to that 960x720 container. All 4 'fixed' positioning classes converted; toast (line 316) kept bottom-6/left-1/2 anchoring but is now relative to canvas overlay parent rather than viewport."
+  },
+  {
+    "bug_id": "BUG-003",
+    "agent": "fix-agent",
+    "fix_plan": "In ExplorationScene.create() NPC render loop (around line 930), after constructing nameLabel with setOrigin(0.5, 0), measure nameLabel.width and clamp the label's x position so its left/right edges stay within [labelPad, roomPxWidth - labelPad] using Phaser.Math.Clamp. roomPxWidth = room.width * TILE. This auto-detects edge cases for any NPC near a room boundary regardless of name length, without modifying roomData.json or per-NPC content. Origin/tween/completed-alpha behavior preserved; only the x coordinate is adjusted post-construction.",
+    "result": "success",
+    "files_changed": ["client/src/phaser/scenes/ExplorationScene.ts"],
+    "diff_summary": "Added 9-line clamp block after nameLabel construction in NPC render loop: measures nameLabel.width and clamps x to keep label inside roomPxWidth - padding on both edges.",
+    "lines_added": 10,
+    "lines_removed": 0,
+    "net_delta": 10,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "Clamp is symmetric (handles both left and right overflow). Guard `if (maxX >= minX)` skips the clamp if the label is wider than the room itself (degenerate case) so we don't pin it off-canvas. Boss text and checkmark labels above NPC head are short enough not to overflow and were left untouched per minimum-fix rule."
   }
 ]

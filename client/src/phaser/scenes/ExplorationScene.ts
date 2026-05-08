@@ -943,6 +943,16 @@ export class ExplorationScene extends Phaser.Scene {
           padding: { x: 2, y: 1 },
         },
       ).setOrigin(0.5, 0).setDepth(npcDepth + 1);
+      // Clamp label horizontally so it never overflows the room/canvas bounds.
+      // With origin (0.5, 0), the label extends labelHalf in each direction from labelX.
+      const labelPad = 2;
+      const labelHalf = nameLabel.width / 2;
+      const roomPxWidth = room.width * TILE;
+      const minX = labelHalf + labelPad;
+      const maxX = roomPxWidth - labelHalf - labelPad;
+      if (maxX >= minX) {
+        nameLabel.x = Phaser.Math.Clamp(labelX, minX, maxX);
+      }
       if (completed) nameLabel.setAlpha(0.4);
 
       // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
