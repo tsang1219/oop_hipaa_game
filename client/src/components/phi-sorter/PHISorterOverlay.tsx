@@ -43,7 +43,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // Error fallback — graceful exit on bad documentSetId (does NOT crash)
   if (!docSet) {
     return (
-      <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/80">
+      <div className="absolute inset-0 z-40 flex items-center justify-center bg-black/80">
         <div className="bg-[#2a2a3e] border-4 border-red-500 p-6 max-w-sm">
           <p
             className="text-white mb-4"
@@ -225,7 +225,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // Sorting phase UI — overlay always mounts directly here.
   return (
     <div
-      className="fixed inset-0 z-40 bg-black/85 flex flex-col items-stretch justify-center p-6"
+      className="absolute inset-0 z-40 bg-black/85 flex flex-col items-stretch justify-center p-6"
       data-testid="phi-sorter-overlay"
     >
       {/* Close button — exits without scoring, encounter remains replayable */}
@@ -313,7 +313,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
       {/* Wrong-answer educational feedback toast — visible ≥3s (Commandment 4) */}
       {wrongFeedback && (
         <div
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 max-w-md w-[90%] bg-[#3a1a2a] border-4 border-[#FF6B9D] p-4 z-50"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 max-w-md w-[90%] bg-[#3a1a2a] border-4 border-[#FF6B9D] p-4 z-50"
           data-testid="sorter-wrong-feedback"
         >
           <div

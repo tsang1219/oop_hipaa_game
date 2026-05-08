@@ -30,7 +30,7 @@ export function SorterContextCard({ title, body, onConfirm }: SorterContextCardP
 
   return (
     <div
-      className="fixed inset-0 z-40 flex items-center justify-center bg-black/70"
+      className="absolute inset-0 z-40 flex items-center justify-center bg-black/70"
       data-testid="sorter-context-card"
     >
       <div className="max-w-xl w-[90%] bg-[#1a2a3e] border-4 border-[#4FB3D9] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
