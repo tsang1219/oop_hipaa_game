@@ -1,14 +1,14 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.2
-milestone_name: Sponsor Demo
-status: roadmap-defined
-last_updated: "2026-05-08"
+milestone: v2.0
+milestone_name: One Game
+status: unknown
+last_updated: "2026-05-08T02:22:15.242Z"
 progress:
-  total_phases: 4
-  completed_phases: 0
-  total_plans: 0
-  completed_plans: 0
+  total_phases: 13
+  completed_phases: 12
+  total_plans: 38
+  completed_plans: 37
 ---
 
 # Project State
