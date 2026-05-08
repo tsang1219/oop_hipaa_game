@@ -31,7 +31,15 @@ import roomDataJson from '@/data/roomData.json';
 import { migrateV1toV2, loadSave, writeSave, hasSaveData } from '@/lib/saveData';
 import { TitleScreen } from '../components/TitleScreen';
 import { StartMenu } from '../components/StartMenu';
-import { startDemo, endDemo, isDemoActive } from '@/lib/demoSession';
+import {
+  startDemo,
+  endDemo,
+  isDemoActive,
+  markRoomComplete,
+  getCompletedDemoRooms,
+  DEMO_ROOM_ORDER,
+} from '@/lib/demoSession';
+import { CertificateOverlay } from '../components/CertificateOverlay';
 import { NarrativeContextCard } from '../components/breach-defense/NarrativeContextCard';
 import { EncounterDebrief } from '../components/breach-defense/EncounterDebrief';
 import { EncounterGameUI } from '../components/breach-defense/EncounterGameUI';
@@ -76,7 +84,8 @@ type PageMode =
   | 'dialogue'
   | 'gameover'
   | 'win'
-  | 'tower-defense-standalone';
+  | 'tower-defense-standalone'
+  | 'demo-complete'; // Phase 21 — sponsor demo capstone (cert + sponsor handoff)
 
 // Phase 19 — standalone TD round result. Distinct from EncounterResult (which carries
 // scoreContribution / outcome semantics tied to the unified compliance score).
@@ -523,6 +532,32 @@ export default function UnifiedGamePage() {
             eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.6 });
             notify(`Room Complete: ${room.name}`, { label: 'ALL CLEAR', type: 'success' });
           }
+        }
+      }
+
+      // ── Phase 21 — Sponsor demo capstone trigger ───────────────
+      // When a demo session is active and the player walks out of Medical
+      // Records AFTER having cleared all 4 demo rooms, fire the completion
+      // sequence INSTEAD OF transitioning to the next room. Player who walks
+      // through Records without satisfying its requirements simply lands at
+      // the next demo room normally — the capstone only fires once the
+      // session has actually marked all 4 rooms complete (gated by the
+      // `checkRoomCompletion` block above feeding `markRoomComplete`).
+      if (isDemoActive() && currentRoomId) {
+        const justCompleted = checkRoomCompletion(
+          rooms.find(r => r.id === currentRoomId)!,
+        );
+        if (justCompleted) {
+          // Idempotent: only adds the room if it's a demo room and not already in.
+          markRoomComplete(currentRoomId);
+        }
+        const completedDemo = getCompletedDemoRooms();
+        const allDemoRoomsDone = DEMO_ROOM_ORDER.every(id =>
+          completedDemo.includes(id),
+        );
+        if (currentRoomId === 'records_room' && allDemoRoomsDone) {
+          setPageMode('demo-complete');
+          return; // skip REACT_LOAD_ROOM — capstone takes over
         }
       }
 
@@ -1144,6 +1179,26 @@ export default function UnifiedGamePage() {
         onNewGame={handleNewGame}
         onResume={handleResume}
       />
+    );
+  }
+
+  // ── Phase 21 — Sponsor demo capstone (CERT-01..03) ────────────
+  // Demo-only completion sequence: dim → 500ms beat → fanfare → certificate
+  // animation → sponsor code reveal, with end-NPC handoff (sprite + two
+  // dialogue lines from SPONSOR_CONFIG). On dismiss, end the demo session
+  // and reload — same pattern as Phase 18 Esc and Phase 19 BACK TO MENU.
+  if (pageMode === 'demo-complete') {
+    return (
+      <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4">
+        <div className="relative w-[960px] h-[720px] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+          <CertificateOverlay
+            onReturn={() => {
+              endDemo();
+              window.location.reload();
+            }}
+          />
+        </div>
+      </div>
     );
   }
 
