@@ -160,30 +160,30 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | SORT-04 | Phase 16 | Complete |
 | SORT-05 | Phase 16 | Complete |
 | SORT-06 | Phase 16 | Complete |
-| DEMO-01 | TBD | Pending |
-| DEMO-02 | TBD | Pending |
-| DEMO-03 | TBD | Pending |
-| DEMO-04 | TBD | Pending |
-| DEMO-05 | TBD | Pending |
-| DEMO-06 | TBD | Pending |
-| DEMO-07 | TBD | Pending |
-| TD-01 | TBD | Pending |
-| TD-02 | TBD | Pending |
-| TD-03 | TBD | Pending |
-| FIX-01 | TBD | Pending |
-| FIX-02 | TBD | Pending |
-| FIX-03 | TBD | Pending |
-| FIX-04 | TBD | Pending |
-| CERT-01 | TBD | Pending |
-| CERT-02 | TBD | Pending |
-| CERT-03 | TBD | Pending |
-| CERT-04 | TBD | Pending |
+| DEMO-01 | Phase 18 | Pending |
+| DEMO-02 | Phase 18 | Pending |
+| DEMO-03 | Phase 18 | Pending |
+| DEMO-04 | Phase 18 | Pending |
+| DEMO-05 | Phase 18 | Pending |
+| DEMO-06 | Phase 18 | Pending |
+| DEMO-07 | Phase 18 | Pending |
+| TD-01 | Phase 19 | Pending |
+| TD-02 | Phase 19 | Pending |
+| TD-03 | Phase 19 | Pending |
+| FIX-01 | Phase 20 | Pending |
+| FIX-02 | Phase 20 | Pending |
+| FIX-03 | Phase 20 | Pending |
+| FIX-04 | Phase 20 | Pending |
+| CERT-01 | Phase 21 | Pending |
+| CERT-02 | Phase 21 | Pending |
+| CERT-03 | Phase 21 | Pending |
+| CERT-04 | Phase 18 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0
 - v2.1 requirements (Phase 16 portion): 6 total, mapped: 6, unmapped: 0
-- v2.2 requirements: 18 total, mapped: 0, unmapped: 18 (roadmapper to map)
+- v2.2 requirements: 18 total, mapped: 18, unmapped: 0
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-05-07 — Added v2.2 Sponsor Demo requirements: DEMO-01..07, TD-01..03, FIX-01..04, CERT-01..04 (18 reqs).*
+*Last updated: 2026-05-08 — Mapped v2.2 requirements to Phases 18-21. CERT-04 (sponsor config scaffold) lands in Phase 18 so dependent phases can reference its shape; CERT-01..03 (completion sequence + end NPC) land in Phase 21.*

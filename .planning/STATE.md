@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v2.2
 milestone_name: Sponsor Demo
-status: defining-requirements
-last_updated: "2026-05-07"
+status: roadmap-defined
+last_updated: "2026-05-08"
 progress:
-  total_phases: 0
+  total_phases: 4
   completed_phases: 0
   total_plans: 0
   completed_plans: 0
@@ -22,17 +22,17 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Not started (defining requirements)
+Phase: Phase 18 (next — not started)
 Plan: —
-Status: Defining requirements
-Last activity: 2026-05-07 — Milestone v2.2 started; v2.1 paused (Phase 16 PHI Sorter at 98%, Plan 04 deferred)
+Status: Roadmap defined; ready for `/gsd:plan-phase 18`
+Last activity: 2026-05-08 — Roadmap created. v2.2 mapped to Phases 18-21 (Demo Mode → TD Standalone → Polish → Completion+Sponsor Hook). 18/18 v2.2 requirements mapped.
 
 Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 19 (v2.0)
+- Total plans completed: 19 (v2.0) + 3 (Phase 16 partial) = 22
 - Average duration: ~7m/plan
 - Total execution time: ~135m
 
@@ -45,6 +45,7 @@ Progress: [░░░░░░░░░░] 0%
 | 13. Encounter Integration | 4/4 | ~9m | ~2m |
 | 14. Three-Act Narrative Arc | 4/4 | ~8m | ~2m |
 | 15. Polish and Completion | 3/3 | ~20m | ~7m |
+| 16. PHI Sorter Encounter | 3/4 | (paused) | — |
 
 *Updated after each plan completion*
 
@@ -94,6 +95,10 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 16-03]: draggingOverBucket state separate from hoveredBucket — per-bucket drag-enter handlers prevent dual highlight (W2 fix)
 - [Phase 16-03]: takeaways passed through in onComplete from docSet.takeaways directly (W4 — avoids redundant re-fetch in Plan 04)
 - [Phase 16-03]: SorterContextCard uses calm blue/teal palette (#1a2a3e + #4FB3D9) — distinct from NarrativeContextCard red SECURITY ALERT
+- [v2.2-roadmap]: 4-phase shape (18 → 19 → 20 → 21). Phase 18 owns CERT-04 sponsor config scaffold so Phase 21 can populate without source-edits. Phase 20 (polish) sequenced after Phase 18 so the 4 demo rooms are known before fixes are scoped.
+- [v2.2-roadmap]: Phase 19 (TD standalone) is independent of Phases 20/21 — can run in parallel with polish work if needed.
+- [v2.2-roadmap]: Phase 21 depends on Phase 18 (demo flow + sponsor config) and Phase 20 (rooms polished); must sequence after both.
+- [v2.2-roadmap]: Pure curation milestone — reuses roomData.json verbatim. No new scenes, NPCs, or dialogue authored. Anything that requires new content is out of scope.
 
 ### Pending Todos
 
@@ -102,15 +107,16 @@ None.
 ### Blockers/Concerns
 
 - RESOLVED: Unified score formula: addScore() updates both privacyScore and unifiedScore; encounter contributes up to +12
-- RESOLVED: /breach standalone mode removed per user decision; BreachDefenseScene only runs as encounter
+- RESOLVED: /breach standalone mode removed per user decision; BreachDefenseScene only runs as encounter — NOTE: Phase 19 (TD-01) re-introduces standalone-launch path through start menu, not through `/breach` route
 - SpriteFactory.ts still active — retirement deferred to v2.1 (was v1.1)
 - RESOLVED: HubWorldScene became room data entry (Phase 12 decision)
 - RESOLVED: Music on scene init now reads current act and starts the correct track (fixed in Phase 15).
+- v2.1 Phase 16 Plan 04 paused at 98% — will resume after v2.2 ships and sponsor outreach lands.
 
 ## Session Continuity
 
-Last session: 2026-05-07
-Stopped at: v2.2 milestone started; PROJECT.md and STATE.md updated. Defining requirements next.
-Resume: Continue v2.2 workflow → REQUIREMENTS.md → ROADMAP.md.
+Last session: 2026-05-08
+Stopped at: v2.2 ROADMAP.md created. Phases 18-21 defined with success criteria. 18/18 v2.2 requirements mapped. REQUIREMENTS.md traceability updated.
+Resume: `/gsd:plan-phase 18` to decompose Phase 18 (Demo Mode + Start Menu Infrastructure) into plans.
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.

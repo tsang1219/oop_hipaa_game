@@ -5,7 +5,8 @@
 - v1.0 **Polish** — Phases 1-5 (shipped 2026-03-01) — [archive](milestones/v1.0-ROADMAP.md)
 - v1.1 **Sprite Overhaul** — Phases 6-10 (archived partial) — [archive](milestones/v1.1-ROADMAP.md)
 - v2.0 **One Game** — Phases 11-15 (shipped 2026-03-28)
-- v2.1 **Full Vision** — Phases 16-17 (in progress)
+- v2.1 **Full Vision** — Phases 16-17 (paused — Phase 16 at 98%, Phase 17 not started)
+- v2.2 **Sponsor Demo** — Phases 18-21 (active — sponsor pitch in 1-2 days)
 
 ## Phases
 
@@ -179,13 +180,11 @@ Plans:
 
 ---
 
-### v2.1 Full Vision (In Progress)
+### v2.1 Full Vision (Paused — Resume After v2.2 Sponsor Outreach)
 
 **Milestone Goal:** Round out the encounter library with the two highest-value mini-games deferred from v2.0 — a PHI Sorter that teaches "Is this PHI?" through play, and a whack-a-mole Breach Triage that drills the Breach Notification Rule under time pressure. Both reuse the Phase 13 encounter trigger infrastructure (sleep/wake, NarrativeContextCard, EncounterDebrief, unified compliance score).
 
-**Sequencing:** PHI Sorter → Breach Triage. Outbound Tower Defense (ENHANCEMENT_BRIEF §4.3) is deprioritized for this milestone — revisit after these two ship.
-
-**Why this order:** PHI Sorter is the lower-engineering-risk new mechanic (no new grid engine; drag/drop + keyboard) and lands in Act 1 where the player needs an early "I get it" moment. Breach Triage tests a different muscle (keyboard reflex + classification under time) and shores up the THIN-rated Breach Notification coverage in the Training Framework.
+**Pause status (2026-05-07):** Phase 16 at 98% (Plans 01-03 complete, Plan 04 deferred). Phase 17 not started. Resume after v2.2 sponsor pitch lands.
 
 ---
 
@@ -223,9 +222,68 @@ Plans:
 
 ---
 
+### v2.2 Sponsor Demo (Active — 1-2 Day Build)
+
+**Milestone Goal:** Ship a curated 4-room sponsor-pitch demo of PrivacyQuest in 1-2 days. Out-of-Pocket (Nikhil) outreach next week at ~$10K target. Pure curation/polish — reuses existing rooms, NPCs, dialogue. No new mechanics, no new content authored. Pluggable sponsor config (`{ name, character_sprite, two_dialogue_lines, code }`) so future sponsors swap in via single file edit.
+
+**Sequencing rationale:**
+- Phase 18 first — start menu + demo-mode infrastructure + sponsor config scaffold. Demo path must exist before completion sequence has anywhere to fire from. Sponsor config shape is set up here so Phase 21 can populate it without source-code churn.
+- Phase 19 — Tower Defense standalone launch. Independent of demo path; small refactor of BreachDefenseScene's encounter-mode entry point so it runs without narrative wrapper.
+- Phase 20 — First-impression polish (FIX-01/02/03/04). Best applied AFTER the 4-room demo path is wired so we know exactly which rooms are in scope and can scope fixes precisely.
+- Phase 21 — Completion sequence + sponsor hook. Depends on Phase 18 (demo flow exists) and reads the Phase 18 sponsor config file.
+
+---
+
+### Phase 18: Demo Mode + Start Menu Infrastructure
+**Goal**: A start menu with three primary buttons routes the player into Demo / Tower Defense / Full Game; the Demo path is a curated 4-room flow (Reception → ER → Break Room → Medical Records) isolated from the full game's progression and save state. Sponsor config file scaffold lands here so Phase 21 can populate without source edits.
+**Depends on**: Phase 15 (existing UnifiedGamePage + useGameState; door state visuals reused)
+**Requirements**: DEMO-01, DEMO-02, DEMO-03, DEMO-04, DEMO-05, DEMO-06, DEMO-07, CERT-04
+**Success Criteria** (what must be TRUE):
+  1. The start menu shows three primary buttons — "Demo", "Tower Defense", "Full Game" — and is the first screen the player sees on `/`.
+  2. Pressing "Full Game" enters the existing full-game flow with progression, unlocks, and save state behaving exactly as before — no regression.
+  3. Pressing "Demo" enters a curated flow where Reception, Emergency Room, Break Room, and Medical Records are all immediately accessible and traversable in that intended order, with no full-game unlock gating applied.
+  4. Demo rooms reuse the existing scenarios, NPCs, and dialogue from `roomData.json` verbatim — no new content authored — and demo activity does not read or write the full-game save key.
+  5. The player can exit the demo at any time (ESC or in-game exit affordance) and is returned to the start menu.
+  6. A single sponsor config file exists at a known path with the shape `{ name, character_sprite, two_dialogue_lines, code }`, is loaded at start menu boot, and editing it changes the sponsor identity without any source-code changes (verified by edit-only swap test).
+**Plans**: TBD (kicked off by `/gsd:plan-phase 18`)
+
+### Phase 19: Tower Defense Standalone Launch
+**Goal**: The "Tower Defense" start-menu button launches BreachDefenseScene as a self-contained mini-game with no narrative wrapper, no encounter context, and no save-state side effects — returning the player to the start menu on win or loss.
+**Depends on**: Phase 18 (start menu exists with TD button wired)
+**Requirements**: TD-01, TD-02, TD-03
+**Success Criteria** (what must be TRUE):
+  1. Pressing "Tower Defense" on the start menu launches BreachDefenseScene directly with no NarrativeContextCard, no IT Office trigger, and no surrounding ExplorationScene — first frame after press is the tower defense grid.
+  2. Winning or losing the standalone TD round returns the player to the start menu with no encounter result feedback, no debrief modal, and no compliance score updates persisted.
+  3. Playing standalone Tower Defense does not modify the full-game save key, the demo session state, or any localStorage value that affects either the Demo or Full Game flows on subsequent launches.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 19`)
+
+### Phase 20: First-Impression Polish
+**Goal**: The three known visual/audio bugs that hurt the first-impression demo run (V1 flat sprite, V4 HUD overlay on entry, V7 loud honk near NPCs) are fixed in the 4 demo rooms without regressing the full-game flow.
+**Depends on**: Phase 18 (demo path defines which 4 rooms are in scope)
+**Requirements**: FIX-01, FIX-02, FIX-03, FIX-04
+**Success Criteria** (what must be TRUE):
+  1. On initial load of any demo room (and the full-game first room), the player sprite renders correctly textured and animated before any movement input — no flat colored rectangle visible at any point.
+  2. On entry to any demo room, the HUD/progress bar does not overlay or block the player's view of the room — the player can see and interact with NPCs and zones immediately on entry.
+  3. The loud honk audio cue near NPCs in the demo path is removed or replaced with an appropriate, proportional cue (Commandment 8) — no jarring honk plays during a demo room playthrough.
+  4. All three fixes are verified in Reception, Emergency Room, Break Room, and Medical Records, and a regression pass on the full-game flow shows no new bugs introduced in non-demo rooms.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 20`)
+
+### Phase 21: Completion Sequence + Sponsor Hook
+**Goal**: Exiting Medical Records as the final demo room triggers a deliberate dim → beat → fanfare → certificate reveal sequence with copy-to-clipboard sponsor code, and an end NPC hands the prize using the sponsor sprite + dialogue lines from the Phase 18 config file.
+**Depends on**: Phase 18 (demo flow + sponsor config scaffold), Phase 20 (demo rooms polished)
+**Requirements**: CERT-01, CERT-02, CERT-03
+**Success Criteria** (what must be TRUE):
+  1. Exiting Medical Records as the fourth and final demo room triggers a deliberate sequence in this exact order: screen dim, brief anticipatory beat (~500ms silence), fanfare (audio + VFX), certificate animation in, then sponsor code reveal — pacing follows Commandment 2 (anticipation before reward).
+  2. The completion certificate displays the configured sponsor's name and shows the sponsor code in monospace font with a clearly labeled copy-to-clipboard button that gives audio + visual confirmation when pressed (Commandment 1).
+  3. An end NPC in the Medical Records closer renders using the sponsor's `character_sprite` and speaks the two configured `two_dialogue_lines` from the sponsor config — handing the prize feels like an in-world Zelda item-get moment (Commandment 6).
+  4. Editing only the sponsor config file (no source-code changes) changes the certificate name, code, end-NPC sprite, and end-NPC dialogue lines on the next launch — verified by a swap test with a second sponsor config.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 21`)
+
+---
+
 ## Progress
 
-**Execution Order:** 11 → 12 → 13 → 14 → 15 → 16 → 17
+**Execution Order:** 11 → 12 → 13 → 14 → 15 → 16 (paused) → 18 → 19 → 20 → 21 → (resume 16 → 17)
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
@@ -239,5 +297,9 @@ Plans:
 | 13. Encounter Integration | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |
-| 16. PHI Sorter Encounter | 3/4 | In Progress|  | - |
+| 16. PHI Sorter Encounter | v2.1 | 3/4 | Paused | - |
 | 17. Breach Triage Encounter | v2.1 | 0/0 | Pending | - |
+| 18. Demo Mode + Start Menu | v2.2 | 0/0 | Not started | - |
+| 19. Tower Defense Standalone | v2.2 | 0/0 | Not started | - |
+| 20. First-Impression Polish | v2.2 | 0/0 | Not started | - |
+| 21. Completion + Sponsor Hook | v2.2 | 0/0 | Not started | - |
