@@ -1270,6 +1270,10 @@ export class BreachDefenseScene extends Phaser.Scene {
       securityScore: this.securityScore,
       budget: this.budget,
       wave: this.wave,
+      // Phase 19: include totalWaves so EncounterGameUI's HUD shows the right
+      // denominator in both modes. Encounter mode uses the 4-wave subset; standalone
+      // mode falls back to the full WAVES set (10 waves).
+      totalWaves: this.getActiveWaves().length,
       gameState: this.gameState,
       enemyCount: this.enemies.length,
       towerCount: this.towers.length

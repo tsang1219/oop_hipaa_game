@@ -300,6 +300,6 @@ Plans:
 | 16. PHI Sorter Encounter | v2.1 | 3/4 | Paused | - |
 | 17. Breach Triage Encounter | v2.1 | 0/0 | Pending | - |
 | 18. Demo Mode + Start Menu | v2.2 | Complete    | 2026-05-08 | - |
-| 19. Tower Defense Standalone | v2.2 | 0/0 | Not started | - |
+| 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 0/0 | Not started | - |
 | 21. Completion + Sponsor Hook | v2.2 | 0/0 | Not started | - |

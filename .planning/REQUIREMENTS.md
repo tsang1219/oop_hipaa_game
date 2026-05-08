@@ -83,9 +83,9 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 
 ### Tower Defense Standalone
 
-- [ ] **TD-01**: "Tower Defense" start menu button launches BreachDefenseScene directly without narrative wrapper or encounter trigger context
-- [ ] **TD-02**: Standalone TD returns to the start menu on win or lose with no encounter result feedback or score persistence
-- [ ] **TD-03**: Standalone TD does not modify full-game or demo save state
+- [x] **TD-01**: "Tower Defense" start menu button launches BreachDefenseScene directly without narrative wrapper or encounter trigger context
+- [x] **TD-02**: Standalone TD returns to the start menu on win or lose with no encounter result feedback or score persistence
+- [x] **TD-03**: Standalone TD does not modify full-game or demo save state
 
 ### First-Impression Polish
 
@@ -167,9 +167,9 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | DEMO-05 | Phase 18 | Pending |
 | DEMO-06 | Phase 18 | Pending |
 | DEMO-07 | Phase 18 | Pending |
-| TD-01 | Phase 19 | Pending |
-| TD-02 | Phase 19 | Pending |
-| TD-03 | Phase 19 | Pending |
+| TD-01 | Phase 19 | Complete |
+| TD-02 | Phase 19 | Complete |
+| TD-03 | Phase 19 | Complete |
 | FIX-01 | Phase 20 | Pending |
 | FIX-02 | Phase 20 | Pending |
 | FIX-03 | Phase 20 | Pending |
@@ -186,4 +186,4 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 
 ---
 *Requirements defined: 2026-03-26*
-*Last updated: 2026-05-08 — Mapped v2.2 requirements to Phases 18-21. CERT-04 (sponsor config scaffold) lands in Phase 18 so dependent phases can reference its shape; CERT-01..03 (completion sequence + end NPC) land in Phase 21.*
+*Last updated: 2026-05-08 — Phase 19 shipped: TD-01..03 complete. Standalone TD launches via start menu, returns to menu on win/lose, no save mutation.*

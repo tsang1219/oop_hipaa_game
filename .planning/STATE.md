@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 18 (next — not started)
-Plan: —
-Status: Roadmap defined; ready for `/gsd:plan-phase 18`
-Last activity: 2026-05-08 — Roadmap created. v2.2 mapped to Phases 18-21 (Demo Mode → TD Standalone → Polish → Completion+Sponsor Hook). 18/18 v2.2 requirements mapped.
+Phase: Phase 19 — Tower Defense Standalone (Complete)
+Plan: 19-01 (Complete)
+Status: Shipped — TD-01..03 verified by build + type check; manual verification deferred to user.
+Last activity: 2026-05-08 — Phase 19 shipped. Standalone TD launches BreachDefenseScene directly from start menu; win/lose returns to menu via reload; no save mutation. EncounterGameUI reused with all 6 tower IDs; React-side wave-complete handler unsticks the scene's mid-game educational pauses since standalone is self-contained.
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -99,6 +99,10 @@ Progress: [░░░░░░░░░░] 0%
 - [v2.2-roadmap]: Phase 19 (TD standalone) is independent of Phases 20/21 — can run in parallel with polish work if needed.
 - [v2.2-roadmap]: Phase 21 depends on Phase 18 (demo flow + sponsor config) and Phase 20 (rooms polished); must sequence after both.
 - [v2.2-roadmap]: Pure curation milestone — reuses roomData.json verbatim. No new scenes, NPCs, or dialogue authored. Anything that requires new content is out of scope.
+- [Phase 19]: BreachDefenseScene's encounterId===null branch already supports standalone arcade mode — Phase 19 wiring lives entirely in UnifiedGamePage.tsx (no scene refactor needed beyond adding totalWaves to broadcastState payload).
+- [Phase 19]: Standalone TD reuses EncounterGameUI HUD with all 6 tower IDs passed in. Educational pauses at waves 3/5/7/9 are unstuck via React-side onWaveComplete → REACT_DISMISS_TUTORIAL — keeps the sponsor-pitch flow unbroken without scene-side flag refactoring.
+- [Phase 19]: Win/lose "Back to Menu" path uses window.location.reload() — same pattern as demo Esc. Guarantees clean teardown of Phaser scene + React state and brings the player to the cold-boot StartMenu.
+- [Phase 19]: Save isolation (TD-03) achieved by NOT calling any gameState mutator from the standalone code path — no addScore, no recordEncounterResult, no completeRoom. Persistence useEffect only fires when gameState.state changes, which it doesn't here.
 
 ### Pending Todos
 
@@ -116,7 +120,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-05-08
-Stopped at: v2.2 ROADMAP.md created. Phases 18-21 defined with success criteria. 18/18 v2.2 requirements mapped. REQUIREMENTS.md traceability updated.
-Resume: `/gsd:plan-phase 18` to decompose Phase 18 (Demo Mode + Start Menu Infrastructure) into plans.
+Stopped at: Phase 19 shipped — Tower Defense standalone launch wired in UnifiedGamePage. TD-01..03 traceability updated.
+Resume: Phase 20 (First-Impression Polish) — fix V1 sprite, V4 HUD overlay, V7 honk in the 4 demo rooms.
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.
