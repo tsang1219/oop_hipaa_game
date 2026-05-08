@@ -6,12 +6,13 @@
  *   TOWER DEFENSE  →  standalone arcade-mode TD (Phase 19 wires)
  *   FULL GAME  →  existing full-game flow with progression + save
  *
- * Pure presentation: no Phaser, no eventBridge, no localStorage. The parent
- * (UnifiedGamePage) wires the three callbacks. Keyboard nav matches the
- * existing TitleScreen vocabulary: Arrow / W-S to move, Enter / Space to confirm.
+ * Pure presentation: no Phaser, no localStorage. Routes SFX through eventBridge.
+ * Keyboard nav matches TitleScreen vocabulary: Arrow / W-S, Enter / Space.
  */
 
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
+import { PixelComputerLogo } from './PixelComputerLogo';
 
 export interface StartMenuProps {
   onDemo: () => void;
@@ -21,33 +22,83 @@ export interface StartMenuProps {
 
 interface MenuItem {
   label: string;
+  description: string;
+  accent: string;
   action: () => void;
 }
 
 export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps): JSX.Element {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showLogo, setShowLogo] = useState(false);
+  const [showTitle, setShowTitle] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [showFooter, setShowFooter] = useState(false);
+  const lastSelectedRef = useRef(0);
 
-  // Fixed order — DEMO first (the primary sponsor-pitch path), TD, then FULL GAME.
   const menuItems: MenuItem[] = [
-    { label: 'DEMO', action: onDemo },
-    { label: 'TOWER DEFENSE', action: onTowerDefense },
-    { label: 'FULL GAME', action: onFullGame },
+    {
+      label: 'DEMO',
+      description: 'GET A TASTE — 4 ROOMS',
+      accent: '#00d4aa',
+      action: onDemo,
+    },
+    {
+      label: 'TOWER DEFENSE',
+      description: 'STOP THE BREACH — ARCADE',
+      accent: '#FF6B9D',
+      action: onTowerDefense,
+    },
+    {
+      label: 'FULL GAME',
+      description: 'PROTECT THE HOSPITAL',
+      accent: '#FFD23F',
+      action: onFullGame,
+    },
   ];
 
-  // Staggered reveal (matches TitleScreen pacing).
+  // Staggered reveal.
   useEffect(() => {
     const t1 = setTimeout(() => setShowLogo(true), 150);
-    const t2 = setTimeout(() => setShowMenu(true), 600);
-    const t3 = setTimeout(() => setShowFooter(true), 1100);
-    return () => {
-      clearTimeout(t1);
-      clearTimeout(t2);
-      clearTimeout(t3);
-    };
+    const t2 = setTimeout(() => setShowTitle(true), 550);
+    const t3 = setTimeout(() => setShowMenu(true), 950);
+    const t4 = setTimeout(() => setShowFooter(true), 1400);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); clearTimeout(t4); };
   }, []);
+
+  // SFX helpers — pitch-varied tick on nav, lower-pitch confirm on select.
+  const playNav = useCallback(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, {
+      key: 'sfx_interact',
+      volume: 0.18,
+      rate: 1.4,
+    });
+  }, []);
+
+  const playSelect = useCallback(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, {
+      key: 'sfx_interact',
+      volume: 0.5,
+      rate: 0.85,
+    });
+  }, []);
+
+  // Play nav tick whenever selection actually changes.
+  useEffect(() => {
+    if (!showMenu) return;
+    if (selectedIndex !== lastSelectedRef.current) {
+      lastSelectedRef.current = selectedIndex;
+      playNav();
+    }
+  }, [selectedIndex, showMenu, playNav]);
+
+  const confirm = useCallback(
+    (action: () => void) => {
+      playSelect();
+      // Tiny delay so the click sound has a moment to fire before the page swaps.
+      setTimeout(action, 90);
+    },
+    [playSelect],
+  );
 
   // Keyboard navigation.
   const handleKeyDown = useCallback(
@@ -61,10 +112,10 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
         setSelectedIndex(i => (i + 1) % menuItems.length);
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        menuItems[selectedIndex].action();
+        confirm(menuItems[selectedIndex].action);
       }
     },
-    [showMenu, selectedIndex, menuItems],
+    [showMenu, selectedIndex, menuItems, confirm],
   );
 
   useEffect(() => {
@@ -73,15 +124,33 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
   }, [handleKeyDown]);
 
   // Twinkling stars — deterministic positions.
-  const stars = Array.from({ length: 24 }, (_, i) => ({
+  const stars = Array.from({ length: 28 }, (_, i) => ({
     left: `${((i * 41 + 7) % 97)}%`,
     top: `${((i * 59 + 11) % 80)}%`,
     delay: `${(i * 0.35) % 3}s`,
     size: i % 3 === 0 ? 3 : 2,
   }));
 
+  // Floating pixel "data bits" — drift upward across the screen.
+  const drifters = Array.from({ length: 14 }, (_, i) => ({
+    left: `${((i * 71 + 5) % 95)}%`,
+    delay: `${(i * 1.7) % 12}s`,
+    duration: `${10 + (i % 5) * 2}s`,
+    color: i % 3 === 0 ? '#FF6B9D' : i % 3 === 1 ? '#00d4aa' : '#6DD8F9',
+    size: i % 4 === 0 ? 4 : 3,
+  }));
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-[#1a1a2e] relative overflow-hidden font-['Press_Start_2P']">
+      {/* Vignette / radial gradient — adds depth */}
+      <div
+        className="absolute inset-0 pointer-events-none z-0"
+        style={{
+          background:
+            'radial-gradient(ellipse at center, rgba(93, 176, 202, 0.08) 0%, rgba(26, 26, 46, 0) 60%)',
+        }}
+      />
+
       {/* CRT scanline overlay */}
       <div
         className="absolute inset-0 pointer-events-none z-10"
@@ -92,76 +161,160 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
         }}
       />
 
+      {/* Slow scan sweep — soft horizontal band drifting down */}
+      <div
+        className="absolute left-0 right-0 h-32 pointer-events-none z-10"
+        style={{
+          background:
+            'linear-gradient(180deg, transparent 0%, rgba(108, 216, 249, 0.04) 50%, transparent 100%)',
+          animation: 'scan-sweep 9s linear infinite',
+        }}
+      />
+
       {/* Twinkling stars */}
       {stars.map((star, i) => (
         <div
-          key={i}
-          className="absolute rounded-full bg-white pointer-events-none"
+          key={`star-${i}`}
+          className="absolute pointer-events-none"
           style={{
             left: star.left,
             top: star.top,
             width: star.size,
             height: star.size,
+            background: 'white',
             animation: `star-twinkle ${2 + (i % 3)}s ease-in-out ${star.delay} infinite`,
           }}
         />
       ))}
 
-      {/* Title block */}
+      {/* Floating data bits drifting upward */}
+      {drifters.map((d, i) => (
+        <div
+          key={`drift-${i}`}
+          className="absolute pointer-events-none z-0"
+          style={{
+            left: d.left,
+            bottom: '-10px',
+            width: d.size,
+            height: d.size,
+            background: d.color,
+            opacity: 0.6,
+            boxShadow: `0 0 6px ${d.color}`,
+            animation: `pixel-drift-up ${d.duration} linear ${d.delay} infinite`,
+          }}
+        />
+      ))}
+
+      {/* Pixel computer logo */}
       <div
-        className="z-20 mb-2 text-center"
+        className="z-20 mb-3"
         style={{
           opacity: showLogo ? 1 : 0,
-          transform: showLogo ? 'translateY(0)' : 'translateY(20px)',
+          transform: showLogo ? 'translateY(0) scale(1)' : 'translateY(24px) scale(0.85)',
+          transition: 'all 700ms ease-out',
+        }}
+      >
+        <PixelComputerLogo className="w-20 h-20 drop-shadow-[0_0_14px_rgba(93,176,202,0.5)]" />
+      </div>
+
+      {/* Title block */}
+      <div
+        className="z-20 mb-1 text-center"
+        style={{
+          opacity: showTitle ? 1 : 0,
+          transform: showTitle ? 'translateY(0)' : 'translateY(20px)',
           transition: 'all 700ms ease-out',
         }}
       >
         <h1
-          className="text-[20px] font-bold tracking-wider leading-relaxed text-white"
-          style={{ animation: showLogo ? 'title-glow 3s ease-in-out infinite' : 'none' }}
+          className="text-[22px] font-bold tracking-wider leading-relaxed text-white"
+          style={{ animation: showTitle ? 'title-glow 3s ease-in-out infinite' : 'none' }}
         >
           HIPAApocalypse
         </h1>
-        <p className="text-[8px] tracking-[0.3em] text-[#00d4aa] mt-3">
-          PICK YOUR POISON
+        <p className="text-[8px] tracking-[0.4em] text-[#00d4aa] mt-3">
+          CHOOSE YOUR PATH
         </p>
       </div>
 
-      {/* Menu card */}
+      {/* Menu cards — themed, with descriptions */}
       <div
-        className="z-20 mt-8"
+        className="z-20 mt-8 flex flex-col gap-3 w-[420px] max-w-[90vw]"
         style={{
           opacity: showMenu ? 1 : 0,
           transform: showMenu ? 'translateY(0)' : 'translateY(20px)',
           transition: 'all 500ms ease-out',
         }}
       >
-        <div className="bg-[#16213e] border-4 border-[#FF6B9D] rounded-[4px] px-10 py-6 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <div className="space-y-4">
-            {menuItems.map((item, i) => (
-              <button
-                key={item.label}
-                onClick={item.action}
-                onMouseEnter={() => setSelectedIndex(i)}
-                className={`flex items-center gap-3 w-full text-left text-[12px] transition-colors duration-150 ${
-                  selectedIndex === i ? 'text-white' : 'text-gray-500 hover:text-gray-300'
-                }`}
-                data-testid={`start-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+        {menuItems.map((item, i) => {
+          const isSelected = selectedIndex === i;
+          return (
+            <button
+              key={item.label}
+              onClick={() => confirm(item.action)}
+              onMouseEnter={() => setSelectedIndex(i)}
+              className="group relative text-left transition-transform duration-150"
+              style={{
+                transform: isSelected ? 'translateX(6px)' : 'translateX(0)',
+              }}
+              data-testid={`start-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+            >
+              <div
+                className="relative flex items-center gap-4 px-5 py-4 border-4 rounded-[4px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                style={{
+                  backgroundColor: isSelected ? `${item.accent}1A` : '#16213e',
+                  borderColor: isSelected ? item.accent : '#2a3a5c',
+                  animation: isSelected ? 'menu-card-pulse 2s ease-in-out infinite' : 'none',
+                }}
               >
+                {/* Left accent bar */}
+                <div
+                  className="absolute left-0 top-0 bottom-0 w-1.5"
+                  style={{ backgroundColor: item.accent }}
+                />
+
+                {/* Cursor */}
                 <span
-                  className="inline-block w-4 text-[#FF6B9D]"
+                  className="inline-block w-4 text-[14px]"
                   style={{
-                    animation: selectedIndex === i ? 'cursor-blink 800ms step-end infinite' : 'none',
-                    opacity: selectedIndex === i ? 1 : 0,
+                    color: item.accent,
+                    animation: isSelected ? 'cursor-blink 800ms step-end infinite' : 'none',
+                    opacity: isSelected ? 1 : 0,
                   }}
                 >
                   {'>'}
                 </span>
-                <span>{item.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
+
+                {/* Label + description */}
+                <div className="flex flex-col gap-1.5 flex-1">
+                  <div
+                    className="text-[14px] tracking-wider transition-colors duration-150"
+                    style={{ color: isSelected ? '#ffffff' : '#888899' }}
+                  >
+                    {item.label}
+                  </div>
+                  <div
+                    className="text-[7px] tracking-[0.2em] transition-colors duration-150"
+                    style={{ color: isSelected ? item.accent : '#555569' }}
+                  >
+                    {item.description}
+                  </div>
+                </div>
+
+                {/* Right chevron — appears on selected */}
+                <span
+                  className="text-[14px] transition-opacity duration-150"
+                  style={{
+                    color: item.accent,
+                    opacity: isSelected ? 1 : 0,
+                  }}
+                >
+                  ◆
+                </span>
+              </div>
+            </button>
+          );
+        })}
       </div>
 
       {/* Footer hint */}
@@ -173,7 +326,7 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
         }}
       >
         <p className="text-[7px] text-gray-600 tracking-wide">
-          ARROW KEYS TO SELECT &bull; ENTER TO CONFIRM
+          ↑↓ TO SELECT &bull; ENTER TO CONFIRM
         </p>
       </div>
 

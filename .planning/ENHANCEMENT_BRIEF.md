@@ -6,6 +6,8 @@
 
 > **V2.0 Scope Note (2026-03-29):** V2.0 delivered Phases 11-15 (stabilization, unified navigation, inbound TD encounter integration, three-act narrative, polish). Sections 4.1 (PHI Sorting), 4.3 (Outbound TD), and 4.4 (Breach Triage) describe encounter types **deferred to V2.1+**. Section 4.2 (Inbound TD) is the only new encounter type implemented in V2.0. Implementation phases in Section 10 use the original numbering (0-7); the actual V2.0 execution used Phases 11-15 in the ROADMAP.
 
+> **V2.1 Sequencing Note (2026-05-01):** V2.1 scopes only the two highest-value deferred encounters: **§4.1 PHI Sorting → Phase 16** (Act 1 Reception trigger first, scaling into Act 2), then **§4.4 Breach Triage → Phase 17** (whack-a-mole pacing, keyboard-driven, Act 3 ER trigger). **§4.3 Outbound TD is deprioritized** out of V2.1 — revisit after Phases 16-17 ship. Rationale: PHI Sorter is lower-engineering-risk (no new grid engine) and gives players an early "I get it" moment; Breach Triage shores up THIN-rated coverage in the HIPAA Training Framework. Outbound TD requires the most new content (5-6 threat types, 4-5 tower types) and has been pushed until the encounter library is broader.
+
 ---
 
 ## 1. Problem Statement

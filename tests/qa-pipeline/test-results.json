@@ -10,14 +10,18 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {},
+    "metadata": {
+      "actualWorkers": 1
+    },
     "preserveOutput": "always",
     "projects": [
       {
         "outputDir": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {},
+        "metadata": {
+          "actualWorkers": 1
+        },
         "id": "",
         "name": "",
         "testDir": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests",
@@ -31,20 +35,7 @@
     "quiet": false,
     "reporter": [
       [
-        "html",
-        {
-          "open": "never"
-        }
-      ],
-      [
-        "list",
-        null
-      ],
-      [
-        "json",
-        {
-          "outputFile": "tests/qa-pipeline/test-results.json"
-        }
+        "json"
       ]
     ],
     "reportSlowTests": {
@@ -99,7 +90,30 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:11:42.335Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                            "line": 18,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
                   "status": "skipped"
                 }
               ],
@@ -128,7 +142,30 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:11:42.335Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                            "line": 22,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
                   "status": "skipped"
                 }
               ],
@@ -157,7 +194,30 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:11:42.335Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                            "line": 26,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
                   "status": "skipped"
                 }
               ],
@@ -186,7 +246,30 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
+                  "results": [
+                    {
+                      "workerIndex": -1,
+                      "parallelIndex": -1,
+                      "status": "skipped",
+                      "duration": 0,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:11:42.335Z",
+                      "annotations": [
+                        {
+                          "type": "skip",
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/breach-gameplay.spec.ts",
+                            "line": 30,
+                            "column": 8
+                          }
+                        }
+                      ],
+                      "attachments": []
+                    }
+                  ],
                   "status": "skipped"
                 }
               ],
@@ -223,8 +306,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9768,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:11:42.802Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-b12240683f62683eab70",
@@ -243,8 +340,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 5344,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:11:53.784Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-599e20ce16c9e37162ff",
@@ -254,7 +365,7 @@
             },
             {
               "title": "Break room unlocks after completing reception",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -263,8 +374,95 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 0,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 78412,
+                      "error": {
+                        "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.",
+                        "stack": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
+                          "column": 14,
+                          "line": 57
+                        },
+                        "snippet": "   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
+                            "column": 14,
+                            "line": 57
+                          },
+                          "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n\n   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:11:59.137Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-door-unlocks-D-37428--after-completing-reception/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
+                        "column": 14,
+                        "line": 57
+                      }
+                    },
+                    {
+                      "workerIndex": 1,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 78583,
+                      "error": {
+                        "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.",
+                        "stack": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
+                          "column": 14,
+                          "line": 57
+                        },
+                        "snippet": "   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
+                            "column": 14,
+                            "line": 57
+                          },
+                          "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n\n   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-05-08T18:13:18.177Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-door-unlocks-D-37428--after-completing-reception-retry1/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
+                        "column": 14,
+                        "line": 57
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-3ec92c42f9600adfd611",
@@ -283,8 +481,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 21061,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:14:38.145Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-da59fae822a3f7828c58",
@@ -303,8 +515,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 18104,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:14:59.772Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-d0cd18f6f1fda3cbad2c",
@@ -323,8 +549,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 16927,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:15:17.890Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-e5a6bed0bed2e1066993",
@@ -343,8 +583,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 17881,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:15:34.865Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-254e7cc5afab8f4cdfe7",
@@ -363,8 +617,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9835,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:15:52.768Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-1d5616f3d1d08175ebcc",
@@ -391,7 +659,7 @@
           "specs": [
             {
               "title": "Complete hospital entrance and reception",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -400,8 +668,95 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 2,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 54235,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[\"hospital_entrance\", \"hallway_reception_break\"]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[\"hospital_entrance\", \"hallway_reception_break\"]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts:68:39",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts",
+                          "column": 39,
+                          "line": 68
+                        },
+                        "snippet": "  66 |     // Verify reception marked complete\n  67 |     const finalState = await qaState(page);\n> 68 |     expect(finalState.completedRooms).toContain('reception');\n     |                                       ^\n  69 |\n  70 |     // Verify no console errors throughout the playthrough\n  71 |     expect(filterBenignErrors(errors)).toEqual([]);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts",
+                            "column": 39,
+                            "line": 68
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[\"hospital_entrance\", \"hallway_reception_break\"]\u001b[39m\n\n  66 |     // Verify reception marked complete\n  67 |     const finalState = await qaState(page);\n> 68 |     expect(finalState.completedRooms).toContain('reception');\n     |                                       ^\n  69 |\n  70 |     // Verify no console errors throughout the playthrough\n  71 |     expect(filterBenignErrors(errors)).toEqual([]);\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts:68:39"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:16:02.656Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-full-playthrou-db04e-ital-entrance-and-reception/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts",
+                        "column": 39,
+                        "line": 68
+                      }
+                    },
+                    {
+                      "workerIndex": 3,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 54754,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[\"hospital_entrance\", \"hallway_reception_break\"]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[\"hospital_entrance\", \"hallway_reception_break\"]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts:68:39",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts",
+                          "column": 39,
+                          "line": 68
+                        },
+                        "snippet": "  66 |     // Verify reception marked complete\n  67 |     const finalState = await qaState(page);\n> 68 |     expect(finalState.completedRooms).toContain('reception');\n     |                                       ^\n  69 |\n  70 |     // Verify no console errors throughout the playthrough\n  71 |     expect(filterBenignErrors(errors)).toEqual([]);"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts",
+                            "column": 39,
+                            "line": 68
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[\"hospital_entrance\", \"hallway_reception_break\"]\u001b[39m\n\n  66 |     // Verify reception marked complete\n  67 |     const finalState = await qaState(page);\n> 68 |     expect(finalState.completedRooms).toContain('reception');\n     |                                       ^\n  69 |\n  70 |     // Verify no console errors throughout the playthrough\n  71 |     expect(filterBenignErrors(errors)).toEqual([]);\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts:68:39"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-05-08T18:16:57.455Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-full-playthrou-db04e-ital-entrance-and-reception-retry1/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/full-playthrough.spec.ts",
+                        "column": 39,
+                        "line": 68
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
                 }
               ],
               "id": "2bfb80d3c40e2a656f1a-5e91cef178f3acbfddd4",
@@ -420,8 +775,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 57091,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:17:53.691Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "2bfb80d3c40e2a656f1a-3bb13b8a825bf6fa1c4a",
@@ -457,8 +826,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6390,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:18:51.593Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "005ada3f36d72ed697a3-9e0c88633cb45b3ba5f5",
@@ -477,8 +860,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 6153,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:18:57.992Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "005ada3f36d72ed697a3-8a28f9ea0cf9b75a00fd",
@@ -488,7 +885,7 @@
             },
             {
               "title": "Can talk to multiple NPCs in reception",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -497,8 +894,95 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 4,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 42289,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"riley\"\u001b[39m\nReceived array: \u001b[31m[\"nervous_patient\"]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"riley\"\u001b[39m\nReceived array: \u001b[31m[\"nervous_patient\"]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:46:33",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts",
+                          "column": 33,
+                          "line": 46
+                        },
+                        "snippet": "  44 |     await talkToNPC(page, nervousPatient.x, nervousPatient.y);\n  45 |     const state = await qaState(page);\n> 46 |     expect(state.completedNPCs).toContain('riley');\n     |                                 ^\n  47 |     expect(state.completedNPCs).toContain('nervous_patient');\n  48 |   });\n  49 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts",
+                            "column": 33,
+                            "line": 46
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"riley\"\u001b[39m\nReceived array: \u001b[31m[\"nervous_patient\"]\u001b[39m\n\n  44 |     await talkToNPC(page, nervousPatient.x, nervousPatient.y);\n  45 |     const state = await qaState(page);\n> 46 |     expect(state.completedNPCs).toContain('riley');\n     |                                 ^\n  47 |     expect(state.completedNPCs).toContain('nervous_patient');\n  48 |   });\n  49 |\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:46:33"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:19:04.169Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-npc-interactio-a031a--multiple-NPCs-in-reception/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts",
+                        "column": 33,
+                        "line": 46
+                      }
+                    },
+                    {
+                      "workerIndex": 5,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 42283,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"riley\"\u001b[39m\nReceived array: \u001b[31m[\"nervous_patient\"]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"riley\"\u001b[39m\nReceived array: \u001b[31m[\"nervous_patient\"]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:46:33",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts",
+                          "column": 33,
+                          "line": 46
+                        },
+                        "snippet": "  44 |     await talkToNPC(page, nervousPatient.x, nervousPatient.y);\n  45 |     const state = await qaState(page);\n> 46 |     expect(state.completedNPCs).toContain('riley');\n     |                                 ^\n  47 |     expect(state.completedNPCs).toContain('nervous_patient');\n  48 |   });\n  49 |"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts",
+                            "column": 33,
+                            "line": 46
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"riley\"\u001b[39m\nReceived array: \u001b[31m[\"nervous_patient\"]\u001b[39m\n\n  44 |     await talkToNPC(page, nervousPatient.x, nervousPatient.y);\n  45 |     const state = await qaState(page);\n> 46 |     expect(state.completedNPCs).toContain('riley');\n     |                                 ^\n  47 |     expect(state.completedNPCs).toContain('nervous_patient');\n  48 |   });\n  49 |\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts:46:33"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-05-08T18:19:47.083Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-npc-interactio-a031a--multiple-NPCs-in-reception-retry1/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/npc-interaction.spec.ts",
+                        "column": 33,
+                        "line": 46
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
                 }
               ],
               "id": "005ada3f36d72ed697a3-a152fa79992941c3fc79",
@@ -517,8 +1001,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7228,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:20:30.652Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "005ada3f36d72ed697a3-a37d348aa10fbe1b5ad0",
@@ -537,8 +1035,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 44692,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:20:38.517Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "005ada3f36d72ed697a3-6d71b3e03e967d66f26f",
@@ -574,8 +1086,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 8485,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:21:23.243Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "cd2f9af4161352775043-d4ef7e8f57231b74ade7",
@@ -585,7 +1111,7 @@
             },
             {
               "title": "Reception completes after all requirements met",
-              "ok": true,
+              "ok": false,
               "tags": [],
               "tests": [
                 {
@@ -594,8 +1120,95 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 6,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 49026,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
+                          "column": 34,
+                          "line": 54
+                        },
+                        "snippet": "  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
+                            "column": 34,
+                            "line": 54
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n\n  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:21:31.735Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-room-completio-aceea--after-all-requirements-met/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
+                        "column": 34,
+                        "line": 54
+                      }
+                    },
+                    {
+                      "workerIndex": 7,
+                      "parallelIndex": 0,
+                      "status": "failed",
+                      "duration": 49322,
+                      "error": {
+                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m",
+                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34",
+                        "location": {
+                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
+                          "column": 34,
+                          "line": 54
+                        },
+                        "snippet": "  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {"
+                      },
+                      "errors": [
+                        {
+                          "location": {
+                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
+                            "column": 34,
+                            "line": 54
+                          },
+                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n\n  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34"
+                        }
+                      ],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 1,
+                      "startTime": "2026-05-08T18:22:21.352Z",
+                      "annotations": [],
+                      "attachments": [
+                        {
+                          "name": "error-context",
+                          "contentType": "text/markdown",
+                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-room-completio-aceea--after-all-requirements-met-retry1/error-context.md"
+                        }
+                      ],
+                      "errorLocation": {
+                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
+                        "column": 34,
+                        "line": 54
+                      }
+                    }
+                  ],
+                  "status": "unexpected"
                 }
               ],
               "id": "cd2f9af4161352775043-cd33e4d014b637780c5b",
@@ -614,8 +1227,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 39650,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:23:11.985Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "cd2f9af4161352775043-b5f2bd84fbcdbf344cdd",
@@ -634,8 +1261,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 12757,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:23:52.279Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "cd2f9af4161352775043-31c571c102fcbeedf3f4",
@@ -671,8 +1312,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 1847,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:24:05.056Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7de6de0e276c92e06065-a548ff06e2849cc03c89",
@@ -691,8 +1346,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 7928,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:24:06.909Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7de6de0e276c92e06065-a7a5a2346b22f9c80708",
@@ -711,8 +1380,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 4830,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:24:14.856Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7de6de0e276c92e06065-1167c1b70872d589661e",
@@ -731,8 +1414,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 3330,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:24:19.696Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7de6de0e276c92e06065-bb2e288647d8351a4abb",
@@ -751,8 +1448,22 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [],
-                  "status": "skipped"
+                  "results": [
+                    {
+                      "workerIndex": 8,
+                      "parallelIndex": 0,
+                      "status": "passed",
+                      "duration": 9682,
+                      "errors": [],
+                      "stdout": [],
+                      "stderr": [],
+                      "retry": 0,
+                      "startTime": "2026-05-08T18:24:45.764Z",
+                      "annotations": [],
+                      "attachments": []
+                    }
+                  ],
+                  "status": "expected"
                 }
               ],
               "id": "7de6de0e276c92e06065-d072d03e60997aa99ac7",
@@ -779,8 +1490,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 1846,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-05-08T18:24:23.034Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-8ef699ebea77e616309a",
@@ -799,8 +1524,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3330,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-05-08T18:24:24.886Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-bf0d855c310a4180069a",
@@ -819,8 +1558,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3514,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-05-08T18:24:28.222Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-93cb3ca90ee22101cdc7",
@@ -839,8 +1592,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3206,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-05-08T18:24:31.744Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-9e9ea1f9f194a6b72633",
@@ -859,8 +1626,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3967,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-05-08T18:24:34.958Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-070ea3a7f03a67439a75",
@@ -879,8 +1660,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3427,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-05-08T18:24:38.932Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-9317e6b0ab92da8bd0a9",
@@ -899,8 +1694,22 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [],
-                      "status": "skipped"
+                      "results": [
+                        {
+                          "workerIndex": 8,
+                          "parallelIndex": 0,
+                          "status": "passed",
+                          "duration": 3386,
+                          "errors": [],
+                          "stdout": [],
+                          "stderr": [],
+                          "retry": 0,
+                          "startTime": "2026-05-08T18:24:42.370Z",
+                          "annotations": [],
+                          "attachments": []
+                        }
+                      ],
+                      "status": "expected"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-a650522b3a08a169d626",
@@ -913,250 +1722,15 @@
           ]
         }
       ]
-    },
-    {
-      "title": "visual-qa.spec.ts",
-      "file": "visual-qa.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "Hub World",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-05cb6113e2ea036a3c40",
-          "file": "visual-qa.spec.ts",
-          "line": 30,
-          "column": 1
-        },
-        {
-          "title": "PrivacyQuest — Room: reception",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-927037e8a651b85905cd",
-          "file": "visual-qa.spec.ts",
-          "line": 54,
-          "column": 3
-        },
-        {
-          "title": "PrivacyQuest — Room: er",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-d9c9ad0c9eb76aee58db",
-          "file": "visual-qa.spec.ts",
-          "line": 54,
-          "column": 3
-        },
-        {
-          "title": "PrivacyQuest — Room: lab",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-ce7e9d80770a7ea0e1da",
-          "file": "visual-qa.spec.ts",
-          "line": 54,
-          "column": 3
-        },
-        {
-          "title": "PrivacyQuest — Room: records_room",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-29c76762a2c9e974cee1",
-          "file": "visual-qa.spec.ts",
-          "line": 54,
-          "column": 3
-        },
-        {
-          "title": "PrivacyQuest — Room: it_office",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-016b5733f26407d05645",
-          "file": "visual-qa.spec.ts",
-          "line": 54,
-          "column": 3
-        },
-        {
-          "title": "PrivacyQuest — Room: break_room",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-8a12cfd3f9c70397a7fa",
-          "file": "visual-qa.spec.ts",
-          "line": 54,
-          "column": 3
-        },
-        {
-          "title": "BreachDefense — Start Screen",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [
-                {
-                  "type": "skip",
-                  "location": {
-                    "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/visual-qa.spec.ts",
-                    "line": 87,
-                    "column": 6
-                  }
-                }
-              ],
-              "expectedStatus": "skipped",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-e1764c2524bd26648a46",
-          "file": "visual-qa.spec.ts",
-          "line": 87,
-          "column": 6
-        },
-        {
-          "title": "BreachDefense — Game Active",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [
-                {
-                  "type": "skip",
-                  "location": {
-                    "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/visual-qa.spec.ts",
-                    "line": 97,
-                    "column": 6
-                  }
-                }
-              ],
-              "expectedStatus": "skipped",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-6709c663ea7f7042af8e",
-          "file": "visual-qa.spec.ts",
-          "line": 97,
-          "column": 6
-        },
-        {
-          "title": "BreachDefense — Onboarding Flow",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [
-                {
-                  "type": "skip",
-                  "location": {
-                    "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/visual-qa.spec.ts",
-                    "line": 111,
-                    "column": 6
-                  }
-                }
-              ],
-              "expectedStatus": "skipped",
-              "projectId": "",
-              "projectName": "",
-              "results": [],
-              "status": "skipped"
-            }
-          ],
-          "id": "acd366a2e83d4ab68325-b7c8904a8f9bbb3eb087",
-          "file": "visual-qa.spec.ts",
-          "line": 111,
-          "column": 6
-        }
-      ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-03-31T16:55:38.647Z",
-    "duration": 39.46600000000001,
-    "expected": 0,
-    "skipped": 45,
-    "unexpected": 0,
+    "startTime": "2026-05-08T18:11:41.416Z",
+    "duration": 794174.4909999999,
+    "expected": 27,
+    "skipped": 4,
+    "unexpected": 4,
     "flaky": 0
   }
 }
