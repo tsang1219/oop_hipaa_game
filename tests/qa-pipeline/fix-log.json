@@ -197,5 +197,21 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Phase B design improvement (lab — lowest scoring screen at 6.7 avg). Lab is full-game only (NOT in demo path) but still needs >=8.0 lift for milestone termination. 3 changes shipped within budget (1 file, +27 net lines, well under 50-line cap). Targets the two weakest dimensions (moment_of_joy 6, polish 6): the microscope glow gives a previously-static prop a 'science is happening' presence (moment_of_joy + Commandment 1: every prop earns its space); fidgets on the two non-researcher NPCs make the room feel inhabited rather than posed (polish + Commandment 4); bubble particles from the chemical shelves add ambient texture to the lab's silent edges (polish + aesthetics, Commandment 7 pacing). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT revert the PHI sorter !isDemoActive() gate. DID NOT add new SFX assets. DID NOT touch existing NPC dialogue/scenarios/IDs/zones — all additions are decorative graphics + tweens layered on top of the existing scene; researcher NPC intentionally left untouched (already animated by standard pulse on first NPC); interaction proximity unaffected since interactables resolve via i.data.x/y tile coords, not sprite pixel position."
+  },
+  {
+    "bug_id": "DESIGN-009",
+    "agent": "fix-agent",
+    "phase": "B-design-improvement",
+    "screen": "tower_defense_standalone",
+    "fix_plan": "TD standalone is a sponsor-pitch surface (current 7.7 avg, weak on moment_of_joy 7 / design 7 / polish 7). Picked 3 polish items inside UnifiedGamePage.tsx — no new SFX, no index.css edits, all keyframes inline. (1) Wave-cleared celebration: extended the existing onWaveComplete handler to capture data.wave from BREACH_WAVE_COMPLETE, set tdWaveBanner state, emit REACT_PLAY_SFX sfx_fanfare at vol 0.45 (under the 0.5 cap), auto-clear after 1.6s. UI renders a centered gold 'WAVE N CLEARED' card animated via td-banner-pop (scale 0.7 -> 1.08 -> 1, hold, fade out). (2) Result overlay polish: replaced the static shadow with td-result-in scale-in (0.85 -> 1.04 -> 1, 460ms cubic-bezier overshoot) plus an infinite color-coded glow loop (td-result-glow-win green / td-result-glow-lose red, 2.4s ease-in-out). Added requestAnimationFrame-driven 900ms ease-out count-up for the security score (cubic ease-out, replaces the static '{result.securityScore}%' with '{shownScore}%'). (3) First-time helper hint: new useEffect on pageMode==='tower-defense-standalone' shows tdHelperVisible after 600ms, hides at 4.6s. UI renders a top-center black-on-gold 'PLACE TOWERS - DEFEND THE NETWORK' card via td-hint-fade keyframe; click to dismiss early. All 5 keyframes packed into a single inline <style> block at the end of the standalone JSX branch.",
+    "result": "success",
+    "files_changed": ["client/src/pages/UnifiedGamePage.tsx"],
+    "changes_implemented": ["wave_cleared_celebration_banner_with_fanfare", "result_overlay_scale_in_glow_score_countup", "first_time_helper_hint_with_fade"],
+    "lines_added": 54,
+    "lines_removed": 6,
+    "net_delta": 48,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "Phase B design improvement (TD standalone — sponsor pitch surface). Within budget: 1 file (cap 3), +48 net lines (cap 50). All keyframes inline (index.css NOT touched per DO-NOT-TOUCH list). Reused sfx_fanfare at vol 0.45 (under the 0.5 cap). DID NOT modify StartMenu.tsx, TitleScreen.tsx, index.css, PixelComputerLogo.tsx. DID NOT modify the encounter-mode TD path (changes gated by pageMode==='tower-defense-standalone' or by the listener useEffect's pageMode guard). DID NOT revert the !isDemoActive() PHI sorter gate. DID NOT add new SFX assets. Targets all three weak dimensions: wave-cleared banner addresses moment_of_joy (Commandment 6 'celebrate learning moments' + Commandment 8 'feedback scales with moment size'); result overlay scale-in/glow/count-up addresses polish (Commandment 1 'every action needs a response' — defeat/victory get proportional ceremony); helper hint addresses design (Commandment 3 'teach through situations' — onboard the player without modal interruption)."
   }
 ]

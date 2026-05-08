@@ -173,6 +173,8 @@ export default function UnifiedGamePage() {
   // gameState (no score, no encounter registry, no save write) — this is enforced by
   // the handlers below not calling any gameState mutator.
   const [tdStandaloneResult, setTdStandaloneResult] = useState<TDStandaloneResult | null>(null);
+  const [tdWaveBanner, setTdWaveBanner] = useState<{ wave: number; key: number } | null>(null); // DESIGN-009
+  const [tdHelperVisible, setTdHelperVisible] = useState(false); // DESIGN-009
 
   // ── Encounter phase state (Phase 13 + 16) ──────────────────────
   type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'phi-sorter' | 'debrief';
@@ -786,8 +788,13 @@ export default function UnifiedGamePage() {
     // BreachDefensePage used to surface a TutorialModal here. Since standalone TD
     // is now a self-contained sponsor-pitch mini-game (no educational lessons), we
     // immediately re-emit DISMISS_TUTORIAL on wave-complete so the loop never stalls.
-    const onWaveComplete = () => {
+    const onWaveComplete = (data?: { wave?: number }) => {
       eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
+      if (data?.wave) { // DESIGN-009: wave-cleared banner + soft fanfare
+        setTdWaveBanner({ wave: data.wave, key: Date.now() });
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_fanfare', volume: 0.45 });
+        window.setTimeout(() => setTdWaveBanner(null), 1600);
+      }
     };
     eventBridge.on(BRIDGE_EVENTS.BREACH_VICTORY, onVictory);
     eventBridge.on(BRIDGE_EVENTS.BREACH_GAME_OVER, onGameOver);
@@ -810,6 +817,14 @@ export default function UnifiedGamePage() {
     window.addEventListener('keydown', onEsc);
     return () => window.removeEventListener('keydown', onEsc);
   }, [pageMode, handleTdBackToMenu]);
+
+  useEffect(() => { // DESIGN-009: first-time helper hint (600ms in, 4s hold)
+    if (pageMode !== 'tower-defense-standalone') return;
+    setTdHelperVisible(false);
+    const inT = window.setTimeout(() => setTdHelperVisible(true), 600);
+    const outT = window.setTimeout(() => setTdHelperVisible(false), 4600);
+    return () => { window.clearTimeout(inT); window.clearTimeout(outT); };
+  }, [pageMode]);
 
   // ── Encounter lifecycle listeners (Phase 13) ────────────────────
   useEffect(() => {
@@ -1152,6 +1167,24 @@ export default function UnifiedGamePage() {
             />
           )}
 
+          {/* DESIGN-009: helper hint + wave-cleared banner */}
+          {!tdStandaloneResult && tdHelperVisible && (
+            <div onClick={() => setTdHelperVisible(false)}
+              className="absolute top-6 left-1/2 -translate-x-1/2 z-40 cursor-pointer px-4 py-2 bg-black/80 border-2 border-[#FFD700] text-[8px] text-[#FFD700]"
+              style={{ fontFamily: '"Press Start 2P", monospace', animation: 'td-hint-fade 600ms ease-out forwards' }}>
+              PLACE TOWERS &bull; DEFEND THE NETWORK
+            </div>
+          )}
+          {!tdStandaloneResult && tdWaveBanner && (
+            <div key={tdWaveBanner.key} className="absolute inset-x-0 top-1/3 z-40 pointer-events-none flex justify-center"
+              style={{ animation: 'td-banner-pop 1.6s ease-out forwards' }}>
+              <div className="px-6 py-3 bg-black/85 border-4 border-[#FFD700] text-[14px] text-[#FFD700]"
+                style={{ fontFamily: '"Press Start 2P", monospace', textShadow: '0 0 12px rgba(255,215,0,0.8)' }}>
+                WAVE {tdWaveBanner.wave} CLEARED
+              </div>
+            </div>
+          )}
+
           {/* Win / lose overlay — minimal, no compliance-score wiring. */}
           {tdStandaloneResult && (
             <StandaloneTDResultOverlay
@@ -1160,6 +1193,9 @@ export default function UnifiedGamePage() {
               onBackToMenu={handleTdBackToMenu}
             />
           )}
+
+          {/* DESIGN-009 inline keyframes (index.css is DO-NOT-TOUCH) */}
+          <style>{`@keyframes td-hint-fade{0%{opacity:0;transform:translate(-50%,-8px)}100%{opacity:1;transform:translate(-50%,0)}}@keyframes td-banner-pop{0%{opacity:0;transform:scale(0.7)}18%{opacity:1;transform:scale(1.08)}32%{transform:scale(1)}78%{opacity:1}100%{opacity:0;transform:scale(1)}}@keyframes td-result-in{0%{opacity:0;transform:scale(0.85)}70%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}@keyframes td-result-glow-win{0%,100%{box-shadow:12px 12px 0 0 #000,0 0 24px rgba(46,204,113,0.45)}50%{box-shadow:12px 12px 0 0 #000,0 0 40px rgba(46,204,113,0.85)}}@keyframes td-result-glow-lose{0%,100%{box-shadow:12px 12px 0 0 #000,0 0 24px rgba(239,68,68,0.4)}50%{box-shadow:12px 12px 0 0 #000,0 0 36px rgba(239,68,68,0.75)}}`}</style>
         </div>
         <p
           className="text-[8px] text-gray-500"
@@ -1480,16 +1516,28 @@ function StandaloneTDResultOverlay({
   onBackToMenu,
 }: StandaloneTDResultOverlayProps): JSX.Element {
   const isWin = result.outcome === 'victory';
+  const targetScore = isWin ? result.securityScore : 0; // DESIGN-009: count-up
+  const [shownScore, setShownScore] = useState(0);
+  useEffect(() => {
+    if (!isWin) return;
+    const start = performance.now();
+    let raf = 0;
+    const tick = (now: number) => {
+      const t = Math.min(1, (now - start) / 900);
+      setShownScore(Math.round((1 - Math.pow(1 - t, 3)) * targetScore));
+      if (t < 1) raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => cancelAnimationFrame(raf);
+  }, [isWin, targetScore]);
   return (
     <div
       className="absolute inset-0 bg-black/85 flex items-center justify-center z-50"
       data-testid="td-standalone-result"
     >
       <div
-        className={`text-center border-4 ${
-          isWin ? 'border-[#2ECC71]' : 'border-red-500'
-        } bg-[#1a1a2e] p-8 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] max-w-md`}
-        style={{ fontFamily: '"Press Start 2P", monospace' }}
+        className={`text-center border-4 ${isWin ? 'border-[#2ECC71]' : 'border-red-500'} bg-[#1a1a2e] p-8 max-w-md`}
+        style={{ fontFamily: '"Press Start 2P", monospace', animation: `td-result-in 460ms cubic-bezier(0.34,1.56,0.64,1) forwards, ${isWin ? 'td-result-glow-win' : 'td-result-glow-lose'} 2.4s ease-in-out infinite` }}
       >
         <h1
           className={`text-xl font-bold mb-3 ${
@@ -1507,7 +1555,7 @@ function StandaloneTDResultOverlay({
           {result.outcome === 'victory' && (
             <p className="text-[8px] text-gray-300">
               Security:{' '}
-              <span className="text-green-400">{result.securityScore}%</span>
+              <span className="text-green-400">{shownScore}%</span>
             </p>
           )}
           <p className="text-[8px] text-gray-300">
