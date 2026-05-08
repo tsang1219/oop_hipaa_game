@@ -1228,6 +1228,39 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // ── IT Office tech-life polish (DESIGN-007) ─────────────────
+    if (this.room.id === 'it_office') {
+      // (1) Server-rack blinking LEDs — green/amber yoyo, slightly out of phase per rack
+      let rackIdx = 0;
+      for (const obs of room.obstacles) {
+        if ((obs as any).type !== 'server_rack') continue;
+        const lx = obs.x * TILE + obs.width * TILE - 5, lyTop = obs.y * TILE + 4;
+        const ledA = this.add.rectangle(lx, lyTop, 2, 2, 0x44ff66).setDepth(20);
+        const ledB = this.add.rectangle(lx, lyTop + 4, 2, 2, 0xffaa33).setDepth(20);
+        const phase = (rackIdx % 4) * 180;
+        this.tweens.add({ targets: ledA, alpha: { from: 1, to: 0.25 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: phase });
+        this.tweens.add({ targets: ledB, alpha: { from: 0.25, to: 1 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: phase + 90 });
+        rackIdx++;
+      }
+      // (2) Monitor flicker — single-frame cyan flash on each monitor_bank every 8-10s
+      for (const obs of room.obstacles) {
+        if ((obs as any).type !== 'monitor_bank') continue;
+        const mx = obs.x * TILE + (obs.width * TILE) / 2, my = obs.y * TILE + TILE / 2;
+        const flash = this.add.rectangle(mx, my, obs.width * TILE - 4, TILE - 4, 0x66ddff, 0).setDepth(6);
+        this.time.addEvent({ delay: 8500 + Math.random() * 1500, loop: true, callback: () => {
+          flash.setAlpha(0.55);
+          this.time.delayedCall(60, () => flash.setAlpha(0));
+        } });
+      }
+      // (3) Encounter trigger glow — subtle pulsing ring at tile (9,6) signposting the IT encounter
+      const alreadyDone = this.registry.get('encounterResult_td-it-office');
+      if (!alreadyDone) {
+        const tx = 9 * TILE + TILE / 2, ty = 6 * TILE + TILE / 2;
+        const ring = this.add.circle(tx, ty, 14, 0x66ddff, 0.0).setStrokeStyle(2, 0x66ddff, 0.7).setDepth(4);
+        this.tweens.add({ targets: ring, scale: { from: 0.8, to: 1.4 }, alpha: { from: 0.7, to: 0 }, duration: 1400, repeat: -1, ease: 'Sine.easeOut' });
+      }
+    }
+
     // ── Player ───────────────────────────────────────────────────
     // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
     // PLAYER_IDLE_FRAMES: down=0, left=3, right=6, up=9 (row * 3 + 0)
