@@ -119,18 +119,32 @@ Verify these previously-fixed issues haven't regressed:
 - ESC exits room after multiple conversations
 - Music doesn't overlap on scene transitions
 
-### Step 4b: Game Design Rating (the "10/10" pass)
+### Step 4b: Game Design Rating (the "10/10" pass) — v2.2 SIX-DIMENSION RUBRIC
 
 This is a SEPARATE evaluation from the polish audit. The polish audit checks rules. This step evaluates **game feel** — would a Nintendo designer ship this?
 
-For each room and hallway, look at the screenshot and rate 1-10:
+**Scope:** Rate every screen the player sees. That includes:
+- Start menu (DEMO / TOWER DEFENSE / FULL GAME selector)
+- Each of the 4 demo rooms (Reception, ER, Break Room, Medical Records)
+- Tower Defense standalone (start, mid-wave, victory, defeat states)
+- Each of the 6 full-game rooms (Reception, ER, Lab, Records, IT Office, Break Room)
+- Every hallway connector
+- Every NPC interaction (dialogue overlay, choice prompts, post-completion state)
+- Demo capstone (dim → beat → fanfare → certificate sequence)
+- Game banners, room-clear celebrations, score deltas
 
-**Rating criteria:**
-- **Sense of place**: Does this feel like a real hospital department, or a flat rectangle with sprites? Is there environmental storytelling — posters, clutter, details that make you curious?
-- **Discovery**: Are there things to find? Surprises? Or is everything laid out like a compliance form?
-- **Pacing**: Does moving through this area feel like part of a journey, or like walking down an empty corridor?
-- **Character**: Do the NPCs feel like people with lives, or like HIPAA delivery devices standing in a grid?
-- **Feedback texture**: When you interact with things, does it feel satisfying? Or flat and mechanical?
+For each screen / room / interaction, rate 1-10 on **all six dimensions**:
+
+| # | Dimension | What it measures |
+|---|---|---|
+| 1 | **Moment of Joy** | Does it produce a "huh, that's cool" or "oh nice" beat? Or is it flat? Anticipation + reward + surprise. |
+| 2 | **Gameplay** | Does the moment-to-moment doing feel good? Walking, talking, choosing, sorting — does the loop pull you forward? |
+| 3 | **Design** | Spatial layout, NPC placement, dead space usage, signposting, visual hierarchy. Does the room read at a glance? |
+| 4 | **Aesthetics** | Visual identity, color palette, mood, texture. 16-bit pixel polish — Stardew tier, not asset-flip tier. |
+| 5 | **Gameplay Mechanic** | The specific mechanic in this screen (dialogue choice, sort, tower placement, exit) — is it crunchy? Does feedback scale to the action? |
+| 6 | **Polish** | The texture: animation timing, transition smoothness, audio feel, edge cases. Where it crosses from "works" to "feels good." |
+
+Compute an **average score** per screen (mean of the 6 dimensions). Rooms below 7 average are improvement candidates.
 
 **Rating scale:**
 - 1-3: Broken or placeholder (empty room, no content)
@@ -290,9 +304,14 @@ Write to `tests/qa-pipeline/report.json`:
     }
   ],
   "design_ratings": {
-    "hospital_entrance": { "score": 8, "to_reach_10": [] },
+    "hospital_entrance": {
+      "scores": { "moment_of_joy": 7, "gameplay": 8, "design": 8, "aesthetics": 8, "gameplay_mechanic": 7, "polish": 8 },
+      "average": 7.7,
+      "to_reach_10": []
+    },
     "hallway_reception_break": {
-      "score": 4,
+      "scores": { "moment_of_joy": 3, "gameplay": 5, "design": 4, "aesthetics": 5, "gameplay_mechanic": 4, "polish": 5 },
+      "average": 4.3,
       "to_reach_10": [
         {
           "change": "Add bulletin board with act-appropriate content",

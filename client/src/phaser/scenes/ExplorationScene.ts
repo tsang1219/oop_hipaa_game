@@ -7,6 +7,7 @@ import {
   ENCOUNTER_AVAILABLE_TOWERS,
 } from '../../game/breach-defense/constants';
 import { getHallwayBoard } from '../../data/hallwayContent';
+import { isDemoActive } from '@/lib/demoSession';
 import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
@@ -1521,7 +1522,8 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // PHI Sorter trigger — Reception (Act 1) (Phase 16)
-    if (this.room.id === 'reception' && !this.encounterTriggered && !this.paused) {
+    // Gated off in demo mode — Phase 16 Plan 04 wiring is paused; demo flow must not snag on it.
+    if (this.room.id === 'reception' && !this.encounterTriggered && !this.paused && !isDemoActive()) {
       const alreadyDone = this.registry.get('encounterResult_phi-sort-reception');
       if (!alreadyDone) {
         const dx = Math.abs(this.player.x - (RECEPTION_TRIGGER_X * TILE + TILE / 2));
@@ -1533,7 +1535,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // PHI Sorter trigger — Lab (Act 2) (Phase 16)
-    if (this.room.id === 'lab' && !this.encounterTriggered && !this.paused) {
+    if (this.room.id === 'lab' && !this.encounterTriggered && !this.paused && !isDemoActive()) {
       const alreadyDone = this.registry.get('encounterResult_phi-sort-lab');
       if (!alreadyDone) {
         const dx = Math.abs(this.player.x - (LAB_TRIGGER_X * TILE + TILE / 2));
