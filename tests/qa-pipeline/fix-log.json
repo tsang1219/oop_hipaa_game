@@ -53,5 +53,22 @@
     "verification_test": "npx tsc --noEmit",
     "verification_result": "clean — no type errors",
     "notes": "Clamp is symmetric (handles both left and right overflow). Guard `if (maxX >= minX)` skips the clamp if the label is wider than the room itself (degenerate case) so we don't pin it off-canvas. Boss text and checkmark labels above NPC head are short enough not to overflow and were left untouched per minimum-fix rule."
+  },
+  {
+    "bug_id": "BUG-004a",
+    "agent": "fix-agent",
+    "fix_plan": "Audit of BattleEncounterScreen, ChoicePrompt, and EducationalItemModal showed ChoicePrompt was already fully wired (open + select). Two real silent player actions remained: (1) BattleEncounterScreen's initial mount (phase='dialogue' open) had no SFX and the dialogue-advance path (SPACE keypress, overlay click, dialogue panel click, CONTINUE button on feedback) was silent; close on unmount was also silent. (2) EducationalItemModal's overlay-click close path bypassed the existing close-button SFX. Fix wires sfx_interact at subtle volumes (0.35 open, 0.3 dialogue advance, 0.4 CONTINUE, 0.2 rate=0.9 close) using the existing eventBridge.REACT_PLAY_SFX pattern already imported in both files. No new SFX keys, no new files, no new abstractions; volumes match the per-action guidance in the ticket and existing house style elsewhere in the codebase.",
+    "result": "success",
+    "files_changed": [
+      "client/src/components/BattleEncounterScreen.tsx",
+      "client/src/components/EducationalItemModal.tsx"
+    ],
+    "diff_summary": "BattleEncounterScreen: added sfx_interact on mount (0.35), on unmount (0.2 rate=0.9), on SPACE-to-advance (0.3), on overlay click advance (0.3), on dialogue panel click advance (0.3), and on CONTINUE button (0.4). EducationalItemModal: wrapped overlay-click close to play sfx_interact (0.2 rate=0.9) before onClose. ChoicePrompt left untouched — already complete.",
+    "lines_added": 15,
+    "lines_removed": 2,
+    "net_delta": 13,
+    "verification_test": "npx tsc --noEmit",
+    "verification_result": "clean — no type errors",
+    "notes": "POLISH_STANDARD Section 4 Rule 4.1 / Commandment 1: every player-initiated action now produces audio feedback. Used only existing SFX (sfx_interact) per BUG-004a constraint; new SFX sourcing deferred to BUG-004b. Volumes kept subtle (0.2-0.4 range) so micro-feedbacks don't compete with music or fanfare moments. ChoicePrompt and the existing dialogue-choice select pathway were already wired in prior commits and were intentionally left untouched."
   }
 ]

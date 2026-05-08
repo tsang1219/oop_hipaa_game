@@ -30,7 +30,10 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
       className={`absolute inset-0 flex items-center justify-center z-50 p-4 transition-all duration-200 ${
         isVisible ? 'bg-black/70' : 'bg-black/0'
       }`}
-      onClick={onClose}
+      onClick={() => {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+        onClose();
+      }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="educational-item-title"

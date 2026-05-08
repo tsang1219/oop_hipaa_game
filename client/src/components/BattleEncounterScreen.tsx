@@ -34,6 +34,10 @@ export default function BattleEncounterScreen({
 
   useEffect(() => {
     requestAnimationFrame(() => setIsVisible(true));
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+    return () => {
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+    };
   }, []);
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -90,6 +94,7 @@ export default function BattleEncounterScreen({
           setIsTyping(false);
           onDialogueComplete?.();
         } else if (phase === 'dialogue') {
+          eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
           onAdvance?.();
         }
       }
@@ -116,6 +121,7 @@ export default function BattleEncounterScreen({
         setIsTyping(false);
         onDialogueComplete?.();
       } else if (phase === 'dialogue') {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
         onAdvance?.();
       }
     }
@@ -128,6 +134,7 @@ export default function BattleEncounterScreen({
       setIsTyping(false);
       onDialogueComplete?.();
     } else if (phase === 'dialogue') {
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
       onAdvance?.();
     }
   };
@@ -313,7 +320,10 @@ export default function BattleEncounterScreen({
 
             <div className="text-center">
               <Button
-                onClick={onAdvance}
+                onClick={() => {
+                  eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+                  onAdvance?.();
+                }}
                 className="font-['Press_Start_2P'] text-xs bg-[#FF6B9D] hover:bg-[#ff8fb5] border-4 border-[#FF6B9D]"
                 data-testid="button-next-scene"
               >
