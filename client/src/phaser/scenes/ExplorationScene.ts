@@ -1079,6 +1079,10 @@ export class ExplorationScene extends Phaser.Scene {
         const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
         if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.5, to: 1.5 }, duration: 1100 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       }
+      // Ambient monitor beep — heartbeat-like cadence (DESIGN-LIFT-001)
+      this.time.addEvent({ delay: 9000, loop: true, callback: () => {
+        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.6 }); } catch (_) {}
+      } });
     }
 
     // ── Reception life pass (DESIGN-005) ────────────────────────
@@ -1104,6 +1108,10 @@ export class ExplorationScene extends Phaser.Scene {
         if (ia.type !== 'zone' && ia.type !== 'item') continue;
         this.tweens.add({ targets: ia.sprite, scaleX: { from: 1.0, to: 1.04 }, scaleY: { from: 1.0, to: 1.04 }, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       }
+      // Ambient distant footsteps — visitor passing in the corridor (DESIGN-LIFT-001)
+      this.time.addEvent({ delay: 13000, loop: true, callback: () => {
+        try { this.sound.play('sfx_footstep', { volume: 0.04, rate: 0.9 + Math.random() * 0.2 }); } catch (_) {}
+      } });
     }
 
     // Pulse first NPC if this room hasn't been pulsed yet
@@ -1151,6 +1159,10 @@ export class ExplorationScene extends Phaser.Scene {
       this.time.addEvent({ delay: 10500, loop: true, callback: () => {
         try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.55 + Math.random() * 0.2 }); } catch (_) {}
       } });
+      // Ambient sliding-door whoosh — distant entry sound every ~20s (DESIGN-LIFT-001)
+      this.time.addEvent({ delay: 19500, loop: true, callback: () => {
+        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.8 }); } catch (_) {}
+      } });
     }
 
     // ── Break Room comedic life (DESIGN-003) ─────────────────────
@@ -1181,6 +1193,10 @@ export class ExplorationScene extends Phaser.Scene {
           this.tweens.add({ targets: b, alpha: 1, y: b.y - 4, duration: 250, yoyo: true, hold: 900, onComplete: () => b.destroy() });
         } });
       }
+      // Ambient vending dispense — soft thunk every ~16s (DESIGN-LIFT-001)
+      this.time.addEvent({ delay: 16000, loop: true, callback: () => {
+        try { this.sound.play('sfx_interact', { volume: 0.05, rate: 0.5 }); } catch (_) {}
+      } });
     }
 
     // ── Records Room final-demo polish (DESIGN-006) ──────────────
@@ -1215,6 +1231,10 @@ export class ExplorationScene extends Phaser.Scene {
       this.add.ellipse(cartStartX, cartY + 10, TILE - 6, 6, 0x000000, 0.18).setDepth(2);
       const cart = this.add.sprite(cartStartX, cartY, furnitureTextureKey('document_cart')).setDepth(3).setScale(0.85);
       this.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      // Ambient paper rustle / drawer slide — every ~12s (DESIGN-LIFT-001)
+      this.time.addEvent({ delay: 12500, loop: true, callback: () => {
+        try { this.sound.play('sfx_interact', { volume: 0.04, rate: 0.7 }); } catch (_) {}
+      } });
     }
 
     // ── Laboratory life pass (DESIGN-002) ────────────────────────
@@ -1242,6 +1262,10 @@ export class ExplorationScene extends Phaser.Scene {
           }
         } });
       }
+      // Ambient bubble pop — chemistry-station blip every ~10s (DESIGN-LIFT-001)
+      this.time.addEvent({ delay: 10500, loop: true, callback: () => {
+        try { this.sound.play('sfx_interact', { volume: 0.05, rate: 1.4 }); } catch (_) {}
+      } });
     }
 
     // ── IT Office tech-life polish (DESIGN-007) ─────────────────
@@ -1277,33 +1301,46 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
-    // ── Hallway life pass (DESIGN-HALLWAY-001) ──────────────────
-    if (this.room.id === 'hallway_break_lab' || this.room.id === 'hallway_it_er') {
-      // (1) Flickering ceiling sconces — warm halo + irregular alpha drop on each wall_sconce
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'wall_sconce') continue;
-        const sx = obs.x * TILE + (obs.width * TILE) / 2;
-        const sy = obs.y * TILE + TILE - 2;
-        const halo = this.add.ellipse(sx, sy + 4, 22, 10, 0xffe6a8, 0.55).setDepth(4);
-        const cone = this.add.ellipse(sx, sy + 14, 30, 18, 0xfff2c8, 0.18).setDepth(3);
-        const flickerDelay = 2400 + Math.random() * 1800;
-        this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
-          this.tweens.add({ targets: [halo, cone], alpha: { from: 1, to: 0.35 }, duration: 70, yoyo: true, repeat: 1, ease: 'Linear' });
-        } });
-      }
-      // (2) Walking employee NPC — non-interactable, patrols the corridor
-      const empY = 4 * TILE + TILE / 2;
-      const empStartX = 7 * TILE + TILE / 2;
-      const empEndX = 13 * TILE + TILE / 2;
-      this.add.ellipse(empStartX, empY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
-      const empSprite = this.add.sprite(empStartX, empY, 'npc_doctor').setDepth(5 + 4);
-      this.tweens.add({ targets: empSprite, x: empEndX, duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => empSprite.setFlipX(true), onRepeat: () => empSprite.setFlipX(false) });
-      this.tweens.add({ targets: empSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      // (3) Act-aware poster accent — colored ribbon stamp on the existing bulletin board
+    // ── Hallway life pass (DESIGN-HALLWAY-001 + 002) ─────────────
+    // All 5 hallways: act-tinted bulletin ribbon + drifting dust motes in two light columns.
+    // Worst 2 only (break_lab + it_er): flickering sconces + walking employee NPC.
+    if (this.room.id.startsWith('hallway_')) {
+      const isHeavyHallway = this.room.id === 'hallway_break_lab' || this.room.id === 'hallway_it_er';
+      // (A) Shared — Act-aware poster accent on the existing bulletin board
       const act = this.getCurrentAct();
       const actTint = act === 1 ? 0x4a90e2 : act === 2 ? 0xe2a04a : 0xc83a3a;
       const ribbon = this.add.rectangle(this.cameras.main.width / 2 + 18, 64 - 16, 10, 4, actTint, 1).setDepth(8).setAngle(-12);
       this.tweens.add({ targets: ribbon, alpha: { from: 1, to: 0.65 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      // (B) Shared — Drifting dust motes in two light columns (atmospheric texture)
+      const moteColumns = [5 * TILE + TILE / 2, 14 * TILE + TILE / 2];
+      for (const cx of moteColumns) {
+        this.time.addEvent({ delay: 1700 + Math.random() * 900, loop: true, callback: () => {
+          const mote = this.add.circle(cx + (Math.random() * 28 - 14), TILE + 4, 1, 0xfff5c8, 0.7).setDepth(20);
+          this.tweens.add({ targets: mote, y: mote.y + 5 * TILE, alpha: 0, duration: 5200 + Math.random() * 800, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
+        } });
+      }
+      // (C) Heavy-only — Flickering ceiling sconces
+      if (isHeavyHallway) {
+        for (const obs of room.obstacles) {
+          if ((obs as any).type !== 'wall_sconce') continue;
+          const sx = obs.x * TILE + (obs.width * TILE) / 2;
+          const sy = obs.y * TILE + TILE - 2;
+          const halo = this.add.ellipse(sx, sy + 4, 22, 10, 0xffe6a8, 0.55).setDepth(4);
+          const cone = this.add.ellipse(sx, sy + 14, 30, 18, 0xfff2c8, 0.18).setDepth(3);
+          const flickerDelay = 2400 + Math.random() * 1800;
+          this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
+            this.tweens.add({ targets: [halo, cone], alpha: { from: 1, to: 0.35 }, duration: 70, yoyo: true, repeat: 1, ease: 'Linear' });
+          } });
+        }
+        // (D) Heavy-only — Walking employee NPC, non-interactable, patrols the corridor
+        const empY = 4 * TILE + TILE / 2;
+        const empStartX = 7 * TILE + TILE / 2;
+        const empEndX = 13 * TILE + TILE / 2;
+        this.add.ellipse(empStartX, empY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
+        const empSprite = this.add.sprite(empStartX, empY, 'npc_doctor').setDepth(5 + 4);
+        this.tweens.add({ targets: empSprite, x: empEndX, duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => empSprite.setFlipX(true), onRepeat: () => empSprite.setFlipX(false) });
+        this.tweens.add({ targets: empSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      }
     }
 
     // ── Player ───────────────────────────────────────────────────
