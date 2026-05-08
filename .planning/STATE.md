@@ -1,33 +1,33 @@
 ---
 gsd_state_version: 1.0
-milestone: v2.1
-milestone_name: PHI Sorter Encounter
-status: in-progress
-last_updated: "2026-05-01"
+milestone: v2.2
+milestone_name: Sponsor Demo
+status: defining-requirements
+last_updated: "2026-05-07"
 progress:
-  total_phases: 6
-  completed_phases: 5
-  total_plans: 23
-  completed_plans: 22
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-03-26)
+See: .planning/PROJECT.md (updated 2026-05-07)
 
 **Core value:** The player should forget they're doing compliance training. One continuous game.
-**Current focus:** v2.1 Phase 16 — PHI Sorter Encounter
+**Current focus:** v2.2 Sponsor Demo — curated 4-room demo path + start menu + completion certificate for Out-of-Pocket pitch
 
 ## Current Position
 
-Phase: 16 of 16 (PHI Sorter Encounter)
-Plan: 4 of 4
-Status: Phase 16 in progress — plans 01, 02, and 03 executed
-Last activity: 2026-05-01 — Phase 16 Plan 03 executed (PHISorterOverlay + SorterContextCard + SorterItem + BucketZone UI components + CSS keyframes)
+Phase: Not started (defining requirements)
+Plan: —
+Status: Defining requirements
+Last activity: 2026-05-07 — Milestone v2.2 started; v2.1 paused (Phase 16 PHI Sorter at 98%, Plan 04 deferred)
 
-Progress: [##########] 98%
+Progress: [░░░░░░░░░░] 0%
 
 ## Performance Metrics
 
@@ -109,6 +109,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-01
-Stopped at: Completed Phase 16 Plan 03 — PHISorterOverlay + SorterContextCard + SorterItem + BucketZone components + CSS keyframes
-Resume: Phase 16 Plan 04 (Phaser triggers + UnifiedGamePage routing) ready to execute.
+Last session: 2026-05-07
+Stopped at: v2.2 milestone started; PROJECT.md and STATE.md updated. Defining requirements next.
+Resume: Continue v2.2 workflow → REQUIREMENTS.md → ROADMAP.md.
+
+**Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.

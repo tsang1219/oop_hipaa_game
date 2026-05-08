@@ -30,26 +30,43 @@ The player should forget they're doing compliance training. One continuous game 
 
 ### Active
 
-## Current Milestone: v2.0 One Game
+## Current Milestone: v2.2 Sponsor Demo
 
-**Goal:** Restructure PrivacyQuest + BreachDefense from two separate games into one cohesive RPG with continuous hospital navigation, integrated tower defense encounters, and a three-act narrative arc.
+**Goal:** Ship a curated sponsor-pitch demo of PrivacyQuest in 1-2 days. Demo is sent to Out-of-Pocket (Nikhil) next week to gauge sponsor interest at ~$10K target. Informal 50/50 revenue split agreed. Pauses v2.1 (Phase 16 PHI Sorter at 98%, Phase 17 Breach Triage not started). Reuses existing rooms/NPCs/dialogue — no new content authored.
 
 **Target features:**
 
-- Continuous hospital navigation — player walks between departments through doors (no room picker, no hub menu)
-- Door-to-door transitions with visual cues (locked/available/completed) and hallway connectors
-- Linear department unlock progression (Reception → Break Room → Lab → Records → IT → ER)
-- Inbound TD encounter integrated into RPG world — condensed 4-wave format, triggered from narrative events
-- Encounter trigger/return system — RPG event launches encounter, results feed back to world state
-- Three-act narrative arc with act progression, per-act music shifts, and transition dialogue
-- Unified compliance score across all encounter types
-- Bug stabilization pass on surviving systems before restructure
+- **Demo mode entrypoint** — start menu adds 3 buttons: "Demo" / "Tower Defense" / "Full Game". Full game route untouched.
+- **Curated 4-room demo path** — Reception → Emergency Room → Break Room → Medical Records. ER-second front-loads tension; Break Room provides comedic screenshot moments; Medical Records closes on procedural depth + Subpoena/CCO scenario. All 4 unlocked from demo start, gated off from full game's progression.
+- **Tower Defense standalone launch** — TD button launches BreachDefenseScene directly, no narrative wrapper, returns to start menu on win/lose.
+- **First-impression polish in 4 demo rooms** — fix V1 (flat sprite on load), V4 (HUD overlay on entry), V7 (loud honk near NPCs).
+- **Completion sequence + sponsor hook** — after Medical Records exit: dim → beat → fanfare → certificate animation → sponsor code reveal + copy button. End NPC hands the prize using configured sponsor sprite/lines. Sponsor data lives in one pluggable config file (`name`, `character_sprite`, `two_dialogue_lines`, `code`) — swap sponsors without re-coding.
 
-### Out of Scope
+**Why this milestone now (2026-05-07):** Sponsor outreach is time-sensitive (summer makes outreach harder). User has baby due 2026-06-01 — no sprawl. v2.1 Phase 16 progress preserved as artifact at `.planning/phases/16-phi-sorter-encounter/`; resume after sponsor outreach lands (or doesn't).
 
-- New encounter types (PHI sorting, outbound TD, breach triage) — v2.1 "Full Vision"
-- Remaining sprite overhaul (portraits, furniture, tiles) — folded into v2.1
-- End-of-game report screen — v2.1
+### Paused Milestone: v2.1 Full Vision
+
+PHI Sorter (Phase 16) at 98% — Plans 01-03 executed, Plan 04 (Phaser triggers + UnifiedGamePage routing) remaining. Phase 17 Breach Triage not started. Resume after v2.2 ships and sponsor interest is gauged.
+
+### Previous Milestone: v2.0 One Game (Shipped 2026-03-28)
+
+Restructured PrivacyQuest + BreachDefense from two separate games into one cohesive RPG with continuous hospital navigation, integrated inbound tower defense encounters, three-act narrative arc, and unified compliance score. 19 plans across Phases 11-15.
+
+### Out of Scope (v2.2)
+
+- Hallway redesign / overworld map — pinned 2026-05-06; not the lever for this demo
+- Character select screen + image-to-8bit pipeline — pinned 2026-05-06; defer to v2.3
+- Breach decision scenario — not built; out of demo scope
+- Phase 17 Breach Triage — deferred to post-sponsor-outreach (v2.1 resumption)
+- Phase 16 PHI Sorter Plan 04 — paused mid-flight; resume with v2.1
+- Room-7 navigation bug — out of demo path; deprioritized
+- Internal escalation / "levels per room" — rejected; use existing scenarios as-is
+- New scenarios, new NPCs, new mechanics, new dialogue — pure curation milestone
+- V2/V3/V5/V6 visual bugs (chat icon, NPC positioning, hallway centering, notice boards) — out of 1-2 day budget
+- Out-of-Pocket cameo NPC, new easter eggs — defer to v2.3 if sponsor bites
+- Outbound Tower Defense encounter — deprioritized; revisit post-v2.1
+- Remaining sprite overhaul (portraits, furniture, tiles) — folded into v2.x
+- End-of-game report screen — future
 - Admin console / certificate generation / analytics — future roadmap
 - Mobile/responsive layout — desktop-first
 - Real-time multiplayer / leaderboards — requires backend
@@ -86,4 +103,4 @@ Enhancement brief: `.planning/ENHANCEMENT_BRIEF.md` — full design reference fo
 
 ---
 
-*Last updated: 2026-03-26 after v2.0 milestone start*
+*Last updated: 2026-05-07 after v2.2 milestone start*
