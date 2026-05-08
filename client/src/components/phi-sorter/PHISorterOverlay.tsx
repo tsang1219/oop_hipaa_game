@@ -20,6 +20,7 @@ export type PHISorterOverlayProps = {
     scoreContribution: number;  // Math.round((correctCount/totalCount) * 12), 0..12
     takeaways: [string, string]; // Pass-through from docSet.takeaways — cleaner Plan 04 wiring (W4)
   }) => void;
+  onAbort?: () => void;      // Player exits via X button or Esc — no scoring, no registry write
 };
 
 /**
@@ -36,7 +37,7 @@ export type PHISorterOverlayProps = {
  *   - 600ms anticipation beat before onComplete fires (Commandment 2)
  *   - Educational wrong-answer feedback panel ≥3s (Commandment 4)
  */
-export function PHISorterOverlay({ documentSetId, encounterId, onComplete }: PHISorterOverlayProps) {
+export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbort }: PHISorterOverlayProps) {
   const docSet = useMemo(() => getSorterDocumentSet(documentSetId), [documentSetId]);
 
   // Error fallback — graceful exit on bad documentSetId (does NOT crash)
@@ -188,6 +189,12 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete }: PHI
   useEffect(() => {
     if (phase !== 'sorting') return;
     const handleKey = (e: KeyboardEvent) => {
+      // Escape — abort encounter (no scoring, no registry write, replayable)
+      if (e.key === 'Escape' && onAbort) {
+        e.preventDefault();
+        onAbort();
+        return;
+      }
       if (remainingItems.length === 0) return;
       if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
         e.preventDefault();
@@ -212,7 +219,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete }: PHI
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [phase, remainingItems, selectedItemIdx, hoveredBucket, handleDrop]);
+  }, [phase, remainingItems, selectedItemIdx, hoveredBucket, handleDrop, onAbort]);
 
   // ── Sorting phase render ─────────────────────────────────────────────────────
   // Sorting phase UI — overlay always mounts directly here.
@@ -221,6 +228,19 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete }: PHI
       className="fixed inset-0 z-40 bg-black/85 flex flex-col items-stretch justify-center p-6"
       data-testid="phi-sorter-overlay"
     >
+      {/* Close button — exits without scoring, encounter remains replayable */}
+      {onAbort && (
+        <button
+          onClick={onAbort}
+          aria-label="Close sorter"
+          data-testid="button-sorter-close"
+          className="absolute top-4 right-4 z-50 bg-[#3a1a2a] hover:bg-[#5a2a3a] text-white border-4 border-[#FF6B9D] w-10 h-10 flex items-center justify-center transition-colors"
+          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '12px' }}
+        >
+          ×
+        </button>
+      )}
+
       {/* Progress header */}
       <div
         className="text-center text-white mb-4"
@@ -287,7 +307,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete }: PHI
         className="text-center text-white/60 mt-4"
         style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
       >
-        DRAG ITEMS &middot; OR &#x2191;&#x2193; TO SELECT &middot; &#x2190;&#x2192; FOR BUCKET &middot; ENTER TO COMMIT
+        DRAG ITEMS &middot; OR &#x2191;&#x2193; TO SELECT &middot; &#x2190;&#x2192; FOR BUCKET &middot; ENTER TO COMMIT &middot; ESC TO EXIT
       </div>
 
       {/* Wrong-answer educational feedback toast — visible ≥3s (Commandment 4) */}

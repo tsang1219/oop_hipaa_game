@@ -1967,7 +1967,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   /** React dismissed the debrief — stop BreachDefense and wake this scene. */
-  private onReturnFromEncounter = (data?: { encounterId?: string }): void => {
+  private onReturnFromEncounter = (data?: { encounterId?: string; aborted?: boolean }): void => {
     try {
       this.scene.stop('BreachDefense');
     } catch (_) {
@@ -1980,13 +1980,15 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Phase 16 (BLOCKER 1): for pure-React encounters (PHI Sorter), the scene was never slept,
     // so scene.wake() above is a no-op and handleWakeFromEncounter never fires. We must
-    // explicitly reset the paused/encounterTriggered flags AND write the persistent registry guard.
-    // This branch is gated by data?.encounterId — TD encounters call onReturnFromEncounter() with
-    // no payload, so this block is skipped for them (they go through the wake path as before).
-    if (data?.encounterId) {
+    // explicitly reset the paused/encounterTriggered flags. The `aborted` branch handles
+    // player-initiated exits (Esc / X button) — same unpause, but no registry guard write so
+    // the encounter remains replayable when the player walks back over the trigger tile.
+    if (data?.encounterId || data?.aborted) {
       this.paused = false;
       this.encounterTriggered = false;
-      this.registry.set(`encounterResult_${data.encounterId}`, true);
+      if (data.encounterId) {
+        this.registry.set(`encounterResult_${data.encounterId}`, true);
+      }
     }
   };
 

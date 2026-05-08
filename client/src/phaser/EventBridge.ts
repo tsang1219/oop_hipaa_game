@@ -77,12 +77,14 @@ export const BRIDGE_EVENTS = {
    * React → Phaser: dismiss the encounter overlay and resume ExplorationScene.
    *
    * Payload shape (optional — undefined for legacy TD callers, populated for Phase 16 sorter):
-   *   { encounterId?: string }
+   *   { encounterId?: string; aborted?: boolean }
    *
-   * When encounterId is present, ExplorationScene's onReturnFromEncounter handler must write
-   * `this.registry.set('encounterResult_' + encounterId, true)` to suppress proximity re-trigger.
-   * (Phase 16 needs this because the PHI Sorter is pure React with no Phaser scene to write the
-   * registry directly — unlike BreachDefenseScene which writes its own registry guard.)
+   * - `encounterId` (encounter completed normally): ExplorationScene writes
+   *   `this.registry.set('encounterResult_' + encounterId, true)` to suppress re-trigger.
+   *   Phase 16 needs this because the PHI Sorter is pure React with no Phaser scene to
+   *   write the registry directly — unlike BreachDefenseScene which writes its own guard.
+   * - `aborted: true` (player exited via Esc / X button): unpause without writing the
+   *   registry guard, so the encounter remains replayable on re-trigger.
    */
   REACT_RETURN_FROM_ENCOUNTER: 'react:return-from-encounter', // React: debrief dismissed, return to RPG
   ACT_ADVANCE: 'react:act-advance',                           // payload: { newAct: 1|2|3, track: string, baseVolume?: number }

@@ -708,6 +708,15 @@ export default function UnifiedGamePage() {
     );
   }, [encounterResult]);
 
+  // PHI Sorter abort handler — player exits via X button or Esc.
+  // No score change, no registry write — encounter remains replayable.
+  const handleSorterAbort = useCallback(() => {
+    setEncounterPhase('idle');
+    setEncounterResult(null);
+    setNarrativeCardData(null);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, { aborted: true });
+  }, []);
+
   // PHI Sorter encounter completion handler (Phase 16)
   const handleSorterComplete = useCallback((result: {
     encounterId: string;
@@ -970,6 +979,7 @@ export default function UnifiedGamePage() {
             documentSetId={narrativeCardData.sorterConfig.documentSetId}
             encounterId={narrativeCardData.encounterId}
             onComplete={handleSorterComplete}
+            onAbort={handleSorterAbort}
           />
         )}
 
