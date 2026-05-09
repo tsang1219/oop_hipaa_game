@@ -14,13 +14,19 @@ import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@sha
 const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
 
-// PHI Sorter trigger tile coordinates (Phase 16)
-// Reception: tile (10,6) — open floor in front of Riley's desk; verified no NPC/zone/obstacle at this tile
-const RECEPTION_TRIGGER_X = 10;
-const RECEPTION_TRIGGER_Y = 6;
-// Lab: tile (9,7) — adjacent to lab_tech (10,7); (7,7) conflicts with sample_labels zone so shifted right
-const LAB_TRIGGER_X = 9;
-const LAB_TRIGGER_Y = 7;
+// All known music track keys — used to clean up other tracks when changing rooms
+const MUSIC_TRACK_KEYS = [
+  'music_hub',
+  'music_exploration',
+  'music_breach',
+  'music_demo_er',
+  'music_demo_break_room',
+  'music_demo_records_room',
+] as const;
+
+// PHI Sorter triggers — proximity polling removed 2026-05-08, replaced by
+// NPC-driven trigger via Aiyana (Reception, tile 10,6) and Marcus (Lab, tile 9,7).
+// See `triggerInteraction` for the npc.encounterTrigger handler.
 
 // QA test gate (BUG-009): when `?qa_no_encounter=1` is on the URL, suppress
 // auto-firing encounter triggers (PHI Sorter Reception/Lab + IT Office TD) so
@@ -112,7 +118,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
-  private readonly musicBaseVolume = 0.25;
+  private readonly musicBaseVolume = 0.13;
 
   // QA state broadcast throttle
   private lastStateBroadcastTime = 0;
@@ -1592,30 +1598,42 @@ export class ExplorationScene extends Phaser.Scene {
       this.sound.mute = true;
     }
 
-    // ── Background music — continue seamlessly or fade in ────────
+    // ── Background music — room override > act default; crossfade if track changed ──
     const currentAct = this.getCurrentAct();
     const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
       1: { track: 'music_hub', baseVol: this.musicBaseVolume },
       2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
       3: { track: 'music_breach', baseVol: 0.15 },
     };
-    const musicCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
+    const actCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
+    const roomTrack = (this.room as any).musicTrack as string | undefined;
+    const roomBaseVol = (this.room as any).musicBaseVolume as number | undefined;
+    const musicCfg = {
+      track: roomTrack ?? actCfg.track,
+      baseVol: roomBaseVol ?? actCfg.baseVol,
+    };
     this.activeMusicBaseVolume = musicCfg.baseVol;
     try {
       const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
       const targetVol = musicCfg.baseVol * userVol;
 
-      // Check if this track survived from the previous room (same act)
+      // Same track survived from previous room — reclaim and fade up
       const existing = this.findPlayingTrack(musicCfg.track);
       if (existing) {
-        // Reclaim the instance and restore volume (door fade set it to 0)
         this.bgMusic = existing;
-        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 400, ease: 'Sine.easeIn' });
+        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 600, ease: 'Sine.easeIn' });
       } else if (userVol > 0) {
-        // No existing track — clean up any orphaned sounds and start fresh.
+        // Different track (or first load) — stop any other music tracks left
+        // playing on the SoundManager, then fade in the new one from silence.
+        for (const k of MUSIC_TRACK_KEYS) {
+          if (k !== musicCfg.track) {
+            this.sound.getAll(k).forEach(s => { s.stop(); s.destroy(); });
+          }
+        }
+        // Clean up orphans of the target key too
+        this.sound.getAll(musicCfg.track).forEach(s => { s.stop(); s.destroy(); });
         // Start muted to prevent any first-frame audio leak, then unmute at
         // volume 0 and tween up on the next tick.
-        this.sound.getAll(musicCfg.track).forEach(s => { s.stop(); s.destroy(); });
         this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0, mute: true });
         const playMusic = () => {
           if (!this.bgMusic || !this.scene.isActive()) return;
@@ -1625,7 +1643,7 @@ export class ExplorationScene extends Phaser.Scene {
             const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
             ws.setMute(false);
             ws.volume = 0;
-            this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1500, ease: 'Sine.easeIn' });
+            this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1800, ease: 'Sine.easeIn' });
           });
         };
         if (this.sound.locked) {
@@ -1822,31 +1840,9 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
-    // PHI Sorter trigger — Reception (Act 1) (Phase 16)
-    // Gated off in demo mode — Phase 16 Plan 04 wiring is paused; demo flow must not snag on it.
-    // Also gated by qa_no_encounter URL param (BUG-009) so progression tests can cross the trigger tile.
-    if (this.room.id === 'reception' && !this.encounterTriggered && !this.paused && !isDemoActive() && !isQANoEncounter()) {
-      const alreadyDone = this.registry.get('encounterResult_phi-sort-reception');
-      if (!alreadyDone) {
-        const dx = Math.abs(this.player.x - (RECEPTION_TRIGGER_X * TILE + TILE / 2));
-        const dy = Math.abs(this.player.y - (RECEPTION_TRIGGER_Y * TILE + TILE / 2));
-        if (dx < TILE * 1.5 && dy < TILE * 1.5) {
-          this.triggerPHISorterEncounter('phi-sort-reception', 'phi-sorter-set-1');
-        }
-      }
-    }
-
-    // PHI Sorter trigger — Lab (Act 2) (Phase 16)
-    if (this.room.id === 'lab' && !this.encounterTriggered && !this.paused && !isDemoActive() && !isQANoEncounter()) {
-      const alreadyDone = this.registry.get('encounterResult_phi-sort-lab');
-      if (!alreadyDone) {
-        const dx = Math.abs(this.player.x - (LAB_TRIGGER_X * TILE + TILE / 2));
-        const dy = Math.abs(this.player.y - (LAB_TRIGGER_Y * TILE + TILE / 2));
-        if (dx < TILE * 1.5 && dy < TILE * 1.5) {
-          this.triggerPHISorterEncounter('phi-sort-lab', 'phi-sorter-set-2');
-        }
-      }
-    }
+    // PHI Sorter triggers are now NPC-driven (Phase 16, 2026-05-08).
+    // Player presses SPACE on Aiyana (Reception) or Marcus (Lab) — see triggerInteraction.
+    // Proximity polling removed because it auto-popped without player agency.
 
     // Door proximity detection — requires SPACE to enter (Phase 12)
     if (!this.transitioning) {
@@ -2215,52 +2211,10 @@ export class ExplorationScene extends Phaser.Scene {
     // React emits REACT_LAUNCH_ENCOUNTER and ExplorationScene handles it below.
   }
 
-  /** PHI Sorter encounter trigger (Phase 16). Pure-React overlay — does NOT call scene.sleep(). */
-  private triggerPHISorterEncounter(encounterId: string, documentSetId: string): void {
-    if (this.encounterTriggered) return;
-    const alreadyDone = this.registry.get(`encounterResult_${encounterId}`);
-    if (alreadyDone) return;
-
-    this.encounterTriggered = true;
-    this.paused = true;
-    // INTENTIONAL: do NOT call this.scene.sleep() here. The PHI Sorter is a pure-React overlay.
-    // ExplorationScene stays active and visible (just paused) behind the React overlay's backdrop.
-    // Because we never sleep, scene.wake() cannot fire handleWakeFromEncounter on return —
-    // onReturnFromEncounter must explicitly reset paused/encounterTriggered for the sorter path
-    // (see onReturnFromEncounter BLOCKER 1 fix).
-
-    // Anticipation beat (Commandment 2) — calm flash, NOT the breach-alert red
-    this.cameras.main.flash(200, 255, 255, 150, true);
-    // FIX-03 (Phase 20): drop from 0.5 → 0.3 — the trigger zone sits next to the
-    // Reception NPCs, so a 0.5-volume cue read as a "honk near NPCs". A soft
-    // 0.3 entry chime is proportional (Commandment 8) — the flash carries the rest.
-    try { this.sound.play('sfx_interact', { volume: 0.3 }); } catch (_) {}
-
-    const NARRATIVE: Record<string, string> = {
-      'phi-sort-reception':
-        "Riley slides a stack of intake forms across the desk.\n\n" +
-        "\"Before these go to the auditor, we need to redact anything that " +
-        "could identify patients. Can you sort what counts as PHI?\"",
-      'phi-sort-lab':
-        "The lab tech looks up from the centrifuge.\n\n" +
-        "\"I need a second pair of eyes. Some of these sample labels — " +
-        "I'm not sure which details we're allowed to include on the external " +
-        "manifest. PHI or not PHI?\"",
-      'phi-sort-records':
-        "The records clerk taps a folder on the counter.\n\n" +
-        "\"Research request came in. They want a de-identified set, but " +
-        "Safe Harbor has some edges I want a second opinion on.\"",
-    };
-
-    this.time.delayedCall(250, () => {
-      eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, {
-        encounterId,
-        narrativeText: NARRATIVE[encounterId] ?? 'Time to sort some records.',
-        type: 'phi-sorter',
-        sorterConfig: { documentSetId },
-      });
-    });
-  }
+  // triggerPHISorterEncounter removed 2026-05-08 — replaced by NPC-driven trigger
+  // (npc.encounterTrigger handler in triggerInteraction emits ENCOUNTER_REQUEST,
+  // React shows EncounterRequestModal, accept transitions phase to 'phi-sorter'
+  // directly without going through the narrative card).
 
   /** React confirmed the narrative card — launch BreachDefense and sleep. */
   private encounterLaunching = false;
@@ -2317,7 +2271,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.cameras.main.fadeIn(400, 0, 0, 0);
     // encounterTriggered stays true — prevents re-triggering on same room session
 
-    // Restore exploration music after BreachDefense ends
+    // Restore exploration music after BreachDefense ends — honor room override
     try {
       const currentAct = this.getCurrentAct();
       const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
@@ -2325,7 +2279,13 @@ export class ExplorationScene extends Phaser.Scene {
         2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
         3: { track: 'music_breach', baseVol: 0.15 },
       };
-      const musicCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
+      const actCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
+      const roomTrack = (this.room as any).musicTrack as string | undefined;
+      const roomBaseVol = (this.room as any).musicBaseVolume as number | undefined;
+      const musicCfg = {
+        track: roomTrack ?? actCfg.track,
+        baseVol: roomBaseVol ?? actCfg.baseVol,
+      };
       this.activeMusicBaseVolume = musicCfg.baseVol;
       const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
       const targetVol = musicCfg.baseVol * userVol;
@@ -2710,6 +2670,33 @@ export class ExplorationScene extends Phaser.Scene {
 
     if (ia.type === 'npc') {
       const npc = ia.data as NPC;
+
+      // Phase 16 (2026-05-08): NPC-driven encounter trigger.
+      // If this NPC has an `encounterTrigger` field, skip the dialogue scene flow
+      // and instead emit ENCOUNTER_REQUEST so React can show the EncounterRequestModal.
+      // Player picks accept (→ encounter) or decline (→ resume exploration).
+      if (npc.encounterTrigger) {
+        // Already-completed encounters skip the request modal entirely
+        const alreadyDone = this.registry.get(`encounterResult_${npc.encounterTrigger.encounterId}`);
+        if (alreadyDone) {
+          // Encounter is done — emit the standard NPC interaction so the player can still
+          // talk to the NPC (they may have a thank-you scene later). For now, no-op fallback.
+          return;
+        }
+        // Pause input to prevent walking off mid-modal; do NOT sleep — the React modal
+        // sits on top and we resume immediately on accept/decline.
+        this.paused = true;
+        eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_REQUEST, {
+          npcId: npc.id,
+          npcName: npc.name,
+          npcRole: (npc as { role?: string }).role,
+          requestText: npc.encounterTrigger.requestText,
+          encounterId: npc.encounterTrigger.encounterId,
+          documentSetId: npc.encounterTrigger.documentSetId,
+        });
+        try { this.sound.play('sfx_interact', { volume: 0.35 }); } catch (_) {}
+        return;
+      }
 
       // First-time NPC discovery sparkle — celebrate the moment
       if (!this.completedNPCs.has(npc.id)) {

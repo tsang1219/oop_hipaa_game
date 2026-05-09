@@ -47,6 +47,7 @@ import type { BreachDefenseInitData } from '../phaser/scenes/BreachDefenseScene'
 import { PHISorterOverlay } from '@/components/phi-sorter/PHISorterOverlay';
 import { SorterContextCard } from '@/components/phi-sorter/SorterContextCard';
 import { SorterDebrief } from '@/components/phi-sorter/SorterDebrief';
+import { EncounterRequestModal } from '@/components/phi-sorter/EncounterRequestModal';
 import { getSorterDocumentSet } from '@/data/sorterData';
 
 // Map an encounter ID to a human-readable location label for the SorterDebrief
@@ -202,6 +203,18 @@ export default function UnifiedGamePage() {
     takeaways?: string[];        // sorter-only: presence of this field discriminates sorter vs TD debrief
     correctCount?: number;       // sorter-only: feeds SorterDebrief accuracy bar
     totalCount?: number;         // sorter-only: feeds SorterDebrief accuracy bar
+  } | null>(null);
+
+  // ── Encounter request modal state (NPC-driven trigger, 2026-05-08) ──
+  // Populated when Phaser emits ENCOUNTER_REQUEST (player pressed SPACE on a
+  // trigger NPC like Aiyana or Marcus). Rendered as EncounterRequestModal.
+  const [encounterRequest, setEncounterRequest] = useState<{
+    npcId: string;
+    npcName: string;
+    npcRole?: string;
+    requestText: string;
+    encounterId: string;
+    documentSetId: string;
   } | null>(null);
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
@@ -906,13 +919,51 @@ export default function UnifiedGamePage() {
       });
     };
 
+    // NPC-driven encounter request (2026-05-08): Phaser emits this when player
+    // presses SPACE on a trigger NPC. We show EncounterRequestModal — the player
+    // picks accept (→ open sorter) or decline (→ resume exploration).
+    const onEncounterRequest = (data: {
+      npcId: string;
+      npcName: string;
+      npcRole?: string;
+      requestText: string;
+      encounterId: string;
+      documentSetId: string;
+    }) => {
+      setEncounterRequest(data);
+    };
+
     eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, onEncounterTriggered);
     eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, onEncounterComplete);
+    eventBridge.on(BRIDGE_EVENTS.ENCOUNTER_REQUEST, onEncounterRequest);
 
     return () => {
       eventBridge.off(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, onEncounterTriggered);
       eventBridge.off(BRIDGE_EVENTS.ENCOUNTER_COMPLETE, onEncounterComplete);
+      eventBridge.off(BRIDGE_EVENTS.ENCOUNTER_REQUEST, onEncounterRequest);
     };
+  }, []);
+
+  // Accept handler: skip the narrative card phase and go directly to the sorter.
+  // (The modal already provided the NPC framing — narrative card would be redundant.)
+  const handleAcceptEncounterRequest = useCallback(() => {
+    if (!encounterRequest) return;
+    const { encounterId, documentSetId } = encounterRequest;
+    setNarrativeCardData({
+      narrativeText: '',
+      encounterId,
+      type: 'phi-sorter',
+      sorterConfig: { documentSetId },
+    });
+    setEncounterPhase('phi-sorter');
+    setEncounterRequest(null);
+  }, [encounterRequest]);
+
+  // Decline handler: close modal, signal Phaser to unpause via the existing
+  // aborted path. No registry write — encounter remains replayable.
+  const handleDeclineEncounterRequest = useCallback(() => {
+    setEncounterRequest(null);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, { aborted: true });
   }, []);
 
   const handleConfirmNarrativeCard = useCallback(() => {
@@ -1375,6 +1426,19 @@ export default function UnifiedGamePage() {
             encounterId={narrativeCardData.encounterId}
             onComplete={handleSorterComplete}
             onAbort={handleSorterAbort}
+          />
+        )}
+
+        {/* NPC-driven encounter request modal — shown when the player presses
+            SPACE on Aiyana (Reception) or Marcus (Lab). Replaced the proximity-
+            tile auto-pop on 2026-05-08 so the player has explicit agency. */}
+        {encounterRequest && (
+          <EncounterRequestModal
+            npcName={encounterRequest.npcName}
+            npcRole={encounterRequest.npcRole}
+            requestText={encounterRequest.requestText}
+            onAccept={handleAcceptEncounterRequest}
+            onDecline={handleDeclineEncounterRequest}
           />
         )}
 

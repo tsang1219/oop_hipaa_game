@@ -185,6 +185,21 @@
           "sprite": "receptionist",
           "sceneId": "riley_scene1",
           "isFinalBoss": false
+        },
+        {
+          "id": "aiyana_intake",
+          "name": "Aiyana",
+          "role": "Intake Volunteer",
+          "x": 10,
+          "y": 6,
+          "sprite": "officer",
+          "sceneId": "_encounter_phi_sort_reception",
+          "encounterTrigger": {
+            "encounterId": "phi-sort-reception",
+            "documentSetId": "phi-sorter-set-1",
+            "requestText": "Hey — auditor's here in twenty minutes and I'm drowning. Can you help me sort what counts as PHI on these intake forms?"
+          },
+          "isFinalBoss": false
         }
       ],
       "interactionZones": [
@@ -1071,6 +1086,7 @@
       "subtitle": "The Edge Cases",
       "description": "Where rules meet urgency. The hardest judgment calls happen here.",
       "unlockRequirement": "it_office",
+      "musicTrack": "music_demo_er",
       "patientStory": {
         "title": "Marcus's Story",
         "text": "Because you held the line when that officer demanded records without a warrant, Marcus's mental health crisis stayed between him and his care team. He got help. He's still here.",
@@ -1503,6 +1519,20 @@
           "sceneId": "lab_tech_scene"
         },
         {
+          "id": "marcus_lab_aide",
+          "name": "Marcus",
+          "role": "Lab Aide",
+          "x": 9,
+          "y": 7,
+          "sprite": "staff",
+          "sceneId": "_encounter_phi_sort_lab",
+          "encounterTrigger": {
+            "encounterId": "phi-sort-lab",
+            "documentSetId": "phi-sorter-set-2",
+            "requestText": "Need a second pair of eyes — these sample labels are headed to an external manifest and I'm not sure which fields we can include. PHI or not PHI?"
+          }
+        },
+        {
           "id": "researcher",
           "name": "Curious Researcher",
           "x": 3,
@@ -1574,6 +1604,7 @@
       "subtitle": "The Archive",
       "description": "The long memory. Everything lives here. Access, amendments, the right to your own story.",
       "unlockRequirement": "lab",
+      "musicTrack": "music_demo_records_room",
       "patientStory": {
         "title": "Mrs. Chen's Story",
         "text": "Because you helped Mrs. Chen correct that error in her record, she got the insurance coverage she needed. A wrong diagnosis almost followed her forever. You stopped it.",
@@ -2208,6 +2239,7 @@
       "subtitle": "The Human Factor",
       "description": "Where people are just people. Gossip, venting, casual lapses. The hardest place to stay vigilant.",
       "unlockRequirement": "reception",
+      "musicTrack": "music_demo_break_room",
       "patientStory": {
         "title": "James's Story",
         "text": "Because you changed the subject when your coworkers started gossiping, James's coworker\u2014sitting two tables away\u2014never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",

@@ -87,6 +87,20 @@ export const BRIDGE_EVENTS = {
    *   registry guard, so the encounter remains replayable on re-trigger.
    */
   REACT_RETURN_FROM_ENCOUNTER: 'react:return-from-encounter', // React: debrief dismissed, return to RPG
+  /**
+   * Phaser → React: an NPC marked with `encounterTrigger` was interacted with.
+   * React shows EncounterRequestModal; player picks accept or decline.
+   *
+   * Payload: { npcId, npcName, npcRole?, requestText, encounterId, documentSetId }
+   *
+   * Accept is handled entirely React-side (sets phase → 'phi-sorter', mounts overlay).
+   * Decline reuses REACT_RETURN_FROM_ENCOUNTER with { aborted: true } payload — existing
+   * onReturnFromEncounter handler unpauses without writing the registry guard, so the
+   * encounter can be re-triggered when the player walks back to the NPC.
+   *
+   * Added 2026-05-08 to replace proximity-tile auto-trigger with NPC dialogue trigger.
+   */
+  ENCOUNTER_REQUEST: 'encounter:request',
   ACT_ADVANCE: 'react:act-advance',                           // payload: { newAct: 1|2|3, track: string, baseVolume?: number }
   CHOICE_FLAG_SET: 'react:choice-flag-set',                   // payload: { flagKey: string, flagValue: string | boolean }
   REACT_ROOM_COMPLETE_FANFARE: 'react:room-complete-fanfare', // payload: { roomId: string; playerX: number; playerY: number }

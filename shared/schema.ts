@@ -66,10 +66,22 @@ export const obstacleSchema = z.object({
 export const npcSchema = z.object({
   id: z.string(),
   name: z.string(),
+  role: z.string().optional(),
+  sprite: z.string().optional(),
   x: z.number(),
   y: z.number(),
   sceneId: z.string(),
   isFinalBoss: z.boolean().optional(),
+  // Phase 16 (2026-05-08): NPCs marked with encounterTrigger open the
+  // EncounterRequestModal on interaction instead of the dialogue scene.
+  // Player picks accept/decline → encounter starts or exploration resumes.
+  encounterTrigger: z
+    .object({
+      encounterId: z.string(),
+      documentSetId: z.string(),
+      requestText: z.string(),
+    })
+    .optional(),
 });
 
 export const interactionZoneSchema = z.object({
