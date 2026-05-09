@@ -160,11 +160,26 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
    * Completion effect: when sorting phase empties the pile →
    * 600ms anticipation beat (Commandment 2) → sfx_fanfare → onComplete.
    */
+  // Step 1 — when the pile empties while in 'sorting', flip phase to 'completing'.
+  // Kept narrow (only depends on the trigger conditions) so the dep change is the
+  // phase flip itself, not the score values that change every drop.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    if (phase !== 'sorting') return;
-    if (remainingItems.length > 0) return;
-    setPhase('completing');
+    if (phase === 'sorting' && remainingItems.length === 0) {
+      setPhase('completing');
+    }
+  }, [phase, remainingItems.length]);
+
+  // Step 2 — after entering 'completing', wait 600ms (anticipation beat,
+  // Commandment 2), play fanfare, fire onComplete. Critical: this effect's
+  // deps do NOT include `phase` beyond the initial entry — once we're in
+  // 'completing' the timeout runs to completion without being cleared by
+  // re-renders. Original bug: a single effect that both flipped phase and
+  // scheduled the timeout — the phase flip cleared its own timeout before
+  // it could fire, so onComplete never ran.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (phase !== 'completing') return;
     const t = setTimeout(() => {
       eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_fanfare', volume: 0.7 });
       const scoreContribution = Math.round((correctCount / totalCount) * 12);
@@ -173,11 +188,11 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         correctCount,
         totalCount,
         scoreContribution,
-        takeaways: docSet.takeaways, // Pass-through directly — avoids redundant docSet re-fetch in Plan 04 (W4)
+        takeaways: docSet.takeaways,
       });
-    }, 600); // Anticipation beat before fanfare and debrief transition
+    }, 600);
     return () => clearTimeout(t);
-  }, [phase, remainingItems.length, correctCount, totalCount, encounterId, onComplete, docSet.takeaways]);
+  }, [phase, correctCount, totalCount, encounterId, onComplete, docSet.takeaways]);
 
   /**
    * Keyboard handler — only active in 'sorting' phase.
