@@ -31,6 +31,7 @@ import roomDataJson from '@/data/roomData.json';
 import { migrateV1toV2, loadSave, writeSave, hasSaveData } from '@/lib/saveData';
 import { TitleScreen } from '../components/TitleScreen';
 import { StartMenu } from '../components/StartMenu';
+import { CharacterSelectScreen } from '../components/CharacterSelectScreen';
 import {
   startDemo,
   endDemo,
@@ -88,6 +89,7 @@ interface RoomWithDoors {
 
 type PageMode =
   | 'start-menu'
+  | 'character-select'
   | 'title'
   | 'exploration'
   | 'dialogue'
@@ -144,12 +146,25 @@ export default function UnifiedGamePage() {
   const gameRef = useRef<Phaser.Game | null>(null);
   const gameState = useGameState();
   const sceneStartedRef = useRef(false);
+  // Track current pageMode in a ref so handleSceneReady (registered once on
+  // mount) can read the latest value without re-registering. Without this,
+  // Boot.SCENE_READY auto-starts Exploration even when the player picked
+  // TOWER DEFENSE — leaving Exploration running in the background and the
+  // player sprite responding to clicks (audible footsteps under the TD HUD).
+  const pageModeRef = useRef<PageMode>('start-menu');
 
   // ── Local UI state (not persisted) ────────────────────────────
   const [pageMode, setPageMode] = useState<PageMode>(() => {
     const params = new URLSearchParams(window.location.search);
     if (params.has('qa-room') || params.has('qa-skip-onboarding') || params.has('qa-no-save')) {
       return 'exploration';
+    }
+    // Post-reload landing flag set by handleNewGame: take the player straight
+    // to character-select (skipping the start-menu) so they immediately pick a
+    // hero for their fresh game.
+    if (sessionStorage.getItem('pq:goto-character-select')) {
+      // Flag is consumed in the postSelectIntent initializer below.
+      return 'character-select';
     }
     const skip = sessionStorage.getItem('pq:skip-title');
     if (skip) {
@@ -159,6 +174,16 @@ export default function UnifiedGamePage() {
     // Phase 18: cold-boot players land on the StartMenu (3-button mode selector).
     // FULL GAME button transitions to 'title' (then existing TitleScreen → exploration path).
     return 'start-menu';
+  });
+  // Tracks which post-character-select flow to run on confirm. 'demo' fires
+  // startDemo() before transitioning to exploration; 'full-game' goes straight.
+  const [postSelectIntent, setPostSelectIntent] = useState<'full-game' | 'demo' | null>(() => {
+    const goto = sessionStorage.getItem('pq:goto-character-select');
+    if (goto) {
+      sessionStorage.removeItem('pq:goto-character-select');
+      return 'full-game';
+    }
+    return null;
   });
   const [currentSceneId, setCurrentSceneId] = useState<string | null>(null);
   const [currentNPCId, setCurrentNPCId] = useState<string | null>(null);
@@ -184,6 +209,10 @@ export default function UnifiedGamePage() {
   const [tdStandaloneResult, setTdStandaloneResult] = useState<TDStandaloneResult | null>(null);
   const [tdWaveBanner, setTdWaveBanner] = useState<{ wave: number; key: number } | null>(null); // DESIGN-009
   const [tdHelperVisible, setTdHelperVisible] = useState(false); // DESIGN-009
+  // Standalone TD wave-pause state — drives the "START NEXT WAVE" button.
+  // The scene PAUSES between waves in standalone mode and waits for the
+  // player to click. Wave 1 still uses the auto-prep countdown.
+  const [tdWavePause, setTdWavePause] = useState<{ wave: number; total: number } | null>(null);
 
   // ── Encounter phase state (Phase 13 + 16) ──────────────────────
   type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'phi-sorter' | 'debrief';
@@ -256,6 +285,12 @@ export default function UnifiedGamePage() {
   const currentRoomId = gameState.state.currentRoomId;
   const currentRoom = rooms.find(r => r.id === currentRoomId) || null;
   const completedRooms = gameState.state.completedRooms;
+
+  // Keep pageModeRef in sync so handleSceneReady (registered once on mount)
+  // can read the latest pageMode without re-registering.
+  useEffect(() => {
+    pageModeRef.current = pageMode;
+  }, [pageMode]);
 
   // ── Consolidated persistence ──────────────────────────────────
   useEffect(() => {
@@ -457,7 +492,12 @@ export default function UnifiedGamePage() {
     };
 
     const handleSceneReady = (sceneKey: string) => {
-      if (sceneKey === 'Boot') startExploration();
+      if (sceneKey === 'Boot') {
+        // Don't auto-start Exploration if the player picked TOWER DEFENSE
+        // standalone — that path starts BreachDefense directly.
+        if (pageModeRef.current === 'tower-defense-standalone') return;
+        startExploration();
+      }
       if (sceneKey === 'BreachDefense') {
         // BreachDefense scene is ready — tell it to start the game
         eventBridge.emit(BRIDGE_EVENTS.REACT_START_BREACH);
@@ -843,14 +883,12 @@ export default function UnifiedGamePage() {
     const onGameOver = (data: { wavesCompleted: number; towersPlaced: number }) => {
       setTdStandaloneResult({ outcome: 'defeat', ...data });
     };
-    // BreachDefenseScene's standalone (encounterId===null) branch PAUSES the wave
-    // loop on waves 3/5/7/9 and waits for REACT_DISMISS_TUTORIAL — the legacy
-    // BreachDefensePage used to surface a TutorialModal here. Since standalone TD
-    // is now a self-contained sponsor-pitch mini-game (no educational lessons), we
-    // immediately re-emit DISMISS_TUTORIAL on wave-complete so the loop never stalls.
+    // BreachDefenseScene now PAUSES between every wave in standalone mode and
+    // waits for the player to click "START NEXT WAVE". This handler only owns
+    // the wave-cleared celebration (banner + fanfare) — wave activation is
+    // user-driven via the button.
     const onWaveComplete = (data?: { wave?: number }) => {
-      eventBridge.emit(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL);
-      if (data?.wave) { // DESIGN-009: wave-cleared banner + soft fanfare
+      if (data?.wave) {
         setTdWaveBanner({ wave: data.wave, key: Date.now() });
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_fanfare', volume: 0.45 });
         window.setTimeout(() => setTdWaveBanner(null), 1600);
@@ -865,6 +903,27 @@ export default function UnifiedGamePage() {
       eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_COMPLETE, onWaveComplete);
     };
   }, [pageMode]);
+
+  // ── Standalone TD: wave-pause state listener ───────────────────
+  // Reads BREACH_STATE_UPDATE; shows the "START NEXT WAVE" button when the
+  // scene is PAUSED between waves (wave > 1, no result overlay yet).
+  useEffect(() => {
+    if (pageMode !== 'tower-defense-standalone') return;
+    const onState = (data: { gameState: string; wave: number; totalWaves: number }) => {
+      const showBtn = data.gameState === 'PAUSED' && data.wave > 1 && data.wave <= data.totalWaves;
+      setTdWavePause(showBtn ? { wave: data.wave, total: data.totalWaves } : null);
+    };
+    eventBridge.on(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onState);
+    return () => {
+      eventBridge.off(BRIDGE_EVENTS.BREACH_STATE_UPDATE, onState);
+    };
+  }, [pageMode]);
+
+  const handleStartNextWave = useCallback(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_START_NEXT_WAVE);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+    setTdWavePause(null);
+  }, []);
 
   // ── Standalone TD Esc-to-menu (Phase 19) ───────────────────────
   // Mirrors the demo-Esc pattern: reload returns the player to the cold-boot
@@ -1135,7 +1194,9 @@ export default function UnifiedGamePage() {
 
   const handleNewGame = useCallback(() => {
     localStorage.clear();
-    sessionStorage.setItem('pq:skip-title', '1');
+    // After reload, land on character-select instead of start-menu so the
+    // player immediately picks a hero for their fresh game.
+    sessionStorage.setItem('pq:goto-character-select', '1');
     window.location.reload();
   }, []);
 
@@ -1144,18 +1205,40 @@ export default function UnifiedGamePage() {
   }, []);
 
   // ── Start menu (Phase 18) ──────────────────────────────────────
-  // FULL GAME: replicate the original cold-boot path — go to TitleScreen if a
-  // save exists (Resume / New Game prompt), otherwise straight into exploration.
+  // FULL GAME: if a save exists, route to TitleScreen (Resume / New Game prompt).
+  // Otherwise route through character-select on the way to a fresh exploration.
   const handleSelectFullGame = useCallback(() => {
-    setPageMode(hasSaveData() ? 'title' : 'exploration');
+    if (hasSaveData()) {
+      setPageMode('title');
+    } else {
+      setPostSelectIntent('full-game');
+      setPageMode('character-select');
+    }
   }, []);
 
-  // DEMO: start a fresh demo session (in-memory, isolated from full-game save)
-  // and route to exploration. Plan 18-04 wires the runtime gating that uses
-  // isDemoActive() to bypass UNLOCK_ORDER and skip writeSave calls.
+  // DEMO: route through character-select first, then start the demo session
+  // on confirm. We deliberately delay startDemo() until after selection so the
+  // player can ESC back to the start-menu without a half-initialized demo.
   const handleSelectDemo = useCallback(() => {
-    startDemo();
+    setPostSelectIntent('demo');
+    setPageMode('character-select');
+  }, []);
+
+  // Character-select confirm — fires startDemo() if the demo path was chosen,
+  // then drops the player into exploration. Phaser mounts at this transition,
+  // so BootScene reads the just-saved character ID and loads the right sheet.
+  const handleCharacterConfirmed = useCallback(() => {
+    if (postSelectIntent === 'demo') {
+      startDemo();
+    }
+    setPostSelectIntent(null);
     setPageMode('exploration');
+  }, [postSelectIntent]);
+
+  // Character-select cancel — bail back to the start-menu without committing.
+  const handleCharacterCancel = useCallback(() => {
+    setPostSelectIntent(null);
+    setPageMode('start-menu');
   }, []);
 
   // Phase 19 — Tower Defense standalone handlers were declared earlier in the
@@ -1234,6 +1317,20 @@ export default function UnifiedGamePage() {
     );
   }
 
+  // ── Character select (sponsor-pitch flourish) ─────────────────
+  // Shown on New Game (both demo and full-game paths). Phaser is NOT mounted
+  // here — the choice persists to localStorage before BootScene runs, so the
+  // selected character's spritesheet is what loads under the `player_sheet`
+  // texture key. ESC returns to the start-menu.
+  if (pageMode === 'character-select') {
+    return (
+      <CharacterSelectScreen
+        onConfirm={handleCharacterConfirmed}
+        onCancel={handleCharacterCancel}
+      />
+    );
+  }
+
   // ── Standalone Tower Defense (Phase 19 — TD-01..03) ───────────
   // Mounts the Phaser canvas + EncounterGameUI HUD with no exploration overlays,
   // no narrative card, no ITS-Office encounter context. Win/lose surfaces a minimal
@@ -1285,6 +1382,24 @@ export default function UnifiedGamePage() {
             </div>
           )}
 
+          {/* START NEXT WAVE button — shows during inter-wave pause in standalone mode */}
+          {!tdStandaloneResult && tdWavePause && !tdWaveBanner && (
+            <button
+              onClick={handleStartNextWave}
+              data-testid="td-start-next-wave"
+              className="absolute left-1/2 -translate-x-1/2 z-30 px-6 py-3 border-4 border-black bg-[#2ECC71] text-black hover:brightness-110 active:translate-y-[2px] cursor-pointer"
+              style={{
+                bottom: 188,
+                fontFamily: '"Press Start 2P", monospace',
+                fontSize: '11px',
+                boxShadow: '4px 4px 0px 0px rgba(0,0,0,1)',
+                animation: 'td-start-pulse 1.4s ease-in-out infinite',
+              }}
+            >
+              ▶ START WAVE {tdWavePause.wave}
+            </button>
+          )}
+
           {/* Win / lose overlay — minimal, no compliance-score wiring. */}
           {tdStandaloneResult && (
             <StandaloneTDResultOverlay
@@ -1295,7 +1410,7 @@ export default function UnifiedGamePage() {
           )}
 
           {/* DESIGN-009 inline keyframes (index.css is DO-NOT-TOUCH) */}
-          <style>{`@keyframes td-hint-fade{0%{opacity:0;transform:translate(-50%,-8px)}100%{opacity:1;transform:translate(-50%,0)}}@keyframes td-banner-pop{0%{opacity:0;transform:scale(0.7)}18%{opacity:1;transform:scale(1.08)}32%{transform:scale(1)}78%{opacity:1}100%{opacity:0;transform:scale(1)}}@keyframes td-result-in{0%{opacity:0;transform:scale(0.85)}70%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}@keyframes td-result-glow-win{0%,100%{box-shadow:12px 12px 0 0 #000,0 0 24px rgba(46,204,113,0.45)}50%{box-shadow:12px 12px 0 0 #000,0 0 40px rgba(46,204,113,0.85)}}@keyframes td-result-glow-lose{0%,100%{box-shadow:12px 12px 0 0 #000,0 0 24px rgba(239,68,68,0.4)}50%{box-shadow:12px 12px 0 0 #000,0 0 36px rgba(239,68,68,0.75)}}`}</style>
+          <style>{`@keyframes td-hint-fade{0%{opacity:0;transform:translate(-50%,-8px)}100%{opacity:1;transform:translate(-50%,0)}}@keyframes td-banner-pop{0%{opacity:0;transform:scale(0.7)}18%{opacity:1;transform:scale(1.08)}32%{transform:scale(1)}78%{opacity:1}100%{opacity:0;transform:scale(1)}}@keyframes td-result-in{0%{opacity:0;transform:scale(0.85)}70%{opacity:1;transform:scale(1.04)}100%{opacity:1;transform:scale(1)}}@keyframes td-result-glow-win{0%,100%{box-shadow:12px 12px 0 0 #000,0 0 24px rgba(46,204,113,0.45)}50%{box-shadow:12px 12px 0 0 #000,0 0 40px rgba(46,204,113,0.85)}}@keyframes td-result-glow-lose{0%,100%{box-shadow:12px 12px 0 0 #000,0 0 24px rgba(239,68,68,0.4)}50%{box-shadow:12px 12px 0 0 #000,0 0 36px rgba(239,68,68,0.75)}}@keyframes td-start-pulse{0%,100%{transform:translateX(-50%) scale(1);box-shadow:4px 4px 0 0 #000,0 0 0 rgba(46,204,113,0)}50%{transform:translateX(-50%) scale(1.04);box-shadow:4px 4px 0 0 #000,0 0 16px rgba(46,204,113,0.7)}}`}</style>
         </div>
         <p
           className="text-[8px] text-gray-500"

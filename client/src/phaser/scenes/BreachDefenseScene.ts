@@ -112,7 +112,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
-  private readonly musicBaseVolume = 0.35;
+  private readonly musicBaseVolume = 0.20;
 
   // Onboarding cell highlights
   private onboardingHighlights: Phaser.GameObjects.Rectangle[] = [];
@@ -688,6 +688,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL, this.onDismissTutorial, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_RESTART_BREACH, this.onRestart, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_START_PREP, this.onStartPrepCountdown, this);
+    eventBridge.on(BRIDGE_EVENTS.REACT_START_NEXT_WAVE, this.onStartNextWave, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_ONBOARDING_HIGHLIGHT, this.showPlacementHighlights, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_ONBOARDING_CLEAR, this.clearPlacementHighlights, this);
 
@@ -724,14 +725,20 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
 
-    // Center the grid in the camera viewport
+    // Center the grid in the camera viewport.
+    // Account for top HUD (~40px wave/budget bar) and bottom HUD
+    // (~160px tower panel + threat strip) so the grid's bottom row
+    // isn't covered by the tower selection panel.
     {
       const gw = GRID_COLS * CELL_SIZE;
       const gh = GRID_ROWS * CELL_SIZE;
       const cw = this.cameras.main.width;
       const ch = this.cameras.main.height;
+      const TOP_HUD = 44;
+      const BOTTOM_HUD = 168;
+      const availableH = ch - TOP_HUD - BOTTOM_HUD;
       this.cameras.main.scrollX = -(cw - gw) / 2;
-      this.cameras.main.scrollY = -(ch - gh) / 2;
+      this.cameras.main.scrollY = -(TOP_HUD + (availableH - gh) / 2);
 
       // Fill the area outside the grid with a dark tech background
       const bgGfx = this.add.graphics().setDepth(-1);
@@ -806,6 +813,18 @@ export class BreachDefenseScene extends Phaser.Scene {
       });
     }
 
+    this.broadcastState();
+  }
+
+  /** Standalone-mode handler: player clicked "START NEXT WAVE" button.
+   * Resumes from PAUSED and activates the wave. Wave 1 still uses the prep
+   * countdown path (auto-armed by the standalone-launch useEffect). */
+  private onStartNextWave() {
+    if (this.gameState !== 'PAUSED' || this.encounterId !== null) return;
+    if (this.waveState.active) return;
+    this.gameState = 'PLAYING';
+    this.activateWave();
+    this.waveState.nextSpawnTime = this.time.now + 1500;
     this.broadcastState();
   }
 
@@ -1462,13 +1481,13 @@ export class BreachDefenseScene extends Phaser.Scene {
             }
           }
 
-          // Check for wave with educational lesson (triggered by React after recap)
-          // Skip educational pause in encounter mode — EncounterGameUI doesn't have tutorial modals
-          if (!this.encounterId && [3, 5, 7, 9].includes(this.wave) && !this.shownWaveSplashes.has(this.wave)) {
-            this.shownWaveSplashes.add(this.wave);
+          // Standalone mode (encounterId === null): pause between EVERY wave
+          // and wait for the player to click "START NEXT WAVE". Bloons / Kingdom
+          // Rush genre convention — gives breathing room to place towers and
+          // is bug-resistant (no auto-advance state desync).
+          // Encounter mode keeps the legacy auto-advance flow.
+          if (this.encounterId === null) {
             this.gameState = 'PAUSED';
-            // React will trigger the tutorial after the recap modal is dismissed
-            // (via BREACH_WAVE_COMPLETE data, which React checks for pending tutorial)
           } else {
             // Auto-start next wave with brief prep time
             this.time.delayedCall(3000, () => {
@@ -2130,6 +2149,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_START_BREACH, this.onStartGame, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_DISMISS_TUTORIAL, this.onDismissTutorial, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_START_PREP, this.onStartPrepCountdown, this);
+    eventBridge.off(BRIDGE_EVENTS.REACT_START_NEXT_WAVE, this.onStartNextWave, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ONBOARDING_HIGHLIGHT, this.showPlacementHighlights, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ONBOARDING_CLEAR, this.clearPlacementHighlights, this);
     this.clearPlacementHighlights();

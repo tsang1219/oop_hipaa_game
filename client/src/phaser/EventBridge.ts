@@ -66,6 +66,9 @@ export const BRIDGE_EVENTS = {
   REACT_SELECT_TOWER_TYPE: 'react:select-tower-type',
   REACT_DISMISS_TUTORIAL: 'react:dismiss-tutorial',
   REACT_START_PREP: 'react:start-prep-countdown',
+  // Standalone TD: player clicks "START NEXT WAVE" button between waves.
+  // Resumes from PAUSED gameState and activates the next wave.
+  REACT_START_NEXT_WAVE: 'react:start-next-wave',
   REACT_ONBOARDING_HIGHLIGHT: 'react:onboarding-highlight',
   REACT_ONBOARDING_CLEAR: 'react:onboarding-clear',
   REACT_RESTART_BREACH: 'react:restart-breach',

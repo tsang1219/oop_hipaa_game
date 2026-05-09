@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures } from '../SpriteFactory';
+import { getSelectedCharacter } from '@/data/characters';
 
 const TILE_SIZE = 32;
 
@@ -50,7 +51,11 @@ export class BootScene extends Phaser.Scene {
     // Load character spritesheets — 32x32 frames, 3 cols x 4 rows
     // Row order: down(0), left(1), right(2), up(3) — 3 frames per direction
     const CHAR_FRAME = { frameWidth: 32, frameHeight: 32 };
-    this.load.spritesheet('player_sheet', `${base}attached_assets/generated_images/privacyquest/characters/player.png`, CHAR_FRAME);
+    // Player sheet is dynamic: whichever character the user picked on the
+    // CharacterSelectScreen gets loaded under the `player_sheet` key. Defaults
+    // to the original `player.png` for cold-boot / pre-selection states.
+    const activeCharacter = getSelectedCharacter();
+    this.load.spritesheet('player_sheet', `${base}${activeCharacter.sheetPath}`, CHAR_FRAME);
     this.load.spritesheet('npc_receptionist_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_receptionist.png`, CHAR_FRAME);
     this.load.spritesheet('npc_nurse_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_nurse.png`, CHAR_FRAME);
     this.load.spritesheet('npc_doctor_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_doctor.png`, CHAR_FRAME);
@@ -94,6 +99,10 @@ export class BootScene extends Phaser.Scene {
     this.load.audio('music_hub',         `${base}attached_assets/audio/music_hub.ogg`);
     this.load.audio('music_exploration', `${base}attached_assets/audio/music_exploration.ogg`);
     this.load.audio('music_breach',      `${base}attached_assets/audio/music_breach.ogg`);
+    // Demo-mode per-room music
+    this.load.audio('music_demo_er',           `${base}attached_assets/audio/music_demo_er.ogg`);
+    this.load.audio('music_demo_break_room',   `${base}attached_assets/audio/music_demo_break_room.ogg`);
+    this.load.audio('music_demo_records_room', `${base}attached_assets/audio/music_demo_records_room.ogg`);
   }
 
   create() {

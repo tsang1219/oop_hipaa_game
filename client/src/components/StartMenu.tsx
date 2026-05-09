@@ -20,11 +20,51 @@ export interface StartMenuProps {
   onFullGame: () => void;
 }
 
+type SectionId = 'main-rpg' | 'mini-games';
+
 interface MenuItem {
   label: string;
   description: string;
   accent: string;
+  icon: 'cross' | 'bolt' | 'shield';
+  section: SectionId;
   action: () => void;
+}
+
+const SECTIONS: { id: SectionId; label: string }[] = [
+  { id: 'main-rpg', label: 'MAIN RPG' },
+  { id: 'mini-games', label: 'MINI GAMES' },
+];
+
+function ModeIcon({ icon, color }: { icon: MenuItem['icon']; color: string }) {
+  const common = { width: 32, height: 32, viewBox: '0 0 16 16', xmlns: 'http://www.w3.org/2000/svg' };
+  const stroke = '#000000';
+  if (icon === 'cross') {
+    // Hospital cross — white plus on a colored square
+    return (
+      <svg {...common}>
+        <rect x="1" y="1" width="14" height="14" fill={color} stroke={stroke} strokeWidth="1" />
+        <rect x="6" y="3" width="4" height="10" fill="#ffffff" />
+        <rect x="3" y="6" width="10" height="4" fill="#ffffff" />
+      </svg>
+    );
+  }
+  if (icon === 'bolt') {
+    // Lightning bolt — classic zigzag
+    return (
+      <svg {...common}>
+        <path d="M 9 1 L 3 9 L 7 9 L 5 15 L 13 6 L 9 6 Z" fill={color} stroke={stroke} strokeWidth="1" strokeLinejoin="miter" />
+      </svg>
+    );
+  }
+  // shield — pixel-art shield silhouette with center notch
+  return (
+    <svg {...common}>
+      <path d="M 2 2 L 14 2 L 14 8 L 13 11 L 10 13 L 8 14 L 6 13 L 3 11 L 2 8 Z" fill={color} stroke={stroke} strokeWidth="1" strokeLinejoin="miter" />
+      <rect x="6" y="5" width="4" height="2" fill="#ffffff" opacity="0.7" />
+      <rect x="7" y="4" width="2" height="6" fill="#ffffff" opacity="0.7" />
+    </svg>
+  );
 }
 
 export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps): JSX.Element {
@@ -37,22 +77,28 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
 
   const menuItems: MenuItem[] = [
     {
+      label: 'FULL GAME',
+      description: 'PROTECT THE HOSPITAL',
+      accent: '#FFD23F',
+      icon: 'cross',
+      section: 'main-rpg',
+      action: onFullGame,
+    },
+    {
       label: 'DEMO',
       description: 'GET A TASTE — 4 ROOMS',
       accent: '#00d4aa',
+      icon: 'bolt',
+      section: 'main-rpg',
       action: onDemo,
     },
     {
       label: 'TOWER DEFENSE',
       description: 'STOP THE BREACH — ARCADE',
       accent: '#FF6B9D',
+      icon: 'shield',
+      section: 'mini-games',
       action: onTowerDefense,
-    },
-    {
-      label: 'FULL GAME',
-      description: 'PROTECT THE HOSPITAL',
-      accent: '#FFD23F',
-      action: onFullGame,
     },
   ];
 
@@ -237,89 +283,122 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
         </p>
       </div>
 
-      {/* Menu cards — themed, with descriptions */}
+      {/* Menu — grouped into sections */}
       <div
-        className="z-20 mt-8 flex flex-col gap-3 w-[420px] max-w-[90vw]"
+        className="z-20 mt-8 flex flex-col gap-5 w-[440px] max-w-[90vw]"
         style={{
           opacity: showMenu ? 1 : 0,
           transform: showMenu ? 'translateY(0)' : 'translateY(20px)',
           transition: 'all 500ms ease-out',
         }}
       >
-        {menuItems.map((item, i) => {
-          const isSelected = selectedIndex === i;
+        {SECTIONS.map(section => {
+          const sectionItems = menuItems
+            .map((item, idx) => ({ item, idx }))
+            .filter(({ item }) => item.section === section.id);
+          if (sectionItems.length === 0) return null;
           return (
-            <button
-              key={item.label}
-              onClick={() => confirm(item.action)}
-              onMouseEnter={() => setSelectedIndex(i)}
-              className="group relative text-left transition-transform duration-150"
-              style={{
-                transform: isSelected ? 'translateX(6px)' : 'translateX(0)',
-              }}
-              data-testid={`start-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
-            >
-              <div
-                className="relative flex items-center gap-4 px-5 py-4 border-4 rounded-[4px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
-                style={{
-                  backgroundColor: isSelected ? `${item.accent}1A` : '#16213e',
-                  borderColor: isSelected ? item.accent : '#2a3a5c',
-                  animation: isSelected ? 'menu-card-pulse 2s ease-in-out infinite' : 'none',
-                }}
-              >
-                {/* Left accent bar */}
-                <div
-                  className="absolute left-0 top-0 bottom-0 w-1.5"
-                  style={{ backgroundColor: item.accent }}
-                />
-
-                {/* Cursor */}
-                <span
-                  className="inline-block w-4 text-[14px]"
-                  style={{
-                    color: item.accent,
-                    animation: isSelected ? 'cursor-blink 800ms step-end infinite' : 'none',
-                    opacity: isSelected ? 1 : 0,
-                  }}
-                >
-                  {'>'}
-                </span>
-
-                {/* Label + description */}
-                <div className="flex flex-col gap-1.5 flex-1">
-                  <div
-                    className="text-[14px] tracking-wider transition-colors duration-150"
-                    style={{ color: isSelected ? '#ffffff' : '#888899' }}
-                  >
-                    {item.label}
-                  </div>
-                  <div
-                    className="text-[7px] tracking-[0.2em] transition-colors duration-150"
-                    style={{ color: isSelected ? item.accent : '#555569' }}
-                  >
-                    {item.description}
-                  </div>
-                </div>
-
-                {/* Right chevron — appears on selected */}
-                <span
-                  className="text-[14px] transition-opacity duration-150"
-                  style={{
-                    color: item.accent,
-                    opacity: isSelected ? 1 : 0,
-                  }}
-                >
-                  ◆
-                </span>
+            <div key={section.id} className="flex flex-col gap-3">
+              {/* Section header */}
+              <div className="flex items-center gap-3 px-1">
+                <div className="h-[2px] w-6 bg-gray-600" />
+                <p className="text-[8px] tracking-[0.4em] text-gray-400">
+                  {section.label}
+                </p>
+                <div className="h-[2px] flex-1 bg-gray-600" />
               </div>
-            </button>
+
+              {/* Section items */}
+              {sectionItems.map(({ item, idx }) => {
+                const isSelected = selectedIndex === idx;
+                return (
+                  <button
+                    key={item.label}
+                    onClick={() => confirm(item.action)}
+                    onMouseEnter={() => setSelectedIndex(idx)}
+                    className="group relative text-left transition-transform duration-150"
+                    style={{
+                      transform: isSelected ? 'translateX(6px)' : 'translateX(0)',
+                    }}
+                    data-testid={`start-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                  >
+                    <div
+                      className="relative flex items-center gap-4 px-5 py-4 border-4 rounded-[4px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                      style={{
+                        backgroundColor: isSelected ? `${item.accent}1A` : '#16213e',
+                        borderColor: isSelected ? item.accent : '#2a3a5c',
+                        animation: isSelected ? 'menu-card-pulse 2s ease-in-out infinite' : 'none',
+                      }}
+                    >
+                      {/* Left accent bar */}
+                      <div
+                        className="absolute left-0 top-0 bottom-0 w-1.5"
+                        style={{ backgroundColor: item.accent }}
+                      />
+
+                      {/* Cursor */}
+                      <span
+                        className="inline-block w-4 text-[14px]"
+                        style={{
+                          color: item.accent,
+                          animation: isSelected ? 'cursor-blink 800ms step-end infinite' : 'none',
+                          opacity: isSelected ? 1 : 0,
+                        }}
+                      >
+                        {'>'}
+                      </span>
+
+                      {/* Mode icon */}
+                      <div
+                        className="shrink-0 transition-transform duration-150"
+                        style={{
+                          transform: isSelected ? 'scale(1.1)' : 'scale(1)',
+                          filter: isSelected ? `drop-shadow(0 0 6px ${item.accent})` : 'none',
+                          opacity: isSelected ? 1 : 0.6,
+                          imageRendering: 'pixelated',
+                        }}
+                      >
+                        <ModeIcon icon={item.icon} color={item.accent} />
+                      </div>
+
+                      {/* Label + description */}
+                      <div className="flex flex-col gap-1.5 flex-1">
+                        <div
+                          className="text-[14px] tracking-wider transition-colors duration-150"
+                          style={{ color: isSelected ? '#ffffff' : '#888899' }}
+                        >
+                          {item.label}
+                        </div>
+                        <div
+                          className="text-[7px] tracking-[0.2em] transition-colors duration-150"
+                          style={{ color: isSelected ? item.accent : '#555569' }}
+                        >
+                          {item.description}
+                        </div>
+                      </div>
+
+                      {/* Right chevron — appears on selected */}
+                      <span
+                        className="text-[14px] transition-opacity duration-150"
+                        style={{
+                          color: item.accent,
+                          opacity: isSelected ? 1 : 0,
+                        }}
+                      >
+                        ◆
+                      </span>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
           );
         })}
       </div>
 
-      {/* Footer hint */}
+      {/* Footer hint + credits */}
       <div
-        className="absolute bottom-8 z-20"
+        className="absolute bottom-8 z-20 flex flex-col items-center gap-2"
         style={{
           opacity: showFooter ? 1 : 0,
           transition: 'opacity 600ms ease-out',
@@ -327,6 +406,9 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
       >
         <p className="text-[7px] text-gray-600 tracking-wide">
           ↑↓ TO SELECT &bull; ENTER TO CONFIRM
+        </p>
+        <p className="text-[7px] text-gray-500 tracking-[0.3em]">
+          BY ANDREW TSANG &bull; A HEALTH IS OTHER PEOPLE GAME
         </p>
       </div>
 
