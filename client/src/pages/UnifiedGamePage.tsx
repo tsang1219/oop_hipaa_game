@@ -46,8 +46,16 @@ import { EncounterGameUI } from '../components/breach-defense/EncounterGameUI';
 import type { BreachDefenseInitData } from '../phaser/scenes/BreachDefenseScene';
 import { PHISorterOverlay } from '@/components/phi-sorter/PHISorterOverlay';
 import { SorterContextCard } from '@/components/phi-sorter/SorterContextCard';
-import { SorterTakeawaysPanel } from '@/components/phi-sorter/SorterTakeawaysPanel';
+import { SorterDebrief } from '@/components/phi-sorter/SorterDebrief';
 import { getSorterDocumentSet } from '@/data/sorterData';
+
+// Map an encounter ID to a human-readable location label for the SorterDebrief
+// "BACK TO X" close button. Falls back to "HOSPITAL" for unknown IDs.
+const SORTER_LOCATION_LABELS: Record<string, string> = {
+  'phi-sort-reception': 'RECEPTION',
+  'phi-sort-lab': 'LAB',
+  'phi-sort-records': 'RECORDS',
+};
 
 interface RoomWithDoors {
   id: string;
@@ -191,7 +199,9 @@ export default function UnifiedGamePage() {
     outcome: 'victory' | 'defeat';
     securityScore: number;
     scoreContribution: number;
-    takeaways?: string[];  // populated by handleSorterComplete (BLOCKER 4 — sibling SorterTakeawaysPanel reads this)
+    takeaways?: string[];        // sorter-only: presence of this field discriminates sorter vs TD debrief
+    correctCount?: number;       // sorter-only: feeds SorterDebrief accuracy bar
+    totalCount?: number;         // sorter-only: feeds SorterDebrief accuracy bar
   } | null>(null);
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
@@ -752,23 +762,60 @@ export default function UnifiedGamePage() {
     const launch = () => {
       if (cancelled || !gameRef.current) return;
       const game = gameRef.current;
+      // Wait until Boot's preload has populated the audio cache before launching.
+      // When the user clicks TD from StartMenu, Phaser mounts fresh and Boot is
+      // still in preload — calling scene.start('BreachDefense') too early throws
+      // "Audio key 'music_breach' not found in cache" inside create(), which
+      // breaks the scene's update loop (timers still fire, but no enemies spawn).
+      if (!game.cache.audio.exists('music_breach')) {
+        // Re-poll until Boot finishes its preload.
+        return;
+      }
       if (game.scene.isActive('Exploration')) game.scene.stop('Exploration');
       if (game.scene.isActive('BreachDefense')) game.scene.stop('BreachDefense');
       game.scene.start('BreachDefense');
     };
-    if (gameRef.current) {
+    let started = false;
+    const tryLaunch = () => {
+      if (started || cancelled || !gameRef.current) return;
+      if (!gameRef.current.cache.audio.exists('music_breach')) return;
+      started = true;
       launch();
-      return () => { cancelled = true; };
-    }
+    };
+    if (gameRef.current) tryLaunch();
     // gameRef populates after PhaserGame mounts in the JSX branch — poll briefly.
     const poll = setInterval(() => {
-      if (gameRef.current) {
-        clearInterval(poll);
-        launch();
-      }
+      tryLaunch();
+      if (started) clearInterval(poll);
     }, 50);
-    const timeout = setTimeout(() => clearInterval(poll), 5000);
+    const timeout = setTimeout(() => clearInterval(poll), 10000);
     return () => { cancelled = true; clearInterval(poll); clearTimeout(timeout); };
+  }, [pageMode]);
+
+  // ── Standalone TD: kick wave 1 prep countdown ───────────────────
+  // In encounter mode, EncounterGameUI's onboarding (SELECT_TOWER → PLACE_TOWER →
+  // PREP) emits REACT_START_PREP after the player places a tower. Standalone has
+  // no narrative wrapper or onboarding state machine, so nothing fires that event
+  // and wave 1 never spawns enemies. We listen for the BREACH_WAVE_START signal
+  // (emitted by onStartGame for wave 1) and emit REACT_START_PREP after a short
+  // grace period so the player sees the wave intro banner and has time to place
+  // initial towers before the countdown begins.
+  useEffect(() => {
+    if (pageMode !== 'tower-defense-standalone') return;
+    let prepTimer: number | null = null;
+    let armed = false;
+    const onWaveStart = (data?: { wave?: number }) => {
+      if (data?.wave !== 1 || armed) return;
+      armed = true;
+      prepTimer = window.setTimeout(() => {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_START_PREP);
+      }, 1500);
+    };
+    eventBridge.on(BRIDGE_EVENTS.BREACH_WAVE_START, onWaveStart);
+    return () => {
+      eventBridge.off(BRIDGE_EVENTS.BREACH_WAVE_START, onWaveStart);
+      if (prepTimer !== null) window.clearTimeout(prepTimer);
+    };
   }, [pageMode]);
 
   // ── Standalone TD result listeners (Phase 19 — TD-02) ──────────
@@ -928,6 +975,8 @@ export default function UnifiedGamePage() {
       securityScore: Math.round(accuracy * 100),
       scoreContribution: result.scoreContribution,
       takeaways: result.takeaways.filter((t: string) => t && t.length > 0),
+      correctCount: result.correctCount,
+      totalCount: result.totalCount,
     });
     setEncounterPhase('debrief');
 
@@ -1330,7 +1379,19 @@ export default function UnifiedGamePage() {
         )}
 
         {encounterPhase === 'debrief' && encounterResult && (
-          <>
+          encounterResult.takeaways && encounterResult.takeaways.length > 0 ? (
+            // Sorter completion — sorter-themed debrief, no TD content
+            <SorterDebrief
+              encounterId={encounterResult.encounterId}
+              correctCount={encounterResult.correctCount ?? 0}
+              totalCount={encounterResult.totalCount ?? 0}
+              scoreContribution={encounterResult.scoreContribution}
+              takeaways={encounterResult.takeaways}
+              locationLabel={SORTER_LOCATION_LABELS[encounterResult.encounterId]}
+              onDismiss={handleDismissDebrief}
+            />
+          ) : (
+            // TD encounter (Phase 13) — original debrief
             <EncounterDebrief
               encounterId={encounterResult.encounterId}
               outcome={encounterResult.outcome}
@@ -1338,10 +1399,7 @@ export default function UnifiedGamePage() {
               scoreContribution={encounterResult.scoreContribution}
               onDismiss={handleDismissDebrief}
             />
-            {encounterResult.takeaways && encounterResult.takeaways.length > 0 && (
-              <SorterTakeawaysPanel takeaways={encounterResult.takeaways} />
-            )}
-          </>
+          )
         )}
 
         {/* Floating score delta indicator */}
