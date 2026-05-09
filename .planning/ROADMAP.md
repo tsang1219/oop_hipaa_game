@@ -5,7 +5,7 @@
 - v1.0 **Polish** — Phases 1-5 (shipped 2026-03-01) — [archive](milestones/v1.0-ROADMAP.md)
 - v1.1 **Sprite Overhaul** — Phases 6-10 (archived partial) — [archive](milestones/v1.1-ROADMAP.md)
 - v2.0 **One Game** — Phases 11-15 (shipped 2026-03-28)
-- v2.1 **Full Vision** — Phases 16-17 (paused — Phase 16 at 98%, Phase 17 not started)
+- v2.1 **Full Vision** — Phases 16, 17, 22-24 (paused — Phase 16 at 98%, Phase 17 + 22-24 not started)
 - v2.2 **Sponsor Demo** — Phases 18-21 (active — sponsor pitch in 1-2 days)
 
 ## Phases
@@ -222,6 +222,50 @@ Plans:
 
 ---
 
+### Phase 22: PHI Sorter Redesign — Content + Connection
+**Goal**: The PHI Sorter encounter feels like a job at a hospital instead of a quiz: items are fake patient charts (Two Point Hospital tone) with names, occupations, and free-form notes that are almost-real funny; each set has 8-12 items (up from 6); Aiyana / Marcus stay present during the sort with a speech bubble that reacts to specific items; one Phoenix Wright "HOLD IT!" reveal beat per encounter on the trickiest call.
+**Depends on**: Phase 16 (encounter routing + sorter overlay shipped 2026-05-07/08)
+**Requirements**: SORTV2-01, SORTV2-02, SORTV2-03, SORTV2-04, SORTV2-05, SORTV2-06 (TBD during /gsd:plan-phase)
+**Branch**: `gsd/phase-22-phi-sorter-content` (cut off main; do not block v2.2 sponsor demo)
+**Success Criteria** (what must be TRUE):
+  1. Each document set has 8-12 items presented as fake patient charts with name, role/occupation, and at least one free-form note field. The 18-identifier HIPAA accuracy per 45 CFR §164.514(b)(2) is preserved across the rewrite — no item changes its `category` field.
+  2. At least 30% of items contain a humor beat in the chart that does not affect HIPAA classification (cat as emergency contact, doctor's frustrated annotation, patient quirks). Humor lives in admin-system absurdity, not patient demographics. CONTENT_MANIFEST.md is updated to reflect the rewrite.
+  3. During the sort, the trigger NPC (Aiyana / Marcus) shows a speech bubble that updates based on the most recent drop — at least 4 distinct reaction lines per NPC, plus 1 generic line per accuracy band (perfect / good / shaky).
+  4. Exactly one item per set is flagged as a "HOLD IT" reveal — when the player nails it correctly, the NPC delivers a dramatic 1-2 sentence beat explaining *why* it was tricky (e.g., partial date, ZIP3 vs ZIP5, diagnosis without name). The reveal is visually distinct from regular reactions (border flash, scaled text, dedicated SFX).
+  5. All existing Phase 16 success criteria still hold (drag-drop + keyboard parity, audio-visual feedback per drop, debrief, score contribution, replayability).
+  6. Encounter completes in 60-90 seconds (up from 30-60 to accommodate larger sets); SorterDebrief surfaces NPC name in the "BACK TO X" button or context.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 22`)
+
+### Phase 23: PHI Sorter Redesign — Feedback Moments
+**Goal**: Every interaction in the sorter produces visible/audible/character response (Commandment 1) at proportional weight (Commandment 8): per-drop particle bursts + camera shake, animated bucket counters, completion overlay before debrief, score animations on each correct, NPC reaction enthusiasm scales with accuracy.
+**Depends on**: Phase 22 (humor + NPC speech bubble framework already in place)
+**Requirements**: SORTV2-07, SORTV2-08, SORTV2-09, SORTV2-10 (TBD during /gsd:plan-phase)
+**Branch**: `gsd/phase-23-phi-sorter-feedback`
+**Success Criteria** (what must be TRUE):
+  1. Each correct drop fires a particle burst on the destination bucket (≥6 particles, color-matched green for correct / red for wrong) plus a brief camera shake (~80ms, 2-3px amplitude). Wrong drops also flash + shake (no positive particles). Both are independent of the existing border flash.
+  2. Both buckets render visible running counters that animate with a small bounce on each increment ("PHI: 3 redacted" / "Not PHI: 2 kept"). Counters reset when the encounter restarts.
+  3. After the final item drops, a completion overlay appears for ~1.2s before the SorterDebrief opens — header text scales from 0 to full size and reads "PERFECT 10/10" / "GOOD" / "KEEP PRACTICING" based on accuracy band, with a screen-wide flash matching the band color.
+  4. The score counter (compliance score in the HUD if visible, or a local sorter score) pulses each time it increments. Increment magnitude is proportional to whether the call was a "HOLD IT" tricky one (+2) or a regular item (+1).
+  5. NPC speech bubble reaction lines escalate in enthusiasm as accuracy climbs above 80%, deflate slightly below 50%. Tone change is felt without text reading like a scoreboard.
+  6. All Phase 22 success criteria still hold.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 23`)
+
+### Phase 24: PHI Sorter Redesign — Format Shift (Papers Please)
+**Goal**: The sorter shifts from a multi-card pile to a one-document-at-a-time desk surface: KEEP / REDACT stamps replace bucket drops; documents slide in and stamp marks persist; soft visible clock adds urgency without hard-fail; NPC portrait stays present above the desk through the whole encounter. The redesign reuses Phase 22 content and Phase 23 feedback layer wholesale.
+**Depends on**: Phase 22 (content), Phase 23 (feedback hooks the format will fire)
+**Requirements**: SORTV2-11, SORTV2-12, SORTV2-13, SORTV2-14, SORTV2-15 (TBD during /gsd:plan-phase)
+**Branch**: `gsd/phase-24-phi-sorter-format`
+**Success Criteria** (what must be TRUE):
+  1. Documents are presented one at a time on a wood-desk surface; the previously-active multi-card pile is gone. Document slides in from off-screen on appearance with a paper-rustle SFX.
+  2. KEEP and REDACT stamps replace the PHI / NOT PHI buckets — clicking the stamp commits the call (no drag required). Each stamp produces an iconic stamp-thunk SFX, an ink mark that persists on the document for 250-400ms, and an ink-splatter particle burst.
+  3. Stamped documents slide off the desk into one of two visible outgoing trays (KEEP / REDACT) which fill visibly as the shift progresses. End-of-shift, tray counts are visible.
+  4. A wall clock or wristwatch is visible in a corner counting down per-set. At 0:00 the encounter wraps with whatever's been stamped — unstamped items don't count toward score, no fail screen ("shift's over, leave the rest for the auditor"). Per-set durations: Set 1 = 90s, Set 2 = 75s, Set 3 = 60s.
+  5. The trigger NPC (Aiyana / Marcus) portrait + name stays visible above the desk during the whole encounter. Speech bubble reactions from Phase 22-23 fire from the persistent portrait location.
+  6. Keyboard parity preserved: keyboard-only completion is fully supported (key to focus stamp, Enter to commit, arrow to switch stamps). All existing Phase 22 + Phase 23 success criteria still hold.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 24`)
+
+---
+
 ### v2.2 Sponsor Demo (Active — 1-2 Day Build)
 
 **Milestone Goal:** Ship a curated 4-room sponsor-pitch demo of PrivacyQuest in 1-2 days. Out-of-Pocket (Nikhil) outreach next week at ~$10K target. Pure curation/polish — reuses existing rooms, NPCs, dialogue. No new mechanics, no new content authored. Pluggable sponsor config (`{ name, character_sprite, two_dialogue_lines, code }`) so future sponsors swap in via single file edit.
@@ -306,3 +350,6 @@ Plans:
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 0/0 | Not started | - |
 | 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
+| 22. PHI Sorter Redesign — Content + Connection | v2.1 | 0/0 | Pending | - |
+| 23. PHI Sorter Redesign — Feedback Moments | v2.1 | 0/0 | Pending | - |
+| 24. PHI Sorter Redesign — Format Shift | v2.1 | 0/0 | Pending | - |

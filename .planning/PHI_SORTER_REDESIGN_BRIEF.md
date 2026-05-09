@@ -1,10 +1,40 @@
 # PHI Sorter Redesign — "Papers, Please" Reimagining
 
-**Status:** Spec — not yet planned, not yet built
+**Status:** Spec — Phase 18 starting; Phases 19 + 20 queued
 **Created:** 2026-05-07
+**Updated:** 2026-05-08 (added Phoenix Wright + WarioWare references + Phase 22/23/24 sequencing)
 **Target milestone:** v2.1 (resumes post-v2.2 sponsor demo)
 **Branch:** Whenever build begins, cut `gsd/phase-XX-phi-sorter-redesign` off main
 **Author intent:** "It works, but it's not quite there. The decision needs to mean something. It has to feel like you're doing something."
+
+---
+
+## 0. Phase Sequencing (added 2026-05-08)
+
+The original brief described one big redesign at "Tier A / B / C" scope. The actual build is split into **three phases** in order of impact-per-hour, each independently shippable:
+
+| Phase | Name | Scope | Effort | What player feels after |
+|-------|------|-------|--------|-------------------------|
+| **22** | Content + Connection | Rewrite items as fake patient charts with humor (Two Point Hospital tone), expand 6 → 8-12 items/set, NPC reactions during sort, Phoenix Wright "HOLD IT!" reveal on tricky calls | ~1.5 days | Reading the cards is funny. NPC participates. Game feels connected to the world. |
+| **23** | Feedback Moments | Bucket counters animate, per-drop particles + camera shake, completion overlay before debrief, score animations, escalating NPC enthusiasm | ~1 day | Every action thwacks. Completion celebrates. Commandment 1 satisfied. |
+| **24** | Format Shift | One-document-at-a-time on a desk, KEEP/REDACT stamps replace buckets, slide-in animation, soft visible clock, NPC portrait persistent | ~2-3 days | It's a different mini-game. Quiz → job. Papers Please-shaped. |
+
+> Phase numbers 22/23/24 (not 18/19/20) because v2.2 Sponsor Demo took 18-21. The redesign trio lives in v2.1, on its own branches off `main`, in parallel with the active v2.2 work.
+
+After Phase 22: funnier and connected. After 22+23: also satisfying. After 22+23+24: it's actually *Papers Please-shaped*. You can stop after any phase.
+
+---
+
+## 0.5 Game References (expanded 2026-05-08)
+
+**Primary inspiration: Papers, Please** (Lucas Pope, 2013) — desk-and-stamps UI, NPC framing, soft time pressure, bureaucratic humor. Drives the Phase 20 format shift.
+
+**Secondary inspirations folded into Phases 18+19:**
+
+- **Two Point Hospital / Theme Hospital** — humor lives in the *admin chaos around the medicine*, not the medicine itself. Mrs. Henderson's emergency contact being her cat is funny because it's almost real (lonely elderly patient + intake form). Patient names, occupations, free-text fields = humor surface.
+- **Phoenix Wright: Ace Attorney** — dramatic reveal moments. When the player nails a tricky call, the NPC delivers a one-shot "HOLD IT!" / "GOT YOU!" beat that explains *why* this was tricky. Elevates the correct-answer moment from "+1 score" to "you proved you understood."
+- **WarioWare** — short punchy reactions on every interaction, vocal-bark energy. Each item gets its own micro-personality on flip ("PHI!" "NOT PHI!" "TRICKY!"). Converts drag-drop monotony into snappy beats.
+- **Phoenix Wright (again, secondary mechanic)** — the "examine evidence" gesture: hover/click an item to see expanded chart context before stamping. Adds deliberation without changing the input model.
 
 ---
 
