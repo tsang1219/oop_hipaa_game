@@ -225,7 +225,7 @@ Plans:
 ### Phase 22: PHI Sorter Redesign — Content + Connection
 **Goal**: The PHI Sorter encounter feels like a job at a hospital instead of a quiz: items are fake patient charts (Two Point Hospital tone) with names, occupations, and free-form notes that are almost-real funny; each set has 8-12 items (up from 6); Aiyana / Marcus stay present during the sort with a speech bubble that reacts to specific items; one Phoenix Wright "HOLD IT!" reveal beat per encounter on the trickiest call.
 **Depends on**: Phase 16 (encounter routing + sorter overlay shipped 2026-05-07/08)
-**Requirements**: SORTV2-01, SORTV2-02, SORTV2-03, SORTV2-04, SORTV2-05, SORTV2-06 (TBD during /gsd:plan-phase)
+**Requirements**: SORTV2-01, SORTV2-02, SORTV2-03, SORTV2-04, SORTV2-05, SORTV2-06
 **Branch**: `gsd/phase-22-phi-sorter-content` (cut off main; do not block v2.2 sponsor demo)
 **Success Criteria** (what must be TRUE):
   1. Each document set has 8-12 items presented as fake patient charts with name, role/occupation, and at least one free-form note field. The 18-identifier HIPAA accuracy per 45 CFR §164.514(b)(2) is preserved across the rewrite — no item changes its `category` field.
@@ -234,7 +234,13 @@ Plans:
   4. Exactly one item per set is flagged as a "HOLD IT" reveal — when the player nails it correctly, the NPC delivers a dramatic 1-2 sentence beat explaining *why* it was tricky (e.g., partial date, ZIP3 vs ZIP5, diagnosis without name). The reveal is visually distinct from regular reactions (border flash, scaled text, dedicated SFX).
   5. All existing Phase 16 success criteria still hold (drag-drop + keyboard parity, audio-visual feedback per drop, debrief, score contribution, replayability).
   6. Encounter completes in 60-90 seconds (up from 30-60 to accommodate larger sets); SorterDebrief surfaces NPC name in the "BACK TO X" button or context.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 22`)
+**Plans:** 4 plans
+
+Plans:
+- [ ] 22-01-PLAN.md — Data foundation: add SORTV2-01..06 to REQUIREMENTS.md, rewrite 30 sorterData items as patient charts with deadpan humor (HIPAA-preserved), update CONTENT_MANIFEST.md
+- [ ] 22-02-PLAN.md — Dr. Tovar NPC in roomData.json (records_room encounter trigger) + sorterReactions.ts NPC reaction banks (Aiyana / Marcus / Tovar)
+- [ ] 22-03-PLAN.md — UI components: SorterItem renders chart fields; new NPCReactionBubble with HOLD IT scaled gold-flash variant
+- [ ] 22-04-PLAN.md — Integration: PHISorterOverlay wires reactions + HOLD IT reveal + sfx_fanfare@0.4 + NPC name in progress header; live human-verify checkpoint (tone / voice / HIPAA / 60-90s)
 
 ### Phase 23: PHI Sorter Redesign — Feedback Moments
 **Goal**: Every interaction in the sorter produces visible/audible/character response (Commandment 1) at proportional weight (Commandment 8): per-drop particle bursts + camera shake, animated bucket counters, completion overlay before debrief, score animations on each correct, NPC reaction enthusiasm scales with accuracy.
@@ -350,6 +356,6 @@ Plans:
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 0/0 | Not started | - |
 | 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
-| 22. PHI Sorter Redesign — Content + Connection | v2.1 | 0/0 | Pending | - |
+| 22. PHI Sorter Redesign — Content + Connection | v2.1 | 0/4 | Planned | - |
 | 23. PHI Sorter Redesign — Feedback Moments | v2.1 | 0/0 | Pending | - |
 | 24. PHI Sorter Redesign — Format Shift | v2.1 | 0/0 | Pending | - |
