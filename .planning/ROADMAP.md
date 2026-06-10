@@ -350,7 +350,7 @@ Plans:
 | 13. Encounter Integration | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |
-| 16. PHI Sorter Encounter | 4/4 | Complete   | 2026-06-10 | - |
+| 16. PHI Sorter Encounter | 4/4 | Complete    | 2026-06-10 | - |
 | 17. Breach Triage Encounter | v2.1 | 0/0 | Pending | - |
 | 18. Demo Mode + Start Menu | v2.2 | Complete    | 2026-05-08 | - |
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
