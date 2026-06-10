@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import NPCSprite from './NPCSprite';
+import DialoguePortrait from './DialoguePortrait';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 
 interface BattleEncounterScreenProps {
@@ -184,23 +184,12 @@ export default function BattleEncounterScreen({
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header: NPC portrait + name + optional privacy meter */}
-        <div className="flex items-center gap-3 px-4 pt-4 pb-2">
-          {/* NPC portrait */}
-          <div
-            className="flex-shrink-0 w-12 h-12 bg-[#16213e] border-2 border-[#FF6B9D] rounded flex items-center justify-center overflow-hidden"
-            data-testid="npc-battle-sprite"
-          >
-            <div className="w-10 h-10">
-              <NPCSprite npcId={npcId} direction="down" />
-            </div>
-          </div>
+        {/* Header: NPC portrait + optional privacy meter */}
+        <div className="flex items-start gap-3 px-4 pt-4 pb-2">
+          {/* NPC portrait plate (96px crop + name plate inside frame) */}
+          <DialoguePortrait npcId={npcId} npcName={npcName} />
 
-          <div className="flex-1 min-w-0">
-            <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-sm">
-              {npcName}
-            </span>
-          </div>
+          <div className="flex-1 min-w-0" />
 
           {/* Compact privacy meter in header */}
           {privacyScore !== undefined && (
