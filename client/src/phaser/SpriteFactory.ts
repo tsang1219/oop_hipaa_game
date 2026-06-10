@@ -29,7 +29,7 @@ export function generateAllTextures(scene: Phaser.Scene) {
   generateFurnitureTextures(scene);
 }
 
-// ── NPC sprite style definitions (matches NPCSprite.tsx SVG art) ─────
+// ── NPC sprite style definitions (legacy SVG palette — NPCSprite.tsx deleted in Phase 25; dialogue portraits now crop the PNG sheets via spriteAssetPaths) ─────
 interface NpcStyle {
   shirt: number; hair: number; pants: number; shoes: number;
   coat?: number; tie?: number;
