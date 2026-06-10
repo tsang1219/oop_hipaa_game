@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T04:38:24.931Z"
+last_updated: "2026-06-10T04:49:39.913Z"
 progress:
   total_phases: 18
   completed_phases: 14
   total_plans: 47
-  completed_plans: 43
+  completed_plans: 44
 ---
 
 # Project State
@@ -54,6 +54,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 22-phi-sorter-content-connection P04 | 15 | 1 tasks | 2 files |
 | Phase 16-phi-sorter-encounter P04 | 25 | 2 tasks | 4 files |
 | Phase 17-breach-triage-encounter P01 | 5min | 3 tasks | 3 files |
+| Phase 17-breach-triage-encounter P02 | 9 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -127,6 +128,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 16-phi-sorter-encounter]: Abort path added: Esc/X emits aborted:true in REACT_RETURN_FROM_ENCOUNTER, resets paused but skips registry guard so encounter stays replayable
 - [Phase 17-breach-triage-encounter]: Priya the Privacy Officer is the NPC for Breach Triage — exhausted, third queue today, precise because she has to be
 - [Phase 17-breach-triage-encounter]: 72-hour deadline used only as GDPR-trap wrong answer in Breach Triage; correct answers use 'without unreasonable delay, 60 days' per HIPAA_TRAINING_FRAMEWORK.md 2026-03-11 fix
+- [Phase 17-breach-triage-encounter]: Single-interval tick engine with empty deps + frozenRef gating — avoids stale closures on tally state per Phase 22 SUMMARY risk note
+- [Phase 17-breach-triage-encounter]: TriageDebrief not imported by BreachTriageOverlay — UnifiedGamePage owns debrief render (BLOCKER-2 precedent from Phase 16)
+- [Phase 17-breach-triage-encounter]: queueRef replaces queue state for interval reads — eliminates nested-setState anti-pattern; totalCountRef increments +2 at follow-up open time
 
 ### Pending Todos
 

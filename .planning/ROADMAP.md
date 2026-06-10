@@ -211,7 +211,7 @@ Plans:
 **Goal**: A timed Breach Notification Rule encounter uses whack-a-mole pacing — incidents pop up, the player classifies reportable vs not and selects notification timeline — driven primarily by keyboard, triggered from the Act 3 ER narrative arc.
 **Depends on**: Phase 13 (encounter trigger infrastructure), Phase 14 (Act 3 state), Phase 16 (encounter UI patterns established)
 **Requirements**: TRIA-01, TRIA-02, TRIA-03, TRIA-04, TRIA-05, TRIA-06
-**Plans:** 1/3 plans executed
+**Plans:** 2/3 plans executed
 **Success Criteria** (what must be TRUE):
   1. Reaching the Act 3 ER narrative trigger launches the Breach Triage encounter — ExplorationScene pauses in place and the triage overlay opens via the existing encounter lifecycle.
   2. Incidents pop up at whack-a-mole pacing (multiple visible at once, time-pressured) and the player classifies each as reportable / not-reportable using number keys or hotkeys — keyboard-only completion is fully supported with no required mouse input.
@@ -356,7 +356,7 @@ Plans:
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |
 | 16. PHI Sorter Encounter | 4/4 | Complete    | 2026-06-10 | - |
-| 17. Breach Triage Encounter | 1/3 | In Progress|  | - |
+| 17. Breach Triage Encounter | 2/3 | In Progress|  | - |
 | 18. Demo Mode + Start Menu | v2.2 | Complete    | 2026-05-08 | - |
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 1/1 | Complete | 2026-05-08 |
