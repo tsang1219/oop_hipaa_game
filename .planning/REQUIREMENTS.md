@@ -143,7 +143,7 @@ NPC portrait system for dialogue overlay. VIS-04..08 are reserved for Phases 26/
 ### Dialogue Portraits (Phase 25)
 
 - [ ] **VIS-01**: The dialogue overlay (BattleEncounterScreen) renders the speaking NPC as a >=96px pixelated portrait CSS-cropped from frame 0 (idle-down) of the same `npc_<type>_sheet` PNG BootScene preloads (Phase 21 CertificateOverlay / Phase 24 NPCReactionBubble crop pattern). The NPCSprite SVG placeholder no longer appears anywhere in dialogue, and NPCSprite.tsx is deleted once it has zero consumers.
-- [ ] **VIS-02**: Every named NPC in roomData.json carries a `sprite` type field (one of the 9 BootScene sheet types), and dialogue portrait resolution is data-driven via a `getNPCPortraitPath(npcId)` resolver in spriteAssetPaths.ts built from that data — no hardcoded component-level npcId map. Unknown/unmapped npcIds fall back to the staff sheet AND emit a `console.warn` in dev mode — named characters never silently render generic.
+- [x] **VIS-02**: Every named NPC in roomData.json carries a `sprite` type field (one of the 9 BootScene sheet types), and dialogue portrait resolution is data-driven via a `getNPCPortraitPath(npcId)` resolver in spriteAssetPaths.ts built from that data — no hardcoded component-level npcId map. Unknown/unmapped npcIds fall back to the staff sheet AND emit a `console.warn` in dev mode — named characters never silently render generic.
 - [ ] **VIS-03**: The portrait sits in a framed plate with the NPC's name and shows a subtle idle animation (breathing bob, ~2.4s loop, 2-3px amplitude) while dialogue is on screen (Commandment 4 — NPCs are people, not icons). Dialogue flow, choices, feedback, and scoring behave exactly as before — zero regression to GameContainer logic; `npm run check` and `npm run build` clean.
 
 ## Out of Scope
@@ -246,7 +246,7 @@ NPC portrait system for dialogue overlay. VIS-04..08 are reserved for Phases 26/
 | SORTV2-15 | Phase 24 | Complete |
 
 | VIS-01 | Phase 25 | Pending |
-| VIS-02 | Phase 25 | Pending |
+| VIS-02 | Phase 25 | Complete |
 | VIS-03 | Phase 25 | Pending |
 
 **Coverage:**
