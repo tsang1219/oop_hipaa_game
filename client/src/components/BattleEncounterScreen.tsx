@@ -71,9 +71,11 @@ export default function BattleEncounterScreen({
   useEffect(() => {
     if (feedback) {
       if (feedback.type === 'correct') {
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_tower_place', volume: 0.55 });
+        // Phase 27 VIS-08: purpose-fit confirmation chime (replaces repurposed tower_place)
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_correct', volume: 0.45 });
       } else if (feedback.type === 'incorrect') {
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_breach_alert', volume: 0.45 });
+        // Phase 27 VIS-08: soft thud accent (replaces breach-alert horn — proportional per Commandment 8)
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_wrong', volume: 0.35 });
       } else {
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
       }
