@@ -1314,14 +1314,7 @@ export class ExplorationScene extends Phaser.Scene {
       if (riley) {
         this.tweens.add({ targets: riley.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
       }
-      // Plant leaf-sway — translucent green oval on each plant, gently rocking
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'plant') continue;
-        const px = obs.x * TILE + (obs.width * TILE) / 2;
-        const py = obs.y * TILE + 4;
-        const leaf = this.add.ellipse(px, py, 14, 6, 0x4a8a3a, 0.45).setDepth(4);
-        this.tweens.add({ targets: leaf, angle: { from: -6, to: 6 }, duration: 1900 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
+      // Plant leaf-sway is now handled generically by addFurnitureIdleAnimations() — no entrance-only block needed
       // (3) Ambient lobby chatter — single subtle blip every 9-12s, max volume 0.08
       this.time.addEvent({ delay: 10500, loop: true, callback: () => {
         try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.55 + Math.random() * 0.2 }); } catch (_) {}
@@ -1872,6 +1865,91 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
     eventBridge.on(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     eventBridge.on(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
+
+    // ── Type-driven furniture idle animations (Phase 26-02) ──────
+    this.addFurnitureIdleAnimations(room);
+  }
+
+  // ── Type-driven furniture idle animations (Phase 26-02) ─────────────────────
+  // Called once from create() after the obstacles render loop.
+  // Positions computed from obstacle tile coords so no sprite references needed.
+  // All tweens/timers use this.tweens.add / this.time.addEvent — Phaser cleans them on scene shutdown.
+  private addFurnitureIdleAnimations(room: any) {
+    for (const obs of room.obstacles) {
+      const obsType = (obs as any).type as string | undefined;
+      if (!obsType) continue;
+
+      // ── plant — leaf sway (14 instances across 9 rooms) ─────────────────
+      if (obsType === 'plant') {
+        const px = obs.x * TILE + (obs.width * TILE) / 2;
+        const py = obs.y * TILE + 4;
+        const leaf = this.add.ellipse(px, py, 14, 6, 0x4a8a3a, 0.45).setDepth(4);
+        this.tweens.add({
+          targets: leaf,
+          angle: { from: -6, to: 6 },
+          duration: 1900 + Math.random() * 400,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+        continue;
+      }
+
+      // ── server_rack / monitor_bank / vital_monitor — screen flicker + LED blink ─
+      if (obsType === 'server_rack' || obsType === 'monitor_bank' || obsType === 'vital_monitor') {
+        const mx = obs.x * TILE + (obs.width * TILE) / 2;
+        const my = obs.y * TILE + (obs.height * TILE) / 2;
+
+        // Screen glow rect — sits over the upper half of the sprite
+        const glowColor = obsType === 'server_rack' ? 0x44ff66 : 0x66ccff;
+        const screenGlow = this.add.rectangle(mx, my - 4, 10, 6, glowColor, 0.30).setDepth(20);
+
+        // CRT flicker — brief dim then restore every 2-3.5s
+        const flickerDelay = 2400 + Math.random() * 1800;
+        this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
+          this.tweens.add({
+            targets: screenGlow,
+            alpha: 0.08,
+            duration: 60,
+            yoyo: true,
+            repeat: 1,
+            ease: 'Linear',
+            onComplete: () => { screenGlow.setAlpha(0.30); },
+          });
+        } });
+
+        // LED dot — toggles between bright green and dim green every ~900ms
+        const ledX = obs.x * TILE + obs.width * TILE - 4;
+        const ledY = obs.y * TILE + 5;
+        const led = this.add.rectangle(ledX, ledY, 2, 2, 0x44ff44).setDepth(20);
+        let ledOn = true;
+        this.time.addEvent({ delay: 880 + Math.random() * 200, loop: true, callback: () => {
+          ledOn = !ledOn;
+          led.setFillStyle(ledOn ? 0x44ff44 : 0x227722);
+        } });
+        continue;
+      }
+
+      // ── coffee_station — steam puffs (break_room's obstacle; entrance cart handled separately) ─
+      if (obsType === 'coffee_station') {
+        const cx = obs.x * TILE + (obs.width * TILE) / 2;
+        const cy = obs.y * TILE + 4;
+        this.time.addEvent({ delay: 2600 + Math.random() * 400, loop: true, callback: () => {
+          const puff = this.add.ellipse(cx + (Math.random() * 4 - 2), cy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
+          this.tweens.add({
+            targets: puff,
+            y: puff.y - 12,
+            alpha: 0,
+            scaleX: 1.5,
+            scaleY: 1.5,
+            duration: 1400,
+            ease: 'Sine.easeOut',
+            onComplete: () => puff.destroy(),
+          });
+        } });
+        continue;
+      }
+    }
   }
 
   update() {
