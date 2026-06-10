@@ -416,6 +416,6 @@ Plans:
 | 22. PHI Sorter Redesign — Content + Connection | v2.1 | 4/4 | Complete | 2026-06-10 |
 | 23. PHI Sorter Redesign — Feedback Moments | v2.1 | 2/2 | Complete | 2026-06-10 |
 | 24. PHI Sorter Redesign — Format Shift | v2.1 | 3/3 | Complete | 2026-06-10 |
-| 25. Dialogue Portraits + NPC Visual Identity | 2/2 | Complete   | 2026-06-10 | - |
+| 25. Dialogue Portraits + NPC Visual Identity | 2/2 | Complete    | 2026-06-10 | - |
 | 26. Room Visual Up-Level | v2.3 | 0/0 | Pending | - |
 | 27. Navigation Clarity + Reward Sweep | v2.3 | 0/0 | Pending | - |
