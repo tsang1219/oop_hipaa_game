@@ -453,8 +453,13 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
   if (!scene.textures.exists('furn_desk')) {
     const g = scene.add.graphics();
     const wood = 0x8b6f47;
-    const woodDark = darken(wood, 30);
-    const woodLight = lighten(wood, 25);
+    const woodDark = darken(wood, 40);
+    const woodLight = lighten(wood, 35);
+    // 1px silhouette outline
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(2, 9, 28, 15);  // desktop + front panel outline
+    g.fillRect(4, 21, 4, 8);   // left leg outline
+    g.fillRect(23, 21, 4, 8);  // right leg outline
     // Desktop surface
     g.fillStyle(wood);
     g.fillRect(3, 10, 26, 4);
@@ -492,6 +497,15 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillStyle(wood);
     g.fillRect(5, 22, 1, 6);
     g.fillRect(24, 22, 1, 6);
+    // Character details: paper sheet + pen on desktop
+    g.fillStyle(0xffffff);
+    g.fillRect(6, 10, 6, 4);   // white paper sheet
+    g.fillStyle(0xdddddd);
+    g.fillRect(11, 10, 1, 4);  // paper right edge
+    g.fillStyle(0x3a3a8a);
+    g.fillRect(14, 11, 2, 1);  // pen barrel (blue)
+    g.fillStyle(0xcccccc);
+    g.fillRect(16, 11, 1, 1);  // pen tip
     g.generateTexture('furn_desk', TILE, TILE);
     g.destroy();
   }
@@ -601,8 +615,13 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
   if (!scene.textures.exists('furn_table')) {
     const g = scene.add.graphics();
     const wood = 0xa0826d;
-    const woodDark = darken(wood, 30);
-    const woodLight = lighten(wood, 25);
+    const woodDark = darken(wood, 40);
+    const woodLight = lighten(wood, 35);
+    // 1px silhouette outline
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(2, 10, 28, 6);  // tabletop outline
+    g.fillRect(4, 16, 4, 13);  // left leg outline
+    g.fillRect(23, 16, 4, 13); // right leg outline
     // Tabletop surface
     g.fillStyle(wood);
     g.fillRect(3, 11, 26, 4);
@@ -628,6 +647,12 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     // Cross brace detail
     g.fillStyle(woodDark);
     g.fillRect(8, 22, 16, 1);
+    // Character details: wood grain streaks + corner wear
+    g.fillStyle(darken(wood, 18));
+    g.fillRect(5, 12, 10, 1);  // grain streak 1
+    g.fillRect(16, 13, 8, 1);  // grain streak 2
+    g.fillStyle(woodLight);
+    g.fillRect(3, 11, 2, 1);   // corner wear highlight (top-left)
     g.generateTexture('furn_table', TILE, TILE);
     g.destroy();
   }
@@ -764,8 +789,14 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
   if (!scene.textures.exists('furn_chair')) {
     const g = scene.add.graphics();
     const blue = 0x3498db;
-    const blueDark = darken(blue, 30);
-    const blueLight = lighten(blue, 25);
+    const blueDark = darken(blue, 40);
+    const blueLight = lighten(blue, 35);
+    // 1px silhouette outline
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(7, 4, 18, 11);  // backrest outline
+    g.fillRect(6, 13, 20, 9);  // seat outline
+    g.fillRect(8, 20, 4, 11);  // left leg outline
+    g.fillRect(20, 20, 4, 11); // right leg outline
     // Backrest
     g.fillStyle(darken(blue, 10));
     g.fillRect(8, 5, 16, 9);
@@ -791,6 +822,9 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillStyle(blueDark);
     g.fillRect(24, 15, 1, 6);
     g.fillRect(8, 20, 16, 1);
+    // Seat stitch line (character detail)
+    g.fillStyle(darken(blue, 20));
+    g.fillRect(9, 17, 14, 1);
     // Legs (metal)
     g.fillStyle(0x555555);
     g.fillRect(9, 21, 2, 8);
@@ -812,18 +846,24 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
 
   if (!scene.textures.exists('furn_plant')) {
     const g = scene.add.graphics();
-    // Pot
     const pot = 0xc0613a;
+    // 1px silhouette outline for pot
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(10, 18, 12, 13);
+    // Pot shadow
     g.fillStyle(darken(pot, 20));
     g.fillRect(11, 20, 10, 10);
     g.fillStyle(pot);
     g.fillRect(12, 20, 8, 9);
     // Pot highlight
-    g.fillStyle(lighten(pot, 25));
+    g.fillStyle(lighten(pot, 35));
     g.fillRect(12, 20, 1, 8);
-    // Pot rim
-    g.fillStyle(lighten(pot, 15));
+    // Pot rim (boosted shine)
+    g.fillStyle(lighten(pot, 25));
     g.fillRect(10, 19, 12, 2);
+    // Pot rim shine pixel
+    g.fillStyle(lighten(pot, 45));
+    g.fillRect(11, 19, 3, 1);
     // Soil
     g.fillStyle(0x3e2723);
     g.fillRect(13, 20, 6, 2);
@@ -837,6 +877,10 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillRect(10, 7, 5, 4);
     g.fillRect(17, 6, 5, 4);
     g.fillRect(12, 4, 8, 4);
+    // Second leaf-cluster tone (character detail)
+    g.fillStyle(0x56c45a);
+    g.fillRect(9, 9, 4, 3);
+    g.fillRect(19, 8, 4, 3);
     g.fillStyle(0x66bb6a);
     g.fillRect(11, 5, 3, 3);
     g.fillRect(18, 7, 3, 2);
@@ -844,10 +888,11 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillRect(14, 3, 4, 3);
     g.fillRect(10, 8, 2, 2);
     g.fillRect(20, 8, 2, 2);
-    // Leaf highlights
-    g.fillStyle(0x81c784);
+    // Leaf highlights (boosted)
+    g.fillStyle(0x9ad89e);
     g.fillRect(12, 4, 2, 1);
     g.fillRect(18, 6, 2, 1);
+    g.fillRect(15, 3, 2, 1);
     g.generateTexture('furn_plant', TILE, TILE);
     g.destroy();
   }
@@ -926,22 +971,41 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
   if (!scene.textures.exists('furn_filing_cabinet')) {
     const g = scene.add.graphics();
     const metal = 0x78909c;
+    // 1px silhouette outline
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(7, 2, 18, 28);
     // Main body
     g.fillStyle(metal);
     g.fillRect(8, 3, 16, 26);
     // Body highlight
-    g.fillStyle(lighten(metal, 20));
+    g.fillStyle(lighten(metal, 30));
     g.fillRect(8, 3, 1, 26);
     g.fillRect(8, 3, 16, 1);
     // Body shadow
-    g.fillStyle(darken(metal, 25));
+    g.fillStyle(darken(metal, 35));
     g.fillRect(23, 4, 1, 25);
     g.fillRect(9, 28, 14, 1);
     // Drawer divisions
-    g.fillStyle(darken(metal, 15));
+    g.fillStyle(darken(metal, 20));
     g.fillRect(9, 9, 14, 1);
     g.fillRect(9, 16, 14, 1);
     g.fillRect(9, 23, 14, 1);
+    // Drawer label slots on each drawer (white paper labels)
+    g.fillStyle(0xfafafa);
+    g.fillRect(11, 4, 10, 4);   // top drawer label
+    g.fillRect(11, 10, 10, 5);  // second drawer label
+    g.fillRect(11, 17, 10, 5);  // third drawer label
+    g.fillRect(11, 24, 10, 3);  // bottom drawer label
+    // Label ruled line (grey)
+    g.fillStyle(0xdddddd);
+    g.fillRect(12, 6, 8, 1);
+    g.fillRect(12, 13, 8, 1);
+    g.fillRect(12, 20, 8, 1);
+    // One drawer drawn 1px ajar (third drawer) with inner shadow
+    g.fillStyle(darken(metal, 25));
+    g.fillRect(9, 22, 14, 1);   // slight gap showing ajar
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(9, 22, 14, 1);
     // Drawer handles
     g.fillStyle(0xcccccc);
     g.fillRect(14, 5, 4, 2);
@@ -954,9 +1018,6 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillRect(14, 11, 2, 1);
     g.fillRect(14, 18, 2, 1);
     g.fillRect(14, 25, 2, 1);
-    // Label slot on top drawer
-    g.fillStyle(0xffffff);
-    g.fillRect(12, 6, 8, 2);
     g.generateTexture('furn_filing_cabinet', TILE, TILE);
     g.destroy();
   }
@@ -1984,8 +2045,11 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
   if (!scene.textures.exists('furn_vending_machine')) {
     const g = scene.add.graphics();
     const body = 0x3a3a4a;
-    const bodyDark = darken(body, 25);
-    const bodyLight = lighten(body, 20);
+    const bodyDark = darken(body, 35);
+    const bodyLight = lighten(body, 30);
+    // 1px silhouette outline
+    g.fillStyle(0x111111);
+    g.fillRect(4, 1, 24, 30);
     // Main body
     g.fillStyle(body);
     g.fillRect(5, 2, 22, 28);
@@ -2000,23 +2064,28 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillRect(7, 4, 18, 12);
     g.fillStyle(lighten(0xeeeedd, 10));
     g.fillRect(7, 4, 18, 1);
-    // Product rows
-    g.fillStyle(0xe74c3c);
-    g.fillRect(8, 5, 4, 3);
+    // Product silhouette rows — 3 rows x 3 cols (character detail: small colored 3x4 rects behind window)
+    g.fillStyle(0xe74c3c);   // row 1
+    g.fillRect(8, 5, 3, 4);
     g.fillStyle(0x2980b9);
-    g.fillRect(13, 5, 4, 3);
+    g.fillRect(13, 5, 3, 4);
     g.fillStyle(0x27ae60);
-    g.fillRect(18, 5, 4, 3);
-    g.fillStyle(0xf39c12);
-    g.fillRect(8, 9, 4, 3);
+    g.fillRect(18, 5, 3, 4);
+    g.fillStyle(0xf39c12);   // row 2
+    g.fillRect(8, 10, 3, 4);
     g.fillStyle(0x9b59b6);
-    g.fillRect(13, 9, 4, 3);
+    g.fillRect(13, 10, 3, 4);
     g.fillStyle(0x1abc9c);
-    g.fillRect(18, 9, 4, 3);
-    g.fillStyle(0xe67e22);
-    g.fillRect(8, 13, 4, 2);
+    g.fillRect(18, 10, 3, 4);
+    g.fillStyle(0xe67e22);   // row 3 (partial)
+    g.fillRect(8, 13, 3, 2);
     g.fillStyle(0x3498db);
-    g.fillRect(13, 13, 4, 2);
+    g.fillRect(13, 13, 3, 2);
+    // Product highlight specular
+    g.fillStyle(0xffffff);
+    g.fillRect(8, 5, 1, 1);
+    g.fillRect(13, 5, 1, 1);
+    g.fillRect(18, 5, 1, 1);
     // Coin/button panel
     g.fillStyle(0x555555);
     g.fillRect(7, 17, 18, 5);
@@ -2025,9 +2094,11 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillRect(8, 18, 3, 3);
     g.fillRect(12, 18, 3, 3);
     g.fillRect(16, 18, 3, 3);
-    // Coin slot
+    // Coin slot (character detail)
+    g.fillStyle(0x444444);
+    g.fillRect(21, 18, 3, 4);
     g.fillStyle(0x888888);
-    g.fillRect(21, 18, 2, 3);
+    g.fillRect(21, 19, 3, 1);
     // Dispensing bay
     g.fillStyle(0x1a1a1a);
     g.fillRect(7, 23, 18, 5);
@@ -2140,7 +2211,10 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     const g = scene.add.graphics();
     const metal = 0x2a2a2a;
     const metalDark = darken(metal, 20);
-    const metalLight = lighten(metal, 20);
+    const metalLight = lighten(metal, 30);
+    // 1px silhouette outline
+    g.fillStyle(0x111111);
+    g.fillRect(5, 1, 22, 30);
     // Main rack body
     g.fillStyle(metal);
     g.fillRect(6, 2, 20, 28);
@@ -2150,7 +2224,7 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillStyle(metalDark);
     g.fillRect(25, 3, 1, 27);
     g.fillRect(7, 29, 18, 1);
-    // Server unit rows with LEDs
+    // Server unit rows with vent slat lines (character detail)
     const unitYs = [4, 9, 14, 19, 24];
     for (const uy of unitYs) {
       // Unit panel
@@ -2158,25 +2232,25 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
       g.fillRect(8, uy, 16, 4);
       g.fillStyle(0x444444);
       g.fillRect(8, uy, 16, 1);
-      // Ventilation slots
-      g.fillStyle(0x222222);
-      g.fillRect(9, uy + 2, 8, 1);
+      // Ventilation slat lines (horizontal dashes)
+      g.fillStyle(0x1a1a1a);
+      g.fillRect(9, uy + 2, 10, 1);
+      g.fillStyle(0x333333);
+      g.fillRect(9, uy + 3, 10, 1);
     }
-    // Blinking LEDs (green and amber)
-    g.fillStyle(0x00ff00);
+    // Baked LED dots: green (active) and amber (warning) — 2px for readability
+    g.fillStyle(0x44ff44);  // bright green LED
+    g.fillRect(20, 5, 2, 2);
+    g.fillRect(20, 15, 2, 2);
+    g.fillRect(20, 25, 2, 2);
+    g.fillStyle(0xffbb00);  // amber LED
+    g.fillRect(23, 5, 2, 2);
+    g.fillRect(23, 10, 2, 2);
+    g.fillRect(23, 20, 2, 2);
+    // LED glare specular
+    g.fillStyle(0xaaffaa);
     g.fillRect(20, 5, 1, 1);
-    g.fillRect(20, 10, 1, 1);
-    g.fillRect(20, 20, 1, 1);
-    g.fillStyle(0xffaa00);
-    g.fillRect(22, 5, 1, 1);
-    g.fillRect(22, 15, 1, 1);
-    g.fillRect(22, 25, 1, 1);
-    g.fillStyle(0x00ff00);
     g.fillRect(20, 15, 1, 1);
-    g.fillRect(20, 25, 1, 1);
-    g.fillStyle(0xff0000);
-    g.fillRect(22, 10, 1, 1);
-    g.fillRect(22, 20, 1, 1);
     g.generateTexture('furn_server_rack', TILE, TILE);
     g.destroy();
   }
@@ -3357,13 +3431,18 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
 
   if (!scene.textures.exists('furn_cable_tray')) {
     const g = scene.add.graphics();
-    // Horizontal tray/raceway
     const tray = 0x666666;
+    // 1px silhouette outline
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(1, 9, 30, 8);
+    g.fillRect(5, 16, 4, 6);   // left bracket outline
+    g.fillRect(23, 16, 4, 6);  // right bracket outline
+    // Horizontal tray/raceway
     g.fillStyle(tray);
     g.fillRect(2, 10, 28, 6);
-    g.fillStyle(lighten(tray, 20));
+    g.fillStyle(lighten(tray, 30));
     g.fillRect(2, 10, 28, 1);
-    g.fillStyle(darken(tray, 20));
+    g.fillStyle(darken(tray, 30));
     g.fillRect(2, 15, 28, 1);
     // Tray sides
     g.fillStyle(darken(tray, 10));
@@ -3373,20 +3452,20 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.fillStyle(0x555555);
     g.fillRect(6, 16, 2, 4);
     g.fillRect(24, 16, 2, 4);
-    // Colored cables running through
-    g.fillStyle(0x2980b9);
-    g.fillRect(4, 11, 24, 1);
-    g.fillStyle(0xe74c3c);
+    // Colored cable runs — muted red, blue, yellow 2px lines (character detail)
+    g.fillStyle(0x1a6090);   // muted blue cable
+    g.fillRect(4, 11, 24, 2);
+    g.fillStyle(0x8b2020);   // muted red cable
     g.fillRect(4, 12, 24, 1);
-    g.fillStyle(0xf39c12);
+    g.fillStyle(0x4a3300);   // muted yellow cable (dark)
     g.fillRect(4, 13, 24, 1);
-    g.fillStyle(0x27ae60);
+    g.fillStyle(darken(tray, 15));
     g.fillRect(4, 14, 24, 1);
-    // Cable highlight
-    g.fillStyle(lighten(0x2980b9, 30));
+    // Cable highlights (shimmer on bend points)
+    g.fillStyle(lighten(0x2980b9, 40));
     g.fillRect(10, 11, 4, 1);
-    g.fillStyle(lighten(0xe74c3c, 30));
-    g.fillRect(16, 12, 4, 1);
+    g.fillStyle(lighten(0x8b2020, 40));
+    g.fillRect(18, 12, 3, 1);
     g.generateTexture('furn_cable_tray', TILE, TILE);
     g.destroy();
   }
@@ -3661,6 +3740,90 @@ function generateFurnitureTextures(scene: Phaser.Scene) {
     g.destroy();
   }
 
+  // ── New generators: wall sconce + corridor bench ─────────────────
+
+  if (!scene.textures.exists('furn_wall_sconce')) {
+    const g = scene.add.graphics();
+    const bracket = 0x4a4a52;
+    const shade = 0xc8b88a;
+    const shadeLight = lighten(shade, 25);
+    const shadeDark = darken(shade, 30);
+    // 1px silhouette outline
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(9, 3, 14, 22);
+    // Metal bracket at top-center
+    g.fillStyle(bracket);
+    g.fillRect(13, 4, 6, 5);
+    g.fillStyle(lighten(bracket, 20));
+    g.fillRect(13, 4, 6, 1);
+    g.fillStyle(darken(bracket, 20));
+    g.fillRect(18, 5, 1, 4);
+    // Lamp shade — upward trapezoid (wide at bottom, narrow at top)
+    g.fillStyle(shade);
+    g.fillRect(11, 9, 10, 9);  // main shade body
+    g.fillRect(13, 7, 6, 3);   // narrowed top
+    // Shade highlight (left edge)
+    g.fillStyle(shadeLight);
+    g.fillRect(11, 9, 1, 8);
+    g.fillRect(13, 7, 1, 4);
+    // Shade shadow (right edge)
+    g.fillStyle(shadeDark);
+    g.fillRect(20, 10, 1, 8);
+    g.fillRect(18, 7, 1, 3);
+    // Warm glow blobs above the shade (additive illusion via alpha fills)
+    g.fillStyle(0xffe8a8, 0.5);
+    g.fillRect(12, 5, 8, 4);   // near glow
+    g.fillStyle(0xffe8a8, 0.25);
+    g.fillRect(10, 3, 12, 5);  // expanding outer glow
+    // Wall mounting base (dark rectangle at very top center)
+    g.fillStyle(darken(bracket, 10));
+    g.fillRect(14, 3, 4, 2);
+    g.generateTexture('furn_wall_sconce', TILE, TILE);
+    g.destroy();
+  }
+
+  if (!scene.textures.exists('furn_bench')) {
+    const g = scene.add.graphics();
+    const wood = 0x8b6f47;
+    const woodDark = darken(wood, 40);
+    const woodLight = lighten(wood, 35);
+    // 1px silhouette outline
+    g.fillStyle(0x1a1a1a);
+    g.fillRect(2, 12, 28, 12);
+    g.fillRect(4, 23, 5, 5);    // left leg outline
+    g.fillRect(23, 23, 5, 5);   // right leg outline
+    // Backrest bar (low, 2px)
+    g.fillStyle(darken(wood, 20));
+    g.fillRect(3, 12, 26, 2);
+    g.fillStyle(woodLight);
+    g.fillRect(3, 12, 26, 1);
+    // Seat — horizontal wooden surface (~6px tall)
+    g.fillStyle(wood);
+    g.fillRect(3, 14, 26, 6);
+    // Seat highlight (top edge)
+    g.fillStyle(woodLight);
+    g.fillRect(3, 14, 26, 1);
+    g.fillRect(3, 14, 1, 6);
+    // Seat shadow (bottom edge)
+    g.fillStyle(woodDark);
+    g.fillRect(4, 19, 25, 1);
+    g.fillRect(28, 14, 1, 6);
+    // Slat lines (3 slats across seat width)
+    g.fillStyle(darken(wood, 15));
+    g.fillRect(10, 14, 1, 6);
+    g.fillRect(18, 14, 1, 6);
+    // Two legs
+    g.fillStyle(woodDark);
+    g.fillRect(5, 20, 3, 7);
+    g.fillRect(24, 20, 3, 7);
+    // Leg highlights
+    g.fillStyle(wood);
+    g.fillRect(5, 20, 1, 7);
+    g.fillRect(24, 20, 1, 7);
+    g.generateTexture('furn_bench', TILE, TILE);
+    g.destroy();
+  }
+
 }
 
 /**
@@ -3755,8 +3918,17 @@ export function furnitureTextureKey(obstacleType?: string): string {
     locked_cabinet: 'furn_locked_cabinet',
     coffee_mug: 'furn_coffee_mug',
     headphones: 'furn_headphones',
-    // Hallway (wall_clock has a texture; others use fallback for now)
+    // Hallway — sconce and bench get real textures; no more desk fallback
     wall_clock: 'furn_clock',
+    wall_sconce: 'furn_wall_sconce',
+    bench: 'furn_bench',
+    emergency_light: 'furn_wall_sconce',   // wall-mounted light fixture
+    // One-off obstacles — nearest-credible remaps
+    biohazard_sign: 'furn_notice_board',
+    glove_dispenser: 'furn_hand_sanitizer',
+    filing_cart: 'furn_document_cart',
+    defibrillator_mount: 'furn_crash_cart',
+    wheelchair: 'furn_chair',
   };
   return map[obstacleType || ''] || 'furn_desk';
 }
