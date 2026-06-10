@@ -62,10 +62,10 @@
 
 ### PHI Sorter Redesign — Content + Connection (Phase 22)
 
-- [ ] **SORTV2-01**: Each PHI Sorter document set contains 10 items (up from 6/8/5), each presented as a fake patient chart with patientName plus at least one free-text chart field. HIPAA accuracy preserved — no item changes its `category` field vs the Phase 16 build; the 18 identifiers per 45 CFR §164.514(b)(2) Safe Harbor remain the source of truth.
-- [ ] **SORTV2-02**: ≥30% of items contain a humor beat (cat-as-emergency-contact, doctor's frustrated annotation, mundane-but-specific oddity) in a chart field that does NOT affect classification. Humor lives in admin-system absurdity, never in patient demographics. CONTENT_MANIFEST.md is updated to reflect the rewrite.
+- [x] **SORTV2-01**: Each PHI Sorter document set contains 10 items (up from 6/8/5), each presented as a fake patient chart with patientName plus at least one free-text chart field. HIPAA accuracy preserved — no item changes its `category` field vs the Phase 16 build; the 18 identifiers per 45 CFR §164.514(b)(2) Safe Harbor remain the source of truth.
+- [x] **SORTV2-02**: ≥30% of items contain a humor beat (cat-as-emergency-contact, doctor's frustrated annotation, mundane-but-specific oddity) in a chart field that does NOT affect classification. Humor lives in admin-system absurdity, never in patient demographics. CONTENT_MANIFEST.md is updated to reflect the rewrite.
 - [ ] **SORTV2-03**: During sorting, the trigger NPC (Aiyana for Set 1, Marcus for Set 2, Dr. Tovar for Set 3) shows a speech bubble that updates on each item drop — at least 4 specific-item reaction lines per NPC plus 3 accuracy-band fallback lines (shaky / good / strong).
-- [ ] **SORTV2-04**: Exactly one item per set is flagged as a "HOLD IT" reveal. When the player correctly classifies it, the NPC reaction bubble enters a distinct visual treatment (scaled portrait, gold border flash, dedicated SFX) and shows a 1-2 sentence educational beat. Stays in flow — not a full-screen modal.
+- [x] **SORTV2-04**: Exactly one item per set is flagged as a "HOLD IT" reveal. When the player correctly classifies it, the NPC reaction bubble enters a distinct visual treatment (scaled portrait, gold border flash, dedicated SFX) and shows a 1-2 sentence educational beat. Stays in flow — not a full-screen modal.
 - [ ] **SORTV2-05**: All Phase 16 PHI Sorter success criteria still hold: drag-and-drop + keyboard parity, audio-visual feedback per drop, debrief with takeaways, score contribution via `Math.round((correct/total) * 12)`, replayability after abort.
 - [ ] **SORTV2-06**: Encounter completes in 60-90 seconds (up from Phase 16's 30-60s to accommodate larger sets with NPC reaction beats). SorterDebrief surfaces the trigger NPC's name in the close-button context (e.g., "BACK TO AIYANA").
 
@@ -187,10 +187,10 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | CERT-02 | Phase 21 | Complete |
 | CERT-03 | Phase 21 | Complete |
 | CERT-04 | Phase 18 | Complete |
-| SORTV2-01 | Phase 22 | Pending |
-| SORTV2-02 | Phase 22 | Pending |
+| SORTV2-01 | Phase 22 | Complete |
+| SORTV2-02 | Phase 22 | Complete |
 | SORTV2-03 | Phase 22 | Pending |
-| SORTV2-04 | Phase 22 | Pending |
+| SORTV2-04 | Phase 22 | Complete |
 | SORTV2-05 | Phase 22 | Pending |
 | SORTV2-06 | Phase 22 | Pending |
 

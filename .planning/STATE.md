@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T03:42:23.093Z"
+last_updated: "2026-06-10T03:46:48.276Z"
 progress:
   total_phases: 17
   completed_phases: 12
   total_plans: 44
-  completed_plans: 38
+  completed_plans: 39
 ---
 
 # Project State
@@ -49,6 +49,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 22-phi-sorter-content-connection P02 | 12 | 2 tasks | 2 files |
+| Phase 22-phi-sorter-content-connection P01 | 6min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,8 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 21]: Reload-to-menu pattern (window.location.reload after endDemo) reused from Phase 18/19 — guarantees clean Phaser teardown + fresh StartMenu boot.
 - [Phase 22-phi-sorter-content-connection]: Dr. Tovar placed at (14, 10) in records_room — NOT added to requiredNpcs, encounter is optional
 - [Phase 22-phi-sorter-content-connection]: NPC reaction banks keyed by npcId; voice differentiation enforced in copy (Tovar uses Safe Harbor + identifier numbers; Marcus uses tonal nicknames; Aiyana references the auditor)
+- [Phase 22-phi-sorter-content-connection]: HOLD IT item selection: s1-dob (full birth date vs year-only) for Set 1; s2-diagnosis-with-mrn (MRN as identifier) for Set 2; s3-zip3 (not-PHI subversion) for Set 3 — Each HOLD IT chosen for maximum instructional value at its act level. Set 3 uses a not_phi item to subvert expectation and reward correct reasoning.
+- [Phase 22-phi-sorter-content-connection]: SorterChart humor tone locked: deadpan Daria/Veep (admin-system absurdity), never surreal or punching down. 45 humor-bearing fields in 30 items. — Per CLAUDE.md Commandment 5 + 22-CONTEXT.md spec. Humor surfaces in doctorNote/emergencyContact/reasonForVisit/miscField only, never in category/identifierType.
 
 ### Pending Todos
 
