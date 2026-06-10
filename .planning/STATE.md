@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T06:40:12.655Z"
+last_updated: "2026-06-10T06:45:21.799Z"
 progress:
   total_phases: 21
-  completed_phases: 17
+  completed_phases: 18
   total_plans: 54
-  completed_plans: 51
+  completed_plans: 52
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 25 — Dialogue Portraits (In Progress)
-Plan: 25-01 (Complete) → 25-02 (Pending)
-Status: Phase 25 Plan 01 complete. VIS-01..03 requirements defined, all 26 named NPCs have sprite fields in roomData.json, getNPCPortraitPath resolver exported from spriteAssetPaths.ts with dev-mode staff-sheet fallback. TypeScript clean.
-Last activity: 2026-06-10 — Phase 25 Plan 01 complete. NPC portrait data foundation ready for Plan 02 (BattleEncounterScreen integration).
+Phase: Phase 25 — Dialogue Portraits (Complete)
+Plan: 25-01 (Complete) → 25-02 (Complete)
+Status: Phase 25 complete. DialoguePortrait component wired into BattleEncounterScreen; NPCSprite SVG placeholder deleted; tsc + production build clean; VIS-01 and VIS-03 requirements met.
+Last activity: 2026-06-10 — Phase 25 Plan 02 complete. 96px breathing NPC portraits in dialogue overlay, NPCSprite.tsx deleted.
 
 Progress: [████░░░░░░] 50% (estimated)
 
@@ -62,6 +62,7 @@ Progress: [████░░░░░░] 50% (estimated)
 | Phase 24-phi-sorter-format-shift P02 | 6 | 3 tasks | 6 files |
 | Phase 24-phi-sorter-format-shift P03 | 7 | 2 tasks | 3 files |
 | Phase 25-dialogue-portraits P01 | 3min | 3 tasks | 3 files |
+| Phase 25-dialogue-portraits P02 | 3 | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -161,6 +162,7 @@ Progress: [████░░░░░░] 50% (estimated)
 - [Phase 24-phi-sorter-format-shift P03]: Completion Effect 1 docAnimState guard on shiftOver: fires only when 'active'/'entering' — lets doc already in 'stamped'/'exiting' at 0:00 finish and score
 - [Phase 25-01]: getNPCPortraitPath built from roomData.json sprite fields at module load (IIFE index) — no hardcoded npcId map, single source of truth
 - [Phase 25-01]: Fallback to npc_staff_sheet with loud console.warn in DEV — named characters never silently render generic
+- [Phase 25-dialogue-portraits]: 96px CSS-crop portrait at 3x scale in dialogue overlay — breathing-bob on crop layer only, frame stays rock-still; NPCSprite SVG placeholder fully deleted
 
 ### Pending Todos
 
@@ -178,7 +180,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-06-10
-Stopped at: Completed 25-01-PLAN.md — VIS-01..03 defined, all 26 NPCs have sprite fields, getNPCPortraitPath exported with dev-warn fallback. TypeScript clean.
-Resume: Execute Phase 25 Plan 02 (BattleEncounterScreen portrait integration — consumes getNPCPortraitPath).
+Stopped at: Completed 25-02-PLAN.md — DialoguePortrait wired into BattleEncounterScreen, NPCSprite.tsx deleted, tsc + build clean. Phase 25 complete.
+Resume: Phase 25 is complete. Next phase TBD.
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.
