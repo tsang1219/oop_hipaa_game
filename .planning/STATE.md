@@ -3,7 +3,7 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T03:56:52.013Z"
+last_updated: "2026-06-10T04:01:56.106Z"
 progress:
   total_phases: 17
   completed_phases: 13

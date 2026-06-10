@@ -356,6 +356,6 @@ Plans:
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 0/0 | Not started | - |
 | 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
-| 22. PHI Sorter Redesign — Content + Connection | 4/4 | Complete   | 2026-06-10 | - |
+| 22. PHI Sorter Redesign — Content + Connection | 4/4 | Complete    | 2026-06-10 | - |
 | 23. PHI Sorter Redesign — Feedback Moments | v2.1 | 0/0 | Pending | - |
 | 24. PHI Sorter Redesign — Format Shift | v2.1 | 0/0 | Pending | - |
