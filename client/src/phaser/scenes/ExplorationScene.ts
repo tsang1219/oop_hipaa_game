@@ -950,17 +950,19 @@ export class ExplorationScene extends Phaser.Scene {
 
         // Filled glow aura: additive gold pulsing behind the item sprite
         // The aura stays anchored; the bob moves the sprite above it — glow reads as floor-glow
-        if (this.textures.exists('particle_circle')) {
-          const aura = this.add.image(sprite.x, sprite.y + 2, 'particle_circle')
-            .setScale(7)
-            .setTint(0xffd700)
+        // glow_radial has soft alpha falloff so the gold tint stays gold (no white blob)
+        if (this.textures.exists('glow_radial')) {
+          // Deep amber + restrained alpha: additive gold clips to white over pale
+          // floors, so go darker on the tint and let the pulse carry the motion
+          const aura = this.add.image(sprite.x, sprite.y + 2, 'glow_radial')
+            .setTint(0xffa000)
             .setBlendMode(Phaser.BlendModes.ADD)
-            .setAlpha(0.18)
+            .setAlpha(0.45)
             .setDepth(sprite.depth - 1);
           this.tweens.add({
             targets: aura,
-            alpha: { from: 0.18, to: 0.38 },
-            scale: { from: 6, to: 8 },
+            alpha: { from: 0.45, to: 0.75 },
+            scale: { from: 0.85, to: 1.1 },
             duration: 1100,
             yoyo: true,
             repeat: -1,
@@ -2719,18 +2721,17 @@ export class ExplorationScene extends Phaser.Scene {
       } else if (state === 'next') {
         // Breathing warm-gold filled aura (Phase 27 VIS-07) — critical-path "next" door
         // Clearly distinct from the blue 'available' ring pulse: filled gold, slower breathe
-        if (this.textures.exists('particle_circle')) {
-          const aura = this.add.image(doorPixelX, doorPixelY, 'particle_circle')
-            .setScale(5)
-            .setTint(0xffd700)
+        if (this.textures.exists('glow_radial')) {
+          const aura = this.add.image(doorPixelX, doorPixelY, 'glow_radial')
+            .setTint(0xffa000)
             .setBlendMode(Phaser.BlendModes.ADD)
-            .setAlpha(0.22)
+            .setAlpha(0.6)
             .setDepth(2);
           this.tweens.add({
             targets: aura,
-            alpha: { from: 0.22, to: 0.45 },
-            scaleX: { from: 5, to: 7 },
-            scaleY: { from: 5, to: 7 },
+            alpha: { from: 0.6, to: 0.95 },
+            scaleX: { from: 1.1, to: 1.5 },
+            scaleY: { from: 1.1, to: 1.5 },
             duration: 1600,
             yoyo: true,
             repeat: -1,

@@ -398,12 +398,25 @@ export class BootScene extends Phaser.Scene {
   }
 
   private generateParticleTexture(): void {
-    if (this.textures.exists('particle_circle')) return;
-    const g = this.add.graphics();
-    g.fillStyle(0xffffff, 1);
-    g.fillCircle(3, 3, 3);   // 6x6 white circle, tinted at emit time
-    g.generateTexture('particle_circle', 6, 6);
-    g.destroy();
+    if (!this.textures.exists('particle_circle')) {
+      const g = this.add.graphics();
+      g.fillStyle(0xffffff, 1);
+      g.fillCircle(3, 3, 3);   // 6x6 white circle, tinted at emit time
+      g.generateTexture('particle_circle', 6, 6);
+      g.destroy();
+    }
+    // Soft radial glow for item auras — alpha falls off toward the edge so
+    // ADD-blended tints stay colored instead of washing out to a white blob
+    if (!this.textures.exists('glow_radial')) {
+      const g = this.add.graphics();
+      const R = 24;
+      for (let r = R; r >= 2; r -= 2) {
+        g.fillStyle(0xffffff, 0.055 * (1 - r / R) + 0.01);
+        g.fillCircle(R, R, r);
+      }
+      g.generateTexture('glow_radial', R * 2, R * 2);
+      g.destroy();
+    }
   }
 
   private generateNPCTextures() {
