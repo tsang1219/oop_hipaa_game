@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T05:21:04.236Z"
+last_updated: "2026-06-10T05:28:12.040Z"
 progress:
   total_phases: 19
-  completed_phases: 15
+  completed_phases: 16
   total_plans: 49
-  completed_plans: 46
+  completed_plans: 47
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 23 — PHI Sorter Feedback Moments (In Progress)
-Plan: 23-01 (Complete) → 23-02 (Next)
-Status: Plan 01 shipped — SORTV2-07..10 defined; 6 keyframes, BucketZone upgraded, SorterCompletionOverlay created, NPC reaction banks at 3/band. Plan 02 wires into PHISorterOverlay.
-Last activity: 2026-06-10 — Phase 23 Plan 01 complete. Foundation plan: REQUIREMENTS.md + CSS + BucketZone + SorterCompletionOverlay + expanded sorterReactions all built, build clean, PHISorterOverlay untouched.
+Phase: Phase 23 — PHI Sorter Feedback Moments (Complete)
+Plan: 23-02 (Complete) → Phase 24 (Next)
+Status: Both plans shipped. SORTV2-07..10 satisfied. PHISorterOverlay wired with shake, counters, score pulse, celebrating phase, band-transition reactions. Build clean, all Phase 22/16 invariants confirmed by grep.
+Last activity: 2026-06-10 — Phase 23 Plan 02 complete. PHISorterOverlay fully wired: camera shake + bucket counters + score pulse + three-effect celebrating pipeline + band-transition NPC reactions. Live playthroughs deferred to user per Phase 16/17/22 pattern.
 
 Progress: [█░░░░░░░░░] 10%
 
@@ -57,6 +57,7 @@ Progress: [█░░░░░░░░░] 10%
 | Phase 17-breach-triage-encounter P02 | 9 | 2 tasks | 5 files |
 | Phase 17-breach-triage-encounter P03 | 6min | 3 tasks | 7 files |
 | Phase 23-phi-sorter-feedback-moments P01 | 5min | 3 tasks | 5 files |
+| Phase 23-phi-sorter-feedback-moments P02 | 4min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -141,6 +142,10 @@ Progress: [█░░░░░░░░░] 10%
 - [Phase 23-phi-sorter-feedback-moments]: Particle burst driven by feedbackState prop transition (idle→correct/incorrect); count prop optional (default 0); nonce param on getNPCFallbackReaction default 0 — all backward compatible with PHISorterOverlay until Plan 02 wires them
 - [Phase 23-phi-sorter-feedback-moments]: KEEP PRACTICING uses teal (#4FB3D9) not red — encouragement without punishment (Commandment 5); band text lines never mention percent/accuracy/score/streak
 - [Phase 23-phi-sorter-feedback-moments]: 8 square (no border-radius) particles at 45° intervals, alternating 44px/60px radii — pixel-art starburst; nonce cycles via lines[nonce % lines.length]
+- [Phase 23-phi-sorter-feedback-moments P02]: holdItReveal extends completing beat to 2200ms (vs 600ms) when final drop was HOLD IT — lets the reveal breathe before celebration
+- [Phase 23-phi-sorter-feedback-moments P02]: Shake surface is inner wrapper div; close button + NPC bubble + toast + SorterCompletionOverlay stay outside — shaking anchored overlays looks like a bug
+- [Phase 23-phi-sorter-feedback-moments P02]: prevBandRef updated BEFORE HOLD IT branch so no late band-transition fires on the next drop; ≥3 drop gate suppresses noisy early signals
+- [Phase 23-phi-sorter-feedback-moments P02]: Band-transition reaction takes priority over specific-item reaction — player hears tone shift; nonce cycling prevents repeating same band line
 
 ### Pending Todos
 
@@ -158,7 +163,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-06-10
-Stopped at: Completed 23-01-PLAN.md — Phase 23 Plan 01 foundation done. SORTV2-07..10 defined, 6 CSS keyframes added, BucketZone upgraded with counters+particles, SorterCompletionOverlay created, NPC reaction banks at 3 lines/band. Build clean, PHISorterOverlay untouched.
-Resume: Phase 23 Plan 02 — wires SorterCompletionOverlay + count props + sorter-shake into PHISorterOverlay.tsx.
+Stopped at: Completed 23-02-PLAN.md — Phase 23 complete. PHISorterOverlay wired with all Phase 23 feedback: camera shake, bucket counters, score pulse, three-effect celebrating pipeline (SorterCompletionOverlay ~1.2s), band-transition NPC reactions. Build + typecheck clean, all Phase 22/16 greps pass. Live playthroughs deferred to user with verification script in SUMMARY.
+Resume: Phase 24 (PHI Sorter Format Moments) or user live-playthrough sign-off.
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.
