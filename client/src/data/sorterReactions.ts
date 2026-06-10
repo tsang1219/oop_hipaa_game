@@ -1,11 +1,18 @@
 /**
- * PHI Sorter NPC Reaction Bank — Phase 22
+ * PHI Sorter NPC Reaction Bank — Phase 22 (expanded Phase 23)
  *
  * The trigger NPC (Aiyana / Marcus / Dr. Tovar) stays present during the sort via a speech bubble
  * (NPCReactionBubble.tsx, Phase 22 Plan 03). After each item drop, PHISorterOverlay (Phase 22 Plan 04)
  * queries this bank for the appropriate reaction text:
  *   1. Try getNPCReactionForItem(npcId, itemId, isCorrect) — specific-item reaction
- *   2. Fall back to getNPCFallbackReaction(npcId, currentAccuracyBand) — band line
+ *   2. Fall back to getNPCFallbackReaction(npcId, currentAccuracyBand, nonce) — band line
+ *
+ * Phase 23 (SORTV2-10): Each band now has exactly 3 lines per NPC (9 band lines per NPC, 27 total).
+ * Band selection drives enthusiasm scaling — tone is felt, not stated:
+ *   strong = escalate (enthusiastic)  — NPC is genuinely delighted, shows it in their own voice
+ *   good   = steady, warm (neutral)   — workmanlike, encouraging
+ *   shaky  = deflated but kind (thoughtful) — a beat of worry, then encouragement; never scolding
+ * No line mentions percentages, accuracy, scores, or streaks.
  *
  * Voice differentiation lives in the COPY, not in any structural difference between banks.
  *   - Aiyana (Reception): warm, professional, mildly anxious about the auditor. Full sentences.
@@ -86,20 +93,53 @@ const AIYANA_BANK: NPCReactionBank = {
       text: "Full date of birth — that's identifier #3. Even the auditor knows this one.",
       variant: 'neutral',
     },
-    // 3 accuracy-band fallbacks
+    // 3 accuracy-band fallbacks — Phase 22 (1 per band) + Phase 23 adds 2 more per band = 3 each
+    // shaky band (3 lines, variant: 'thoughtful')
     {
       accuracyBand: 'shaky',
       text: "It's okay — take your time. The auditor can wait another minute.",
       variant: 'thoughtful',
     },
     {
+      accuracyBand: 'shaky',
+      text: "Deep breath. The forms aren't going anywhere — well, they ARE, that's the problem, but slowly.",
+      variant: 'thoughtful',
+    },
+    {
+      accuracyBand: 'shaky',
+      text: "No rush. Read it again and trust your gut — these trip everyone up at first.",
+      variant: 'thoughtful',
+    },
+    // good band (3 lines, variant: 'neutral')
+    {
       accuracyBand: 'good',
       text: "Nice. You're getting the rhythm.",
       variant: 'neutral',
     },
     {
+      accuracyBand: 'good',
+      text: "Exactly. Keep going — you've got this stack handled.",
+      variant: 'neutral',
+    },
+    {
+      accuracyBand: 'good',
+      text: "That's it. Steady hands, steady forms.",
+      variant: 'neutral',
+    },
+    // strong band (3 lines, variant: 'enthusiastic')
+    {
       accuracyBand: 'strong',
       text: "Honestly? You're faster at this than I am.",
+      variant: 'enthusiastic',
+    },
+    {
+      accuracyBand: 'strong',
+      text: "Okay, wow. I'm going to stop double-checking your stack.",
+      variant: 'enthusiastic',
+    },
+    {
+      accuracyBand: 'strong',
+      text: "If the auditor asks who sorted these, I am absolutely giving her your name.",
       variant: 'enthusiastic',
     },
   ],
@@ -145,20 +185,53 @@ const MARCUS_BANK: NPCReactionBank = {
       text: "Oh yeah — the spooky one. Fingerprint in a health record is always PHI, no debate.",
       variant: 'thoughtful',
     },
-    // 3 accuracy-band fallbacks
+    // 3 accuracy-band fallbacks per band
+    // shaky band (3 lines, variant: 'thoughtful')
     {
       accuracyBand: 'shaky',
       text: "All good — these subtle ones are why I asked.",
       variant: 'thoughtful',
     },
     {
+      accuracyBand: 'shaky',
+      text: "Hey, no stress. The manifest software gets these wrong too. Constantly.",
+      variant: 'thoughtful',
+    },
+    {
+      accuracyBand: 'shaky',
+      text: "Tricky batch. Don't overthink it — go with the identifier question.",
+      variant: 'thoughtful',
+    },
+    // good band (3 lines, variant: 'neutral')
+    {
       accuracyBand: 'good',
       text: "Solid. Keep going.",
       variant: 'neutral',
     },
     {
+      accuracyBand: 'good',
+      text: "Yeah, that tracks. Moving on.",
+      variant: 'neutral',
+    },
+    {
+      accuracyBand: 'good',
+      text: "You're reading these right. Good pace.",
+      variant: 'neutral',
+    },
+    // strong band (3 lines, variant: 'enthusiastic')
+    {
       accuracyBand: 'strong',
       text: "Okay — I'm just gonna let you finish. You're better at this than the manifest software.",
+      variant: 'enthusiastic',
+    },
+    {
+      accuracyBand: 'strong',
+      text: "Dude. You're a sorting machine. A HIPAA-potamus.",
+      variant: 'enthusiastic',
+    },
+    {
+      accuracyBand: 'strong',
+      text: "Honestly I'm taking notes. Is this what they teach you before day one?",
       variant: 'enthusiastic',
     },
   ],
@@ -198,20 +271,53 @@ const TOVAR_BANK: NPCReactionBank = {
       text: "Month plus year is more specific than year. That's the catch most people miss.",
       variant: 'neutral',
     },
-    // 3 accuracy-band fallbacks
+    // 3 accuracy-band fallbacks per band
+    // shaky band (3 lines, variant: 'thoughtful')
     {
       accuracyBand: 'shaky',
       text: "These edges are why I still keep the regulation tab open.",
       variant: 'thoughtful',
     },
     {
+      accuracyBand: 'shaky',
+      text: "Slow down a touch. Read the field, then decide. The regulation rewards patience.",
+      variant: 'thoughtful',
+    },
+    {
+      accuracyBand: 'shaky',
+      text: "Don't guess. The Safe Harbor list exists precisely so you don't have to guess.",
+      variant: 'thoughtful',
+    },
+    // good band (3 lines, variant: 'neutral')
+    {
       accuracyBand: 'good',
       text: "You're reading them carefully. That's the work.",
       variant: 'neutral',
     },
     {
+      accuracyBand: 'good',
+      text: "Consistent. That's what I look for on a review.",
+      variant: 'neutral',
+    },
+    {
+      accuracyBand: 'good',
+      text: "Solid instincts. Keep applying them.",
+      variant: 'neutral',
+    },
+    // strong band (3 lines, variant: 'enthusiastic')
+    {
       accuracyBand: 'strong',
       text: "Honestly impressive. You can audit me next time.",
+      variant: 'enthusiastic',
+    },
+    {
+      accuracyBand: 'strong',
+      text: "I mean this professionally: it is a pleasure to watch you work.",
+      variant: 'enthusiastic',
+    },
+    {
+      accuracyBand: 'strong',
+      text: "At this rate, I'm forwarding your name to the Privacy Board. They could use someone who actually reads the list.",
       variant: 'enthusiastic',
     },
   ],
@@ -243,19 +349,27 @@ export function getNPCReactionForItem(
 /**
  * Look up an accuracy-band fallback line for an NPC.
  * 'shaky' = <50% running accuracy, 'good' = 50-79%, 'strong' = ≥80%.
- * Always returns a reaction (each bank guarantees one per band).
+ *
+ * Phase 23: nonce parameter cycles through the 3 lines in the band deterministically
+ * (nonce % lineCount). Typically pass the running drop count as nonce so consecutive
+ * fallbacks in the same band don't repeat the identical line.
+ * Same nonce → same line (deterministic, testable). Backward compatible — existing
+ * two-arg call sites still compile and receive the first band line (nonce=0).
+ *
+ * Always returns a reaction (each bank guarantees 3 per band).
  */
 export function getNPCFallbackReaction(
   npcId: NPCSorterId,
   band: AccuracyBand,
+  nonce: number = 0,
 ): NPCReaction {
   const bank = NPC_REACTION_BANKS[npcId];
-  const fallback = bank?.reactions.find((r) => r.accuracyBand === band);
-  if (!fallback) {
+  const lines = bank?.reactions.filter((r) => r.accuracyBand === band) ?? [];
+  if (lines.length === 0) {
     // Should be unreachable — defensive default for runtime safety
     return { text: 'Nice work.', variant: 'neutral', accuracyBand: band };
   }
-  return fallback;
+  return lines[nonce % lines.length];
 }
 
 /**
