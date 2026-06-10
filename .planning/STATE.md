@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T07:45:34.221Z"
+last_updated: "2026-06-10T07:53:21.815Z"
 progress:
   total_phases: 23
-  completed_phases: 19
+  completed_phases: 20
   total_plans: 58
-  completed_plans: 55
+  completed_plans: 56
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 27 — Navigation Clarity (In Progress)
-Plan: 27-01 (Complete)
-Status: Phase 27 Plan 01 complete. 'next' door state end-to-end (UNLOCK_ORDER BFS → warm-gold aura 1600ms breathe) + 9s idle-hint sparkle cycling un-met room objectives. VIS-07 implemented; tsc + production build clean.
-Last activity: 2026-06-10 — Phase 27 Plan 01 complete. next-door breathing gold pulse + idle-hint sparkle system shipped.
+Phase: Phase 27 — Navigation Clarity (Complete)
+Plan: 27-02 (Complete)
+Status: Phase 27 complete. Zone glow registry + live checkmark pop-in + NPC fade parity + wrong-answer SFX swap (sorter_correct/sorter_wrong). VIS-08 implemented; tsc + production build clean. Feedback audit table in 27-02-SUMMARY.md.
+Last activity: 2026-06-10 — Phase 27 Plan 02 complete. Live completion visuals (zone glow kill + checkmark pop + NPC fade) + proportional SFX shipped.
 
-Progress: [████░░░░░░] 50% (estimated)
+Progress: [█████░░░░░] 55% (estimated)
 
 ## Performance Metrics
 
@@ -68,6 +68,7 @@ Progress: [████░░░░░░] 50% (estimated)
 | Phase 26-room-visual-uplevel P02 | 7min | 3 tasks | 2 files |
 | Phase 27-navigation-clarity P01 | 5min | 3 tasks | 4 files |
 | Phase 27-navigation-clarity P01 | 5min | 3 tasks | 4 files |
+| Phase 27-navigation-clarity P02 | 4min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -178,6 +179,10 @@ Progress: [████░░░░░░] 50% (estimated)
 - [Phase 27-01]: 'next' door promoted from 'completed' shows aura only (no checkmark) — aura is the stronger signal; checkmark returns when dept fully complete and 'next' advances
 - [Phase 27-01]: DoorState union exported from UnifiedGamePage.tsx (not EventBridge) — avoids cross-file type import; EventBridge JSDoc comments updated to document union
 - [Phase 27-01]: BFS findFirstHopDoorId always allows reaching nextTarget even if isDepartmentAccessible returns false — goal room must be reachable for pathfinding correctness
+- [Phase 27-02]: Zone completion tick uses sfx_sorter_correct at 0.25/rate 1.1 — quiet tick proportional to moment size (Commandment 8); hierarchy: zone < NPC banner < room fanfare
+- [Phase 27-02]: zoneGlows Map stores ring+tween at render; updateCompletionState diffs prev sets for live kill — avoids re-popping checkmarks on already-completed entries
+- [Phase 27-02]: NPC tint stays immediate under 400ms alpha fade — tint is subtle and signals state before fade completes; separate tweens not needed
+- [Phase 27-02]: Encounter return has no dedicated SFX — intentional release beat (silence after tension, Commandment 7); documented in feedback audit table as by-design-silent
 
 ### Pending Todos
 
@@ -195,7 +200,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-06-10
-Stopped at: Completed 27-01-PLAN.md — 'next' door state (BFS derive → breathe-gold render) + idle-hint sparkle system. VIS-07 implemented. Phase 27 Plan 01 complete.
-Resume: 27-02-PLAN.md (feedback audit + proportional interaction responses).
+Stopped at: Completed 27-02-PLAN.md — zone glow registry + live checkmark pop-in + NPC fade parity + answer SFX swap. VIS-08 implemented. Phase 27 complete.
+Resume: Phase 27 complete. See ROADMAP.md for next phase.
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.

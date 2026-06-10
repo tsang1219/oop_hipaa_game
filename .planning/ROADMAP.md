@@ -391,7 +391,7 @@ Plans:
   2. In-room, un-met completion requirements are discoverable without a modal: subtle sparkle on untalked NPCs / unspotted zones after a idle grace period, never nagging, never obnoxious.
   3. A feedback audit table of every player action in exploration mode (move, interact, collect, complete, door, encounter enter/exit) shows audio + visual response for each, with previously-silent interactions fixed (Commandment 1).
   4. No new modals; everything ambient. tsc and production build clean.
-**Plans:** 1/2 plans executed
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 27-01-PLAN.md — VIS-07/08 definitions + 'next' door breathing gold pulse (UNLOCK_ORDER + BFS first-hop) + idle-hint sparkle system
@@ -426,4 +426,4 @@ Plans:
 | 24. PHI Sorter Redesign — Format Shift | v2.1 | 3/3 | Complete | 2026-06-10 |
 | 25. Dialogue Portraits + NPC Visual Identity | 2/2 | Complete    | 2026-06-10 | - |
 | 26. Room Visual Up-Level | 2/2 | Complete    | 2026-06-10 | - |
-| 27. Navigation Clarity + Reward Sweep | 1/2 | In Progress|  | - |
+| 27. Navigation Clarity + Reward Sweep | 2/2 | Complete   | 2026-06-10 | - |
