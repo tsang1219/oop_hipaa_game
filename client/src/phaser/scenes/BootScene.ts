@@ -94,6 +94,8 @@ export class BootScene extends Phaser.Scene {
     this.load.audio('sfx_fanfare',       `${base}attached_assets/audio/sfx_fanfare.ogg`);
     this.load.audio('sfx_sorter_correct', `${base}attached_assets/audio/kenney_interface-sounds/Audio/confirmation_001.ogg`);
     this.load.audio('sfx_sorter_wrong',   `${base}attached_assets/audio/kenney_interface-sounds/Audio/error_001.ogg`);
+    this.load.audio('sfx_sorter_stamp',   `${base}attached_assets/audio/kenney_impact-sounds/Audio/impactPlank_medium_000.ogg`);
+    this.load.audio('sfx_sorter_paper',   `${base}attached_assets/audio/kenney_interface-sounds/Audio/scroll_002.ogg`);
 
     // Load background music — loaded once here, available to all scenes globally
     this.load.audio('music_hub',         `${base}attached_assets/audio/music_hub.ogg`);

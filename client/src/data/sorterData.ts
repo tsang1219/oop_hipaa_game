@@ -80,6 +80,7 @@ export type SorterDocumentSet = {
   items: SorterItem[];
   passingAccuracy: number;     // 0.0–1.0; 0.7 default
   takeaways: [string, string]; // EncounterDebrief takeaways (1-2 short HIPAA learnings)
+  shiftSeconds: number;        // Phase 24: per-set soft countdown — encounter wraps at 0:00, unstamped items don't score
 };
 
 // ── Set 1: Reception (Act 1, obvious) ───────────────────────────────────────
@@ -248,6 +249,7 @@ const SET_1: SorterDocumentSet = {
     },
   ],
   passingAccuracy: 0.7,
+  shiftSeconds: 90,
   takeaways: [
     'PHI = an identifier PLUS a connection to health care or payment. ' +
       'In a hospital intake form, that health link is always implied for patient-specific fields.',
@@ -434,6 +436,7 @@ const SET_2: SorterDocumentSet = {
     },
   ],
   passingAccuracy: 0.7,
+  shiftSeconds: 75,
   takeaways: [
     'Device serials, IP addresses, and biometric identifiers are all PHI under §164.514(b)(2) — ' +
       'even when a patient\'s name doesn\'t appear on the document.',
@@ -626,6 +629,7 @@ const SET_3: SorterDocumentSet = {
     },
   ],
   passingAccuracy: 0.7,
+  shiftSeconds: 60,
   takeaways: [
     'Safe Harbor lets you keep the year and 3-digit ZIP prefixes (in populous areas). ' +
       'Full dates, full ZIP codes, and ages 90 and above must be removed.',

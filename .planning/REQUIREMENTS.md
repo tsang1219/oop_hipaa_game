@@ -87,6 +87,14 @@
 - [x] **SORTV2-09**: After the final item drops, a completion overlay appears for ~1.2s before the SorterDebrief opens — header text scales from 0 to full size and reads "PERFECT n/n" (100% accuracy, gold), "GOOD" (≥60%, green), or "KEEP PRACTICING" (<60%, teal — encouraging, never red), with a screen-wide flash matching the band color. The existing 600ms anticipation beat (Commandment 2) precedes the celebration.
 - [x] **SORTV2-10**: A visible local sorter score pulses on each increment: +2 for a correct "HOLD IT" tricky item, +1 for a correct regular item (display-only — the compliance contribution formula Math.round((correct/total) × 12) is unchanged). NPC speech-bubble reaction lines escalate in enthusiasm above 80% running accuracy and deflate below 50%, via 3 band-variant lines per band per NPC — tone is felt without text reading like a scoreboard.
 
+### PHI Sorter Redesign — Format Shift (Phase 24)
+
+- [ ] **SORTV2-11**: The sorter presents exactly one document at a time on a wood-desk surface — the multi-card scrollable pile is gone. Each document slides in from off-screen right (~300ms, slight settle wobble) accompanied by a paper-rustle SFX (`sfx_sorter_paper`, sourced from the already-vendored kenney_interface-sounds scroll_002.ogg — no new binary assets). Chart content rendering (patientName/role/reasonForVisit/emergencyContact/doctorNote/miscField from Phase 22) is preserved on a paper-styled document.
+- [ ] **SORTV2-12**: KEEP and REDACT stamp buttons replace the PHI / NOT PHI buckets — clicking a stamp commits the call with no drag interaction anywhere in the encounter. Semantic mapping preserves HIPAA correctness: REDACT commits `category === 'phi'` (it IS PHI, must be redacted), KEEP commits `category === 'not_phi'` (safe to keep); item `category` fields in sorterData.ts are unchanged. Each stamp fires a stamp-thunk SFX (`sfx_sorter_stamp`, kenney impactPlank_medium_000.ogg), an ink mark (green KEEP / red REDACT, slight rotation) that persists on the document 250-400ms before it slides off, and an 8-particle ink-splatter burst in the stamp's ink color (reuses the Phase 23 `sorter-particle` keyframe). Correct/wrong distinction stays carried by the Phase 16/23 channels: green flash vs red shake on the document, sfx_sorter_correct/wrong, camera shake, and the educational toast.
+- [ ] **SORTV2-13**: Stamped documents slide off the desk into one of two visible outgoing trays (KEEP left, REDACT right) rendered as stacked-paper visuals that fill as the shift progresses. Each tray shows a running count that bounces on increment (reuses Phase 23 `counter-bounce`); counts remain visible through end-of-shift and reset to 0 on encounter restart.
+- [ ] **SORTV2-14**: A visible shift clock counts down per set — Set 1 = 90s, Set 2 = 75s, Set 3 = 60s (data-driven via `shiftSeconds` on SorterDocumentSet). Under 10s remaining the clock pulses for urgency. At 0:00 the encounter wraps softly with whatever has been stamped: unstamped items do not count toward score, no fail screen appears — the NPC delivers a "shift's over, leave the rest for the auditor" line and the normal completing → celebrating → debrief pipeline runs. scoreContribution remains `Math.round((correctCount / totalCount) * 12)` where totalCount is the FULL set size (unstamped items score as not-correct); SorterDebrief is unchanged.
+- [ ] **SORTV2-15**: The trigger NPC's portrait (CSS-cropped spritesheet frame, Phase 21 CertificateOverlay pattern) + name stays persistently visible above the desk for the whole encounter; Phase 22-23 speech-bubble reactions (specific-item, band-fallback, band-transition, HOLD IT reveal) fire from the persistent portrait location. Keyboard parity holds: ←/→ focus the KEEP/REDACT stamp, Enter/Space commits the focused stamp, Esc aborts — keyboard-only completion fully supported. All Phase 22 (SORTV2-01..06) and Phase 23 (SORTV2-07..10) success criteria still hold under the new format.
+
 ### Polish & Completion
 
 - **POLISH-01**: End-of-game report screen (department scores, knowledge areas, time)
@@ -221,10 +229,15 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | SORTV2-08 | Phase 23 | Complete |
 | SORTV2-09 | Phase 23 | Complete |
 | SORTV2-10 | Phase 23 | Complete |
+| SORTV2-11 | Phase 24 | Pending |
+| SORTV2-12 | Phase 24 | Pending |
+| SORTV2-13 | Phase 24 | Pending |
+| SORTV2-14 | Phase 24 | Pending |
+| SORTV2-15 | Phase 24 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0
-- v2.1 requirements (Phase 16 portion + Phase 22 portion + Phase 17 portion + Phase 23 portion): 22 total (SORT-01..06, SORTV2-01..10, TRIA-01..06), mapped: 22, unmapped: 0
+- v2.1 requirements (Phase 16 portion + Phase 22 portion + Phase 17 portion + Phase 23 portion + Phase 24 portion): 27 total (SORT-01..06, SORTV2-01..15, TRIA-01..06), mapped: 27, unmapped: 0
 - v2.2 requirements: 18 total, mapped: 18, unmapped: 0
 
 ---
