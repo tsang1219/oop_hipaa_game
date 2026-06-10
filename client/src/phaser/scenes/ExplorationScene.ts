@@ -14,6 +14,10 @@ import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@sha
 const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
 
+// ── Idle-hint sparkle system constants (Phase 27 VIS-07) ─────────────────────
+const IDLE_HINT_GRACE_MS = 9000;  // 9s without input before first sparkle
+const IDLE_HINT_INTERVAL_MS = 5000; // ~5s between individual sparkles
+
 // ── Per-room floor style configuration ───────────────────────────────────────
 // Each entry holds the four tile shade variants (checkerboard 2x2 pattern),
 // a bevel-highlight colour and a bevel-shadow/grout colour.
@@ -165,6 +169,11 @@ export class ExplorationScene extends Phaser.Scene {
   // Footstep throttle — minimum interval between plays (ms)
   private lastFootstepTime = 0;
 
+  // Idle-hint sparkle system (Phase 27 VIS-07)
+  private lastActivityAt = 0;
+  private lastIdleHintAt = 0;
+  private idleHintIndex = 0;
+
   // Idle frame index per direction (row * 3 + 0 for idle col) — from CREDITS.md layout
   // down=0, left=3, right=6, up=9
   private lastFacingFrame = 0;
@@ -248,6 +257,11 @@ export class ExplorationScene extends Phaser.Scene {
       this.npcPulseTween = null;
     }
     this.npcPulseTarget = null;
+
+    // Reset idle-hint timers on room entry (time.now not available yet; set in create())
+    this.lastActivityAt = 0;
+    this.lastIdleHintAt = 0;
+    this.idleHintIndex = 0;
   }
 
   create() {
@@ -1868,6 +1882,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // ── Type-driven furniture idle animations (Phase 26-02) ──────
     this.addFurnitureIdleAnimations(room);
+
+    // Seed idle-hint timer to now so grace period starts fresh on room load
+    this.lastActivityAt = this.time.now;
+    this.lastIdleHintAt = this.time.now;
   }
 
   // ── Type-driven furniture idle animations (Phase 26-02) ─────────────────────
@@ -1970,6 +1988,7 @@ export class ExplorationScene extends Phaser.Scene {
     const body = this.player.body as Phaser.Physics.Arcade.Body;
 
     // If following a path, don't accept keyboard movement
+    if (this.movePath.length > 0) this.lastActivityAt = this.time.now;
     if (this.movePath.length === 0) {
       body.setVelocity(0);
 
@@ -2007,6 +2026,7 @@ export class ExplorationScene extends Phaser.Scene {
       }
 
       const isMoving = left || right || up || down;
+      if (isMoving) this.lastActivityAt = this.time.now;
       if (isMoving && !this.paused && this.time.now - this.lastFootstepTime > 350) {
         this.sound.play('sfx_footstep', { volume: 0.25 });
         this.lastFootstepTime = this.time.now;
@@ -2062,9 +2082,21 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Interact key — sample once, use for NPC/item/door
     const interactPressed = Phaser.Input.Keyboard.JustDown(this.interactKey);
+    if (interactPressed) this.lastActivityAt = this.time.now; // any key press resets idle hint
 
     if (interactPressed && this.nearbyInteractable) {
       this.triggerInteraction(this.nearbyInteractable);
+    }
+
+    // Idle-hint sparkle system (Phase 27 VIS-07): after grace period, shimmer un-met objectives
+    if (!this.paused && !this.transitioning) {
+      const now = this.time.now;
+      if (
+        now - this.lastActivityAt > IDLE_HINT_GRACE_MS &&
+        now - this.lastIdleHintAt > IDLE_HINT_INTERVAL_MS
+      ) {
+        this.emitIdleHint();
+      }
     }
 
     // IT Office encounter zone check (Phase 13)
@@ -2564,6 +2596,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   private handleDoorInteraction(door: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string }): void {
     if (this.transitioning) return;
+    this.lastActivityAt = this.time.now; // Reset idle-hint grace period on door entry
     this.transitioning = true;
     this.sound.play('sfx_footstep', { volume: 0.35, rate: 0.8 });
     // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
@@ -2577,6 +2610,56 @@ export class ExplorationScene extends Phaser.Scene {
         fromDoorId: door.id,
       });
     });
+  }
+
+  /**
+   * Idle-hint sparkle system (Phase 27 VIS-07).
+   * After IDLE_HINT_GRACE_MS without player input, fire a single 3-particle sparkle
+   * on one un-met completion requirement (NPC/zone/item). Cycles round-robin.
+   * Stops when the room has no un-met requirements (hallways, completed rooms).
+   */
+  private emitIdleHint(): void {
+    this.lastIdleHintAt = this.time.now;
+
+    const reqs = (this.room as any).completionRequirements;
+    if (!reqs) return; // hallways and rooms without completionRequirements never sparkle
+
+    // Build list of un-met target ids
+    const targets: string[] = [];
+    for (const id of (reqs.requiredNpcs ?? [])) {
+      if (!this.completedNPCs.has(id)) targets.push(id);
+    }
+    for (const id of (reqs.requiredZones ?? [])) {
+      if (!this.completedZones.has(id)) targets.push(id);
+    }
+    for (const id of (reqs.requiredItems ?? [])) {
+      if (!this.collectedItems.has(id)) targets.push(id);
+    }
+    if (targets.length === 0) return; // room is complete — no shimmer
+
+    const targetId = targets[this.idleHintIndex % targets.length];
+    this.idleHintIndex++;
+
+    // Find the interactable sprite for this id
+    const ia = this.interactables.find(i => i.id === targetId);
+    if (!ia?.sprite) return; // act-gated NPC may not have spawned yet
+
+    const sprite = ia.sprite;
+    if (!this.textures.exists('particle_circle')) return; // texture not loaded — silently skip
+
+    const s = this.add.particles(sprite.x, sprite.y - 6, 'particle_circle', {
+      speed: { min: 10, max: 25 },
+      angle: { min: 0, max: 360 },
+      scale: { start: 0.6, end: 0 },
+      alpha: { start: 0.9, end: 0 },
+      tint: [0xffffff, 0xffe9a0],
+      lifespan: 450,
+      quantity: 3,
+      emitting: false,
+    });
+    s.setDepth(sprite.depth + 1);
+    s.explode(3);
+    this.time.delayedCall(500, () => { if (s.active) s.destroy(); });
   }
 
   private renderDoorStates(): void {
@@ -2936,6 +3019,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   // ── Interaction ────────────────────────────────────────────────
   private triggerInteraction(ia: InteractableData) {
+    this.lastActivityAt = this.time.now; // Reset idle-hint grace period on interaction
     this.sound.play('sfx_interact', { volume: 0.55 });
     this.stopNpcPulse(ia);
     this.paused = true;
@@ -3131,6 +3215,7 @@ export class ExplorationScene extends Phaser.Scene {
   private onDialogueComplete = () => {
     if (!this.scene.isActive()) return;
     this.paused = false;
+    this.lastActivityAt = this.time.now; // Restart idle-hint grace after dialogue closes
 
     // Zoom back from boss encounter
     if (this.cameras.main.zoom !== 1) {
