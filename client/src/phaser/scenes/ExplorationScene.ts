@@ -930,6 +930,15 @@ export class ExplorationScene extends Phaser.Scene {
 
     // ── NPCs ─────────────────────────────────────────────────────
     for (const npc of room.npcs) {
+      // Phase 17 (2026-06-10): Act-gated and demo-excluded NPCs.
+      // If the NPC's encounterTrigger.minAct is set, skip spawning when the
+      // current act is too low OR when demo mode is active (demo runs in Act 1
+      // state, so Priya would appear without valid Act 3 context).
+      const minAct = (npc.encounterTrigger as { minAct?: number } | undefined)?.minAct;
+      if (minAct !== undefined) {
+        if (isDemoActive() || this.getCurrentAct() < minAct) continue;
+      }
+
       const texKey = npcTextureKey(npc.id);
       const completed = this.completedNPCs.has(npc.id);
 
@@ -2693,6 +2702,7 @@ export class ExplorationScene extends Phaser.Scene {
           requestText: npc.encounterTrigger.requestText,
           encounterId: npc.encounterTrigger.encounterId,
           documentSetId: npc.encounterTrigger.documentSetId,
+          encounterType: (npc.encounterTrigger as { encounterType?: string }).encounterType,
         });
         try { this.sound.play('sfx_interact', { volume: 0.35 }); } catch (_) {}
         return;

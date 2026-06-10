@@ -75,11 +75,20 @@ export const npcSchema = z.object({
   // Phase 16 (2026-05-08): NPCs marked with encounterTrigger open the
   // EncounterRequestModal on interaction instead of the dialogue scene.
   // Player picks accept/decline → encounter starts or exploration resumes.
+  //
+  // Phase 17 (2026-06-10): Extended with optional discriminator + act gate.
+  //   - encounterType: 'phi-sorter' | 'breach-triage' — absent = 'phi-sorter'
+  //     (backward-compatible with the three existing sorter NPCs).
+  //   - minAct: minimum act for the NPC to spawn at all; absent = always spawns.
+  //   - documentSetId is the generic content-set key (sorter document set OR
+  //     triage incident set ID, depending on encounterType).
   encounterTrigger: z
     .object({
       encounterId: z.string(),
       documentSetId: z.string(),
       requestText: z.string(),
+      encounterType: z.enum(['phi-sorter', 'breach-triage']).optional(),
+      minAct: z.number().optional(),
     })
     .optional(),
 });

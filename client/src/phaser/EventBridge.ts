@@ -94,9 +94,10 @@ export const BRIDGE_EVENTS = {
    * Phaser → React: an NPC marked with `encounterTrigger` was interacted with.
    * React shows EncounterRequestModal; player picks accept or decline.
    *
-   * Payload: { npcId, npcName, npcRole?, requestText, encounterId, documentSetId }
+   * Payload: { npcId, npcName, npcRole?, requestText, encounterId, documentSetId, encounterType?: 'phi-sorter' | 'breach-triage' }
    *
-   * Accept is handled entirely React-side (sets phase → 'phi-sorter', mounts overlay).
+   * encounterType discriminates which overlay to mount (Phase 17). Absent = 'phi-sorter' (backward compat).
+   * Accept is handled entirely React-side (sets phase → 'phi-sorter' | 'breach-triage', mounts overlay).
    * Decline reuses REACT_RETURN_FROM_ENCOUNTER with { aborted: true } payload — existing
    * onReturnFromEncounter handler unpauses without writing the registry guard, so the
    * encounter can be re-triggered when the player walks back to the NPC.

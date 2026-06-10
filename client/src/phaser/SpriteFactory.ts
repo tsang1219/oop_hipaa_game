@@ -3778,6 +3778,7 @@ export function npcTextureKey(npcId: string): string {
     dr_martinez: 'npc_doctor',
     officer: 'npc_officer',
     frantic_family: 'npc_visitor',
+    priya_privacy_officer: 'npc_officer',  // Phase 17: Breach Triage Privacy Officer
     // Lab
     lab_tech: 'npc_it_tech',
     researcher: 'npc_doctor',

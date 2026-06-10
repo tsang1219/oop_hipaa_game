@@ -1287,6 +1287,22 @@
           "x": 17,
           "y": 7,
           "sceneId": "family_pressure"
+        },
+        {
+          "id": "priya_privacy_officer",
+          "name": "Priya",
+          "role": "Privacy Officer",
+          "x": 8,
+          "y": 12,
+          "sceneId": "_encounter_breach_triage_er",
+          "encounterTrigger": {
+            "encounterId": "breach-triage-er",
+            "documentSetId": "breach-triage-set-1",
+            "encounterType": "breach-triage",
+            "minAct": 3,
+            "requestText": "Priya hasn't looked up from her tablet in an hour. She slides it toward you without breaking her stare at the door. 'Fourteen incidents since midnight. OCR opens in three hours. I need someone who knows the 60-day rule to help me sort what's reportable before the lawyers get here. Please tell me you know the 60-day rule.'"
+          },
+          "isFinalBoss": false
         }
       ],
       "interactionZones": [
