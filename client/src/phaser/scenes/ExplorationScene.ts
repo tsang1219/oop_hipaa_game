@@ -196,6 +196,13 @@ export class ExplorationScene extends Phaser.Scene {
   private pendingSpawnTileY: number | null = null;
   private transitioning = false;
 
+  // Zone glow registry — stores ring arc + tween per zone id so we can kill glow on live completion (Phase 27 VIS-08)
+  private zoneGlows: Map<string, { ring: Phaser.GameObjects.Arc; tween: Phaser.Tweens.Tween }> = new Map();
+
+  // Previous completion sets — used by updateCompletionState to detect NEW completions
+  private prevCompletedNPCs: Set<string> = new Set();
+  private prevCompletedZones: Set<string> = new Set();
+
   // Background music
   private bgMusic?: Phaser.Sound.BaseSound;
   private readonly musicBaseVolume = 0.13;
@@ -226,6 +233,11 @@ export class ExplorationScene extends Phaser.Scene {
     this.pendingInteraction = null;
     this.paused = false;
     this.encounterTriggered = false;
+
+    // Clear zone glow registry and prev-completion sets on scene restart (room re-render rebuilds all visuals)
+    this.zoneGlows.clear();
+    this.prevCompletedNPCs = new Set();
+    this.prevCompletedZones = new Set();
 
     // Reset transitioning so scene restart doesn't freeze movement
     this.transitioning = false;
@@ -1064,12 +1076,13 @@ export class ExplorationScene extends Phaser.Scene {
         ease: 'Sine.easeInOut',
       });
       // Interaction zone glow ring — pulsing blue aura for incomplete zones
+      // Ring + tween stored in zoneGlows map so live completion can kill it (Phase 27 VIS-08)
       if (!this.completedZones.has(zone.id)) {
         const zoneGlow = this.add.circle(
           sprite.x, sprite.y, 20, 0x00aaff, 0
         ).setStrokeStyle(1.5, 0x00aaff, 0).setDepth(sprite.depth - 1);
 
-        this.tweens.add({
+        const glowTween = this.tweens.add({
           targets: zoneGlow,
           strokeAlpha: { from: 0, to: 0.4 },
           scale: { from: 0.8, to: 1.2 },
@@ -1078,17 +1091,13 @@ export class ExplorationScene extends Phaser.Scene {
           repeat: -1,
           ease: 'Sine.easeInOut'
         });
+
+        this.zoneGlows.set(zone.id, { ring: zoneGlow, tween: glowTween });
       }
 
-      // Completed zone checkmark
+      // Completed zone checkmark (at-render time, no pop — pop is for live completion)
       if (this.completedZones.has(zone.id)) {
-        this.add.text(sprite.x, sprite.y - 16, '\u2713', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '7px',
-          color: '#44ff44',
-          stroke: '#000000',
-          strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(sprite.depth + 1);
+        this.addCompletionCheck(sprite.x, sprite.y - 16, sprite.depth + 1, false);
       }
 
       this.interactables.push({ type: 'zone', id: zone.id, data: zone, sprite });
@@ -1164,13 +1173,8 @@ export class ExplorationScene extends Phaser.Scene {
 
       // Completed checkmark
       if (completed) {
-        const checkmark = this.add.text(sprite.x, sprite.y - 20, '\u2713', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '8px',
-          color: '#44ff44',
-          stroke: '#000000',
-          strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(sprite.depth + 1);
+        // At-render checkmark (no pop — pop is for live completion via updateCompletionState)
+        this.addCompletionCheck(sprite.x, sprite.y - 20, sprite.depth + 1, false);
       }
 
       // Boss indicator
@@ -3267,22 +3271,108 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
+  // ── Shared checkmark helper (Phase 27 VIS-08) ─────────────────
+  /** Render a green checkmark at (x, y) at the given depth.
+   *  When pop=true, starts at scale 0 and pops to scale 1 (Back.easeOut, 250ms)
+   *  for live-completion moments (Commandment 6 — celebrate learning moments).
+   *  pop=false is used at render time when the room is loaded already-completed. */
+  private addCompletionCheck(x: number, y: number, depth: number, pop = false): void {
+    const mark = this.add.text(x, y, '✓', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '7px',
+      color: '#44ff44',
+      stroke: '#000000',
+      strokeThickness: 2,
+    }).setOrigin(0.5).setDepth(depth);
+
+    if (pop) {
+      mark.setScale(0);
+      this.tweens.add({
+        targets: mark,
+        scale: 1,
+        duration: 250,
+        ease: 'Back.easeOut',
+      });
+    }
+  }
+
   // ── Public: update completion state from React ─────────────────
   updateCompletionState(npcs: string[], zones: string[], items: string[]) {
-    this.completedNPCs = new Set(npcs);
-    this.completedZones = new Set(zones);
-    this.collectedItems = new Set(items);
+    // Guard: bail if scene is not active (called from React, may race a transition)
+    if (!this.scene.isActive()) return;
 
-    // Update NPC sprite visual state for completed NPCs
-    for (const ia of this.interactables) {
-      if (ia.type === 'npc' && this.completedNPCs.has(ia.id)) {
-        ia.sprite.setAlpha(0.4);
-        ia.sprite.setTint(0x888888);
+    const newNPCs = new Set(npcs);
+    const newZones = new Set(zones);
+    const newItems = new Set(items);
+
+    // ── Detect newly completed zones ──────────────────────────────
+    for (const id of Array.from(newZones)) {
+      if (this.prevCompletedZones.has(id)) continue; // already known
+
+      // Kill the pulsing glow ring
+      const glow = this.zoneGlows.get(id);
+      if (glow) {
+        glow.tween.stop();
+        this.tweens.add({
+          targets: glow.ring,
+          strokeAlpha: 0,
+          scale: 0.6,
+          duration: 300,
+          ease: 'Sine.easeOut',
+          onComplete: () => { glow.ring.destroy(); },
+        });
+        this.zoneGlows.delete(id);
       }
-      if (ia.type === 'item' && this.collectedItems.has(ia.id)) {
+
+      // Pop checkmark on the zone sprite
+      const ia = this.interactables.find(i => i.type === 'zone' && i.id === id);
+      if (ia) {
+        this.addCompletionCheck(ia.sprite.x, ia.sprite.y - 16, ia.sprite.depth + 1, true);
+      }
+
+      // Quiet completion tick — distinct from NPC banner, softer than room fanfare (Commandment 8)
+      try { this.sound.play('sfx_sorter_correct', { volume: 0.25, rate: 1.1 }); } catch (_) {}
+    }
+
+    // ── Detect newly completed NPCs ───────────────────────────────
+    for (const id of Array.from(newNPCs)) {
+      if (this.prevCompletedNPCs.has(id)) continue; // already known
+
+      const ia = this.interactables.find(i => i.type === 'npc' && i.id === id);
+      if (ia) {
+        // Fade-out instead of snap (Commandment 1 + parity with reload render)
+        this.tweens.add({
+          targets: ia.sprite,
+          alpha: 0.4,
+          duration: 400,
+          ease: 'Sine.easeOut',
+        });
+        ia.sprite.setTint(0x888888); // tint is subtle under fade — immediate is fine
+        // Pop the live checkmark (same position as the at-render mark in the NPC loop)
+        this.addCompletionCheck(ia.sprite.x, ia.sprite.y - 20, ia.sprite.depth + 1, true);
+      }
+    }
+
+    // ── Already-completed entries: keep idempotent visual state ───
+    for (const ia of this.interactables) {
+      if (ia.type === 'npc' && newNPCs.has(ia.id) && this.prevCompletedNPCs.has(ia.id)) {
+        // Sprite stays dimmed — no re-pop
+        if (ia.sprite.alpha > 0.5) {
+          ia.sprite.setAlpha(0.4);
+          ia.sprite.setTint(0x888888);
+        }
+      }
+      if (ia.type === 'item' && newItems.has(ia.id)) {
         ia.sprite.setAlpha(0.4);
         this.tweens.killTweensOf(ia.sprite);
       }
     }
+
+    // ── Advance the prev-sets for next diff ───────────────────────
+    this.prevCompletedNPCs = newNPCs;
+    this.prevCompletedZones = newZones;
+    this.completedNPCs = newNPCs;
+    this.completedZones = newZones;
+    this.collectedItems = newItems;
   }
 }
