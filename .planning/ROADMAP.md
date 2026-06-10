@@ -268,7 +268,7 @@ Plans:
 ### Phase 24: PHI Sorter Redesign — Format Shift (Papers Please)
 **Goal**: The sorter shifts from a multi-card pile to a one-document-at-a-time desk surface: KEEP / REDACT stamps replace bucket drops; documents slide in and stamp marks persist; soft visible clock adds urgency without hard-fail; NPC portrait stays present above the desk through the whole encounter. The redesign reuses Phase 22 content and Phase 23 feedback layer wholesale.
 **Depends on**: Phase 22 (content), Phase 23 (feedback hooks the format will fire)
-**Requirements**: SORTV2-11, SORTV2-12, SORTV2-13, SORTV2-14, SORTV2-15 (TBD during /gsd:plan-phase)
+**Requirements**: SORTV2-11, SORTV2-12, SORTV2-13, SORTV2-14, SORTV2-15
 **Branch**: `gsd/phase-24-phi-sorter-format`
 **Success Criteria** (what must be TRUE):
   1. Documents are presented one at a time on a wood-desk surface; the previously-active multi-card pile is gone. Document slides in from off-screen on appearance with a paper-rustle SFX.
@@ -277,7 +277,12 @@ Plans:
   4. A wall clock or wristwatch is visible in a corner counting down per-set. At 0:00 the encounter wraps with whatever's been stamped — unstamped items don't count toward score, no fail screen ("shift's over, leave the rest for the auditor"). Per-set durations: Set 1 = 90s, Set 2 = 75s, Set 3 = 60s.
   5. The trigger NPC (Aiyana / Marcus) portrait + name stays visible above the desk during the whole encounter. Speech bubble reactions from Phase 22-23 fire from the persistent portrait location.
   6. Keyboard parity preserved: keyboard-only completion is fully supported (key to focus stamp, Enter to commit, arrow to switch stamps). All existing Phase 22 + Phase 23 success criteria still hold.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 24`)
+**Plans:** 3 plans
+
+Plans:
+- [ ] 24-01-PLAN.md — Foundation: SORTV2-11..15 in REQUIREMENTS.md, BootScene SFX keys (stamp-thunk + paper-rustle from vendored Kenney packs), shiftSeconds in sorterData, 6 desk-format CSS keyframes
+- [ ] 24-02-PLAN.md — Desk components: DeskSurface, ShiftClock, OutgoingTray, StampPad, DeskDocument + NPCReactionBubble persistent-portrait extension
+- [ ] 24-03-PLAN.md — Integration: PHISorterOverlay desk-format rewrite (one-doc state machine, stamp commits, soft clock, keyboard parity) + BucketZone/SorterItem deletion + regression gate
 
 ---
 
