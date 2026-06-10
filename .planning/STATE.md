@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T04:49:39.913Z"
+last_updated: "2026-06-10T04:59:02.544Z"
 progress:
   total_phases: 18
-  completed_phases: 14
+  completed_phases: 15
   total_plans: 47
-  completed_plans: 44
+  completed_plans: 45
 ---
 
 # Project State
@@ -55,6 +55,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 16-phi-sorter-encounter P04 | 25 | 2 tasks | 4 files |
 | Phase 17-breach-triage-encounter P01 | 5min | 3 tasks | 3 files |
 | Phase 17-breach-triage-encounter P02 | 9 | 2 tasks | 5 files |
+| Phase 17-breach-triage-encounter P03 | 6min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -131,6 +132,10 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 17-breach-triage-encounter]: Single-interval tick engine with empty deps + frozenRef gating — avoids stale closures on tally state per Phase 22 SUMMARY risk note
 - [Phase 17-breach-triage-encounter]: TriageDebrief not imported by BreachTriageOverlay — UnifiedGamePage owns debrief render (BLOCKER-2 precedent from Phase 16)
 - [Phase 17-breach-triage-encounter]: queueRef replaces queue state for interval reads — eliminates nested-setState anti-pattern; totalCountRef increments +2 at follow-up open time
+- [Phase 17-breach-triage-encounter]: minAct gate at NPC spawn time (not interaction time) — Priya absent from room before Act 3; isDemoActive() also suppresses spawn so demo ER is clean
+- [Phase 17-breach-triage-encounter]: handleSorterAbort reused as onAbort for BreachTriageOverlay — encounter-agnostic (aborted:true, no registry write), zero additional code
+- [Phase 17-breach-triage-encounter]: kind:'triage' debrief discriminator checked before takeaways check — prevents future sorter encounters from matching if they also carry takeaways
+- [Phase 17-breach-triage-encounter]: HIPAA_TRAINING_FRAMEWORK.md §3.1+§3.3 ADEQUATE→STRONG; 500+ threshold gap closed; coverage 18 STRONG / 12 ADEQUATE (TRIA-06 exceeded)
 
 ### Pending Todos
 
@@ -147,8 +152,8 @@ None.
 
 ## Session Continuity
 
-Last session: 2026-05-08
-Stopped at: Phase 21 shipped — sponsor demo CAPSTONE LANDED. CertificateOverlay wires the full dim → beat → fanfare → cert + handoff sequence; demo-only; sponsor swap via single config edit. v2.2 Sponsor Demo milestone is now functionally complete (Phases 18/19/20/21 all shipped).
-Resume: v2.2 audit + sponsor outreach (Out-of-Pocket / Nikhil pitch). Then resume v2.1 Phase 16 Plan 04 + Phase 17.
+Last session: 2026-06-10
+Stopped at: Completed 17-03-PLAN.md — Phase 17 breach-triage-encounter COMPLETE (all 3 plans done). Priya NPC wired end-to-end, HIPAA framework §3.1+§3.3 at STRONG, build clean.
+Resume: Manual playthrough verification deferred to user. Phase 17 complete — v2.1 Phase 16 Plan 04 is the only remaining v2.1 work (Phaser triggers + UnifiedGamePage routing, paused at 98%).
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.
