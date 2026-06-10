@@ -285,12 +285,17 @@ Each set has: `id`, `act`, `triggerLocation`, `npcId`, `contextCard`, `items[]`,
 
 Format: PHI Sorter document set
 HIPAA topic tags: "PHI Definition", "18 Identifiers (45 CFR §164.514(b)(2))", "Safe Harbor De-identification"
+Item counts (Phase 22): 10 / 10 / 10 (Set 1 / Set 2 / Set 3)
 
 | ID | File | Act | Trigger Location | NPC | Items | PHI Items | Not PHI | Coverage | Summary |
 |----|------|-----|-----------------|-----|-------|-----------|---------|----------|---------|
-| `phi-sorter-set-1` | `client/src/data/sorterData.ts` | 1 | reception | `receptionist_riley` | 6 | 4 | 2 | ADEQUATE | Obvious identifiers: name, SSN, DOB, home address vs. hospital address and room temp. Teaches the implied health-care connection in intake forms. |
-| `phi-sorter-set-2` | `client/src/data/sorterData.ts` | 2 | lab | `lab_tech` | 8 | 5 | 3 | ADEQUATE | Subtle identifiers: device serial, IP address, biometric, MRN+diagnosis pair, license plate vs. bare ICD-10 code, test type, sample volume. Teaches the two-part PHI rule. |
-| `phi-sorter-set-3` | `client/src/data/sorterData.ts` | 3 | medical_records | `records_clerk` | 5 | 3 | 2 | ADEQUATE | Edge cases: ZIP5 vs. ZIP3 prefix, admission month+year vs. year-only, age 90+ as identifier. Teaches Safe Harbor nuance for de-identification. |
+| `phi-sorter-set-1` | `client/src/data/sorterData.ts` | 1 | reception | `receptionist_riley` | 10 | 7 | 3 | GOOD | Obvious identifiers: name, SSN, DOB, home address, phone, email, employer name vs. hospital address, room temp, marital status. Every item is a fake patient chart with deadpan humor fields. |
+| `phi-sorter-set-2` | `client/src/data/sorterData.ts` | 2 | lab | `lab_tech` | 10 | 6 | 4 | GOOD | Subtle identifiers: device serial, IP address, biometric, MRN+diagnosis pair, license plate, health plan ID vs. bare ICD-10 code, test type, sample volume, specimen type. Teaches the two-part PHI rule. |
+| `phi-sorter-set-3` | `client/src/data/sorterData.ts` | 3 | medical_records | `records_clerk` | 10 | 5 | 5 | GOOD | Edge cases: ZIP5, admission month+year, age 90+, fax number, account number vs. ZIP3 prefix, year-only, email domain, URL without identifiers, partial vehicle ID fragment. Teaches Safe Harbor nuance. |
+
+> **Humor coverage (Phase 22):** ≥30% of items contain a humor beat in a free-text chart field (`doctorNote`, `emergencyContact`, `reasonForVisit`, or `miscField`) that does NOT affect HIPAA classification. Tone calibration: deadpan (Daria/Veep), grounded in admin-system absurdity, never punching down at patient demographics. See `.planning/phases/22-phi-sorter-content-connection/22-CONTEXT.md` for examples.
+
+> **HOLD IT reveals (Phase 22):** Each set has exactly one item flagged with `holdIt: { npcLine, educationalBeat }` for the Phoenix-Wright-style dramatic reveal on correct classification. Set 1 = `s1-dob` (full birth date vs. year-only Safe Harbor rule); Set 2 = `s2-diagnosis-with-mrn` (MRN as the identifier that turns a code into PHI); Set 3 = `s3-zip3` (ZIP3 passes Safe Harbor — but only because 902 covers >20,000 people). NPC delivers the line with distinct visual treatment (scaled bubble, gold flash) — stays in flow.
 
 ---
 
@@ -301,3 +306,4 @@ HIPAA topic tags: "PHI Definition", "18 Identifiers (45 CFR §164.514(b)(2))", "
 | 2026-03-01 | Initial manifest created from full content audit | Claude |
 | 2026-03-11 | Wired all unassigned scenes into rooms. Added new scenes: npp_notice, social_media_slip, vendor_baa. Added hipaa_penalties educational item. Fixed privacy_notice zone link. Updated all tables. | Claude |
 | 2026-05-01 | Added 3 PHI Sorter document sets (Phase 16) — phi-sorter-set-1..3 covering PHI Definition, 18 Identifiers, and Safe Harbor De-identification. | Claude |
+| 2026-06-09 | Phase 22: Rewrote 30 PHI Sorter items as fake patient charts with deadpan humor. Extended SorterItem schema with `chart` + `holdIt` fields. Set counts: 6/8/5 → 10/10/10 (30 total). All 19 Phase-16 item IDs preserved with original category (HIPAA accuracy gate). 45 humor-bearing chart fields. Recurring patients: Mrs. Henderson (s1+s3), Mr. Okonkwo (s2+s3). | Claude |
