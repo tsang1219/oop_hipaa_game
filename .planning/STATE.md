@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T07:08:43.508Z"
+last_updated: "2026-06-10T07:19:55.278Z"
 progress:
   total_phases: 22
-  completed_phases: 18
+  completed_phases: 19
   total_plans: 56
-  completed_plans: 53
+  completed_plans: 54
 ---
 
 # Project State
@@ -23,9 +23,9 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 ## Current Position
 
 Phase: Phase 26 — Room Visual Up-Level (In Progress)
-Plan: 26-01 (Complete)
-Status: Phase 26 Plan 01 complete. FLOOR_STYLES extracted, reception + hallway treatments added, wall/floor contact shadow pass implemented. VIS-04 requirement met; VIS-04..06 defined in REQUIREMENTS.md.
-Last activity: 2026-06-10 — Phase 26 Plan 01 complete. Per-room floor distinctness + contact shadow; tsc + production build clean.
+Plan: 26-02 (Complete)
+Status: Phase 26 Plan 02 complete. 8 furniture textures detail-passed, furn_wall_sconce + furn_bench generated (16 hallway fallback-desks eliminated), collectible glow up-leveled to additive aura + sparkles, addFurnitureIdleAnimations() added (plants sway everywhere, screens flicker, coffee steams). VIS-05 + VIS-06 requirements met.
+Last activity: 2026-06-10 — Phase 26 Plan 02 complete. Furniture detail pass + collectible glow + type-driven idle animations; tsc + production build clean.
 
 Progress: [████░░░░░░] 50% (estimated)
 
@@ -64,6 +64,8 @@ Progress: [████░░░░░░] 50% (estimated)
 | Phase 25-dialogue-portraits P01 | 3min | 3 tasks | 3 files |
 | Phase 25-dialogue-portraits P02 | 3 | 3 tasks | 4 files |
 | Phase 26-room-visual-uplevel P01 | 4min | 3 tasks | 2 files |
+| Phase 26-room-visual-uplevel P02 | 7min | 3 tasks | 2 files |
+| Phase 26-room-visual-uplevel P02 | 7min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -167,6 +169,10 @@ Progress: [████░░░░░░] 50% (estimated)
 - [Phase 26-01]: FLOOR_STYLES module-level config in ExplorationScene.ts; floorStyleFor() checks 'hallway' FIRST — hallway_reception_break resolves to hallway style, not reception/break
 - [Phase 26-01]: Contact shadow drawn into same floor Graphics object (not decorGfx) — preserves depth stack; 'doors' array hoisted above floor render loop, duplicate declaration in collision block removed
 - [Phase 26-01]: Reception large-format tile illusion via 2x2 grout (no per-tile grout), navy accent diamonds at slab intersections (x%2===1 && y%2===1)
+- [Phase 26-02]: Furniture outline: draw dark rect 1px larger before body fills — minimal code, reliable 1px rim at 32px without line/stroke API calls
+- [Phase 26-02]: addFurnitureIdleAnimations() called at end of create() after all room blocks — guarantees all obstacles placed; scene shutdown auto-cleans all tweens/timers
+- [Phase 26-02]: Collectible aura uses ADD blendMode on particle_circle image — luminous against any floor, no per-floor color tuning; fallback is filled circle (never stroke-only)
+- [Phase 26-02]: IT Office DESIGN-007 server_rack/monitor block coexists with generic pass — both add overlapping depth-20 effects, both additive, no conflict
 
 ### Pending Todos
 
@@ -184,7 +190,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-06-10
-Stopped at: Completed 26-01-PLAN.md — FLOOR_STYLES config, reception/hallway treatments, contact shadow, VIS-04 implemented. Phase 26 Plan 01 complete.
-Resume: Phase 26 Plan 02 ready (VIS-05 furniture texture detail pass + collectible glow).
+Stopped at: Completed 26-02-PLAN.md — furniture detail pass (8 generators), furn_wall_sconce + furn_bench, collectible glow/sparkle, addFurnitureIdleAnimations(). VIS-05 + VIS-06 implemented. Phase 26 Plan 02 complete.
+Resume: Phase 26 Plan 03 (if exists) or phase complete.
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.

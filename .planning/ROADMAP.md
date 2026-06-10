@@ -376,7 +376,7 @@ Plans:
   2. The 8 most-frequently-seen furniture textures get a detail pass (shading, highlights, readable silhouettes at 32px) and educational collectibles glow or sparkle so they are distinguishable at a glance (Commandment 9).
   3. At least 3 furniture types display a subtle idle animation (monitor flicker, coffee steam, plant sway) — rooms feel alive.
   4. No gameplay or collision changes; tsc and production build clean.
-**Plans:** 2 plans
+**Plans:** 2/2 plans complete
 
 Plans:
 - [ ] 26-01-PLAN.md — Define VIS-04..06 + per-room floor treatments (FLOOR_STYLES, reception + hallway runner, wall/floor contact shadow)
@@ -421,5 +421,5 @@ Plans:
 | 23. PHI Sorter Redesign — Feedback Moments | v2.1 | 2/2 | Complete | 2026-06-10 |
 | 24. PHI Sorter Redesign — Format Shift | v2.1 | 3/3 | Complete | 2026-06-10 |
 | 25. Dialogue Portraits + NPC Visual Identity | 2/2 | Complete    | 2026-06-10 | - |
-| 26. Room Visual Up-Level | v2.3 | 0/0 | Pending | - |
+| 26. Room Visual Up-Level | 2/2 | Complete   | 2026-06-10 | - |
 | 27. Navigation Clarity + Reward Sweep | v2.3 | 0/0 | Pending | - |
