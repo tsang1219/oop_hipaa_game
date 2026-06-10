@@ -372,4 +372,4 @@ Plans:
 | 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 22. PHI Sorter Redesign — Content + Connection | v2.1 | 4/4 | Complete | 2026-06-10 |
 | 23. PHI Sorter Redesign — Feedback Moments | 2/2 | Complete    | 2026-06-10 | - |
-| 24. PHI Sorter Redesign — Format Shift | 3/3 | Complete   | 2026-06-10 | - |
+| 24. PHI Sorter Redesign — Format Shift | 3/3 | Complete    | 2026-06-10 | - |
