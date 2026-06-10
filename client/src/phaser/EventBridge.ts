@@ -54,11 +54,11 @@ export const BRIDGE_EVENTS = {
   REACT_PAUSE_EXPLORATION: 'react:pause-exploration',
   REACT_RESUME_EXPLORATION: 'react:resume-exploration',
   REACT_DIALOGUE_COMPLETE: 'react:dialogue-complete',
-  // REACT_LOAD_ROOM payload: { room: RoomData, spawnDoorId?: string, completedNPCs: string[], completedZones: string[], collectedItems: string[], doorStates: Record<string, 'locked' | 'available' | 'completed'> }
+  // REACT_LOAD_ROOM payload: { room: RoomData, spawnDoorId?: string, completedNPCs: string[], completedZones: string[], collectedItems: string[], doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> }
   REACT_LOAD_ROOM: 'react:load-room',
   // REACT_DOOR_LOCKED: React tells scene the door is locked (play locked SFX + visual)
   REACT_DOOR_LOCKED: 'react:door-locked',
-  // REACT_UPDATE_DOOR_STATES payload: { doorStates: Record<string, 'locked' | 'available' | 'completed'> }
+  // REACT_UPDATE_DOOR_STATES payload: { doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> }
   REACT_UPDATE_DOOR_STATES: 'react:update-door-states',
   REACT_PLACE_TOWER: 'react:place-tower',
   REACT_START_BREACH: 'react:start-breach-defense',

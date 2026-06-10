@@ -181,7 +181,7 @@ export class ExplorationScene extends Phaser.Scene {
 
   // Door navigation state (Phase 12)
   private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
-  private doorStates: Record<string, 'locked' | 'available' | 'completed'> = {};
+  private doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> = {};
   private doorVisuals: Phaser.GameObjects.GameObject[] = [];
   private pendingSpawnTileX: number | null = null;
   private pendingSpawnTileY: number | null = null;
@@ -204,7 +204,7 @@ export class ExplorationScene extends Phaser.Scene {
     completedZones?: string[];
     collectedItems?: string[];
     spawnDoorId?: string;
-    doorStates?: Record<string, 'locked' | 'available' | 'completed'>;
+    doorStates?: Record<string, 'locked' | 'available' | 'completed' | 'next'>;
   }) {
     this.room = data.room;
     this.completedNPCs = new Set(data.completedNPCs || []);
@@ -2629,6 +2629,57 @@ export class ExplorationScene extends Phaser.Scene {
         }).setOrigin(0.5).setDepth(3);
         this.doorVisuals.push(overlay, lockText);
 
+      } else if (state === 'next') {
+        // Breathing warm-gold filled aura (Phase 27 VIS-07) — critical-path "next" door
+        // Clearly distinct from the blue 'available' ring pulse: filled gold, slower breathe
+        if (this.textures.exists('particle_circle')) {
+          const aura = this.add.image(doorPixelX, doorPixelY, 'particle_circle')
+            .setScale(5)
+            .setTint(0xffd700)
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setAlpha(0.22)
+            .setDepth(2);
+          this.tweens.add({
+            targets: aura,
+            alpha: { from: 0.22, to: 0.45 },
+            scaleX: { from: 5, to: 7 },
+            scaleY: { from: 5, to: 7 },
+            duration: 1600,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          });
+          this.doorVisuals.push(aura);
+        } else {
+          // Fallback: filled gold circle alpha pulse (never stroke-only)
+          const fallbackAura = this.add.circle(doorPixelX, doorPixelY, 20, 0xffd700, 0.22).setDepth(2);
+          this.tweens.add({
+            targets: fallbackAura,
+            alpha: { from: 0.22, to: 0.45 },
+            scaleX: { from: 1, to: 1.4 },
+            scaleY: { from: 1, to: 1.4 },
+            duration: 1600,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          });
+          this.doorVisuals.push(fallbackAura);
+        }
+        // Gold stroke ring — slower (1600ms) vs the blue available ring (1000ms) for distinct read
+        const nextRing = this.add.circle(doorPixelX, doorPixelY, 18, 0xffd700, 0)
+          .setStrokeStyle(2, 0xffd700, 1).setDepth(2);
+        this.tweens.add({
+          targets: nextRing,
+          alpha: { from: 0.3, to: 0.9 },
+          scaleX: { from: 0.8, to: 1.4 },
+          scaleY: { from: 0.8, to: 1.4 },
+          duration: 1600,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+        this.doorVisuals.push(nextRing);
+
       } else if (state === 'available') {
         // Pulsing glow ring
         const glow = this.add.circle(doorPixelX, doorPixelY, 18, 0x4a90e2, 0)
@@ -2678,12 +2729,12 @@ export class ExplorationScene extends Phaser.Scene {
     completedNPCs: string[];
     completedZones: string[];
     collectedItems: string[];
-    doorStates: Record<string, 'locked' | 'available' | 'completed'>;
+    doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'>;
   }) => {
     this.scene.restart(data);
   };
 
-  private onUpdateDoorStates = (data: { doorStates: Record<string, 'locked' | 'available' | 'completed'> }) => {
+  private onUpdateDoorStates = (data: { doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> }) => {
     this.doorStates = data.doorStates;
     this.renderDoorStates();
   };
