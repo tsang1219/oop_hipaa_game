@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T04:01:56.106Z"
+last_updated: "2026-06-10T04:09:07.125Z"
 progress:
   total_phases: 17
-  completed_phases: 13
+  completed_phases: 14
   total_plans: 44
-  completed_plans: 41
+  completed_plans: 42
 ---
 
 # Project State
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 22-phi-sorter-content-connection P01 | 6min | 3 tasks | 3 files |
 | Phase 22-phi-sorter-content-connection P03 | 8 | 2 tasks | 2 files |
 | Phase 22-phi-sorter-content-connection P04 | 15 | 1 tasks | 2 files |
+| Phase 16-phi-sorter-encounter P04 | 25 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -120,6 +121,9 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 22-phi-sorter-content-connection]: HOLD IT variant implemented inline (prop-driven border+scale swap, no sub-component); screen pulse / SFX / portrait deferred to Phase 23/24
 - [Phase 22-phi-sorter-content-connection]: ChartLine extracted as private function inside SorterItem.tsx; fields render in order: patientName+age, role, reasonForVisit, emergencyContact, doctorNote, miscField
 - [Phase 22-phi-sorter-content-connection]: HOLD IT SFX reuses sfx_fanfare at 0.4 volume — no new asset; screen pulse deferred to Phase 23; SORTER_LOCATION_LABELS data-only change to NPC names (SORTV2-06); holdItReveal dwells 3.5s; opener seeded on mount via good-band fallback
+- [Phase 16-phi-sorter-encounter]: Proximity tile triggers replaced by NPC-driven encounterTrigger fields (explicit player agency via EncounterRequestModal)
+- [Phase 16-phi-sorter-encounter]: SorterDebrief standalone component supersedes SorterTakeawaysPanel-sibling approach — purpose-built sorter debrief with accuracy bar + KEY LEARNINGS, no TD content bleed
+- [Phase 16-phi-sorter-encounter]: Abort path added: Esc/X emits aborted:true in REACT_RETURN_FROM_ENCOUNTER, resets paused but skips registry guard so encounter stays replayable
 
 ### Pending Todos
 
