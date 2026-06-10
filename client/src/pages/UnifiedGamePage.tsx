@@ -51,12 +51,15 @@ import { SorterDebrief } from '@/components/phi-sorter/SorterDebrief';
 import { EncounterRequestModal } from '@/components/phi-sorter/EncounterRequestModal';
 import { getSorterDocumentSet } from '@/data/sorterData';
 
-// Map an encounter ID to a human-readable location label for the SorterDebrief
-// "BACK TO X" close button. Falls back to "HOSPITAL" for unknown IDs.
+// Map an encounter ID to the NPC display name for the SorterDebrief "BACK TO {NPC}" close button.
+// PHASE 22 (data-only change — no routing, no state-machine changes):
+//   Previously mapped to room names ("RECEPTION", "LAB", "RECORDS").
+//   Now maps to NPC names per SORTV2-06 so the button reads "BACK TO AIYANA" etc.
+//   This is the only UnifiedGamePage.tsx change in Phase 22.
 const SORTER_LOCATION_LABELS: Record<string, string> = {
-  'phi-sort-reception': 'RECEPTION',
-  'phi-sort-lab': 'LAB',
-  'phi-sort-records': 'RECORDS',
+  'phi-sort-reception': 'AIYANA',
+  'phi-sort-lab': 'MARCUS',
+  'phi-sort-records': 'DR. TOVAR',
 };
 
 interface RoomWithDoors {

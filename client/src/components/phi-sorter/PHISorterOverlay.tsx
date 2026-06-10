@@ -3,6 +3,14 @@ import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { getSorterDocumentSet, type SorterItem as SorterItemData } from '@/data/sorterData';
 import { SorterItem } from './SorterItem';
 import { BucketZone } from './BucketZone';
+import {
+  getNPCReactionForItem,
+  getNPCFallbackReaction,
+  accuracyToBand,
+  type NPCReaction,
+  type NPCSorterId,
+} from '@/data/sorterReactions';
+import { NPCReactionBubble } from './NPCReactionBubble';
 // NOTE: SorterContextCard is intentionally NOT imported here.
 // UnifiedGamePage owns that render during encounterPhase === 'narrative-card'.
 // By the time this overlay mounts, the player has already dismissed the context card.
@@ -23,6 +31,25 @@ export type PHISorterOverlayProps = {
   onAbort?: () => void;      // Player exits via X button or Esc — no scoring, no registry write
 };
 
+// ── NPC display mapping ───────────────────────────────────────────────────────
+// Maps documentSetId → (npcId, display name, role) used by NPCReactionBubble and
+// the reaction-bank lookups. Stable across Phase 22 — no runtime changes needed.
+
+type NPCDisplay = {
+  id: NPCSorterId;
+  name: string;
+  role: string;
+};
+
+const NPC_DISPLAY_BY_SET: Record<string, NPCDisplay> = {
+  'phi-sorter-set-1': { id: 'aiyana', name: 'Aiyana', role: 'Intake Volunteer' },
+  'phi-sorter-set-2': { id: 'marcus', name: 'Marcus', role: 'Lab Aide' },
+  'phi-sorter-set-3': { id: 'tovar', name: 'Dr. Tovar', role: 'Compliance Lead' },
+};
+
+// Defensive default — should never fire if Plan 22-02 wired roomData correctly.
+const FALLBACK_NPC_DISPLAY: NPCDisplay = { id: 'aiyana', name: 'Co-worker', role: 'Staff' };
+
 /**
  * Top-level PHI Sorter encounter overlay.
  *
@@ -36,6 +63,8 @@ export type PHISorterOverlayProps = {
  *   - Audio feedback via REACT_PLAY_SFX for correct/wrong/fanfare
  *   - 600ms anticipation beat before onComplete fires (Commandment 2)
  *   - Educational wrong-answer feedback panel ≥3s (Commandment 4)
+ *   - PHASE 22: NPC speech bubble (NPCReactionBubble) with specific-item + accuracy-band reactions
+ *   - PHASE 22: HOLD IT dramatic reveal on correct classification of the tricky item per set
  */
 export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbort }: PHISorterOverlayProps) {
   const docSet = useMemo(() => getSorterDocumentSet(documentSetId), [documentSetId]);
@@ -99,11 +128,37 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
     explanation: string;
   } | null>(null);
 
+  // PHASE 22: NPC reaction bubble state.
+  // currentReactionText drives the bubble. holdItReveal triggers the HOLD IT variant when truthy.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [currentReactionText, setCurrentReactionText] = useState<string>('');
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [currentReactionVariant, setCurrentReactionVariant] = useState<NPCReaction['variant']>('neutral');
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [holdItReveal, setHoldItReveal] = useState<{ educationalBeat: string } | null>(null);
+
+  // Track total drops to drive accuracy-band fallback selection
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [totalDropsSoFar, setTotalDropsSoFar] = useState(0);
+
+  const npcDisplay = NPC_DISPLAY_BY_SET[documentSetId] ?? FALLBACK_NPC_DISPLAY;
+
   const totalCount = docSet.items.length;
+
+  // Phase 22: Seed bubble with opening line on mount so the NPC is "present" from frame one
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    const opener = getNPCFallbackReaction(npcDisplay.id, 'good');
+    setCurrentReactionText(opener.text);
+    setCurrentReactionVariant(opener.variant ?? 'neutral');
+    // Intentionally keyed to docSet.id — runs once per document set
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [docSet.id]);
 
   /**
    * Core drop handler — invoked by both mouse drop and keyboard Enter/Space.
    * Emits SFX, sets feedback state, removes item from pile, checks completion.
+   * PHASE 22: Also computes NPC reaction and fires HOLD IT reveal for tricky items.
    */
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const handleDrop = useCallback(
@@ -113,6 +168,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
 
       const isCorrect = item.category === bucket;
 
+      // EXISTING Phase 16 audio + visual + wrong-feedback logic — preserved verbatim
       if (isCorrect) {
         setCorrectCount((c) => c + 1);
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_correct', volume: 0.7 });
@@ -127,6 +183,34 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         setTimeout(() => setWrongFeedback(null), 3500);
       }
 
+      // PHASE 22: HOLD IT reveal — fires ONLY on correct classification of a holdIt item.
+      if (isCorrect && item.holdIt) {
+        // Dedicated SFX — reusing sfx_fanfare at 0.4 volume per CONTEXT.md decision (no new asset)
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_fanfare', volume: 0.4 });
+        // Set the reveal text (drives NPCReactionBubble's holdIt prop)
+        setHoldItReveal({ educationalBeat: item.holdIt.educationalBeat });
+        // Use the npcLine from the holdIt object (takes precedence over reaction-bank lookup)
+        setCurrentReactionText(item.holdIt.npcLine);
+        setCurrentReactionVariant('enthusiastic');
+        // HOLD IT reveal dwells for ~3.5s before fading back to band fallback
+        setTimeout(() => {
+          setHoldItReveal(null);
+        }, 3500);
+      } else {
+        // PHASE 22: Standard reaction — specific-item lookup, fall back to accuracy band.
+        // Use setState callback form for correctCount to get the post-update value for band calc.
+        const newCorrectCount = isCorrect ? correctCount + 1 : correctCount;
+        const newTotalDrops = totalDropsSoFar + 1;
+        const specificReaction = getNPCReactionForItem(npcDisplay.id, itemId, isCorrect);
+        const reaction =
+          specificReaction ??
+          getNPCFallbackReaction(npcDisplay.id, accuracyToBand(newCorrectCount, newTotalDrops));
+        setCurrentReactionText(reaction.text);
+        setCurrentReactionVariant(reaction.variant ?? 'neutral');
+      }
+
+      setTotalDropsSoFar((n) => n + 1);
+
       // Remove item; clamp selectedItemIdx to avoid out-of-bounds
       setRemainingItems((prev) => {
         const next = prev.filter((i) => i.id !== itemId);
@@ -137,7 +221,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
       setDraggingItemId(null);
       setDraggingOverBucket(null); // W2 fix: clear per-bucket drag state on drop
     },
-    [remainingItems],
+    [remainingItems, correctCount, totalDropsSoFar, npcDisplay.id],
   );
 
   /**
@@ -256,13 +340,22 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         </button>
       )}
 
-      {/* Progress header */}
+      {/* Phase 22: NPC reaction bubble — persistent during sort, fades on text change */}
+      <NPCReactionBubble
+        npcName={npcDisplay.name}
+        npcRole={npcDisplay.role}
+        text={currentReactionText}
+        variant={currentReactionVariant}
+        holdIt={holdItReveal ?? undefined}
+      />
+
+      {/* Progress header — SORTV2-06: includes NPC name for in-encounter context */}
       <div
-        className="text-center text-white mb-4"
+        className="text-center text-white mb-4 mt-20"
         style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}
         data-testid="text-sorter-progress"
       >
-        {totalCount - remainingItems.length} / {totalCount} sorted &middot; {correctCount} correct
+        HELPING {npcDisplay.name.toUpperCase()} &middot; {totalCount - remainingItems.length} / {totalCount} sorted &middot; {correctCount} correct
       </div>
 
       {/* Three-column layout: NOT PHI bucket | items pile | PHI bucket */}
