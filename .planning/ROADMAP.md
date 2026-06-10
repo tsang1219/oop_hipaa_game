@@ -210,7 +210,8 @@ Plans:
 ### Phase 17: Breach Triage Encounter (Whack-a-Mole)
 **Goal**: A timed Breach Notification Rule encounter uses whack-a-mole pacing — incidents pop up, the player classifies reportable vs not and selects notification timeline — driven primarily by keyboard, triggered from the Act 3 ER narrative arc.
 **Depends on**: Phase 13 (encounter trigger infrastructure), Phase 14 (Act 3 state), Phase 16 (encounter UI patterns established)
-**Requirements**: TRIA-01, TRIA-02, TRIA-03, TRIA-04, TRIA-05, TRIA-06 (TBD during /gsd:plan-phase)
+**Requirements**: TRIA-01, TRIA-02, TRIA-03, TRIA-04, TRIA-05, TRIA-06
+**Plans:** 3 plans
 **Success Criteria** (what must be TRUE):
   1. Reaching the Act 3 ER narrative trigger launches the Breach Triage encounter — ExplorationScene pauses in place and the triage overlay opens via the existing encounter lifecycle.
   2. Incidents pop up at whack-a-mole pacing (multiple visible at once, time-pressured) and the player classifies each as reportable / not-reportable using number keys or hotkeys — keyboard-only completion is fully supported with no required mouse input.
@@ -218,7 +219,11 @@ Plans:
   4. Each interaction produces audio + visual feedback (Commandments 1, 8): correct = ding + green pulse, miss/wrong = buzz + red flash, time-up = urgency cue. Tension escalates as incidents accumulate.
   5. At least 6 incident scenarios exist covering reportable vs non-reportable edge cases (lost laptop encrypted vs unencrypted, fax to wrong number, HR snooping, vendor breach, deceased patient records, internal misuse) with mixed difficulty.
   6. Encounter completes in 60-120 seconds with an EncounterDebrief showing classification accuracy, average response time, and 1-2 Breach Notification takeaways. The unified compliance score updates proportionally; this encounter raises Breach Notification coverage in the HIPAA Training Framework from THIN to ADEQUATE.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 17`)
+
+Plans:
+- [ ] 17-01-PLAN.md — Foundation: TRIA-01..06 in REQUIREMENTS.md, triageData.ts (9 HIPAA-accurate incidents + notify/timeline follow-ups per §164.404-410), CONTENT_MANIFEST.md indexing
+- [ ] 17-02-PLAN.md — Overlay UI: BreachTriageOverlay (3-slot whack-a-mole board, spawn engine, hotkeys, escalating tension) + TriageIncidentCard + TriageFollowUpPanel + TriageDebrief
+- [ ] 17-03-PLAN.md — Integration: Priya NPC in ER (act-gated encounterTrigger), schema encounterType/minAct, UnifiedGamePage breach-triage phase + handleTriageComplete + debrief discriminator, HIPAA framework rating update
 
 ---
 
