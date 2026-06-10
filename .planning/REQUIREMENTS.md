@@ -154,7 +154,7 @@ NPC portrait system for dialogue overlay and navigation clarity systems (Phase 2
 
 ### Navigation Clarity + Reward Sweep (Phase 27)
 
-- [ ] **VIS-07**: The door leading toward the next incomplete department on the critical path renders a distinct breathing warm-gold glow that locked, completed, and merely-available doors do not have. "Next" is derived in React (UnifiedGamePage) from UNLOCK_ORDER + completedRooms, with first-hop resolution through hallway connectors via BFS over the roomData door graph; the door state union gains a 'next' value carried through REACT_LOAD_ROOM / REACT_UPDATE_DOOR_STATES. When the player is inside the next incomplete department itself, no door is marked next. Demo mode is unaffected. In-room, after an idle grace period (~9s without movement/click/interaction), un-met completion requirements (untalked required NPCs, unexamined required zones, uncollected required items) receive an occasional single sparkle (2-3 particles, one target every ~5s, round-robin) that stops immediately on any player input — environmental shimmer, never a quest marker: no arrows, no labels, no modals (Commandments 3, 9).
+- [x] **VIS-07**: The door leading toward the next incomplete department on the critical path renders a distinct breathing warm-gold glow that locked, completed, and merely-available doors do not have. "Next" is derived in React (UnifiedGamePage) from UNLOCK_ORDER + completedRooms, with first-hop resolution through hallway connectors via BFS over the roomData door graph; the door state union gains a 'next' value carried through REACT_LOAD_ROOM / REACT_UPDATE_DOOR_STATES. When the player is inside the next incomplete department itself, no door is marked next. Demo mode is unaffected. In-room, after an idle grace period (~9s without movement/click/interaction), un-met completion requirements (untalked required NPCs, unexamined required zones, uncollected required items) receive an occasional single sparkle (2-3 particles, one target every ~5s, round-robin) that stops immediately on any player input — environmental shimmer, never a quest marker: no arrows, no labels, no modals (Commandments 3, 9).
 - [ ] **VIS-08**: A feedback audit table covering every player action in exploration mode (walk/footsteps, click-to-move, NPC talk start, zone examine, item collect, hallway board read, dialogue answer correct/incorrect, NPC completion tick, zone completion tick, room-complete fanfare, door enter, locked-door bump, encounter enter/return) documents the audio + visual response for each channel, recorded in the executing plan's SUMMARY. Previously-silent or disproportionate interactions are fixed using already-preloaded SFX keys and existing VFX patterns (Commandments 1, 8): zone and NPC completion update in-world immediately (glow stops, checkmark pops in) without a room reload, and wrong-answer audio is proportional (no breach-alert honk for a dialogue miss). No new modals anywhere; `npm run check` and `npm run build` clean.
 
 ## Out of Scope
@@ -262,7 +262,7 @@ NPC portrait system for dialogue overlay and navigation clarity systems (Phase 2
 | VIS-04 | Phase 26 | Complete |
 | VIS-05 | Phase 26 | Complete |
 | VIS-06 | Phase 26 | Complete |
-| VIS-07 | Phase 27 | Pending |
+| VIS-07 | Phase 27 | Complete |
 | VIS-08 | Phase 27 | Pending |
 
 **Coverage:**

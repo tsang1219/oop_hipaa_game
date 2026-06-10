@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T07:25:42.332Z"
+last_updated: "2026-06-10T07:45:34.221Z"
 progress:
-  total_phases: 22
+  total_phases: 23
   completed_phases: 19
-  total_plans: 56
-  completed_plans: 54
+  total_plans: 58
+  completed_plans: 55
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 26 — Room Visual Up-Level (In Progress)
-Plan: 26-02 (Complete)
-Status: Phase 26 Plan 02 complete. 8 furniture textures detail-passed, furn_wall_sconce + furn_bench generated (16 hallway fallback-desks eliminated), collectible glow up-leveled to additive aura + sparkles, addFurnitureIdleAnimations() added (plants sway everywhere, screens flicker, coffee steams). VIS-05 + VIS-06 requirements met.
-Last activity: 2026-06-10 — Phase 26 Plan 02 complete. Furniture detail pass + collectible glow + type-driven idle animations; tsc + production build clean.
+Phase: Phase 27 — Navigation Clarity (In Progress)
+Plan: 27-01 (Complete)
+Status: Phase 27 Plan 01 complete. 'next' door state end-to-end (UNLOCK_ORDER BFS → warm-gold aura 1600ms breathe) + 9s idle-hint sparkle cycling un-met room objectives. VIS-07 implemented; tsc + production build clean.
+Last activity: 2026-06-10 — Phase 27 Plan 01 complete. next-door breathing gold pulse + idle-hint sparkle system shipped.
 
 Progress: [████░░░░░░] 50% (estimated)
 
@@ -66,6 +66,8 @@ Progress: [████░░░░░░] 50% (estimated)
 | Phase 26-room-visual-uplevel P01 | 4min | 3 tasks | 2 files |
 | Phase 26-room-visual-uplevel P02 | 7min | 3 tasks | 2 files |
 | Phase 26-room-visual-uplevel P02 | 7min | 3 tasks | 2 files |
+| Phase 27-navigation-clarity P01 | 5min | 3 tasks | 4 files |
+| Phase 27-navigation-clarity P01 | 5min | 3 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -173,6 +175,9 @@ Progress: [████░░░░░░] 50% (estimated)
 - [Phase 26-02]: addFurnitureIdleAnimations() called at end of create() after all room blocks — guarantees all obstacles placed; scene shutdown auto-cleans all tweens/timers
 - [Phase 26-02]: Collectible aura uses ADD blendMode on particle_circle image — luminous against any floor, no per-floor color tuning; fallback is filled circle (never stroke-only)
 - [Phase 26-02]: IT Office DESIGN-007 server_rack/monitor block coexists with generic pass — both add overlapping depth-20 effects, both additive, no conflict
+- [Phase 27-01]: 'next' door promoted from 'completed' shows aura only (no checkmark) — aura is the stronger signal; checkmark returns when dept fully complete and 'next' advances
+- [Phase 27-01]: DoorState union exported from UnifiedGamePage.tsx (not EventBridge) — avoids cross-file type import; EventBridge JSDoc comments updated to document union
+- [Phase 27-01]: BFS findFirstHopDoorId always allows reaching nextTarget even if isDepartmentAccessible returns false — goal room must be reachable for pathfinding correctness
 
 ### Pending Todos
 
@@ -190,7 +195,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-06-10
-Stopped at: Completed 26-02-PLAN.md — furniture detail pass (8 generators), furn_wall_sconce + furn_bench, collectible glow/sparkle, addFurnitureIdleAnimations(). VIS-05 + VIS-06 implemented. Phase 26 Plan 02 complete.
-Resume: Phase 26 Plan 03 (if exists) or phase complete.
+Stopped at: Completed 27-01-PLAN.md — 'next' door state (BFS derive → breathe-gold render) + idle-hint sparkle system. VIS-07 implemented. Phase 27 Plan 01 complete.
+Resume: 27-02-PLAN.md (feedback audit + proportional interaction responses).
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.
