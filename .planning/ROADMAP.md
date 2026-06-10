@@ -234,7 +234,7 @@ Plans:
   4. Exactly one item per set is flagged as a "HOLD IT" reveal — when the player nails it correctly, the NPC delivers a dramatic 1-2 sentence beat explaining *why* it was tricky (e.g., partial date, ZIP3 vs ZIP5, diagnosis without name). The reveal is visually distinct from regular reactions (border flash, scaled text, dedicated SFX).
   5. All existing Phase 16 success criteria still hold (drag-drop + keyboard parity, audio-visual feedback per drop, debrief, score contribution, replayability).
   6. Encounter completes in 60-90 seconds (up from 30-60 to accommodate larger sets); SorterDebrief surfaces NPC name in the "BACK TO X" button or context.
-**Plans:** 3/4 plans executed
+**Plans:** 4/4 plans complete
 
 Plans:
 - [ ] 22-01-PLAN.md — Data foundation: add SORTV2-01..06 to REQUIREMENTS.md, rewrite 30 sorterData items as patient charts with deadpan humor (HIPAA-preserved), update CONTENT_MANIFEST.md
@@ -356,6 +356,6 @@ Plans:
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 0/0 | Not started | - |
 | 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
-| 22. PHI Sorter Redesign — Content + Connection | 3/4 | In Progress|  | - |
+| 22. PHI Sorter Redesign — Content + Connection | 4/4 | Complete   | 2026-06-10 | - |
 | 23. PHI Sorter Redesign — Feedback Moments | v2.1 | 0/0 | Pending | - |
 | 24. PHI Sorter Redesign — Format Shift | v2.1 | 0/0 | Pending | - |

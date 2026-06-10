@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T03:51:10.012Z"
+last_updated: "2026-06-10T03:56:52.013Z"
 progress:
   total_phases: 17
-  completed_phases: 12
+  completed_phases: 13
   total_plans: 44
-  completed_plans: 40
+  completed_plans: 41
 ---
 
 # Project State
@@ -51,6 +51,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 22-phi-sorter-content-connection P02 | 12 | 2 tasks | 2 files |
 | Phase 22-phi-sorter-content-connection P01 | 6min | 3 tasks | 3 files |
 | Phase 22-phi-sorter-content-connection P03 | 8 | 2 tasks | 2 files |
+| Phase 22-phi-sorter-content-connection P04 | 15 | 1 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -118,6 +119,7 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 22-phi-sorter-content-connection]: SorterChart humor tone locked: deadpan Daria/Veep (admin-system absurdity), never surreal or punching down. 45 humor-bearing fields in 30 items. — Per CLAUDE.md Commandment 5 + 22-CONTEXT.md spec. Humor surfaces in doctorNote/emergencyContact/reasonForVisit/miscField only, never in category/identifierType.
 - [Phase 22-phi-sorter-content-connection]: HOLD IT variant implemented inline (prop-driven border+scale swap, no sub-component); screen pulse / SFX / portrait deferred to Phase 23/24
 - [Phase 22-phi-sorter-content-connection]: ChartLine extracted as private function inside SorterItem.tsx; fields render in order: patientName+age, role, reasonForVisit, emergencyContact, doctorNote, miscField
+- [Phase 22-phi-sorter-content-connection]: HOLD IT SFX reuses sfx_fanfare at 0.4 volume — no new asset; screen pulse deferred to Phase 23; SORTER_LOCATION_LABELS data-only change to NPC names (SORTV2-06); holdItReveal dwells 3.5s; opener seeded on mount via good-band fallback
 
 ### Pending Todos
 
