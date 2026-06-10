@@ -80,6 +80,13 @@
 - [x] **SORTV2-05**: All Phase 16 PHI Sorter success criteria still hold: drag-and-drop + keyboard parity, audio-visual feedback per drop, debrief with takeaways, score contribution via `Math.round((correct/total) * 12)`, replayability after abort.
 - [x] **SORTV2-06**: Encounter completes in 60-90 seconds (up from Phase 16's 30-60s to accommodate larger sets with NPC reaction beats). SorterDebrief surfaces the trigger NPC's name in the close-button context (e.g., "BACK TO AIYANA").
 
+### PHI Sorter Redesign — Feedback Moments (Phase 23)
+
+- [ ] **SORTV2-07**: Every bucket drop fires a particle burst on the destination bucket (≥6 DOM/CSS particles, green #2ECC71 on correct, red #EF4444 on wrong) plus a brief camera shake of the sorter surface (~80ms, 2-3px amplitude, CSS animation on the overlay content wrapper). Wrong drops never receive the green celebratory treatment. Both effects are additive to — and independent of — the existing flash-green/shake-red bucket border feedback.
+- [ ] **SORTV2-08**: Both buckets render visible running counters ("N redacted" under PHI, "N kept" under NOT PHI) that animate with a small bounce on each increment. Counters count items dropped into that bucket and reset to 0 when the encounter restarts (replay after abort).
+- [ ] **SORTV2-09**: After the final item drops, a completion overlay appears for ~1.2s before the SorterDebrief opens — header text scales from 0 to full size and reads "PERFECT n/n" (100% accuracy, gold), "GOOD" (≥60%, green), or "KEEP PRACTICING" (<60%, teal — encouraging, never red), with a screen-wide flash matching the band color. The existing 600ms anticipation beat (Commandment 2) precedes the celebration.
+- [ ] **SORTV2-10**: A visible local sorter score pulses on each increment: +2 for a correct "HOLD IT" tricky item, +1 for a correct regular item (display-only — the compliance contribution formula Math.round((correct/total) × 12) is unchanged). NPC speech-bubble reaction lines escalate in enthusiasm above 80% running accuracy and deflate below 50%, via 3 band-variant lines per band per NPC — tone is felt without text reading like a scoreboard.
+
 ### Polish & Completion
 
 - **POLISH-01**: End-of-game report screen (department scores, knowledge areas, time)
@@ -210,10 +217,14 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | TRIA-04 | Phase 17 | Complete |
 | TRIA-05 | Phase 17 | Complete |
 | TRIA-06 | Phase 17 | Complete |
+| SORTV2-07 | Phase 23 | Pending |
+| SORTV2-08 | Phase 23 | Pending |
+| SORTV2-09 | Phase 23 | Pending |
+| SORTV2-10 | Phase 23 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0
-- v2.1 requirements (Phase 16 portion + Phase 22 portion + Phase 17 portion): 18 total (SORT-01..06, SORTV2-01..06, TRIA-01..06), mapped: 18, unmapped: 0
+- v2.1 requirements (Phase 16 portion + Phase 22 portion + Phase 17 portion + Phase 23 portion): 22 total (SORT-01..06, SORTV2-01..10, TRIA-01..06), mapped: 22, unmapped: 0
 - v2.2 requirements: 18 total, mapped: 18, unmapped: 0
 
 ---
