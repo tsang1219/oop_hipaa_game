@@ -385,13 +385,17 @@ Plans:
 ### Phase 27: Navigation Clarity + Reward Sweep
 **Goal**: The player always knows where to go next without being told twice: the next-objective door breathes with a soft glow, in-room remaining objectives are discoverable at a glance, and the moment-to-moment reward layer (score blips, completion ticks, discovery chimes) is audited against Commandments 1 and 8 with gaps filled.
 **Depends on**: Phase 26
-**Requirements**: VIS-07, VIS-08 (TBD during /gsd:plan-phase)
+**Requirements**: VIS-07, VIS-08 (defined in REQUIREMENTS.md by plan 27-01)
 **Success Criteria** (what must be TRUE):
   1. The door leading to the next incomplete department has a distinct soft pulse/glow that completed and locked doors do not have — a playtester can answer "where do I go next?" by looking, not by reading.
   2. In-room, un-met completion requirements are discoverable without a modal: subtle sparkle on untalked NPCs / unspotted zones after a idle grace period, never nagging, never obnoxious.
   3. A feedback audit table of every player action in exploration mode (move, interact, collect, complete, door, encounter enter/exit) shows audio + visual response for each, with previously-silent interactions fixed (Commandment 1).
   4. No new modals; everything ambient. tsc and production build clean.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 27`)
+**Plans:** 2 plans
+
+Plans:
+- [ ] 27-01-PLAN.md — VIS-07/08 definitions + 'next' door breathing gold pulse (UNLOCK_ORDER + BFS first-hop) + idle-hint sparkle system
+- [ ] 27-02-PLAN.md — Feedback audit table + live zone/NPC completion visuals + wrong-answer honk fix + tsc/build regression gate
 
 ---
 
