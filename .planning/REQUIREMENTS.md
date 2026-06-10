@@ -138,7 +138,7 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 
 ## v2.3 Requirements (Active — Nintendo Polish)
 
-NPC portrait system for dialogue overlay. VIS-07..08 are reserved for Phase 27 to define (full-character dialogue system expansion, sprite animation pipeline).
+NPC portrait system for dialogue overlay and navigation clarity systems (Phase 27).
 
 ### Dialogue Portraits (Phase 25)
 
@@ -151,6 +151,11 @@ NPC portrait system for dialogue overlay. VIS-07..08 are reserved for Phase 27 t
 - [x] **VIS-04**: Each department and connector renders a visually distinct floor treatment — distinct palette + pattern per room type (ER pale clinical tile with safety accents, Lab green clean-room grid, IT dark raised panels, Break Room wood planks, Records carpet, Entrance marble, Reception its own warm porcelain treatment with large-format tile illusion and navy accent diamonds, hallways a corridor runner strip down the walkway row). Floor tiles adjacent to wall bottoms render a contact-shadow gradient so walls visibly meet floors rather than appearing to float on the grid. Floor rendering stays a once-per-room-load Graphics pass (no per-frame draw); zero collision changes.
 - [x] **VIS-05**: The 8 most-frequently-rendered furniture textures (furn_plant, furn_chair, furn_filing_cabinet, furn_cable_tray, furn_server_rack, furn_desk, furn_table, furn_vending_machine — derived from roomData.json obstacle frequency counts) get a detail pass: 1px dark silhouette outline, boosted highlight/shadow contrast, 1-2 characterful details each, readable at 32px. The 16 hallway `wall_sconce` (9) and `bench` (7) obstacles stop falling back to the desk texture via two new generators (furn_wall_sconce, furn_bench) plus map entries; remaining unmapped one-off types get nearest-credible remaps. Uncollected educational collectibles display an at-a-glance glow: soft pulsing filled aura behind the item plus periodic sparkle particles, additive to the existing bob (Commandment 9).
 - [x] **VIS-06**: At least 3 furniture types display a subtle, type-driven idle animation in every room where they appear (not just one hardcoded room): plant leaf-sway (all 14 plants), screen flicker + LED blink on server_rack / monitor_bank / vital_monitor, coffee steam on coffee_station. Animations are created once per room load via tweens/timers; no gameplay or collision changes.
+
+### Navigation Clarity + Reward Sweep (Phase 27)
+
+- [ ] **VIS-07**: The door leading toward the next incomplete department on the critical path renders a distinct breathing warm-gold glow that locked, completed, and merely-available doors do not have. "Next" is derived in React (UnifiedGamePage) from UNLOCK_ORDER + completedRooms, with first-hop resolution through hallway connectors via BFS over the roomData door graph; the door state union gains a 'next' value carried through REACT_LOAD_ROOM / REACT_UPDATE_DOOR_STATES. When the player is inside the next incomplete department itself, no door is marked next. Demo mode is unaffected. In-room, after an idle grace period (~9s without movement/click/interaction), un-met completion requirements (untalked required NPCs, unexamined required zones, uncollected required items) receive an occasional single sparkle (2-3 particles, one target every ~5s, round-robin) that stops immediately on any player input — environmental shimmer, never a quest marker: no arrows, no labels, no modals (Commandments 3, 9).
+- [ ] **VIS-08**: A feedback audit table covering every player action in exploration mode (walk/footsteps, click-to-move, NPC talk start, zone examine, item collect, hallway board read, dialogue answer correct/incorrect, NPC completion tick, zone completion tick, room-complete fanfare, door enter, locked-door bump, encounter enter/return) documents the audio + visual response for each channel, recorded in the executing plan's SUMMARY. Previously-silent or disproportionate interactions are fixed using already-preloaded SFX keys and existing VFX patterns (Commandments 1, 8): zone and NPC completion update in-world immediately (glow stops, checkmark pops in) without a room reload, and wrong-answer audio is proportional (no breach-alert honk for a dialogue miss). No new modals anywhere; `npm run check` and `npm run build` clean.
 
 ## Out of Scope
 
@@ -257,12 +262,14 @@ NPC portrait system for dialogue overlay. VIS-07..08 are reserved for Phase 27 t
 | VIS-04 | Phase 26 | Complete |
 | VIS-05 | Phase 26 | Complete |
 | VIS-06 | Phase 26 | Complete |
+| VIS-07 | Phase 27 | Pending |
+| VIS-08 | Phase 27 | Pending |
 
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0
 - v2.1 requirements (Phase 16 portion + Phase 22 portion + Phase 17 portion + Phase 23 portion + Phase 24 portion): 27 total (SORT-01..06, SORTV2-01..15, TRIA-01..06), mapped: 27, unmapped: 0
 - v2.2 requirements: 18 total, mapped: 18, unmapped: 0
-- v2.3 requirements: 6 total, mapped: 6, unmapped: 0
+- v2.3 requirements: 8 total, mapped: 8, unmapped: 0
 
 ---
 *Requirements defined: 2026-03-26*
