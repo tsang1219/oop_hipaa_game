@@ -356,7 +356,7 @@ Plans:
 | 14. Three-Act Narrative Arc | v2.0 | 4/4 | Complete | 2026-03-28 |
 | 15. Polish and Completion | v2.0 | 3/3 | Complete | 2026-03-28 |
 | 16. PHI Sorter Encounter | 4/4 | Complete    | 2026-06-10 | - |
-| 17. Breach Triage Encounter | 3/3 | Complete   | 2026-06-10 | - |
+| 17. Breach Triage Encounter | 3/3 | Complete    | 2026-06-10 | - |
 | 18. Demo Mode + Start Menu | v2.2 | Complete    | 2026-05-08 | - |
 | 19. Tower Defense Standalone | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 20. First-Impression Polish | v2.2 | 1/1 | Complete | 2026-05-08 |
