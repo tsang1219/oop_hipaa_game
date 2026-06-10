@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T05:55:41.305Z"
+last_updated: "2026-06-10T06:05:17.310Z"
 progress:
   total_phases: 20
-  completed_phases: 16
+  completed_phases: 17
   total_plans: 52
-  completed_plans: 49
+  completed_plans: 50
 ---
 
 # Project State
@@ -22,12 +22,12 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 24 — PHI Sorter Format Shift (In Progress)
-Plan: 24-01 (Complete) → 24-02 (Next)
-Status: Plan 01 foundation shipped. SORTV2-11..15 defined, sfx_sorter_stamp/paper preloaded, shiftSeconds on SorterDocumentSet (90/75/60), 6 CSS keyframes (doc-slide-in/off-left/off-right, ink-stamp-in, stamp-press, clock-pulse) committed as contract surface for Plans 02/03. Build and typecheck clean.
-Last activity: 2026-06-10 — Phase 24 Plan 01 complete. Foundation data/config/CSS groundwork laid. No user-visible behavior change.
+Phase: Phase 24 — PHI Sorter Format Shift (Complete)
+Plan: 24-01 (Complete) → 24-02 (Complete) → 24-03 (Complete)
+Status: Phase 24 complete. PHISorterOverlay rewritten to Papers Please desk format: one-doc state machine, stamp commits, shift clock, outgoing trays, persistent NPC portrait. All Phase 22/23 invariants preserved. BucketZone + SorterItem deleted. SORTV2-11..15 all satisfied. Build + typecheck clean.
+Last activity: 2026-06-10 — Phase 24 Plan 03 complete. Live playthrough script in 24-03-SUMMARY.md.
 
-Progress: [█░░░░░░░░░] 10%
+Progress: [████░░░░░░] 50% (estimated)
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [█░░░░░░░░░] 10%
 | Phase 23-phi-sorter-feedback-moments P02 | 4min | 2 tasks | 1 files |
 | Phase 24-phi-sorter-format-shift P01 | 9 | 2 tasks | 4 files |
 | Phase 24-phi-sorter-format-shift P02 | 6 | 3 tasks | 6 files |
+| Phase 24-phi-sorter-format-shift P03 | 7 | 2 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -153,6 +154,10 @@ Progress: [█░░░░░░░░░] 10%
 - [Phase 24]: clock-pulse keyframe handles scale only; <10s color shift handled by class swap in component — separation of animation and color concerns (Phase 24-01)
 - [Phase 24-phi-sorter-format-shift]: StampPad uses tabIndex=-1 on buttons — parent window keydown handler owns keyboard; prevents double-commit via native button Enter focus
 - [Phase 24-phi-sorter-format-shift]: NPCReactionBubble speech tail switches from down-pointing to left-pointing when spriteUrl portrait is present
+- [Phase 24-phi-sorter-format-shift P03]: Timer-expiry scoring: unstamped items score 0 but totalCount = docSet.items.length (FULL set) — formula Math.round((correctCount/totalCount)*12) unchanged; sub-60% KEEP PRACTICING (teal, encouraging, never fail screen)
+- [Phase 24-phi-sorter-format-shift P03]: focusedStamp intentionally NOT cleared between documents — Papers Please rapid-keyboard rhythm (→ Enter Enter Enter) requires sticky stamp focus
+- [Phase 24-phi-sorter-format-shift P03]: cascadeTimersRef tracks all doc lifecycle setTimeout IDs; cleared on unmount — abort mid-animation leaks nothing
+- [Phase 24-phi-sorter-format-shift P03]: Completion Effect 1 docAnimState guard on shiftOver: fires only when 'active'/'entering' — lets doc already in 'stamped'/'exiting' at 0:00 finish and score
 
 ### Pending Todos
 
@@ -170,7 +175,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-06-10
-Stopped at: Completed 23-02-PLAN.md — Phase 23 complete. PHISorterOverlay wired with all Phase 23 feedback: camera shake, bucket counters, score pulse, three-effect celebrating pipeline (SorterCompletionOverlay ~1.2s), band-transition NPC reactions. Build + typecheck clean, all Phase 22/16 greps pass. Live playthroughs deferred to user with verification script in SUMMARY.
-Resume: Phase 24 (PHI Sorter Format Moments) or user live-playthrough sign-off.
+Stopped at: Completed 24-03-PLAN.md — Phase 24 complete. PHISorterOverlay rewritten to Papers Please desk format; BucketZone+SorterItem deleted; SORTV2-11..15 all satisfied in code. Build + typecheck clean, all 16+ Phase 22/23/24 regression greps pass. Live playthrough script in 24-03-SUMMARY.md.
+Resume: User live-playthrough sign-off on Phase 24, then next phase (v2.2 demo work or Phase 16 Plan 04 resumption).
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.
