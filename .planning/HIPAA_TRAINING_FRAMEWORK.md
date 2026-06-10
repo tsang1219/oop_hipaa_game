@@ -263,11 +263,18 @@ These are the core Privacy Rule concepts that corporate HIPAA training must cove
 
 #### 3.1 What Constitutes a Breach
 - **Requirement:** Unauthorized access, use, or disclosure of unsecured PHI
-- **Coverage:** `ADEQUATE`
+- **Coverage:** `STRONG`
 - **Game content:**
   - `breach_response` — Breach Response Playbook
   - `fax_machine_freddy` — Misdirected fax as breach example
   - BreachDefense overall concept — Breaches as tangible harm
+  - Breach Triage encounter (triageData.ts, `breach-triage-set-1`) — 9 scenario-tested incidents:
+    - `encrypted-laptop` — Encryption safe harbor (45 CFR §164.402(2)) — NOT a breach despite lost device
+    - `good-faith-glance` — Good-faith workforce exception (45 CFR §164.402(1)(i)) — accidental non-malicious access
+    - `deceased-records` — 50-year rule for decedents (45 CFR §164.502(f)) — records of patients dead 50+ years are not PHI
+    - `ransomware` — Ransomware presumption (HHS OCR 2016 Guidance) — treated as PHI access unless proven otherwise
+    - `hr-snooping` — Snooping / unauthorized access IS a breach regardless of whether data is shared
+    - `internal-misuse` — Internal misuse as breach (sharing with unauthorized internal party)
 
 #### 3.2 Breach Response Procedures
 - **Requirement:** Documentation, risk assessment, notification procedures
@@ -275,14 +282,21 @@ These are the core Privacy Rule concepts that corporate HIPAA training must cove
 - **Game content:**
   - `breach_response` — Document, notify Privacy Officer, risk assessment
   - `fax_machine_freddy` — Full breach response sequence (document, notify, retrieve, assess, possibly notify patient)
+  - Breach Triage encounter — Players classify incidents under time pressure, drilling classify-then-notify decisions and the consequence of incorrect triage (missed notifications = OCR exposure)
 
 #### 3.3 Notification Requirements
 - **Requirement:** Patient notification within 60 days, HHS reporting, state AG notification
-- **Coverage:** `ADEQUATE` (upgraded from THIN after corrections)
+- **Coverage:** `STRONG`
 - **Game content:**
   - `breach_response` — Now explicitly teaches 60-day patient notification and HHS reporting rules (corrected from erroneous 72-hour reference, which is GDPR not HIPAA)
   - `fax_machine_freddy` — Full breach response sequence with notification steps
-- **Remaining gap:** 500+ threshold for immediate HHS notification and state AG requirements not explicitly taught
+  - Breach Triage encounter — Follow-up questions for all 6 reportable incidents scenario-test notification rules:
+    - 60-day individual notice (45 CFR §164.404) — tested in every reportable incident follow-up
+    - >500 affected: media notification + concurrent HHS report (45 CFR §164.406-408) — 500+ threshold gap closed
+    - <500 affected: annual HHS log submission — tested in single-patient breach incidents
+    - Business Associate breach: BA notifies CE within 60 days; that deadline starts the CE's clock (45 CFR §164.410) — tested in `vendor-breach` incident
+  - **Note:** State attorney general notification requirements are state-level obligations outside this federal-baseline framework's scope
+  - **GDPR trap:** 72-hour deadline appears only as a wrong-answer option in `misdirected-fax` — reinforces that 72 hours is GDPR, not HIPAA
 
 ---
 
@@ -356,8 +370,8 @@ These aren't strictly HIPAA regulation sections but are critical for corporate t
 
 | Level | Count | Topics |
 |-------|-------|--------|
-| STRONG | 16 | PHI definition, Minimum Necessary, Patient Rights (access), Authorization, Family disclosures, Research, Incidental disclosures, Physical safeguards, Technical safeguards, Phishing, Password security, Ransomware, Defense in depth, Reporting violations, Snooping, Verbal disclosures |
-| ADEQUATE | 14 | 18 Identifiers, TPO, De-identification, Permitted disclosures, Administrative safeguards, Encryption, Breach definition, Breach response, PHI disposal, Wrong-patient errors, Breach notification timelines, NPP, BAAs, Social media / electronic communications |
+| STRONG | 18 | PHI definition, Minimum Necessary, Patient Rights (access), Authorization, Family disclosures, Research, Incidental disclosures, Physical safeguards, Technical safeguards, Phishing, Password security, Ransomware, Defense in depth, Reporting violations, Snooping, Verbal disclosures, **Breach definition (§3.1)**, **Breach notification timelines (§3.3)** |
+| ADEQUATE | 12 | 18 Identifiers, TPO, De-identification, Permitted disclosures, Administrative safeguards, Encryption, Breach response, PHI disposal, Wrong-patient errors, NPP, BAAs, Social media / electronic communications |
 | THIN | 2 | Patient Rights (accounting, restrictions, confidential comm), HIPAA penalties & enforcement |
 | GAP | 4 | Marketing/fundraising restrictions, Psychotherapy notes, Remote work/telehealth, State-level notifications |
 
@@ -425,3 +439,4 @@ Before shipping new content:
 | 2026-03-01 | Initial framework created from full content audit | Claude |
 | 2026-03-11 | Accuracy review: fixed 72-hour GDPR→HIPAA error, hallway conversation prohibition, law enforcement warrant oversimplification, authorization vs agreement terminology, QI/TPO authorization error, encryption addressable clarification, Min Necessary treatment exception, scoring rebalances, real-world case reference corrections. Upgraded Breach Notification Timelines from THIN→ADEQUATE. | Claude |
 | 2026-03-11 | Coverage expansion: added npp_notice, social_media_slip, vendor_baa scenes. Added hipaa_penalties educational item. Wired all unassigned scenes into rooms. Fixed privacy_notice zone. Upgraded NPP, BAAs, Social Media from THIN→ADEQUATE. Coverage now: 16 STRONG, 14 ADEQUATE, 2 THIN, 4 GAP. | Claude |
+| 2026-06-10 | Phase 17: Breach Triage encounter added (triageData.ts, 9 scenario-tested incidents across misdirected-fax, unencrypted-laptop, encrypted-laptop, hr-snooping, good-faith-glance, vendor-breach, internal-misuse, deceased-records, ransomware). §3.1 ADEQUATE→STRONG (6 incident types + encryption safe harbor + presumption rule scenario-tested). §3.3 ADEQUATE→STRONG (500+ threshold gap closed — follow-up questions cover individual 60-day, >500 media+OCR concurrent, <500 annual log, BA→CE clock). Roadmap TRIA-06 "THIN→ADEQUATE" target exceeded. Coverage now: 18 STRONG, 12 ADEQUATE, 2 THIN, 4 GAP. | Claude |
