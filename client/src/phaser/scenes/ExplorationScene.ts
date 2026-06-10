@@ -14,6 +14,77 @@ import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@sha
 const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
 
+// ── Per-room floor style configuration ───────────────────────────────────────
+// Each entry holds the four tile shade variants (checkerboard 2x2 pattern),
+// a bevel-highlight colour and a bevel-shadow/grout colour.
+const FLOOR_STYLES = {
+  er: {
+    tileShades: [0xd8e0e4, 0xd0d8de, 0xc8d2d8, 0xdce4e8],
+    highlightColor: 0xe8f0f4,
+    shadowColor: 0xa8b4bc,
+  },
+  lab: {
+    tileShades: [0xd4e0d4, 0xccdbcc, 0xc4d4c4, 0xdce8dc],
+    highlightColor: 0xe8f4e8,
+    shadowColor: 0xa4b4a4,
+  },
+  it: {
+    tileShades: [0x8890a0, 0x848c9c, 0x808898, 0x8c94a4],
+    highlightColor: 0x98a0b0,
+    shadowColor: 0x686e80,
+  },
+  break: {
+    tileShades: [0xd8c4a0, 0xd4c09c, 0xd0bc98, 0xdcc8a4],
+    highlightColor: 0xe8d8b8,
+    shadowColor: 0xb8a880,
+  },
+  records: {
+    tileShades: [0xb8b4a0, 0xb4b09c, 0xb0ac98, 0xbcb8a4],
+    highlightColor: 0xc8c4b0,
+    shadowColor: 0x989488,
+  },
+  entrance: {
+    tileShades: [0xe0dcd4, 0xdcd8d0, 0xd8d4cc, 0xe4e0d8],
+    highlightColor: 0xf0ece4,
+    shadowColor: 0xc0bcb4,
+  },
+  // Reception: warm cream porcelain — reads as 64px slabs, not individual tiles
+  reception: {
+    tileShades: [0xe2d8c4, 0xded4c0, 0xdad0bc, 0xe6dcc8],
+    highlightColor: 0xf2e8d4,
+    shadowColor: 0xbeb49e,
+  },
+  // Hallways: slightly cooler/dimmer beige base — runner strip added post-loop
+  hallway: {
+    tileShades: [0xccc2a6, 0xc8bea2, 0xc4ba9e, 0xd0c6aa],
+    highlightColor: 0xdcd2b6,
+    shadowColor: 0xaaa092,
+  },
+  default: {
+    tileShades: [0xd4c9a8, 0xd0c5a4, 0xccc0a0, 0xd8cdb0],
+    highlightColor: 0xe2d8bc,
+    shadowColor: 0xb8ad94,
+  },
+} as const;
+
+type FloorStyleKey = keyof typeof FLOOR_STYLES;
+
+/** Map a room id to its floor style key.
+ *  Order matters: 'hallway' is checked FIRST so 'hallway_reception_break'
+ *  resolves to 'hallway' rather than 'reception' or 'break'. */
+function floorStyleFor(roomId: string): FloorStyleKey {
+  if (roomId.includes('hallway'))                                 return 'hallway';
+  if (roomId.includes('er') || roomId.includes('emergency'))     return 'er';
+  if (roomId.includes('lab'))                                     return 'lab';
+  if (roomId.includes('it') || roomId.includes('server'))        return 'it';
+  if (roomId.includes('break'))                                   return 'break';
+  if (roomId.includes('records'))                                 return 'records';
+  if (roomId.includes('entrance') || roomId.includes('lobby'))   return 'entrance';
+  if (roomId.includes('reception'))                               return 'reception';
+  return 'default';
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // All known music track keys — used to clean up other tracks when changing rooms
 const MUSIC_TRACK_KEYS = [
   'music_hub',
@@ -305,45 +376,12 @@ export class ExplorationScene extends Phaser.Scene {
     // ── Floor — beveled hospital tiles with room-specific color variation ──
     const floor = this.add.graphics();
     const roomId = room.id.toLowerCase();
-    let tileShades: number[];
-    let highlightColor: number;
-    let shadowColor: number;
-    if (roomId.includes('er') || roomId.includes('emergency')) {
-      // Sterile clinical white-blue — high contrast, clean
-      tileShades = [0xd8e0e4, 0xd0d8de, 0xc8d2d8, 0xdce4e8];
-      highlightColor = 0xe8f0f4;
-      shadowColor = 0xa8b4bc;
-    } else if (roomId.includes('lab')) {
-      // Greenish-white clean room floor
-      tileShades = [0xd4e0d4, 0xccdbcc, 0xc4d4c4, 0xdce8dc];
-      highlightColor = 0xe8f4e8;
-      shadowColor = 0xa4b4a4;
-    } else if (roomId.includes('it') || roomId.includes('server')) {
-      // Dark raised-floor panels — distinctly technical
-      tileShades = [0x8890a0, 0x848c9c, 0x808898, 0x8c94a4];
-      highlightColor = 0x98a0b0;
-      shadowColor = 0x686e80;
-    } else if (roomId.includes('break')) {
-      // Warm wood-tone laminate — visibly warm and cozy
-      tileShades = [0xd8c4a0, 0xd4c09c, 0xd0bc98, 0xdcc8a4];
-      highlightColor = 0xe8d8b8;
-      shadowColor = 0xb8a880;
-    } else if (roomId.includes('records')) {
-      // Low-pile commercial carpet — muted olive
-      tileShades = [0xb8b4a0, 0xb4b09c, 0xb0ac98, 0xbcb8a4];
-      highlightColor = 0xc8c4b0;
-      shadowColor = 0x989488;
-    } else if (roomId.includes('entrance') || roomId.includes('lobby')) {
-      // Polished marble-like lobby floor — bright and grand
-      tileShades = [0xe0dcd4, 0xdcd8d0, 0xd8d4cc, 0xe4e0d8];
-      highlightColor = 0xf0ece4;
-      shadowColor = 0xc0bcb4;
-    } else {
-      // Default beige (reception, hallways)
-      tileShades = [0xd4c9a8, 0xd0c5a4, 0xccc0a0, 0xd8cdb0];
-      highlightColor = 0xe2d8bc;
-      shadowColor = 0xb8ad94;
-    }
+    const floorStyle = FLOOR_STYLES[floorStyleFor(roomId)];
+    const { tileShades, highlightColor, shadowColor } = floorStyle;
+
+    // Pre-compute door tiles for ER accent ring and contact-shadow exclusions
+    const doors: Array<{ x: number; y: number }> = (room as any).doors || [];
+
     for (let y = 0; y < room.height; y++) {
       for (let x = 0; x < room.width; x++) {
         const shadeIdx = ((x % 2) + (y % 2) * 2) % tileShades.length;
@@ -366,7 +404,8 @@ export class ExplorationScene extends Phaser.Scene {
         floor.fillRect(px + TILE - 1, py, 1, TILE);  // right edge
 
         // Subtle inner cross pattern on every other tile (linoleum texture)
-        if ((x + y) % 2 === 0) {
+        // — Skipped for reception (large-format tile illusion uses 2x2 grout instead)
+        if ((x + y) % 2 === 0 && !roomId.includes('reception') && !roomId.includes('hallway')) {
           floor.fillStyle(highlightColor, 0.15);
           floor.fillRect(px + 8, py + 2, 16, 1);  // horizontal line
           floor.fillRect(px + 14, py + 2, 1, 28);  // vertical line
@@ -380,9 +419,21 @@ export class ExplorationScene extends Phaser.Scene {
         }
 
         // Grout lines (thin dark lines between tiles)
-        floor.fillStyle(shadowColor, 0.3);
-        floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout
-        floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout
+        // Reception uses large-format (2x2) grout only at slab boundaries
+        if (roomId.includes('reception')) {
+          // Large-format tile illusion — grout only at every 2nd boundary
+          floor.fillStyle(shadowColor, 0.35);
+          if (x % 2 === 1) {
+            floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout on odd x
+          }
+          if (y % 2 === 1) {
+            floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout on odd y
+          }
+        } else {
+          floor.fillStyle(shadowColor, 0.3);
+          floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout
+          floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout
+        }
 
         // Room-specific floor pattern detail (boosted opacity for visibility)
         if (roomId.includes('er') || roomId.includes('emergency')) {
@@ -391,6 +442,12 @@ export class ExplorationScene extends Phaser.Scene {
             floor.fillStyle(0xffffff, 0.12);
             floor.fillRect(px + 10, py + 10, 12, 1);
             floor.fillRect(px + 15, py + 5, 1, 12);
+          }
+          // ER: pale red accent ring near door tiles (urgency — hazard accents near entrances)
+          const nearDoor = doors.some(d => Math.abs(d.x - x) <= 1 && Math.abs(d.y - y) <= 1);
+          if (nearDoor) {
+            floor.fillStyle(0xff6b6b, 0.07);
+            floor.fillRect(px, py, TILE, TILE);
           }
         } else if (roomId.includes('lab')) {
           // Lab: Grid dots + thin drain lines — clean room look
@@ -430,13 +487,22 @@ export class ExplorationScene extends Phaser.Scene {
             }
           }
         } else if (roomId.includes('records')) {
-          // Records room: Commercial carpet weave — denser, muted
+          // Records room: Commercial carpet weave — row-offset dot grid + pile lines
+          // Offset dot positions on odd rows to simulate carpet weave
+          const dotOffsetX = y % 2 === 1 ? 4 : 0;
           floor.fillStyle(0x000000, 0.06);
-          floor.fillRect(px + 4, py + 4, 2, 2);
-          floor.fillRect(px + 20, py + 20, 2, 2);
-          floor.fillRect(px + 12, py + 12, 2, 2);
-          floor.fillRect(px + 28, py + 4, 2, 2);
-          floor.fillRect(px + 4, py + 28, 2, 2);
+          floor.fillRect(px + 4 + dotOffsetX, py + 4, 2, 2);
+          floor.fillRect(px + 20 + dotOffsetX, py + 20, 2, 2);
+          floor.fillRect(px + 12 + dotOffsetX, py + 12, 2, 2);
+          floor.fillRect(px + 28 + dotOffsetX, py + 4, 2, 2);
+          floor.fillRect(px + 4 + dotOffsetX, py + 28, 2, 2);
+          // Faint horizontal pile lines every 8px
+          if (py % 8 < TILE) {
+            for (let pile = 0; pile < 4; pile++) {
+              floor.fillStyle(0x000000, 0.04);
+              floor.fillRect(px, py + pile * 8, TILE, 1);
+            }
+          }
         } else if (roomId.includes('entrance') || roomId.includes('lobby')) {
           // Lobby: Marble veining effect
           if ((x + y) % 3 === 0) {
@@ -444,7 +510,40 @@ export class ExplorationScene extends Phaser.Scene {
             floor.fillRect(px + 4, py + 12, 24, 1);
             floor.fillRect(px + 8, py + 8, 1, 16);
           }
+        } else if (roomId.includes('reception')) {
+          // Reception: Navy accent diamond at each 2x2 slab intersection
+          // Drawn at bottom-right corner of slab (odd x, odd y tile)
+          if (x % 2 === 1 && y % 2 === 1) {
+            floor.fillStyle(0x2c4a6e, 0.18);
+            // Four fillRects forming a 6px diamond
+            floor.fillRect(px + TILE - 3, py + TILE - 6, 6, 2); // top bar
+            floor.fillRect(px + TILE - 6, py + TILE - 4, 12, 2); // mid-top bar
+            floor.fillRect(px + TILE - 6, py + TILE - 2, 12, 2); // mid-bot bar
+            floor.fillRect(px + TILE - 3, py + TILE,     6, 2); // bottom bar
+          }
         }
+      }
+    }
+
+    // Hallway runner strip — corridor identity down the walkway row (y=3)
+    if (roomId.includes('hallway')) {
+      const runnerRowY = 3; // middle walkway row of the 20x7 hallway
+      const runnerX = 1 * TILE;           // inset 1 tile from left
+      const runnerW = (room.width - 2) * TILE; // inset 1 tile from right
+      const runnerY = runnerRowY * TILE;
+      // Muted teal base
+      floor.fillStyle(0x3e6b6b, 0.55);
+      floor.fillRect(runnerX, runnerY, runnerW, TILE);
+      // Top border
+      floor.fillStyle(0x2a4a4a, 0.7);
+      floor.fillRect(runnerX, runnerY, runnerW, 2);
+      // Bottom border
+      floor.fillRect(runnerX, runnerY + TILE - 2, runnerW, 2);
+      // Stitch ticks every 16px along top border
+      floor.fillStyle(0x5a8a8a, 0.5);
+      for (let tx = runnerX; tx < runnerX + runnerW; tx += 16) {
+        floor.fillRect(tx, runnerY, 3, 2);
+        floor.fillRect(tx, runnerY + TILE - 2, 3, 2);
       }
     }
 
@@ -744,7 +843,7 @@ export class ExplorationScene extends Phaser.Scene {
       }
 
       // Physics collision body (invisible) — skip tiles occupied by doors
-      const doors: Array<{ x: number; y: number }> = (room as any).doors || [];
+      // (doors already declared above at floor render time — reuse same array)
       if (obsType === 'wall' && doors.length > 0) {
         // Build collision per-tile, skipping door tiles (and 1 tile adjacent inward)
         for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
