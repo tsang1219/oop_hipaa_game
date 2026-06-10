@@ -136,6 +136,16 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 - [x] **CERT-03**: An end NPC in the Medical Records closer uses the configured sponsor's character sprite and two configured dialogue lines to hand the prize
 - [ ] **CERT-04**: Sponsor data is read from a single config file with shape `{ name, character_sprite, two_dialogue_lines, code }` — swapping sponsors requires only a config file edit, no source-code changes
 
+## v2.3 Requirements (Active — Nintendo Polish)
+
+NPC portrait system for dialogue overlay. VIS-04..08 are reserved for Phases 26/27 to define (full-character dialogue system expansion, sprite animation pipeline).
+
+### Dialogue Portraits (Phase 25)
+
+- [ ] **VIS-01**: The dialogue overlay (BattleEncounterScreen) renders the speaking NPC as a >=96px pixelated portrait CSS-cropped from frame 0 (idle-down) of the same `npc_<type>_sheet` PNG BootScene preloads (Phase 21 CertificateOverlay / Phase 24 NPCReactionBubble crop pattern). The NPCSprite SVG placeholder no longer appears anywhere in dialogue, and NPCSprite.tsx is deleted once it has zero consumers.
+- [ ] **VIS-02**: Every named NPC in roomData.json carries a `sprite` type field (one of the 9 BootScene sheet types), and dialogue portrait resolution is data-driven via a `getNPCPortraitPath(npcId)` resolver in spriteAssetPaths.ts built from that data — no hardcoded component-level npcId map. Unknown/unmapped npcIds fall back to the staff sheet AND emit a `console.warn` in dev mode — named characters never silently render generic.
+- [ ] **VIS-03**: The portrait sits in a framed plate with the NPC's name and shows a subtle idle animation (breathing bob, ~2.4s loop, 2-3px amplitude) while dialogue is on screen (Commandment 4 — NPCs are people, not icons). Dialogue flow, choices, feedback, and scoring behave exactly as before — zero regression to GameContainer logic; `npm run check` and `npm run build` clean.
+
 ## Out of Scope
 
 | Feature | Reason |
@@ -235,10 +245,15 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | SORTV2-14 | Phase 24 | Complete |
 | SORTV2-15 | Phase 24 | Complete |
 
+| VIS-01 | Phase 25 | Pending |
+| VIS-02 | Phase 25 | Pending |
+| VIS-03 | Phase 25 | Pending |
+
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0
 - v2.1 requirements (Phase 16 portion + Phase 22 portion + Phase 17 portion + Phase 23 portion + Phase 24 portion): 27 total (SORT-01..06, SORTV2-01..15, TRIA-01..06), mapped: 27, unmapped: 0
 - v2.2 requirements: 18 total, mapped: 18, unmapped: 0
+- v2.3 requirements: 3 total, mapped: 3, unmapped: 0
 
 ---
 *Requirements defined: 2026-03-26*
