@@ -50,6 +50,9 @@ import { SorterContextCard } from '@/components/phi-sorter/SorterContextCard';
 import { SorterDebrief } from '@/components/phi-sorter/SorterDebrief';
 import { EncounterRequestModal } from '@/components/phi-sorter/EncounterRequestModal';
 import { getSorterDocumentSet } from '@/data/sorterData';
+import { BreachTriageOverlay } from '@/components/breach-triage/BreachTriageOverlay';
+import { TriageDebrief } from '@/components/breach-triage/TriageDebrief';
+import { getTriageIncidentSet } from '@/data/triageData';
 
 // Map an encounter ID to the NPC display name for the SorterDebrief "BACK TO {NPC}" close button.
 // PHASE 22 (data-only change — no routing, no state-machine changes):
@@ -60,6 +63,7 @@ const SORTER_LOCATION_LABELS: Record<string, string> = {
   'phi-sort-reception': 'AIYANA',
   'phi-sort-lab': 'MARCUS',
   'phi-sort-records': 'DR. TOVAR',
+  'breach-triage-er': 'PRIYA',  // Phase 17: Breach Triage close button reads "BACK TO PRIYA"
 };
 
 interface RoomWithDoors {
@@ -217,24 +221,27 @@ export default function UnifiedGamePage() {
   // player to click. Wave 1 still uses the auto-prep countdown.
   const [tdWavePause, setTdWavePause] = useState<{ wave: number; total: number } | null>(null);
 
-  // ── Encounter phase state (Phase 13 + 16) ──────────────────────
-  type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'phi-sorter' | 'debrief';
+  // ── Encounter phase state (Phase 13 + 16 + 17) ─────────────────
+  type EncounterPhase = 'idle' | 'narrative-card' | 'encounter' | 'phi-sorter' | 'breach-triage' | 'debrief';
   const [encounterPhase, setEncounterPhase] = useState<EncounterPhase>('idle');
   const [narrativeCardData, setNarrativeCardData] = useState<{
     narrativeText: string;
     config?: BreachDefenseInitData;         // optional — only TD encounters carry it
     encounterId: string;
-    type: 'td' | 'phi-sorter';             // discriminator (Phase 16)
+    type: 'td' | 'phi-sorter' | 'breach-triage';  // discriminator (Phase 16 + 17)
     sorterConfig?: { documentSetId: string }; // present when type === 'phi-sorter'
+    triageConfig?: { incidentSetId: string }; // present when type === 'breach-triage' (Phase 17)
   } | null>(null);
   const [encounterResult, setEncounterResult] = useState<{
     encounterId: string;
     outcome: 'victory' | 'defeat';
     securityScore: number;
     scoreContribution: number;
-    takeaways?: string[];        // sorter-only: presence of this field discriminates sorter vs TD debrief
-    correctCount?: number;       // sorter-only: feeds SorterDebrief accuracy bar
-    totalCount?: number;         // sorter-only: feeds SorterDebrief accuracy bar
+    takeaways?: string[];        // sorter-only + triage: presence discriminates from TD debrief
+    correctCount?: number;       // sorter + triage: feeds accuracy bar
+    totalCount?: number;         // sorter + triage: feeds accuracy bar
+    avgResponseMs?: number;      // triage-only: feeds AVG RESPONSE stat in TriageDebrief
+    kind?: 'triage';             // triage-only discriminator — sorter leaves this absent
   } | null>(null);
 
   // ── Encounter request modal state (NPC-driven trigger, 2026-05-08) ──
@@ -247,6 +254,7 @@ export default function UnifiedGamePage() {
     requestText: string;
     encounterId: string;
     documentSetId: string;
+    encounterType?: 'phi-sorter' | 'breach-triage';  // Phase 17: discriminates which overlay to launch
   } | null>(null);
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
@@ -991,6 +999,7 @@ export default function UnifiedGamePage() {
       requestText: string;
       encounterId: string;
       documentSetId: string;
+      encounterType?: 'phi-sorter' | 'breach-triage';
     }) => {
       setEncounterRequest(data);
     };
@@ -1006,18 +1015,31 @@ export default function UnifiedGamePage() {
     };
   }, []);
 
-  // Accept handler: skip the narrative card phase and go directly to the sorter.
+  // Accept handler: skip the narrative card phase and go directly to the encounter.
   // (The modal already provided the NPC framing — narrative card would be redundant.)
+  // Phase 17: branches on encounterType to route to breach-triage vs phi-sorter.
   const handleAcceptEncounterRequest = useCallback(() => {
     if (!encounterRequest) return;
-    const { encounterId, documentSetId } = encounterRequest;
-    setNarrativeCardData({
-      narrativeText: '',
-      encounterId,
-      type: 'phi-sorter',
-      sorterConfig: { documentSetId },
-    });
-    setEncounterPhase('phi-sorter');
+    const { encounterId, documentSetId, encounterType } = encounterRequest;
+
+    if (encounterType === 'breach-triage') {
+      setNarrativeCardData({
+        narrativeText: '',
+        encounterId,
+        type: 'breach-triage',
+        triageConfig: { incidentSetId: documentSetId },
+      });
+      setEncounterPhase('breach-triage');
+    } else {
+      // Default: phi-sorter (backward compat with Aiyana, Marcus, Dr. Tovar)
+      setNarrativeCardData({
+        narrativeText: '',
+        encounterId,
+        type: 'phi-sorter',
+        sorterConfig: { documentSetId },
+      });
+      setEncounterPhase('phi-sorter');
+    }
     setEncounterRequest(null);
   }, [encounterRequest]);
 
@@ -1068,6 +1090,44 @@ export default function UnifiedGamePage() {
     setNarrativeCardData(null);
     eventBridge.emit(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, { aborted: true });
   }, []);
+
+  // Breach Triage encounter completion handler (Phase 17)
+  // Mirrors handleSorterComplete — routes to TriageDebrief via kind:'triage' discriminator.
+  const handleTriageComplete = useCallback((result: {
+    encounterId: string;
+    correctCount: number;
+    totalCount: number;
+    scoreContribution: number;
+    avgResponseMs: number;
+    takeaways: [string, string];
+  }) => {
+    const incidentSet = getTriageIncidentSet(narrativeCardData?.triageConfig?.incidentSetId ?? '');
+    const accuracy = result.totalCount > 0 ? result.correctCount / result.totalCount : 0;
+    const passingAccuracy = incidentSet?.passingAccuracy ?? 0.7;
+    const outcome: 'victory' | 'defeat' = accuracy >= passingAccuracy ? 'victory' : 'defeat';
+
+    setEncounterResult({
+      encounterId: result.encounterId,
+      outcome,
+      securityScore: Math.round(accuracy * 100),
+      scoreContribution: result.scoreContribution,
+      takeaways: result.takeaways.filter((t: string) => t && t.length > 0),
+      correctCount: result.correctCount,
+      totalCount: result.totalCount,
+      avgResponseMs: result.avgResponseMs,
+      kind: 'triage',
+    });
+    setEncounterPhase('debrief');
+
+    if (result.scoreContribution > 0) {
+      gameState.addScore(result.scoreContribution);
+    }
+    gameState.recordEncounterResult(result.encounterId, {
+      completed: true,
+      score: result.correctCount,
+      outcome,
+    });
+  }, [narrativeCardData, gameState]);
 
   // PHI Sorter encounter completion handler (Phase 16)
   const handleSorterComplete = useCallback((result: {
@@ -1547,6 +1607,16 @@ export default function UnifiedGamePage() {
           />
         )}
 
+        {/* Phase 17: Breach Triage encounter — Act 3 ER, Priya the Privacy Officer */}
+        {encounterPhase === 'breach-triage' && narrativeCardData?.triageConfig && (
+          <BreachTriageOverlay
+            incidentSetId={narrativeCardData.triageConfig.incidentSetId}
+            encounterId={narrativeCardData.encounterId}
+            onComplete={handleTriageComplete}
+            onAbort={handleSorterAbort}
+          />
+        )}
+
         {/* NPC-driven encounter request modal — shown when the player presses
             SPACE on Aiyana (Reception) or Marcus (Lab). Replaced the proximity-
             tile auto-pop on 2026-05-08 so the player has explicit agency. */}
@@ -1561,8 +1631,20 @@ export default function UnifiedGamePage() {
         )}
 
         {encounterPhase === 'debrief' && encounterResult && (
-          encounterResult.takeaways && encounterResult.takeaways.length > 0 ? (
-            // Sorter completion — sorter-themed debrief, no TD content
+          encounterResult.kind === 'triage' ? (
+            // Phase 17: Breach Triage debrief — accuracy bar + AVG RESPONSE + takeaways
+            <TriageDebrief
+              encounterId={encounterResult.encounterId}
+              correctCount={encounterResult.correctCount ?? 0}
+              totalCount={encounterResult.totalCount ?? 0}
+              scoreContribution={encounterResult.scoreContribution}
+              avgResponseMs={encounterResult.avgResponseMs ?? 0}
+              takeaways={encounterResult.takeaways as [string, string] ?? ['', '']}
+              locationLabel={SORTER_LOCATION_LABELS[encounterResult.encounterId]}
+              onDismiss={handleDismissDebrief}
+            />
+          ) : encounterResult.takeaways && encounterResult.takeaways.length > 0 ? (
+            // Phase 16: PHI Sorter debrief — sorter-themed, no TD content
             <SorterDebrief
               encounterId={encounterResult.encounterId}
               correctCount={encounterResult.correctCount ?? 0}
@@ -1573,7 +1655,7 @@ export default function UnifiedGamePage() {
               onDismiss={handleDismissDebrief}
             />
           ) : (
-            // TD encounter (Phase 13) — original debrief
+            // Phase 13: TD encounter debrief — original debrief
             <EncounterDebrief
               encounterId={encounterResult.encounterId}
               outcome={encounterResult.outcome}
