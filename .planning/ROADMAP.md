@@ -250,8 +250,8 @@ Plans:
 ### Phase 23: PHI Sorter Redesign — Feedback Moments
 **Goal**: Every interaction in the sorter produces visible/audible/character response (Commandment 1) at proportional weight (Commandment 8): per-drop particle bursts + camera shake, animated bucket counters, completion overlay before debrief, score animations on each correct, NPC reaction enthusiasm scales with accuracy.
 **Depends on**: Phase 22 (humor + NPC speech bubble framework already in place)
-**Requirements**: SORTV2-07, SORTV2-08, SORTV2-09, SORTV2-10 (TBD during /gsd:plan-phase)
-**Branch**: `gsd/phase-23-phi-sorter-feedback`
+**Requirements**: SORTV2-07, SORTV2-08, SORTV2-09, SORTV2-10
+**Branch**: none — commit to main per branching_strategy (Phases 16-22 precedent)
 **Success Criteria** (what must be TRUE):
   1. Each correct drop fires a particle burst on the destination bucket (≥6 particles, color-matched green for correct / red for wrong) plus a brief camera shake (~80ms, 2-3px amplitude). Wrong drops also flash + shake (no positive particles). Both are independent of the existing border flash.
   2. Both buckets render visible running counters that animate with a small bounce on each increment ("PHI: 3 redacted" / "Not PHI: 2 kept"). Counters reset when the encounter restarts.
@@ -259,7 +259,11 @@ Plans:
   4. The score counter (compliance score in the HUD if visible, or a local sorter score) pulses each time it increments. Increment magnitude is proportional to whether the call was a "HOLD IT" tricky one (+2) or a regular item (+1).
   5. NPC speech bubble reaction lines escalate in enthusiasm as accuracy climbs above 80%, deflate slightly below 50%. Tone change is felt without text reading like a scoreboard.
   6. All Phase 22 success criteria still hold.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 23`)
+**Plans:** 2 plans
+
+Plans:
+- [ ] 23-01-PLAN.md — Foundation: SORTV2-07..10 in REQUIREMENTS.md, Phase 23 CSS keyframes, BucketZone counters + particle bursts, SorterCompletionOverlay component, enthusiasm-scaled reaction-bank band variants
+- [ ] 23-02-PLAN.md — Integration: PHISorterOverlay wiring (camera shake, bucket counts, +2/+1 score pulse, 'celebrating' completion phase, band-transition reactions) + Phase 22/16 regression verification
 
 ### Phase 24: PHI Sorter Redesign — Format Shift (Papers Please)
 **Goal**: The sorter shifts from a multi-card pile to a one-document-at-a-time desk surface: KEEP / REDACT stamps replace bucket drops; documents slide in and stamp marks persist; soft visible clock adds urgency without hard-fail; NPC portrait stays present above the desk through the whole encounter. The redesign reuses Phase 22 content and Phase 23 feedback layer wholesale.
