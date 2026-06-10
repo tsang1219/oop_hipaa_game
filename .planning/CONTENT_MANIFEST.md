@@ -299,6 +299,38 @@ Item counts (Phase 22): 10 / 10 / 10 (Set 1 / Set 2 / Set 3)
 
 ---
 
+## Breach Triage Encounter (Phase 17)
+
+All incident sets live in: **`client/src/data/triageData.ts`** → `BREACH_TRIAGE_SETS` constant
+
+HIPAA topic tags: "Breach Notification Rule (45 CFR §164.400-414)"
+
+Each incident set has: `id`, `npcId`, `npcName`, `npcRole`, `contextCard`, `incidents[]`, `passingAccuracy`, `takeaways[2]`
+
+### Incident Set: breach-triage-set-1
+
+NPC: Priya (Privacy Officer) — `priya_privacy_officer`
+
+Context card: Priya's Triage Queue — she's on her third queue today, precise and exhausted, needs help classifying incidents and determining notification obligations.
+
+| ID | Headline | Reportable? | HIPAA Topic / CFR Section | Difficulty |
+|----|----------|-------------|--------------------------|------------|
+| `misdirected-fax` | MISDIRECTED FAX — DISCHARGE SUMMARY | YES | Impermissible disclosure; individual notify; <500 = annual OCR log (§164.402, §164.404, §164.408) | 1 |
+| `unencrypted-laptop` | LAPTOP STOLEN — STAFF PARKING LOT | YES | Unsecured PHI; 1,200 records >500 threshold → patient + OCR concurrent + media notice (§164.402, §164.404, §164.406, §164.408) | 1 |
+| `encrypted-laptop` | LAPTOP LEFT IN RIDESHARE — ENCRYPTED | NO | Encryption safe harbor; encrypted PHI is not "unsecured PHI" (§164.402) | 2 |
+| `hr-snooping` | UNAUTHORIZED ACCESS — HR REP, BEHAVIORAL HEALTH RECORDS | YES | Intentional unauthorized access; individual notify; internal location is not an exception (§164.402, §164.404) | 2 |
+| `good-faith-glance` | WRONG CHART OPENED — FLOAT NURSE, SELF-REPORTED | NO | Good-faith exception; unintentional acquisition, immediate self-report, no further use (§164.402(1)(i)) | 2 |
+| `vendor-breach` | BUSINESS ASSOCIATE BREACH — 3,400 RECORDS EXFILTRATED | YES | BA notifies CE ≤60 days; CE owns patient+OCR+media (>500); BA delay eats CE's clock (§164.404, §164.406, §164.408, §164.410) | 2 |
+| `internal-misuse` | UNAUTHORIZED EXPORT — REGISTRATION CLERK, PATIENT CONTACT LIST | YES | Impermissible use for personal gain; individual notify; <500 annual OCR log (§164.402, §164.404, §164.408) | 2 |
+| `deceased-records` | HISTORICAL RECORDS RELEASED — PATIENT DECEASED 1962 | NO | 50-year post-death PHI rule; 60+ years deceased = no longer PHI (§164.502(f)) | 3 |
+| `ransomware` | RANSOMWARE — FILE SERVER ENCRYPTED, 2,800 RECORDS AT RISK | YES | Breach presumption for ransomware on unsecured PHI; no-exfil not a defense; >500 → full notification (§164.402; OCR 2016) | 3 |
+
+**Takeaways (shown in TriageDebrief):**
+1. Breach presumption + encryption safe harbor: ransomware on unsecured PHI is presumed a breach unless disproved; encrypted PHI = not unsecured PHI.
+2. 60-day clock, 500-record threshold: individual notification within 60 days of discovery; >500 residents in a state/jurisdiction adds media + concurrent OCR notice.
+
+---
+
 ## Revision History
 
 | Date | Change | Author |
