@@ -370,13 +370,17 @@ Plans:
 ### Phase 26: Room Visual Up-Level (Furniture + Floors)
 **Goal**: The six departments and hallways read as distinct, furnished spaces: room-specific floor treatments, an upgraded furniture detail pass on the most-seen objects, visible glow/sparkle on educational collectibles, and idle motion on at least three furniture types.
 **Depends on**: Phase 25
-**Requirements**: VIS-04, VIS-05, VIS-06 (TBD during /gsd:plan-phase)
+**Requirements**: VIS-04, VIS-05, VIS-06 (defined in REQUIREMENTS.md by plan 26-01)
 **Success Criteria** (what must be TRUE):
   1. Each department has a visually distinct floor treatment (palette + pattern variation per room type) with visible wall/floor transition — rooms no longer look like recolors of the same grid.
   2. The 8 most-frequently-seen furniture textures get a detail pass (shading, highlights, readable silhouettes at 32px) and educational collectibles glow or sparkle so they are distinguishable at a glance (Commandment 9).
   3. At least 3 furniture types display a subtle idle animation (monitor flicker, coffee steam, plant sway) — rooms feel alive.
   4. No gameplay or collision changes; tsc and production build clean.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 26`)
+**Plans:** 2 plans
+
+Plans:
+- [ ] 26-01-PLAN.md — Define VIS-04..06 + per-room floor treatments (FLOOR_STYLES, reception + hallway runner, wall/floor contact shadow)
+- [ ] 26-02-PLAN.md — Furniture detail pass + furn_wall_sconce/furn_bench (kills 16 fallback desks) + collectible glow/sparkle + type-driven idle animations
 
 ### Phase 27: Navigation Clarity + Reward Sweep
 **Goal**: The player always knows where to go next without being told twice: the next-objective door breathes with a soft glow, in-room remaining objectives are discoverable at a glance, and the moment-to-moment reward layer (score blips, completion ticks, discovery chimes) is audited against Commandments 1 and 8 with gaps filled.
