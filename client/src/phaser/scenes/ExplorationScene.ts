@@ -912,6 +912,7 @@ export class ExplorationScene extends Phaser.Scene {
       }
       sprite.setDepth(10);
       if (!collected) {
+        // Bob tween — keep as-is
         this.tweens.add({
           targets: sprite,
           y: sprite.y - 4,
@@ -921,30 +922,50 @@ export class ExplorationScene extends Phaser.Scene {
           ease: 'Sine.easeInOut',
         });
 
-        // Item shimmer (alpha pulse)
-        this.tweens.add({
-          targets: sprite,
-          alpha: { from: 1, to: 0.7 },
-          duration: 800,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-
-        // Golden glow ring for uncollected items
-        if (!this.collectedItems.has(item.id)) {
-          const itemGlow = this.add.circle(sprite.x, sprite.y, 14, 0xffd700, 0)
-            .setStrokeStyle(1, 0xffd700, 0)
+        // Filled glow aura: additive gold pulsing behind the item sprite
+        // The aura stays anchored; the bob moves the sprite above it — glow reads as floor-glow
+        if (this.textures.exists('particle_circle')) {
+          const aura = this.add.image(sprite.x, sprite.y + 2, 'particle_circle')
+            .setScale(7)
+            .setTint(0xffd700)
+            .setBlendMode(Phaser.BlendModes.ADD)
+            .setAlpha(0.18)
             .setDepth(sprite.depth - 1);
           this.tweens.add({
-            targets: itemGlow,
-            strokeAlpha: { from: 0, to: 0.5 },
-            scale: { from: 0.7, to: 1.2 },
-            duration: 1000,
+            targets: aura,
+            alpha: { from: 0.18, to: 0.38 },
+            scale: { from: 6, to: 8 },
+            duration: 1100,
             yoyo: true,
             repeat: -1,
-            ease: 'Sine.easeInOut'
+            ease: 'Sine.easeInOut',
           });
+        } else {
+          // Fallback: filled circle alpha pulse (never stroke-only)
+          const auraFallback = this.add.circle(sprite.x, sprite.y + 2, 20, 0xffd700, 0.12)
+            .setDepth(sprite.depth - 1);
+          this.tweens.add({
+            targets: auraFallback,
+            alpha: { from: 0.12, to: 0.28 },
+            duration: 1100,
+            yoyo: true,
+            repeat: -1,
+            ease: 'Sine.easeInOut',
+          });
+        }
+
+        // Periodic sparkle — the Zelda "this thing matters" twinkle (Commandment 9)
+        if (this.textures.exists('particle_circle')) {
+          this.add.particles(sprite.x, sprite.y, 'particle_circle', {
+            speed: { min: 8, max: 20 },
+            scale: { start: 0.8, end: 0 },
+            alpha: { start: 0.9, end: 0 },
+            tint: [0xffffff, 0xffe9a0],
+            lifespan: 500,
+            frequency: 1400,
+            quantity: 2,
+            angle: { min: 0, max: 360 },
+          } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(sprite.depth + 1);
         }
       }
       this.interactables.push({ type: 'item', id: item.id, data: item, sprite });
