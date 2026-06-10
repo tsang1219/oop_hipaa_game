@@ -277,7 +277,7 @@ Plans:
   4. A wall clock or wristwatch is visible in a corner counting down per-set. At 0:00 the encounter wraps with whatever's been stamped — unstamped items don't count toward score, no fail screen ("shift's over, leave the rest for the auditor"). Per-set durations: Set 1 = 90s, Set 2 = 75s, Set 3 = 60s.
   5. The trigger NPC (Aiyana / Marcus) portrait + name stays visible above the desk during the whole encounter. Speech bubble reactions from Phase 22-23 fire from the persistent portrait location.
   6. Keyboard parity preserved: keyboard-only completion is fully supported (key to focus stamp, Enter to commit, arrow to switch stamps). All existing Phase 22 + Phase 23 success criteria still hold.
-**Plans:** 3 plans
+**Plans:** 1/3 plans executed
 
 Plans:
 - [ ] 24-01-PLAN.md — Foundation: SORTV2-11..15 in REQUIREMENTS.md, BootScene SFX keys (stamp-thunk + paper-rustle from vendored Kenney packs), shiftSeconds in sorterData, 6 desk-format CSS keyframes
@@ -372,4 +372,4 @@ Plans:
 | 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 22. PHI Sorter Redesign — Content + Connection | v2.1 | 4/4 | Complete | 2026-06-10 |
 | 23. PHI Sorter Redesign — Feedback Moments | 2/2 | Complete    | 2026-06-10 | - |
-| 24. PHI Sorter Redesign — Format Shift | v2.1 | 0/0 | Pending | - |
+| 24. PHI Sorter Redesign — Format Shift | 1/3 | In Progress|  | - |

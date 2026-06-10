@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T05:33:27.797Z"
+last_updated: "2026-06-10T05:53:19.941Z"
 progress:
-  total_phases: 19
+  total_phases: 20
   completed_phases: 16
-  total_plans: 49
-  completed_plans: 47
+  total_plans: 52
+  completed_plans: 48
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 23 — PHI Sorter Feedback Moments (Complete)
-Plan: 23-02 (Complete) → Phase 24 (Next)
-Status: Both plans shipped. SORTV2-07..10 satisfied. PHISorterOverlay wired with shake, counters, score pulse, celebrating phase, band-transition reactions. Build clean, all Phase 22/16 invariants confirmed by grep.
-Last activity: 2026-06-10 — Phase 23 Plan 02 complete. PHISorterOverlay fully wired: camera shake + bucket counters + score pulse + three-effect celebrating pipeline + band-transition NPC reactions. Live playthroughs deferred to user per Phase 16/17/22 pattern.
+Phase: Phase 24 — PHI Sorter Format Shift (In Progress)
+Plan: 24-01 (Complete) → 24-02 (Next)
+Status: Plan 01 foundation shipped. SORTV2-11..15 defined, sfx_sorter_stamp/paper preloaded, shiftSeconds on SorterDocumentSet (90/75/60), 6 CSS keyframes (doc-slide-in/off-left/off-right, ink-stamp-in, stamp-press, clock-pulse) committed as contract surface for Plans 02/03. Build and typecheck clean.
+Last activity: 2026-06-10 — Phase 24 Plan 01 complete. Foundation data/config/CSS groundwork laid. No user-visible behavior change.
 
 Progress: [█░░░░░░░░░] 10%
 
@@ -58,6 +58,7 @@ Progress: [█░░░░░░░░░] 10%
 | Phase 17-breach-triage-encounter P03 | 6min | 3 tasks | 7 files |
 | Phase 23-phi-sorter-feedback-moments P01 | 5min | 3 tasks | 5 files |
 | Phase 23-phi-sorter-feedback-moments P02 | 4min | 2 tasks | 1 files |
+| Phase 24-phi-sorter-format-shift P01 | 9 | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -146,6 +147,9 @@ Progress: [█░░░░░░░░░] 10%
 - [Phase 23-phi-sorter-feedback-moments P02]: Shake surface is inner wrapper div; close button + NPC bubble + toast + SorterCompletionOverlay stay outside — shaking anchored overlays looks like a bug
 - [Phase 23-phi-sorter-feedback-moments P02]: prevBandRef updated BEFORE HOLD IT branch so no late band-transition fires on the next drop; ≥3 drop gate suppresses noisy early signals
 - [Phase 23-phi-sorter-feedback-moments P02]: Band-transition reaction takes priority over specific-item reaction — player hears tone shift; nonce cycling prevents repeating same band line
+- [Phase 24]: sfx_sorter_stamp = impactPlank_medium_000.ogg from kenney_impact-sounds; sfx_sorter_paper = scroll_002.ogg from kenney_interface-sounds — both vendored, no new binaries (Phase 24-01)
+- [Phase 24]: ink-stamp-in CSS keyframe uses --ink-rot CSS variable for per-stamp angle variation without JS randomization (Phase 24-01)
+- [Phase 24]: clock-pulse keyframe handles scale only; <10s color shift handled by class swap in component — separation of animation and color concerns (Phase 24-01)
 
 ### Pending Todos
 
