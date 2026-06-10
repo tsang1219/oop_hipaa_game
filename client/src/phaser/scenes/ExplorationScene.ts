@@ -547,6 +547,38 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
+    // ── Wall/floor contact shadow ─────────────────────────────────
+    // A 3-step vertical gradient at the top edge of each floor tile directly
+    // below a wall bottom — classic SNES ambient-occlusion strip.
+    // Drawn into the same `floor` Graphics object so depth is unchanged.
+    for (const obs of room.obstacles) {
+      if ((obs as any).type !== 'wall') continue;
+      const rowY = obs.y + obs.height; // floor row immediately below wall bottom
+      if (rowY >= room.height) continue; // off-map (no floor below)
+      for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
+        // Skip door-adjacent columns so walkable openings stay clean
+        const nearDoorH = doors.some(d => d.y === rowY - 1 && Math.abs(d.x - wx) <= 1);
+        if (nearDoorH) continue;
+        // Skip tiles occupied by another obstacle (furniture or wall above)
+        const blocked = room.obstacles.some((o: any) =>
+          wx >= o.x && wx < o.x + o.width && rowY >= o.y && rowY < o.y + o.height
+        );
+        if (blocked) continue;
+        const spx = wx * TILE;
+        const spy = rowY * TILE;
+        // Step 1 — darkest 3px at very top (directly below wall)
+        floor.fillStyle(0x000000, 0.18);
+        floor.fillRect(spx, spy, TILE, 3);
+        // Step 2 — medium band +3 to +5
+        floor.fillStyle(0x000000, 0.10);
+        floor.fillRect(spx, spy + 3, TILE, 2);
+        // Step 3 — lightest fade +5 to +8
+        floor.fillStyle(0x000000, 0.05);
+        floor.fillRect(spx, spy + 5, TILE, 3);
+      }
+    }
+    // ─────────────────────────────────────────────────────────────
+
     // Room-specific ambient color overlay — visible mood tint
     const roomTints: Record<string, { color: number; alpha: number }> = {
       hospital_entrance: { color: 0xf5e6d0, alpha: 0.06 },  // Warm lobby glow
