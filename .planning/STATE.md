@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T06:49:39.869Z"
+last_updated: "2026-06-10T07:08:43.508Z"
 progress:
-  total_phases: 21
+  total_phases: 22
   completed_phases: 18
-  total_plans: 54
-  completed_plans: 52
+  total_plans: 56
+  completed_plans: 53
 ---
 
 # Project State
@@ -22,10 +22,10 @@ See: .planning/PROJECT.md (updated 2026-05-07)
 
 ## Current Position
 
-Phase: Phase 25 — Dialogue Portraits (Complete)
-Plan: 25-01 (Complete) → 25-02 (Complete)
-Status: Phase 25 complete. DialoguePortrait component wired into BattleEncounterScreen; NPCSprite SVG placeholder deleted; tsc + production build clean; VIS-01 and VIS-03 requirements met.
-Last activity: 2026-06-10 — Phase 25 Plan 02 complete. 96px breathing NPC portraits in dialogue overlay, NPCSprite.tsx deleted.
+Phase: Phase 26 — Room Visual Up-Level (In Progress)
+Plan: 26-01 (Complete)
+Status: Phase 26 Plan 01 complete. FLOOR_STYLES extracted, reception + hallway treatments added, wall/floor contact shadow pass implemented. VIS-04 requirement met; VIS-04..06 defined in REQUIREMENTS.md.
+Last activity: 2026-06-10 — Phase 26 Plan 01 complete. Per-room floor distinctness + contact shadow; tsc + production build clean.
 
 Progress: [████░░░░░░] 50% (estimated)
 
@@ -63,6 +63,7 @@ Progress: [████░░░░░░] 50% (estimated)
 | Phase 24-phi-sorter-format-shift P03 | 7 | 2 tasks | 3 files |
 | Phase 25-dialogue-portraits P01 | 3min | 3 tasks | 3 files |
 | Phase 25-dialogue-portraits P02 | 3 | 3 tasks | 4 files |
+| Phase 26-room-visual-uplevel P01 | 4min | 3 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -163,6 +164,9 @@ Progress: [████░░░░░░] 50% (estimated)
 - [Phase 25-01]: getNPCPortraitPath built from roomData.json sprite fields at module load (IIFE index) — no hardcoded npcId map, single source of truth
 - [Phase 25-01]: Fallback to npc_staff_sheet with loud console.warn in DEV — named characters never silently render generic
 - [Phase 25-dialogue-portraits]: 96px CSS-crop portrait at 3x scale in dialogue overlay — breathing-bob on crop layer only, frame stays rock-still; NPCSprite SVG placeholder fully deleted
+- [Phase 26-01]: FLOOR_STYLES module-level config in ExplorationScene.ts; floorStyleFor() checks 'hallway' FIRST — hallway_reception_break resolves to hallway style, not reception/break
+- [Phase 26-01]: Contact shadow drawn into same floor Graphics object (not decorGfx) — preserves depth stack; 'doors' array hoisted above floor render loop, duplicate declaration in collision block removed
+- [Phase 26-01]: Reception large-format tile illusion via 2x2 grout (no per-tile grout), navy accent diamonds at slab intersections (x%2===1 && y%2===1)
 
 ### Pending Todos
 
@@ -180,7 +184,7 @@ None.
 ## Session Continuity
 
 Last session: 2026-06-10
-Stopped at: Completed 25-02-PLAN.md — DialoguePortrait wired into BattleEncounterScreen, NPCSprite.tsx deleted, tsc + build clean. Phase 25 complete.
-Resume: Phase 25 is complete. Next phase TBD.
+Stopped at: Completed 26-01-PLAN.md — FLOOR_STYLES config, reception/hallway treatments, contact shadow, VIS-04 implemented. Phase 26 Plan 01 complete.
+Resume: Phase 26 Plan 02 ready (VIS-05 furniture texture detail pass + collectible glow).
 
 **Paused work (v2.1):** Phase 16 PHI Sorter Plan 04 (Phaser triggers + UnifiedGamePage routing) — resume after v2.2 ships and sponsor interest is gauged.
