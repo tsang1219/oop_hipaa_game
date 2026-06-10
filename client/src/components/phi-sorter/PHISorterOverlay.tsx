@@ -1,8 +1,12 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
-import { getSorterDocumentSet, type SorterItem as SorterItemData } from '@/data/sorterData';
-import { SorterItem } from './SorterItem';
-import { BucketZone } from './BucketZone';
+import { getSorterDocumentSet } from '@/data/sorterData';
+import { getSponsorSpritePath } from '@/data/spriteAssetPaths';
+import { DeskSurface } from './DeskSurface';
+import { ShiftClock } from './ShiftClock';
+import { OutgoingTray } from './OutgoingTray';
+import { StampPad, type StampKind } from './StampPad';
+import { DeskDocument, type DocAnimState } from './DeskDocument';
 import {
   getNPCReactionForItem,
   getNPCFallbackReaction,
@@ -35,23 +39,37 @@ export type PHISorterOverlayProps = {
 };
 
 // ── NPC display mapping ───────────────────────────────────────────────────────
-// Maps documentSetId → (npcId, display name, role) used by NPCReactionBubble and
-// the reaction-bank lookups. Stable across Phase 22 — no runtime changes needed.
+// Maps documentSetId → (npcId, display name, role, spriteKey) used by NPCReactionBubble and
+// the reaction-bank lookups. Phase 24 extends with spriteKey for portrait resolution.
+//
+// NPC portrait sheet mapping (matches each NPC's in-world roomData.json sprite):
+//   phi-sorter-set-1 → Aiyana (intake_officer sprite → 'npc_officer_sheet')
+//   phi-sorter-set-2 → Marcus (lab_aide sprite → 'npc_staff_sheet')
+//   phi-sorter-set-3 → Dr. Tovar (compliance_lead sprite → 'npc_officer_sheet')
 
 type NPCDisplay = {
   id: NPCSorterId;
   name: string;
   role: string;
+  spriteKey: string;
 };
 
 const NPC_DISPLAY_BY_SET: Record<string, NPCDisplay> = {
-  'phi-sorter-set-1': { id: 'aiyana', name: 'Aiyana', role: 'Intake Volunteer' },
-  'phi-sorter-set-2': { id: 'marcus', name: 'Marcus', role: 'Lab Aide' },
-  'phi-sorter-set-3': { id: 'tovar', name: 'Dr. Tovar', role: 'Compliance Lead' },
+  'phi-sorter-set-1': { id: 'aiyana',  name: 'Aiyana',    role: 'Intake Volunteer', spriteKey: 'npc_officer_sheet' },
+  'phi-sorter-set-2': { id: 'marcus',  name: 'Marcus',    role: 'Lab Aide',         spriteKey: 'npc_staff_sheet'   },
+  'phi-sorter-set-3': { id: 'tovar',   name: 'Dr. Tovar', role: 'Compliance Lead',  spriteKey: 'npc_officer_sheet' },
 };
 
 // Defensive default — should never fire if Plan 22-02 wired roomData correctly.
-const FALLBACK_NPC_DISPLAY: NPCDisplay = { id: 'aiyana', name: 'Co-worker', role: 'Staff' };
+const FALLBACK_NPC_DISPLAY: NPCDisplay = { id: 'aiyana', name: 'Co-worker', role: 'Staff', spriteKey: 'npc_staff_sheet' };
+
+// Shift-over NPC lines — voice-matched per Phase 22 banks (Record<NPCSorterId, string>).
+// These fire when secondsLeft hits 0 during the sort. Soft and honest — no fail language.
+const SHIFT_OVER_LINES: Record<NPCSorterId, string> = {
+  aiyana: "Shift's over! Leave the rest of the pile for the auditor — she loves that.",
+  marcus: "Aaand time. The unsorted ones go to the auditor. Godspeed, little manifests.",
+  tovar:  "Time. Whatever's left goes to the auditor's queue — that's what it's there for.",
+};
 
 /**
  * Top-level PHI Sorter encounter overlay.
@@ -59,20 +77,24 @@ const FALLBACK_NPC_DISPLAY: NPCDisplay = { id: 'aiyana', name: 'Co-worker', role
  * Starts directly in 'sorting' phase — UnifiedGamePage rendered SorterContextCard during
  * the prior 'narrative-card' phase (BLOCKER 2 fix: single render path, no double-card bug).
  *
- * Supports:
- *   - Mouse drag-and-drop (HTML5 DnD)
- *   - Keyboard: ↑↓ to cycle items, ←→ to highlight bucket, Enter/Space to commit
- *   - Per-bucket draggingOverBucket state (W2 fix: only active bucket highlights during drag)
- *   - Audio feedback via REACT_PLAY_SFX for correct/wrong/fanfare
- *   - 600ms anticipation beat before completion phase (Commandment 2)
- *   - Educational wrong-answer feedback panel ≥3s (Commandment 4)
- *   - PHASE 22: NPC speech bubble (NPCReactionBubble) with specific-item + accuracy-band reactions
- *   - PHASE 22: HOLD IT dramatic reveal on correct classification of the tricky item per set
- *   - PHASE 23: Camera shake (~80ms) on every drop — Commandment 1 proportional feedback (SORTV2-07)
- *   - PHASE 23: Animated bucket counters fed from bucketCounts state (SORTV2-08)
- *   - PHASE 23: Pulsing score readout (+2 HOLD IT / +1 regular, display-only) (SORTV2-10)
- *   - PHASE 23: 'celebrating' phase with SorterCompletionOverlay ~1.2s before onComplete (SORTV2-09)
- *   - PHASE 23: Band-transition-aware NPC reactions with nonce cycling (SORTV2-10)
+ * PHASE 22:
+ *   - NPC speech bubble (NPCReactionBubble) with specific-item + accuracy-band reactions
+ *   - HOLD IT dramatic reveal on correct classification of the tricky item per set
+ *
+ * PHASE 23:
+ *   - Camera shake (~80ms) on every stamp — Commandment 1 proportional feedback (SORTV2-07)
+ *   - Animated tray counters fed from trayCounts state (SORTV2-08)
+ *   - Pulsing score readout (+2 HOLD IT / +1 regular, display-only) (SORTV2-10)
+ *   - 'celebrating' phase with SorterCompletionOverlay ~1.2s before onComplete (SORTV2-09)
+ *   - Band-transition-aware NPC reactions with nonce cycling (SORTV2-10)
+ *
+ * PHASE 24:
+ *   - Papers Please desk format: one document at a time (SORTV2-11)
+ *   - KEEP/REDACT stamp commits with stamp-thunk SFX + ink mark + ink-splatter (SORTV2-12)
+ *   - Outgoing trays filling; timer expiry counts unstamped items in totalCount (SORTV2-13)
+ *   - Soft 90/75/60s shift clock — wraps at 0:00 with auditor line (SORTV2-14)
+ *   - Persistent NPC portrait hosting all reactions (SORTV2-15)
+ *   - Keyboard-only completion: ←/→ focus stamp, Enter/Space commit, Esc abort (SORTV2-15)
  */
 export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbort }: PHISorterOverlayProps) {
   const docSet = useMemo(() => getSorterDocumentSet(documentSetId), [documentSetId]);
@@ -111,24 +133,40 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // Phase starts at 'sorting' directly (context card was handled by UnifiedGamePage).
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [phase, setPhase] = useState<SorterPhase>('sorting');
+
+  // ── PHASE 24: Desk-format document state ────────────────────────────────────
+  // One document at a time indexed into docSet.items (SORTV2-11)
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [remainingItems, setRemainingItems] = useState<SorterItemData[]>(docSet.items);
+  const [currentDocIndex, setCurrentDocIndex] = useState(0);
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [selectedItemIdx, setSelectedItemIdx] = useState(0);
+  const [docAnimState, setDocAnimState] = useState<DocAnimState>('entering');
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [hoveredBucket, setHoveredBucket] = useState<'phi' | 'not_phi' | null>(null);
+  const [stampedKind, setStampedKind] = useState<StampKind | null>(null);
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [draggingItemId, setDraggingItemId] = useState<string | null>(null);
-  // W2 fix: tracks which specific bucket the cursor is over during mouse drag
+  const [lastWasCorrect, setLastWasCorrect] = useState<boolean | null>(null);
+
+  // Stamp focus/press state — focusedStamp stays sticky between documents
+  // (Papers Please rapid-keyboard rhythm: → Enter Enter Enter must work)
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [draggingOverBucket, setDraggingOverBucket] = useState<'phi' | 'not_phi' | null>(null);
+  const [focusedStamp, setFocusedStamp] = useState<StampKind | null>(null);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [pressedStamp, setPressedStamp] = useState<StampKind | null>(null);
+
+  // ── PHASE 24: Tray counts (renamed from bucketCounts — same shape) ──────────
+  // phi feeds REDACT tray, not_phi feeds KEEP tray; resets on mount for replay (SORTV2-13/08)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [trayCounts, setTrayCounts] = useState<{ phi: number; not_phi: number }>({ phi: 0, not_phi: 0 });
+
+  // ── PHASE 24: Shift clock (SORTV2-14) ────────────────────────────────────────
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [secondsLeft, setSecondsLeft] = useState(docSet.shiftSeconds);
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [shiftOver, setShiftOver] = useState(false);
+
+  // ── Phase 16/22/23 state preserved verbatim ───────────────────────────────────
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [correctCount, setCorrectCount] = useState(0);
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [bucketFeedback, setBucketFeedback] = useState<{
-    phi: 'idle' | 'correct' | 'incorrect';
-    not_phi: 'idle' | 'correct' | 'incorrect';
-  }>({ phi: 'idle', not_phi: 'idle' });
+
   // Educational wrong-answer panel — shown ≥3s (Commandment 4: teach why)
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [wrongFeedback, setWrongFeedback] = useState<{
@@ -149,11 +187,6 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [totalDropsSoFar, setTotalDropsSoFar] = useState(0);
 
-  // PHASE 23: Per-bucket drop tallies — reset on mount (resets per replay since UnifiedGamePage
-  // remounts the overlay for each encounter). Feeds the count prop on each BucketZone (SORTV2-08).
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const [bucketCounts, setBucketCounts] = useState<{ phi: number; not_phi: number }>({ phi: 0, not_phi: 0 });
-
   // PHASE 23: Display-only sorter score (+2 HOLD IT, +1 regular — never flows into onComplete).
   // scorePulseNonce is re-keyed on the score span to restart the CSS pulse animation each increment.
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -161,7 +194,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [scorePulseNonce, setScorePulseNonce] = useState(0);
 
-  // PHASE 23: Camera shake flag — boolean is sufficient; drops can't occur faster than 80ms animation.
+  // PHASE 23: Camera shake flag — boolean is sufficient; stamps can't occur faster than 80ms animation.
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isShaking, setIsShaking] = useState(false);
 
@@ -170,9 +203,15 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const prevBandRef = useRef<AccuracyBand>('good');
 
-  const npcDisplay = NPC_DISPLAY_BY_SET[documentSetId] ?? FALLBACK_NPC_DISPLAY;
+  // Ref array for cascade timeouts — cleared on unmount so abort mid-animation leaks nothing
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const cascadeTimersRef = useRef<ReturnType<typeof setTimeout>[]>([]);
 
+  const npcDisplay = NPC_DISPLAY_BY_SET[documentSetId] ?? FALLBACK_NPC_DISPLAY;
   const totalCount = docSet.items.length;
+
+  // Resolve NPC portrait path for Phase 24 persistent portrait (SORTV2-15)
+  const npcSpriteUrl = getSponsorSpritePath(npcDisplay.spriteKey);
 
   // Phase 22: Seed bubble with opening line on mount so the NPC is "present" from frame one
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -184,38 +223,88 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [docSet.id]);
 
+  // PHASE 24: Emit sfx_sorter_paper on mount — first document slides in (SORTV2-11)
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_paper', volume: 0.5 });
+    // Intentionally keyed to docSet.id — runs once per document set
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [docSet.id]);
+
+  // PHASE 24: Cleanup cascade timers on unmount — abort mid-animation leaks nothing
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    return () => {
+      cascadeTimersRef.current.forEach(clearTimeout);
+    };
+  }, []);
+
+  // ── PHASE 24: Shift clock engine (SORTV2-14) ─────────────────────────────────
+  // Interval keyed to [phase] — starts when sorting begins, stops otherwise.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (phase !== 'sorting') return;
+    const id = setInterval(() => {
+      setSecondsLeft((s) => Math.max(0, s - 1));
+    }, 1000);
+    return () => clearInterval(id);
+  }, [phase]);
+
+  // Separate narrow effect watches [secondsLeft] — shift-over transition
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (secondsLeft === 0 && phase === 'sorting' && !shiftOver) {
+      setShiftOver(true);
+      // NPC delivers the shift-over line (voice-matched per set)
+      setCurrentReactionText(SHIFT_OVER_LINES[npcDisplay.id]);
+      setCurrentReactionVariant('neutral');
+      // Do NOT setPhase here — Completion Effect 1 owns that transition
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [secondsLeft]);
+
   /**
-   * Core drop handler — invoked by both mouse drop and keyboard Enter/Space.
-   * Emits SFX, sets feedback state, removes item from pile, checks completion.
-   * PHASE 22: Also computes NPC reaction and fires HOLD IT reveal for tricky items.
-   * PHASE 23: Adds shake, bucket count increment, score pulse, and band-transition reactions.
+   * Core stamp handler — replaces handleDrop. Invoked by both mouse click and keyboard Enter/Space.
+   * Guards: bail unless sorting phase, document is active, and shift is not over.
+   * PHASE 22: Computes NPC reaction and fires HOLD IT reveal for tricky items.
+   * PHASE 23: Adds shake, tray count increment, score pulse, band-transition reactions.
+   * PHASE 24: Desk document lifecycle chain: stamped → exiting → next doc slides in.
    */
   // eslint-disable-next-line react-hooks/rules-of-hooks
-  const handleDrop = useCallback(
-    (itemId: string, bucket: 'phi' | 'not_phi') => {
-      const item = remainingItems.find((i) => i.id === itemId);
+  const handleStamp = useCallback(
+    (kind: StampKind) => {
+      if (phase !== 'sorting' || docAnimState !== 'active' || shiftOver) return;
+
+      const item = docSet.items[currentDocIndex];
       if (!item) return;
 
+      const bucket = kind === 'redact' ? 'phi' : 'not_phi';
       const isCorrect = item.category === bucket;
 
-      // PHASE 23: Increment bucket count on EVERY drop (SORTV2-08)
-      setBucketCounts((c) => ({ ...c, [bucket]: c[bucket] + 1 }));
+      // ── PHASE 24: Stamp feedback (SORTV2-12) ─────────────────────────────
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_stamp', volume: 0.8 });
+      setPressedStamp(kind);
+      const pressTimer = setTimeout(() => setPressedStamp(null), 150);
+      cascadeTimersRef.current.push(pressTimer);
+      setStampedKind(kind);
+      setLastWasCorrect(isCorrect);
+      setDocAnimState('stamped');
 
-      // PHASE 23: Camera shake on EVERY drop (SORTV2-07).
+      // PHASE 23: Increment tray count on EVERY stamp (SORTV2-08)
+      // phi feeds REDACT tray, not_phi feeds KEEP tray
+      setTrayCounts((c) => ({ ...c, [bucket]: c[bucket] + 1 }));
+
+      // PHASE 23: Camera shake on EVERY stamp (SORTV2-07).
       // 120ms clear gives the 80ms animation room to complete without queuing.
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 120);
 
-      // EXISTING Phase 16 audio + visual + wrong-feedback logic — preserved verbatim
+      // Correct / wrong audio + educational feedback (Phase 16 logic preserved verbatim)
       if (isCorrect) {
         setCorrectCount((c) => c + 1);
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_correct', volume: 0.7 });
-        setBucketFeedback((f) => ({ ...f, [bucket]: 'correct' }));
-        setTimeout(() => setBucketFeedback((f) => ({ ...f, [bucket]: 'idle' })), 400);
       } else {
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_wrong', volume: 0.7 });
-        setBucketFeedback((f) => ({ ...f, [bucket]: 'incorrect' }));
-        setTimeout(() => setBucketFeedback((f) => ({ ...f, [bucket]: 'idle' })), 500);
         // Educational feedback panel — teach the rule for ≥3s before fading
         setWrongFeedback({ label: item.label, explanation: item.explanation });
         setTimeout(() => setWrongFeedback(null), 3500);
@@ -254,7 +343,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         // When band crosses a threshold (and we have ≥3 drops for signal stability),
         // the tone-shift reaction takes priority — the player hears the band change.
         // Otherwise: specific-item reaction first, then nonce-cycled band fallback.
-        const specificReaction = getNPCReactionForItem(npcDisplay.id, itemId, isCorrect);
+        const specificReaction = getNPCReactionForItem(npcDisplay.id, item.id, isCorrect);
         const reaction = bandChanged
           ? getNPCFallbackReaction(npcDisplay.id, newBand, newTotalDrops)   // tone shift takes priority
           : specificReaction ?? getNPCFallbackReaction(npcDisplay.id, newBand, newTotalDrops);
@@ -264,39 +353,52 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
 
       setTotalDropsSoFar((n) => n + 1);
 
-      // Remove item; clamp selectedItemIdx to avoid out-of-bounds
-      setRemainingItems((prev) => {
-        const next = prev.filter((i) => i.id !== itemId);
-        setSelectedItemIdx((idx) => Math.max(0, Math.min(idx, next.length - 1)));
-        return next;
-      });
-      setHoveredBucket(null);
-      setDraggingItemId(null);
-      setDraggingOverBucket(null); // W2 fix: clear per-bucket drag state on drop
+      // ── PHASE 24: Document lifecycle chain (SORTV2-11/12/13) ─────────────────
+      // 350ms ink-mark dwell (inside the 250-400ms spec) → exiting → next doc slides in
+      const isLastDoc = currentDocIndex === totalCount - 1;
+
+      const t1 = setTimeout(() => {
+        setDocAnimState('exiting');
+      }, 350);
+      cascadeTimersRef.current.push(t1);
+
+      if (!isLastDoc) {
+        // Advance to next document after exit completes
+        const t2 = setTimeout(() => {
+          setCurrentDocIndex((i) => i + 1);
+          setStampedKind(null);
+          setLastWasCorrect(null);
+          setDocAnimState('entering');
+          eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_paper', volume: 0.5 });
+        }, 650); // 350ms stamp dwell + 300ms exit
+        cascadeTimersRef.current.push(t2);
+
+        const t3 = setTimeout(() => {
+          setDocAnimState('active');
+        }, 950); // 650ms advance + 300ms slide-in
+        cascadeTimersRef.current.push(t3);
+      } else {
+        // Last document — skip slide-in beats; advance index past end so Completion Effect 1 fires.
+        // No paper SFX for a document that doesn't exist.
+        const t2 = setTimeout(() => {
+          setCurrentDocIndex((i) => i + 1);
+          setStampedKind(null);
+          setLastWasCorrect(null);
+          setDocAnimState('entering');
+        }, 650); // 350ms stamp dwell + 300ms exit
+        cascadeTimersRef.current.push(t2);
+      }
     },
-    [remainingItems, correctCount, totalDropsSoFar, npcDisplay.id],
+    [phase, docAnimState, shiftOver, docSet.items, currentDocIndex, correctCount, totalDropsSoFar, totalCount, npcDisplay.id],
   );
 
   /**
-   * Per-bucket drag enter/leave handlers (W2 fix).
-   * Passed to each BucketZone so the parent knows which specific bucket the cursor is over.
-   * Prevents both buckets from highlighting simultaneously during a mouse drag.
-   */
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const handleBucketDragEnter = useCallback((bucketType: 'phi' | 'not_phi') => {
-    setDraggingOverBucket(bucketType);
-  }, []);
-
-  // eslint-disable-next-line react-hooks/rules-of-hooks
-  const handleBucketDragLeave = useCallback((bucketType: 'phi' | 'not_phi') => {
-    // Only clear if leaving the same bucket we entered — avoids child-element onDragLeave races
-    setDraggingOverBucket((curr) => (curr === bucketType ? null : curr));
-  }, []);
-
-  /**
-   * Completion Effect 1 — when the pile empties while in 'sorting', flip phase to 'completing'.
-   * Kept narrow (only depends on the trigger conditions) so the dep change is the
-   * phase flip itself, not the score values that change every drop.
+   * Completion Effect 1 — when all docs stamped (or shift expired while no doc animating),
+   * flip phase to 'completing'. Condition uses currentDocIndex >= totalCount (pile empty)
+   * OR (shiftOver while docAnimState is active/entering — no stamp in flight).
+   *
+   * The docAnimState guard lets a document that was already stamped when the clock hit 0:00
+   * finish its exit and count (it was committed in time).
    *
    * DO NOT merge Effects 1, 2, or 3 — commit 90f41b3 fixed the original bug where a
    * single merged effect cleared its own timeout via the phase flip it triggered.
@@ -304,10 +406,14 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
    */
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    if (phase === 'sorting' && remainingItems.length === 0) {
+    if (
+      phase === 'sorting' &&
+      (currentDocIndex >= totalCount ||
+        (shiftOver && (docAnimState === 'active' || docAnimState === 'entering')))
+    ) {
       setPhase('completing');
     }
-  }, [phase, remainingItems.length]);
+  }, [phase, currentDocIndex, totalCount, shiftOver, docAnimState]);
 
   /**
    * Completion Effect 2 — after entering 'completing', wait for the anticipation beat
@@ -315,8 +421,8 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
    *
    * Beat duration:
    *   - Normal: 600ms
-   *   - If the final drop was the HOLD IT item: 2200ms — lets the HOLD IT reveal breathe
-   *     before the celebration overlay appears. holdItReveal only changes via final drop
+   *   - If the final stamp was the HOLD IT item: 2200ms — lets the HOLD IT reveal breathe
+   *     before the celebration overlay appears. holdItReveal only changes via final stamp
    *     here, so no clear-own-timeout hazard.
    *
    * The fanfare now accompanies the celebration overlay's appearance (not the debrief handoff).
@@ -342,6 +448,8 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
    * Deps: [phase, correctCount, totalCount, encounterId, onComplete, docSet.takeaways]
    * None of these change during 'celebrating', so the timeout survives without being cleared.
    * scoreContribution formula Math.round((correctCount / totalCount) * 12) is sacred — unchanged.
+   * totalCount = docSet.items.length (FULL set) — timer-expired unstamped items don't score
+   * but are counted in the denominator, giving honest proportional score (SORTV2-14 decision).
    *
    * DO NOT merge with Effects 1 or 2. See Effect 1 comment above.
    */
@@ -363,9 +471,10 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
 
   /**
    * Keyboard handler — only active in 'sorting' phase.
-   * ↑/↓ cycle items, ←/→ highlight bucket, Enter/Space commit.
-   * All reactive values are in deps to prevent stale closures (research Pitfall 1).
-   * Cleanup via useEffect return prevents listener leaks (research Pitfall 2).
+   * ← focus KEEP stamp, → focus REDACT stamp, Enter/Space commit, Esc abort.
+   * focusedStamp stays sticky between documents so → Enter Enter Enter rapid-stamps correctly.
+   * handleStamp's own guards make mid-animation presses harmless.
+   * No ArrowUp/ArrowDown — items are no longer a scrollable list.
    */
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
@@ -377,34 +486,35 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         onAbort();
         return;
       }
-      if (remainingItems.length === 0) return;
-      if (e.key === 'ArrowUp' || e.key === 'ArrowDown') {
-        e.preventDefault();
-        const delta = e.key === 'ArrowDown' ? 1 : -1;
-        setSelectedItemIdx(
-          (idx) => (idx + delta + remainingItems.length) % remainingItems.length,
-        );
-      }
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
-        setHoveredBucket('not_phi');
+        setFocusedStamp('keep');
       }
       if (e.key === 'ArrowRight') {
         e.preventDefault();
-        setHoveredBucket('phi');
+        setFocusedStamp('redact');
       }
-      if ((e.key === 'Enter' || e.key === ' ') && hoveredBucket) {
+      if ((e.key === 'Enter' || e.key === ' ') && focusedStamp) {
         e.preventDefault();
-        const item = remainingItems[selectedItemIdx];
-        if (item) handleDrop(item.id, hoveredBucket);
+        handleStamp(focusedStamp);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [phase, remainingItems, selectedItemIdx, hoveredBucket, handleDrop, onAbort]);
+  }, [phase, focusedStamp, handleStamp, onAbort]);
 
-  // ── Sorting phase render ─────────────────────────────────────────────────────
-  // Sorting phase UI — overlay always mounts directly here.
+  // ── Computed values ──────────────────────────────────────────────────────────
+  const currentItem = docSet.items[currentDocIndex];
+  // "Stamped so far" count for progress header — includes the doc currently stamping/exiting
+  const stampedCount = Math.min(
+    currentDocIndex + (docAnimState === 'stamped' || docAnimState === 'exiting' ? 1 : 0),
+    totalCount,
+  );
+
+  // ── Render ────────────────────────────────────────────────────────────────────
+  // Root div + backdrop + close button + shake-surface discipline unchanged —
+  // close button, NPCReactionBubble, wrongFeedback toast, SorterCompletionOverlay all stay
+  // OUTSIDE the shake surface (Phase 23-02 decision: shaking anchored overlays looks like a bug).
   return (
     <div
       className="absolute inset-0 z-40 bg-black/85 flex flex-col items-stretch justify-center p-6"
@@ -424,7 +534,8 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         </button>
       )}
 
-      {/* Phase 22: NPC reaction bubble — persistent during sort, fades on text change.
+      {/* PHASE 24: NPC reaction bubble with persistent portrait (SORTV2-15).
+          spriteUrl = resolved sprite path → portrait+name always visible, bubble hides when empty.
           Kept outside shake surface — anchored overlay, shaking it would look like a bug. */}
       <NPCReactionBubble
         npcName={npcDisplay.name}
@@ -432,9 +543,10 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         text={currentReactionText}
         variant={currentReactionVariant}
         holdIt={holdItReveal ?? undefined}
+        spriteUrl={npcSpriteUrl}
       />
 
-      {/* PHASE 23: Shake surface — wraps only the main content (progress header + columns + keyboard hint).
+      {/* PHASE 23: Shake surface — wraps only the main content (progress header + desk + keyboard hint).
           The root div stays fixed (it owns the dark backdrop); the inner wrapper moves.
           When not shaking, flex layout is identical to the previous flat structure. */}
       <div
@@ -442,15 +554,16 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         data-testid="sorter-shake-surface"
       >
         {/* Progress header — SORTV2-06: includes NPC name for in-encounter context.
-            PHASE 23: Appended score readout with pulse animation (SORTV2-10). */}
+            PHASE 23: Appended score readout with pulse animation (SORTV2-10).
+            PHASE 24: "sorted" count reflects stamped docs including the doc currently exiting. */}
         <div
           className="text-center text-white mb-4 mt-20"
           style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}
           data-testid="text-sorter-progress"
         >
-          HELPING {npcDisplay.name.toUpperCase()} &middot; {totalCount - remainingItems.length} / {totalCount} sorted &middot; {correctCount} correct
+          HELPING {npcDisplay.name.toUpperCase()} &middot; {stampedCount} / {totalCount} sorted &middot; {correctCount} correct
           {' '}&middot; SCORE{' '}
-          {/* Re-keying the leaf span restarts the animation on every correct drop (SORTV2-10).
+          {/* Re-keying the leaf span restarts the animation on every correct stamp (SORTV2-10).
               inline-block is required for transform-based scale to render. */}
           <span
             key={scorePulseNonce}
@@ -461,66 +574,53 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
           </span>
         </div>
 
-        {/* Three-column layout: NOT PHI bucket | items pile | PHI bucket */}
-        <div className="flex-1 flex flex-row items-stretch justify-center gap-4 max-w-5xl mx-auto w-full">
+        {/* PHASE 24: Desk surface containing all desk components */}
+        <DeskSurface>
+          {/* ShiftClock — absolute top-right of desk */}
+          <div className="absolute top-3 right-3 z-10">
+            <ShiftClock secondsLeft={secondsLeft} totalSeconds={docSet.shiftSeconds} />
+          </div>
 
-          {/* Left bucket: NOT PHI */}
-          <div className="flex-1 flex items-center">
-            <BucketZone
-              bucketType="not_phi"
-              isHovered={hoveredBucket === 'not_phi' || draggingOverBucket === 'not_phi'} /* W2: per-bucket only */
-              feedbackState={bucketFeedback.not_phi}
-              count={bucketCounts.not_phi}
-              onDragEnter={handleBucketDragEnter}
-              onDragLeave={handleBucketDragLeave}
-              onDrop={(bt) => {
-                if (draggingItemId) handleDrop(draggingItemId, bt);
-              }}
+          {/* Outgoing tray layout: KEEP left | document center | REDACT right */}
+          <div className="flex flex-row items-end justify-between px-4 py-6 min-h-[280px]">
+            {/* KEEP tray — left edge */}
+            <OutgoingTray kind="keep" count={trayCounts.not_phi} />
+
+            {/* DeskDocument — centered, keyed by item.id so each doc remounts and replays slide-in */}
+            <div className="flex-1 mx-4 flex items-center justify-center">
+              {currentItem && currentDocIndex < totalCount ? (
+                <DeskDocument
+                  key={currentItem.id}
+                  item={currentItem}
+                  animState={docAnimState}
+                  stampedKind={stampedKind}
+                  wasCorrect={lastWasCorrect}
+                />
+              ) : null}
+            </div>
+
+            {/* REDACT tray — right edge */}
+            <OutgoingTray kind="redact" count={trayCounts.phi} />
+          </div>
+
+          {/* StampPad — bottom-center of desk */}
+          <div className="flex justify-center pb-5">
+            <StampPad
+              focusedStamp={focusedStamp}
+              pressedStamp={pressedStamp}
+              disabled={docAnimState !== 'active' || phase !== 'sorting' || shiftOver}
+              onStamp={handleStamp}
+              onHover={setFocusedStamp}
             />
           </div>
-
-          {/* Center: item pile */}
-          <div
-            className="flex-1 max-h-[60vh] overflow-y-auto bg-[#1a1a2e]/60 border-4 border-[#4FB3D9] p-3"
-            data-testid="sorter-items-pile"
-          >
-            {remainingItems.map((item, idx) => (
-              <SorterItem
-                key={item.id}
-                item={item}
-                isSelected={idx === selectedItemIdx}
-                isDragging={draggingItemId === item.id}
-                onDragStart={(id) => setDraggingItemId(id)}
-                onDragEnd={() => {
-                  setDraggingItemId(null);
-                  setDraggingOverBucket(null);
-                }}
-              />
-            ))}
-          </div>
-
-          {/* Right bucket: PHI */}
-          <div className="flex-1 flex items-center">
-            <BucketZone
-              bucketType="phi"
-              isHovered={hoveredBucket === 'phi' || draggingOverBucket === 'phi'} /* W2: per-bucket only */
-              feedbackState={bucketFeedback.phi}
-              count={bucketCounts.phi}
-              onDragEnter={handleBucketDragEnter}
-              onDragLeave={handleBucketDragLeave}
-              onDrop={(bt) => {
-                if (draggingItemId) handleDrop(draggingItemId, bt);
-              }}
-            />
-          </div>
-        </div>
+        </DeskSurface>
 
         {/* Keyboard hint footer */}
         <div
           className="text-center text-white/60 mt-4"
           style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
         >
-          DRAG ITEMS &middot; OR &#x2191;&#x2193; TO SELECT &middot; &#x2190;&#x2192; FOR BUCKET &middot; ENTER TO COMMIT &middot; ESC TO EXIT
+          CLICK A STAMP &middot; OR &#x2190; KEEP / REDACT &#x2192; &middot; ENTER TO STAMP &middot; ESC TO EXIT
         </div>
       </div>
       {/* END shake surface */}
