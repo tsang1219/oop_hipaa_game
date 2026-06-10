@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T05:53:19.941Z"
+last_updated: "2026-06-10T05:55:41.305Z"
 progress:
   total_phases: 20
   completed_phases: 16
   total_plans: 52
-  completed_plans: 48
+  completed_plans: 49
 ---
 
 # Project State
@@ -59,6 +59,7 @@ Progress: [█░░░░░░░░░] 10%
 | Phase 23-phi-sorter-feedback-moments P01 | 5min | 3 tasks | 5 files |
 | Phase 23-phi-sorter-feedback-moments P02 | 4min | 2 tasks | 1 files |
 | Phase 24-phi-sorter-format-shift P01 | 9 | 2 tasks | 4 files |
+| Phase 24-phi-sorter-format-shift P02 | 6 | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -150,6 +151,8 @@ Progress: [█░░░░░░░░░] 10%
 - [Phase 24]: sfx_sorter_stamp = impactPlank_medium_000.ogg from kenney_impact-sounds; sfx_sorter_paper = scroll_002.ogg from kenney_interface-sounds — both vendored, no new binaries (Phase 24-01)
 - [Phase 24]: ink-stamp-in CSS keyframe uses --ink-rot CSS variable for per-stamp angle variation without JS randomization (Phase 24-01)
 - [Phase 24]: clock-pulse keyframe handles scale only; <10s color shift handled by class swap in component — separation of animation and color concerns (Phase 24-01)
+- [Phase 24-phi-sorter-format-shift]: StampPad uses tabIndex=-1 on buttons — parent window keydown handler owns keyboard; prevents double-commit via native button Enter focus
+- [Phase 24-phi-sorter-format-shift]: NPCReactionBubble speech tail switches from down-pointing to left-pointing when spriteUrl portrait is present
 
 ### Pending Todos
 
