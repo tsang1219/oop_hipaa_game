@@ -3,11 +3,11 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-05-08T03:00:00.000Z"
+last_updated: "2026-06-10T03:42:23.093Z"
 progress:
-  total_phases: 14
-  completed_phases: 13
-  total_plans: 39
+  total_phases: 17
+  completed_phases: 12
+  total_plans: 44
   completed_plans: 38
 ---
 
@@ -48,6 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 | 16. PHI Sorter Encounter | 3/4 | (paused) | — |
 
 *Updated after each plan completion*
+| Phase 22-phi-sorter-content-connection P02 | 12 | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,8 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 21]: Capstone trigger gated by `isDemoActive() && currentRoomId === 'records_room' && DEMO_ROOM_ORDER.every(id => getCompletedDemoRooms().includes(id))`. `markRoomComplete` called for each demo room as it completes on exit, so all 4 must have been actually cleared (not just walked through).
 - [Phase 21]: Sponsor swap test passes by construction — overlay consumes name/code/character_sprite/two_dialogue_lines straight from SPONSOR_CONFIG with no hardcoded fallbacks except defensive sprite-path lookup that falls back to npc_staff_sheet for typo'd keys.
 - [Phase 21]: Reload-to-menu pattern (window.location.reload after endDemo) reused from Phase 18/19 — guarantees clean Phaser teardown + fresh StartMenu boot.
+- [Phase 22-phi-sorter-content-connection]: Dr. Tovar placed at (14, 10) in records_room — NOT added to requiredNpcs, encounter is optional
+- [Phase 22-phi-sorter-content-connection]: NPC reaction banks keyed by npcId; voice differentiation enforced in copy (Tovar uses Safe Harbor + identifier numbers; Marcus uses tonal nicknames; Aiyana references the auditor)
 
 ### Pending Todos
 
