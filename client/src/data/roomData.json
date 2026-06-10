@@ -1819,6 +1819,21 @@
           "x": 8,
           "y": 12,
           "sceneId": "final_boss_1"
+        },
+        {
+          "id": "dr_tovar",
+          "name": "Dr. Tovar",
+          "role": "Compliance Lead",
+          "x": 14,
+          "y": 10,
+          "sprite": "officer",
+          "sceneId": "_encounter_phi_sort_records",
+          "encounterTrigger": {
+            "encounterId": "phi-sort-records",
+            "documentSetId": "phi-sorter-set-3",
+            "requestText": "Got a minute? I'm reviewing a research data set for Safe Harbor compliance and some of these geographic and date fields are borderline. Want a fresh set of eyes before this goes out the door?"
+          },
+          "isFinalBoss": false
         }
       ],
       "interactionZones": [
