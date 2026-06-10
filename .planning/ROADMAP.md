@@ -5,8 +5,9 @@
 - v1.0 **Polish** — Phases 1-5 (shipped 2026-03-01) — [archive](milestones/v1.0-ROADMAP.md)
 - v1.1 **Sprite Overhaul** — Phases 6-10 (archived partial) — [archive](milestones/v1.1-ROADMAP.md)
 - v2.0 **One Game** — Phases 11-15 (shipped 2026-03-28)
-- v2.1 **Full Vision** — Phases 16, 17, 22-24 (paused — Phase 16 at 98%, Phase 17 + 22-24 not started)
-- v2.2 **Sponsor Demo** — Phases 18-21 (active — sponsor pitch in 1-2 days)
+- v2.1 **Full Vision** — Phases 16, 17, 22-24 (SHIPPED 2026-06-10)
+- v2.2 **Sponsor Demo** — Phases 18-21 (shipped 2026-05-08)
+- v2.3 **Nintendo Polish** — Phases 25-27 (active — graphics/navigation/reward up-level toward the Nintendo Test)
 
 ## Phases
 
@@ -346,6 +347,44 @@ Plans:
 Plans:
 - [x] 21-01-PLAN.md — Capstone wiring: CertificateOverlay (sequence machine + NPC handoff + cert card + copy button) + spriteAssetPaths.ts (9-key NPC path map) + UnifiedGamePage trigger in handleExitRoom records_room exit branch
 
+
+### v2.3 Nintendo Polish (Active)
+
+**Milestone Goal:** Close the visual and feel gap between "functional RPG" and "polished SNES-era RPG." Dialogue shows real character portraits instead of placeholder SVGs, rooms read as richer spaces, and the player always knows where to go next without being told. Reuses on-disk spritesheets and procedural pixel art — no new binary assets required.
+
+### Phase 25: Dialogue Portraits + NPC Visual Identity
+**Goal**: Every dialogue overlay shows the speaking NPC as a large pixelated portrait cropped from their actual in-world spritesheet — the 32px placeholder SVG is gone, every named NPC in roomData.json maps to the correct sheet, and the portrait has presence (frame, name plate, subtle life animation).
+**Depends on**: Phase 21 (spriteAssetPaths CSS-crop pattern), Phase 24 (NPCReactionBubble portrait precedent)
+**Requirements**: VIS-01, VIS-02, VIS-03 (TBD during /gsd:plan-phase)
+**Success Criteria** (what must be TRUE):
+  1. The dialogue overlay (BattleEncounterScreen) renders the speaking NPC as a >=96px pixelated portrait cropped from the same spritesheet BootScene preloads — the NPCSprite SVG placeholder no longer appears anywhere in dialogue.
+  2. Every named NPC in roomData.json resolves to the correct spritesheet via a data-driven mapping (no hardcoded component map; named characters never fall back to a generic sheet silently — fallback logs a dev warning).
+  3. The portrait sits in a framed plate with the NPC's name, and shows a subtle idle animation (breathing bob or periodic blink) while dialogue is on screen — NPCs feel like people, not icons (Commandment 4).
+  4. Dialogue flow, choices, feedback, and scoring behave exactly as before — zero regression to GameContainer logic; tsc and production build clean.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 25`)
+
+### Phase 26: Room Visual Up-Level (Furniture + Floors)
+**Goal**: The six departments and hallways read as distinct, furnished spaces: room-specific floor treatments, an upgraded furniture detail pass on the most-seen objects, visible glow/sparkle on educational collectibles, and idle motion on at least three furniture types.
+**Depends on**: Phase 25
+**Requirements**: VIS-04, VIS-05, VIS-06 (TBD during /gsd:plan-phase)
+**Success Criteria** (what must be TRUE):
+  1. Each department has a visually distinct floor treatment (palette + pattern variation per room type) with visible wall/floor transition — rooms no longer look like recolors of the same grid.
+  2. The 8 most-frequently-seen furniture textures get a detail pass (shading, highlights, readable silhouettes at 32px) and educational collectibles glow or sparkle so they are distinguishable at a glance (Commandment 9).
+  3. At least 3 furniture types display a subtle idle animation (monitor flicker, coffee steam, plant sway) — rooms feel alive.
+  4. No gameplay or collision changes; tsc and production build clean.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 26`)
+
+### Phase 27: Navigation Clarity + Reward Sweep
+**Goal**: The player always knows where to go next without being told twice: the next-objective door breathes with a soft glow, in-room remaining objectives are discoverable at a glance, and the moment-to-moment reward layer (score blips, completion ticks, discovery chimes) is audited against Commandments 1 and 8 with gaps filled.
+**Depends on**: Phase 26
+**Requirements**: VIS-07, VIS-08 (TBD during /gsd:plan-phase)
+**Success Criteria** (what must be TRUE):
+  1. The door leading to the next incomplete department has a distinct soft pulse/glow that completed and locked doors do not have — a playtester can answer "where do I go next?" by looking, not by reading.
+  2. In-room, un-met completion requirements are discoverable without a modal: subtle sparkle on untalked NPCs / unspotted zones after a idle grace period, never nagging, never obnoxious.
+  3. A feedback audit table of every player action in exploration mode (move, interact, collect, complete, door, encounter enter/exit) shows audio + visual response for each, with previously-silent interactions fixed (Commandment 1).
+  4. No new modals; everything ambient. tsc and production build clean.
+**Plans**: TBD (kicked off by `/gsd:plan-phase 27`)
+
 ---
 
 ## Progress
@@ -371,5 +410,8 @@ Plans:
 | 20. First-Impression Polish | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 21. Completion + Sponsor Hook | v2.2 | 1/1 | Complete | 2026-05-08 |
 | 22. PHI Sorter Redesign — Content + Connection | v2.1 | 4/4 | Complete | 2026-06-10 |
-| 23. PHI Sorter Redesign — Feedback Moments | 2/2 | Complete    | 2026-06-10 | - |
-| 24. PHI Sorter Redesign — Format Shift | 3/3 | Complete    | 2026-06-10 | - |
+| 23. PHI Sorter Redesign — Feedback Moments | v2.1 | 2/2 | Complete | 2026-06-10 |
+| 24. PHI Sorter Redesign — Format Shift | v2.1 | 3/3 | Complete | 2026-06-10 |
+| 25. Dialogue Portraits + NPC Visual Identity | v2.3 | 0/0 | Not started | - |
+| 26. Room Visual Up-Level | v2.3 | 0/0 | Pending | - |
+| 27. Navigation Clarity + Reward Sweep | v2.3 | 0/0 | Pending | - |
