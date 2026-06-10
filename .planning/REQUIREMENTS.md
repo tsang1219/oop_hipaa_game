@@ -64,12 +64,12 @@
 
 ### Breach Triage Encounter (Phase 17)
 
-- [ ] **TRIA-01**: Breach Triage encounter triggers from an Act 3 ER NPC via the `encounterTrigger` pattern (Aiyana/Marcus/Dr. Tovar precedent). The NPC only spawns in the full game at Act 3 (hidden in demo mode and earlier acts). ExplorationScene pauses in place; the triage overlay opens via the existing pure-React encounter lifecycle (ENCOUNTER_REQUEST → EncounterRequestModal accept → overlay; registry guard `encounterResult_breach-triage-er` written on debrief dismiss; abort/decline keeps it replayable).
-- [ ] **TRIA-02**: Incidents pop up at whack-a-mole pacing — up to 3 visible simultaneously, each with its own countdown timer, spawn cadence escalating over the run. Player classifies each as REPORTABLE / NOT REPORTABLE via keyboard (1/2/3 to focus a slot, R/N to classify, number keys in follow-ups, Esc to abort). Keyboard-only completion fully supported; mouse is optional, never required.
-- [ ] **TRIA-03**: Correctly flagging a reportable incident opens a two-step follow-up: (a) who must be notified (patient / patient+OCR / patient+OCR+media), (b) within what timeframe. Content is accurate per 45 CFR §164.404 (individuals: without unreasonable delay, ≤60 days), §164.406 (media: breaches affecting >500 residents of a state/jurisdiction), §164.408 (OCR: concurrent for 500+, annual log within 60 days of year-end for <500), §164.410 (business associate → covered entity ≤60 days), §164.402 (breach definition, encryption safe harbor, ransomware presumption). Wrong answers display an explanation teaching the rule.
-- [ ] **TRIA-04**: Every interaction produces audio + visual feedback (Commandments 1, 8): correct = ding + green pulse; wrong = buzz + red flash + explanation; time-up = urgency cue + miss; tension escalates as incidents accumulate (vignette pulse at 2+ on board, alert sting at full board). No silent interactions.
-- [ ] **TRIA-05**: At least 6 incident scenarios cover the required edge cases — encrypted lost laptop (NOT reportable, safe harbor), unencrypted lost laptop (reportable, >500), misdirected fax, HR snooping, vendor/BA breach, deceased patient records (50-year rule), internal misuse — with mixed difficulty (per-incident difficulty tier drives timer length).
-- [ ] **TRIA-06**: Encounter completes in 60-120 seconds. TriageDebrief shows classification accuracy, average response time, and 2 Breach Notification takeaways. Unified compliance score updates proportionally (`Math.round(accuracy * 12)`, consistent with Phases 13/16). HIPAA_TRAINING_FRAMEWORK.md Part 3 Breach Notification coverage is upgraded to scenario-tested (§3.3 → STRONG, closing the noted 500+ threshold gap).
+- [x] **TRIA-01**: Breach Triage encounter triggers from an Act 3 ER NPC via the `encounterTrigger` pattern (Aiyana/Marcus/Dr. Tovar precedent). The NPC only spawns in the full game at Act 3 (hidden in demo mode and earlier acts). ExplorationScene pauses in place; the triage overlay opens via the existing pure-React encounter lifecycle (ENCOUNTER_REQUEST → EncounterRequestModal accept → overlay; registry guard `encounterResult_breach-triage-er` written on debrief dismiss; abort/decline keeps it replayable).
+- [x] **TRIA-02**: Incidents pop up at whack-a-mole pacing — up to 3 visible simultaneously, each with its own countdown timer, spawn cadence escalating over the run. Player classifies each as REPORTABLE / NOT REPORTABLE via keyboard (1/2/3 to focus a slot, R/N to classify, number keys in follow-ups, Esc to abort). Keyboard-only completion fully supported; mouse is optional, never required.
+- [x] **TRIA-03**: Correctly flagging a reportable incident opens a two-step follow-up: (a) who must be notified (patient / patient+OCR / patient+OCR+media), (b) within what timeframe. Content is accurate per 45 CFR §164.404 (individuals: without unreasonable delay, ≤60 days), §164.406 (media: breaches affecting >500 residents of a state/jurisdiction), §164.408 (OCR: concurrent for 500+, annual log within 60 days of year-end for <500), §164.410 (business associate → covered entity ≤60 days), §164.402 (breach definition, encryption safe harbor, ransomware presumption). Wrong answers display an explanation teaching the rule.
+- [x] **TRIA-04**: Every interaction produces audio + visual feedback (Commandments 1, 8): correct = ding + green pulse; wrong = buzz + red flash + explanation; time-up = urgency cue + miss; tension escalates as incidents accumulate (vignette pulse at 2+ on board, alert sting at full board). No silent interactions.
+- [x] **TRIA-05**: At least 6 incident scenarios cover the required edge cases — encrypted lost laptop (NOT reportable, safe harbor), unencrypted lost laptop (reportable, >500), misdirected fax, HR snooping, vendor/BA breach, deceased patient records (50-year rule), internal misuse — with mixed difficulty (per-incident difficulty tier drives timer length).
+- [x] **TRIA-06**: Encounter completes in 60-120 seconds. TriageDebrief shows classification accuracy, average response time, and 2 Breach Notification takeaways. Unified compliance score updates proportionally (`Math.round(accuracy * 12)`, consistent with Phases 13/16). HIPAA_TRAINING_FRAMEWORK.md Part 3 Breach Notification coverage is upgraded to scenario-tested (§3.3 → STRONG, closing the noted 500+ threshold gap).
 
 ### PHI Sorter Redesign — Content + Connection (Phase 22)
 
@@ -204,12 +204,12 @@ Curation + polish milestone for sponsor pitch. Reuses all existing room data, NP
 | SORTV2-04 | Phase 22 | Complete |
 | SORTV2-05 | Phase 22 | Complete |
 | SORTV2-06 | Phase 22 | Complete |
-| TRIA-01 | Phase 17 | Pending |
-| TRIA-02 | Phase 17 | Pending |
-| TRIA-03 | Phase 17 | Pending |
-| TRIA-04 | Phase 17 | Pending |
-| TRIA-05 | Phase 17 | Pending |
-| TRIA-06 | Phase 17 | Pending |
+| TRIA-01 | Phase 17 | Complete |
+| TRIA-02 | Phase 17 | Complete |
+| TRIA-03 | Phase 17 | Complete |
+| TRIA-04 | Phase 17 | Complete |
+| TRIA-05 | Phase 17 | Complete |
+| TRIA-06 | Phase 17 | Complete |
 
 **Coverage:**
 - v2.0 requirements: 27 total, mapped: 27, unmapped: 0

@@ -3,12 +3,12 @@ gsd_state_version: 1.0
 milestone: v2.0
 milestone_name: One Game
 status: unknown
-last_updated: "2026-06-10T04:15:24.754Z"
+last_updated: "2026-06-10T04:38:24.931Z"
 progress:
-  total_phases: 17
+  total_phases: 18
   completed_phases: 14
-  total_plans: 44
-  completed_plans: 42
+  total_plans: 47
+  completed_plans: 43
 ---
 
 # Project State
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 | Phase 22-phi-sorter-content-connection P03 | 8 | 2 tasks | 2 files |
 | Phase 22-phi-sorter-content-connection P04 | 15 | 1 tasks | 2 files |
 | Phase 16-phi-sorter-encounter P04 | 25 | 2 tasks | 4 files |
+| Phase 17-breach-triage-encounter P01 | 5min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -124,6 +125,8 @@ Progress: [░░░░░░░░░░] 0%
 - [Phase 16-phi-sorter-encounter]: Proximity tile triggers replaced by NPC-driven encounterTrigger fields (explicit player agency via EncounterRequestModal)
 - [Phase 16-phi-sorter-encounter]: SorterDebrief standalone component supersedes SorterTakeawaysPanel-sibling approach — purpose-built sorter debrief with accuracy bar + KEY LEARNINGS, no TD content bleed
 - [Phase 16-phi-sorter-encounter]: Abort path added: Esc/X emits aborted:true in REACT_RETURN_FROM_ENCOUNTER, resets paused but skips registry guard so encounter stays replayable
+- [Phase 17-breach-triage-encounter]: Priya the Privacy Officer is the NPC for Breach Triage — exhausted, third queue today, precise because she has to be
+- [Phase 17-breach-triage-encounter]: 72-hour deadline used only as GDPR-trap wrong answer in Breach Triage; correct answers use 'without unreasonable delay, 60 days' per HIPAA_TRAINING_FRAMEWORK.md 2026-03-11 fix
 
 ### Pending Todos
 
