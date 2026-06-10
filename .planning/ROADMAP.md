@@ -355,13 +355,17 @@ Plans:
 ### Phase 25: Dialogue Portraits + NPC Visual Identity
 **Goal**: Every dialogue overlay shows the speaking NPC as a large pixelated portrait cropped from their actual in-world spritesheet — the 32px placeholder SVG is gone, every named NPC in roomData.json maps to the correct sheet, and the portrait has presence (frame, name plate, subtle life animation).
 **Depends on**: Phase 21 (spriteAssetPaths CSS-crop pattern), Phase 24 (NPCReactionBubble portrait precedent)
-**Requirements**: VIS-01, VIS-02, VIS-03 (TBD during /gsd:plan-phase)
+**Requirements**: VIS-01, VIS-02, VIS-03 (defined in REQUIREMENTS.md by plan 25-01)
 **Success Criteria** (what must be TRUE):
   1. The dialogue overlay (BattleEncounterScreen) renders the speaking NPC as a >=96px pixelated portrait cropped from the same spritesheet BootScene preloads — the NPCSprite SVG placeholder no longer appears anywhere in dialogue.
   2. Every named NPC in roomData.json resolves to the correct spritesheet via a data-driven mapping (no hardcoded component map; named characters never fall back to a generic sheet silently — fallback logs a dev warning).
   3. The portrait sits in a framed plate with the NPC's name, and shows a subtle idle animation (breathing bob or periodic blink) while dialogue is on screen — NPCs feel like people, not icons (Commandment 4).
   4. Dialogue flow, choices, feedback, and scoring behave exactly as before — zero regression to GameContainer logic; tsc and production build clean.
-**Plans**: TBD (kicked off by `/gsd:plan-phase 25`)
+**Plans**: 2 plans
+
+Plans:
+- [ ] 25-01-PLAN.md — Define VIS-01..03 + sprite field on all 26 roomData NPCs + getNPCPortraitPath resolver in spriteAssetPaths.ts
+- [ ] 25-02-PLAN.md — DialoguePortrait component (96px crop, framed plate, breathing bob) + BattleEncounterScreen swap + NPCSprite.tsx deletion
 
 ### Phase 26: Room Visual Up-Level (Furniture + Floors)
 **Goal**: The six departments and hallways read as distinct, furnished spaces: room-specific floor treatments, an upgraded furniture detail pass on the most-seen objects, visible glow/sparkle on educational collectibles, and idle motion on at least three furniture types.
