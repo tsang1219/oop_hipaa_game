@@ -550,3 +550,44 @@
   70%  { transform: scale(1.15); opacity: 1; }
   100% { transform: scale(1); opacity: 1; }
 }
+
+/* ── Phase 24: PHI Sorter desk format (SORTV2-11..14) ── */
+
+/* Document arrives from off-screen right with a settle wobble (Commandment 2: arrival has weight) */
+@keyframes doc-slide-in {
+  0%   { transform: translateX(120%) rotate(2deg); opacity: 0.6; }
+  75%  { transform: translateX(-2%) rotate(-0.5deg); opacity: 1; }
+  100% { transform: translateX(0) rotate(0); opacity: 1; }
+}
+
+/* Stamped KEEP document exits toward the left tray */
+@keyframes doc-slide-off-left {
+  0%   { transform: translateX(0) rotate(0); opacity: 1; }
+  100% { transform: translateX(-140%) rotate(-6deg); opacity: 0.4; }
+}
+
+/* Stamped REDACT document exits toward the right tray */
+@keyframes doc-slide-off-right {
+  0%   { transform: translateX(0) rotate(0); opacity: 1; }
+  100% { transform: translateX(140%) rotate(6deg); opacity: 0.4; }
+}
+
+/* Ink mark slams onto the paper — uses --ink-rot CSS var for organic per-stamp angle */
+@keyframes ink-stamp-in {
+  0%   { transform: scale(1.6) rotate(var(--ink-rot, -6deg)); opacity: 0; }
+  60%  { transform: scale(0.95) rotate(var(--ink-rot, -6deg)); opacity: 1; }
+  100% { transform: scale(1) rotate(var(--ink-rot, -6deg)); opacity: 1; }
+}
+
+/* Stamp button physically presses down on commit */
+@keyframes stamp-press {
+  0%   { transform: translateY(0) scale(1); }
+  40%  { transform: translateY(5px) scale(0.94); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* Low-time urgency pulse for the shift clock — color shift handled by class swap, not keyframe */
+@keyframes clock-pulse {
+  0%, 100% { transform: scale(1); }
+  50%       { transform: scale(1.12); }
+}
