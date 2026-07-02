@@ -21,21 +21,15 @@ import {
   IDLE_HINT_GRACE_MS,
   IDLE_HINT_INTERVAL_MS,
 } from '../systems/exploration/idleHints';
+import { MusicController } from '../systems/exploration/MusicController';
+import { DoorSystem } from '../systems/exploration/DoorSystem';
 import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
 
-// All known music track keys — used to clean up other tracks when changing rooms
-const MUSIC_TRACK_KEYS = [
-  'music_hub',
-  'music_exploration',
-  'music_breach',
-  'music_demo_er',
-  'music_demo_break_room',
-  'music_demo_records_room',
-] as const;
+// MUSIC_TRACK_KEYS moved to systems/exploration/MusicController (Round 6)
 
 // PHI Sorter triggers — proximity polling removed 2026-05-08, replaced by
 // NPC-driven trigger via Aiyana (Reception, tile 10,6) and Marcus (Lab, tile 9,7).
@@ -103,7 +97,8 @@ export class ExplorationScene extends Phaser.Scene {
   private lastFootstepTime = 0;
 
   // Idle-hint sparkle system (Phase 27 VIS-07)
-  private lastActivityAt = 0;
+  // lastActivityAt is public: DoorSystem.enter() resets it on door entry (Round 6)
+  lastActivityAt = 0;
   private lastIdleHintAt = 0;
   private idleHintIndex = 0;
 
@@ -126,13 +121,14 @@ export class ExplorationScene extends Phaser.Scene {
   // very next frame and "NOT RIGHT NOW" becomes an inescapable loop.
   private encounterDeclined = false;
 
-  // Door navigation state (Phase 12)
-  private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
-  private doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> = {};
-  private doorVisuals: Phaser.GameObjects.GameObject[] = [];
+  // Door navigation state (Phase 12) — nearDoor/doorStates/doorVisuals moved
+  // to DoorSystem (Round 6); transitioning STAYS here (it also gates idle
+  // hints, movement, QA nav, and locked-door recovery) and is public so
+  // DoorSystem reads/writes it through the scene reference.
+  private doors!: DoorSystem;
   private pendingSpawnTileX: number | null = null;
   private pendingSpawnTileY: number | null = null;
-  private transitioning = false;
+  transitioning = false;
 
   // Zone glow registry — stores ring arc + tween per zone id so we can kill glow on live completion (Phase 27 VIS-08)
   private zoneGlows: Map<string, { ring: Phaser.GameObjects.Arc; tween: Phaser.Tweens.Tween }> = new Map();
@@ -145,9 +141,10 @@ export class ExplorationScene extends Phaser.Scene {
   private prevCompletedNPCs: Set<string> = new Set();
   private prevCompletedZones: Set<string> = new Set();
 
-  // Background music
-  private bgMusic?: Phaser.Sound.BaseSound;
-  private readonly musicBaseVolume = 0.13;
+  // Background music — bgMusic/musicBaseVolume/activeMusicBaseVolume moved to
+  // MusicController (Round 6). The scene keeps its eventBridge subscriptions
+  // (REACT_SET_MUSIC_VOLUME, ACT_ADVANCE) and delegates.
+  private readonly music = new MusicController(this);
 
   // QA state broadcast throttle
   private lastStateBroadcastTime = 0;
@@ -185,10 +182,12 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Reset transitioning so scene restart doesn't freeze movement
     this.transitioning = false;
-    this.nearDoor = null;
 
-    // Store door states for visual rendering
-    this.doorStates = data.doorStates ?? {};
+    // Fresh DoorSystem per room (Round 6) — resets nearDoor/doorVisuals; the
+    // previous room's visuals were already destroyed by the scene restart.
+    // Store door states for visual rendering.
+    this.doors = new DoorSystem(this, this.room, this.music);
+    this.doors.setStates(data.doorStates ?? {});
 
     // Read door-specific spawn position if provided
     this.pendingSpawnTileX = null;
@@ -398,7 +397,7 @@ export class ExplorationScene extends Phaser.Scene {
     });
 
     // ── Door visuals (Phase 12) — render all doors with state indicators ──
-    this.renderDoorStates();
+    this.doors.render();
 
     // ── Legacy exit door glow at spawn point (only if no doors[] present) ──
     if (!(room as any).doors || (room as any).doors.length === 0) {
@@ -520,62 +519,9 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // ── Background music — room override > act default; crossfade if track changed ──
-    const currentAct = this.getCurrentAct();
-    const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
-      1: { track: 'music_hub', baseVol: this.musicBaseVolume },
-      2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
-      3: { track: 'music_breach', baseVol: 0.15 },
-    };
-    const actCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
-    const roomTrack = (this.room as any).musicTrack as string | undefined;
-    const roomBaseVol = (this.room as any).musicBaseVolume as number | undefined;
-    const musicCfg = {
-      track: roomTrack ?? actCfg.track,
-      baseVol: roomBaseVol ?? actCfg.baseVol,
-    };
-    this.activeMusicBaseVolume = musicCfg.baseVol;
-    try {
-      const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-      const targetVol = musicCfg.baseVol * userVol;
-
-      // Same track survived from previous room — reclaim and fade up
-      const existing = this.findPlayingTrack(musicCfg.track);
-      if (existing) {
-        this.bgMusic = existing;
-        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 600, ease: 'Sine.easeIn' });
-      } else if (userVol > 0) {
-        // Different track (or first load) — stop any other music tracks left
-        // playing on the SoundManager, then fade in the new one from silence.
-        for (const k of MUSIC_TRACK_KEYS) {
-          if (k !== musicCfg.track) {
-            this.sound.getAll(k).forEach(s => { s.stop(); s.destroy(); });
-          }
-        }
-        // Clean up orphans of the target key too
-        this.sound.getAll(musicCfg.track).forEach(s => { s.stop(); s.destroy(); });
-        // Start muted to prevent any first-frame audio leak, then unmute at
-        // volume 0 and tween up on the next tick.
-        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0, mute: true });
-        const playMusic = () => {
-          if (!this.bgMusic || !this.scene.isActive()) return;
-          this.bgMusic.play();
-          this.time.delayedCall(0, () => {
-            if (!this.bgMusic || !this.scene.isActive()) return;
-            const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
-            ws.setMute(false);
-            ws.volume = 0;
-            this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1800, ease: 'Sine.easeIn' });
-          });
-        };
-        if (this.sound.locked) {
-          this.sound.once('unlocked', playMusic);
-        } else {
-          this.time.delayedCall(300, playMusic);
-        }
-      }
-    } catch (e) {
-      console.warn(`[ExplorationScene] ${musicCfg.track} not ready, skipping BGM:`, e);
-    }
+    // (Round 6 → systems/exploration/MusicController.startRoomMusic; 1800ms
+    // room-entry fade preserved via parameter — wake-restore uses 800ms.)
+    this.music.startRoomMusic(this.room, this.getCurrentAct(), 1800);
 
     // Room entrance — fade in from black
     this.cameras.main.fadeIn(500, 0, 0, 0);
@@ -763,9 +709,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Door proximity detection — requires SPACE to enter (Phase 12)
     if (!this.transitioning) {
-      this.checkDoorProximity();
-      if (this.nearDoor && interactPressed && !this.nearbyInteractable) {
-        this.handleDoorInteraction(this.nearDoor);
+      this.doors.checkProximity(this.player.x, this.player.y);
+      const nearDoor = this.doors.nearDoor;
+      if (nearDoor && interactPressed && !this.nearbyInteractable) {
+        this.doors.enter(nearDoor);
       }
     }
 
@@ -796,8 +743,8 @@ export class ExplorationScene extends Phaser.Scene {
         nearbyInteractable: this.nearbyInteractable
           ? { type: this.nearbyInteractable.type, id: this.nearbyInteractable.id }
           : null,
-        nearDoor: this.nearDoor
-          ? { id: this.nearDoor.id, targetRoomId: this.nearDoor.targetRoomId }
+        nearDoor: this.doors.nearDoor
+          ? { id: this.doors.nearDoor.id, targetRoomId: this.doors.nearDoor.targetRoomId }
           : null,
         paused: this.paused,
         roomNPCs: byType('npc').map(n => ({ ...n, completed: this.completedNPCs.has(n.id) })),
@@ -814,14 +761,14 @@ export class ExplorationScene extends Phaser.Scene {
           targetRoomId: d.targetRoomId,
           x: d.x,
           y: d.y,
-          state: this.doorStates[d.id] ?? 'available',
+          state: this.doors.states[d.id] ?? 'available',
         })),
         doors: ((this.room as any).doors || []).map((d: any) => ({
           id: d.id,
           targetRoomId: d.targetRoomId,
           x: d.x,
           y: d.y,
-          state: this.doorStates[d.id] ?? 'available',
+          state: this.doors.states[d.id] ?? 'available',
         })),
       });
     }
@@ -861,10 +808,9 @@ export class ExplorationScene extends Phaser.Scene {
    *  throw-proofed because the DESTROY path runs with plugins partly torn down. */
   shutdown() {
     // Don't stop music — create() will reclaim it if same track is needed,
-    // or crossfadeToMusic will clean it up if the act changed.
-    this.bgMusic = undefined;
-    // Clean up sound unlock listener
-    try { this.sound.off('unlocked'); } catch (_) {}
+    // or crossfadeTo will clean it up if the act changed. release() drops the
+    // bgMusic ref and clears the sound 'unlocked' listener (Round 6).
+    this.music.release();
     // Clean up EventBridge listeners
     this.removeBridgeListeners();
     try { this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this); } catch (_) {}
@@ -906,7 +852,7 @@ export class ExplorationScene extends Phaser.Scene {
     body.setVelocity(0);
     // Immediately update proximity so QA pressSpace can find nearby interactables
     this.checkProximity();
-    this.checkDoorProximity();
+    this.doors.checkProximity(this.player.x, this.player.y);
   };
 
   private onQAMoveTo = (data: { tileX: number; tileY: number }) => {
@@ -929,8 +875,8 @@ export class ExplorationScene extends Phaser.Scene {
       return;
     }
     // If near a door, enter it
-    if (this.nearDoor && !this.transitioning) {
-      this.handleDoorInteraction(this.nearDoor);
+    if (this.doors.nearDoor && !this.transitioning) {
+      this.doors.enter(this.doors.nearDoor);
       return;
     }
     // Fallback: find closest interactable within 2 tiles and trigger it
@@ -975,9 +921,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Small delay for proximity check to fire, then trigger door
     this.time.delayedCall(200, () => {
-      this.checkDoorProximity();
-      if (this.nearDoor && this.nearDoor.id === data.doorId) {
-        this.handleDoorInteraction(this.nearDoor);
+      this.doors.checkProximity(this.player.x, this.player.y);
+      const nearDoor = this.doors.nearDoor;
+      if (nearDoor && nearDoor.id === data.doorId) {
+        this.doors.enter(nearDoor);
       } else {
         // Force it — directly emit the door event
         this.transitioning = true;
@@ -993,95 +940,17 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onMusicVolume = (vol: number) => {
-    if (!this.scene.isActive()) return;
-    if (this.bgMusic) {
-      (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.activeMusicBaseVolume * vol;
-    }
+    // Handler body moved to MusicController.setUserVolume (Round 6)
+    this.music.setUserVolume(vol);
   };
 
   // ── Act-based music crossfade (Phase 14) ──────────────────────────
-
-  /** Current effective base volume — may differ from musicBaseVolume for Act 3 */
-  private activeMusicBaseVolume = 0.25;
+  // crossfadeToMusic/findPlayingTrack/startMusicTrack + activeMusicBaseVolume
+  // moved to systems/exploration/MusicController (Round 6)
 
   private onActAdvance = (data: { newAct: number; track: string; baseVolume?: number }) => {
-    this.crossfadeToMusic(data.track, data.baseVolume);
+    this.music.crossfadeTo(data.track, data.baseVolume);
   };
-
-  /**
-   * Fade out current music over 2s, then fade in new track over 2s.
-   * Guards against scene shutdown mid-crossfade.
-   */
-  private crossfadeToMusic(newTrackKey: string, baseVolumeOverride?: number): void {
-    const effectiveBase = baseVolumeOverride ?? this.musicBaseVolume;
-    this.activeMusicBaseVolume = effectiveBase;
-    const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-    const targetVol = effectiveBase * userVol;
-
-    // Reclaim orphaned bgMusic ref (shutdown cleared it but sound still plays)
-    if (!this.bgMusic) {
-      const playing = this.sound.getAll('music_hub')
-        .concat(this.sound.getAll('music_exploration'))
-        .concat(this.sound.getAll('music_breach'))
-        .find(s => s.isPlaying);
-      if (playing) this.bgMusic = playing;
-    }
-
-    if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
-      // F-24 fix (Run 07): kill any tween already targeting this sound before
-      // fading. A duplicate crossfade (or a still-running fade-in) would keep
-      // ticking after onComplete destroys the sound — "Cannot set properties
-      // of null (setting 'volume')".
-      try { this.tweens.killTweensOf(this.bgMusic); } catch (_) {}
-      // Fade out current track, then start new one
-      this.tweens.add({
-        targets: this.bgMusic,
-        volume: 0,
-        duration: 2000,
-        ease: 'Sine.easeOut',
-        onComplete: () => {
-          // Guard: scene may have shut down while fade was running
-          if (!this.scene || !this.scene.isActive()) return;
-          if (this.bgMusic) {
-            this.bgMusic.stop();
-            this.bgMusic.destroy();
-            this.bgMusic = undefined;
-          }
-          this.startMusicTrack(newTrackKey, targetVol);
-        },
-      });
-    } else {
-      // No current track (or not playing) — start new track immediately
-      if (this.bgMusic) {
-        this.bgMusic.stop();
-        this.bgMusic.destroy();
-        this.bgMusic = undefined;
-      }
-      this.startMusicTrack(newTrackKey, targetVol);
-    }
-  }
-
-  /** Find an already-playing sound instance on the global SoundManager by key. */
-  private findPlayingTrack(key: string): Phaser.Sound.BaseSound | undefined {
-    return this.sound.getAll(key).find(s => s.isPlaying);
-  }
-
-  private startMusicTrack(key: string, targetVol: number): void {
-    if (!this.scene || !this.scene.isActive()) return;
-    try {
-      this.bgMusic = this.sound.add(key, { loop: true, volume: 0, mute: true });
-      this.bgMusic.play();
-      this.time.delayedCall(0, () => {
-        if (!this.bgMusic || !this.scene.isActive()) return;
-        const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
-        ws.setMute(false);
-        ws.volume = 0;
-        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 2000, ease: 'Sine.easeIn' });
-      });
-    } catch (e) {
-      console.warn(`[ExplorationScene] crossfade to ${key} failed:`, e);
-    }
-  }
 
   private onPlaySfx = (data: { key: string; volume?: number; rate?: number }) => {
     if (!this.scene.isActive()) return;
@@ -1200,12 +1069,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.encounterLaunching = true;
 
     // Kill any active music tweens before destroying to avoid null volume errors
-    if (this.bgMusic) {
-      try { this.tweens.killTweensOf(this.bgMusic); } catch (_) {}
-      try { this.bgMusic.stop(); } catch (_) {}
-      try { this.bgMusic.destroy(); } catch (_) {}
-      this.bgMusic = undefined;
-    }
+    this.music.killForEncounter();
 
     // Launch directly — camera fade callbacks silently fail with scene.launch
     this.scene.setVisible(false);
@@ -1256,232 +1120,19 @@ export class ExplorationScene extends Phaser.Scene {
     // encounterTriggered stays true — prevents re-triggering on same room session
 
     // Restore exploration music after BreachDefense ends — honor room override
-    try {
-      const currentAct = this.getCurrentAct();
-      const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
-        1: { track: 'music_hub', baseVol: this.musicBaseVolume },
-        2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
-        3: { track: 'music_breach', baseVol: 0.15 },
-      };
-      const actCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
-      const roomTrack = (this.room as any).musicTrack as string | undefined;
-      const roomBaseVol = (this.room as any).musicBaseVolume as number | undefined;
-      const musicCfg = {
-        track: roomTrack ?? actCfg.track,
-        baseVol: roomBaseVol ?? actCfg.baseVol,
-      };
-      this.activeMusicBaseVolume = musicCfg.baseVol;
-      const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-      const targetVol = musicCfg.baseVol * userVol;
-      if (userVol > 0) {
-        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0, mute: true });
-        this.bgMusic.play();
-        this.time.delayedCall(0, () => {
-          if (!this.bgMusic || !this.scene.isActive()) return;
-          const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
-          ws.setMute(false);
-          ws.volume = 0;
-          this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 800, ease: 'Sine.easeIn' });
-        });
-      }
-    } catch (e) {
-      // Sound manager may be in a bad state after encounter cleanup
-    }
+    // (Round 6 → MusicController.startRoomMusic; 800ms wake fade preserved via
+    // parameter — room-entry create() uses 1800ms.)
+    this.music.startRoomMusic(this.room, this.getCurrentAct(), 800);
   };
 
   // ── Door navigation (Phase 12) ──────────────────────────────────
-
-  private checkDoorProximity(): void {
-    const doors = (this.room as any).doors;
-    if (!doors || doors.length === 0) return;
-    const px = this.player.x;
-    const py = this.player.y;
-    for (const door of doors) {
-      const dx = Math.abs(px - (door.x * TILE + TILE / 2));
-      const dy = Math.abs(py - (door.y * TILE + TILE / 2));
-      if (dx < TILE * 1.5 && dy < TILE * 1.5) {
-        this.nearDoor = door;
-        return;
-      }
-    }
-    this.nearDoor = null;
-  }
-
-  private handleDoorInteraction(door: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string }): void {
-    if (this.transitioning) return;
-    this.lastActivityAt = this.time.now; // Reset idle-hint grace period on door entry
-    this.transitioning = true;
-    this.sound.play('sfx_footstep', { volume: 0.35, rate: 0.8 });
-    // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
-    if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
-      this.tweens.add({ targets: this.bgMusic, volume: 0, duration: 300, ease: 'Sine.easeOut' });
-    }
-    this.cameras.main.fadeOut(300, 0, 0, 0);
-    this.time.delayedCall(300, () => {
-      eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
-        targetRoomId: door.targetRoomId,
-        fromDoorId: door.id,
-      });
-    });
-  }
+  // checkDoorProximity/handleDoorInteraction/renderDoorStates moved to
+  // systems/exploration/DoorSystem (Round 6) — the onLoadRoom /
+  // onUpdateDoorStates / onDoorLocked eventBridge handlers stay here and
+  // delegate. `transitioning` stays on the scene.
 
   // emitIdleHint moved to systems/exploration/idleHints (Round 4) — called from update()
 
-  private renderDoorStates(): void {
-    const doors = (this.room as any).doors;
-    if (!doors || doors.length === 0) return;
-
-    // Clear existing door visuals so we can re-render cleanly
-    for (const v of this.doorVisuals) {
-      v.destroy();
-    }
-    this.doorVisuals = [];
-
-    for (const door of doors) {
-      const doorPixelX = door.x * TILE + TILE / 2;
-      const doorPixelY = door.y * TILE + TILE / 2;
-      const state = this.doorStates[door.id] ?? 'available';
-
-      // Door frame — prominent wood frame with highlight and shadow
-      const frameG = this.add.graphics().setDepth(1);
-      this.doorVisuals.push(frameG);
-      const fx = door.x * TILE;
-      const fy = door.y * TILE - TILE / 2;
-      // Frame posts (solid wood)
-      frameG.fillStyle(0xa0845a, 1);
-      frameG.fillRect(fx - 3, fy, 5, TILE + TILE / 2);
-      frameG.fillRect(fx + TILE - 2, fy, 5, TILE + TILE / 2);
-      // Frame header
-      frameG.fillStyle(0xa0845a, 1);
-      frameG.fillRect(fx - 3, fy, TILE + 6, 5);
-      // Highlight (inner edge)
-      frameG.fillStyle(0xc4a870, 0.8);
-      frameG.fillRect(fx + 1, fy + 1, 1, TILE + TILE / 2 - 1);
-      frameG.fillRect(fx + TILE - 3, fy + 1, 1, TILE + TILE / 2 - 1);
-      frameG.fillRect(fx, fy + 1, TILE, 1);
-      // Shadow (outer edge)
-      frameG.fillStyle(0x5a4430, 0.7);
-      frameG.fillRect(fx - 3, fy + TILE + TILE / 2 - 1, TILE + 6, 2);
-
-      if (state === 'locked') {
-        // Dark overlay + lock icon
-        const overlay = this.add.graphics().setDepth(2);
-        overlay.fillStyle(0x000000, 0.55);
-        overlay.fillRect(door.x * TILE - TILE / 2, door.y * TILE - TILE, TILE * 2, TILE * 3);
-        const lockText = this.add.text(doorPixelX, doorPixelY, '[X]', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '10px',
-          color: '#ff4444',
-          stroke: '#000000',
-          strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(3);
-        this.doorVisuals.push(overlay, lockText);
-
-      } else if (state === 'next') {
-        // Breathing warm-gold filled aura (Phase 27 VIS-07) — critical-path "next" door
-        // Clearly distinct from the blue 'available' ring pulse: filled gold, slower breathe
-        if (this.textures.exists('glow_radial')) {
-          const aura = this.add.image(doorPixelX, doorPixelY, 'glow_radial')
-            .setTint(0xffa000)
-            .setBlendMode(Phaser.BlendModes.ADD)
-            .setAlpha(0.6)
-            .setDepth(2);
-          this.tweens.add({
-            targets: aura,
-            alpha: { from: 0.6, to: 0.95 },
-            scaleX: { from: 1.1, to: 1.5 },
-            scaleY: { from: 1.1, to: 1.5 },
-            duration: 1600,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-          this.doorVisuals.push(aura);
-        } else {
-          // Fallback: filled gold circle alpha pulse (never stroke-only)
-          const fallbackAura = this.add.circle(doorPixelX, doorPixelY, 20, 0xffd700, 0.22).setDepth(2);
-          this.tweens.add({
-            targets: fallbackAura,
-            alpha: { from: 0.22, to: 0.45 },
-            scaleX: { from: 1, to: 1.4 },
-            scaleY: { from: 1, to: 1.4 },
-            duration: 1600,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-          this.doorVisuals.push(fallbackAura);
-        }
-        // Gold stroke ring — slower (1600ms) vs the blue available ring (1000ms) for distinct read
-        const nextRing = this.add.circle(doorPixelX, doorPixelY, 18, 0xffd700, 0)
-          .setStrokeStyle(2, 0xffd700, 1).setDepth(2);
-        this.tweens.add({
-          targets: nextRing,
-          alpha: { from: 0.3, to: 0.9 },
-          scaleX: { from: 0.8, to: 1.4 },
-          scaleY: { from: 0.8, to: 1.4 },
-          duration: 1600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        this.doorVisuals.push(nextRing);
-
-      } else if (state === 'available') {
-        // Pulsing glow ring
-        const glow = this.add.circle(doorPixelX, doorPixelY, 18, 0x4a90e2, 0)
-          .setStrokeStyle(2, 0x4a90e2, 1).setDepth(2);
-        this.tweens.add({
-          targets: glow,
-          alpha: { from: 0.2, to: 0.8 },
-          scaleX: { from: 0.8, to: 1.3 },
-          scaleY: { from: 0.8, to: 1.3 },
-          duration: 1000,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        this.doorVisuals.push(glow);
-
-      } else if (state === 'completed') {
-        // Gold checkmark badge above door (Phase 15 upgrade — persistent fanfare badge)
-        const badge = this.add.circle(doorPixelX, doorPixelY - TILE, 9, 0x2a6a2a, 1)
-          .setDepth(3);
-        this.doorVisuals.push(badge);
-        const check = this.add.text(doorPixelX, doorPixelY - TILE, '\u2713', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '9px',
-          color: '#ffd700',
-          stroke: '#000000',
-          strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(4);
-        this.doorVisuals.push(check);
-      }
-
-      // Door label (always shown)
-      const labelText = this.add.text(doorPixelX, doorPixelY + TILE, door.label, {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
-        color: state === 'locked' ? '#888888' : '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 1,
-      }).setOrigin(0.5).setDepth(3);
-      // F-20 fix (Run 07): clamp inside the room bounds — edge-door labels used
-      // to truncate at the canvas edge ("Recepti", "Hallwa"). Same clamp the
-      // NPC nameplates already use.
-      {
-        const pad = 2;
-        const half = labelText.width / 2;
-        const roomPxWidth = (this.room.width ?? 20) * TILE;
-        const minX = half + pad;
-        const maxX = roomPxWidth - half - pad;
-        if (maxX >= minX) {
-          labelText.x = Phaser.Math.Clamp(labelText.x, minX, maxX);
-        }
-      }
-      this.doorVisuals.push(labelText);
-    }
-  }
 
   private onLoadRoom = (data: {
     room: any;
@@ -1495,8 +1146,8 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onUpdateDoorStates = (data: { doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> }) => {
-    this.doorStates = data.doorStates;
-    this.renderDoorStates();
+    this.doors.setStates(data.doorStates);
+    this.doors.render();
   };
 
   private onDoorLocked = () => {
@@ -1630,12 +1281,13 @@ export class ExplorationScene extends Phaser.Scene {
     } else {
       this.nearbyInteractable = null;
       // Show door prompt if near a door and no other interactable
-      if (this.nearDoor) {
-        const doorLabel = this.nearDoor.label || this.nearDoor.targetRoomId.replace(/_/g, ' ');
+      const nearDoor = this.doors.nearDoor;
+      if (nearDoor) {
+        const doorLabel = nearDoor.label || nearDoor.targetRoomId.replace(/_/g, ' ');
         // F-12 fix (Run 07): a locked door used to show the same inviting
         // "[SPACE] Enter" prompt, then honk on the attempt. Tell the truth
         // up front — the attempt feedback (red flash + alert) stays.
-        if (this.doorStates[this.nearDoor.id] === 'locked') {
+        if (this.doors.states[nearDoor.id] === 'locked') {
           this.promptText.setText(`[LOCKED] ${doorLabel} — finish this area first`);
         } else {
           this.promptText.setText(`[SPACE] Enter ${doorLabel}`);
