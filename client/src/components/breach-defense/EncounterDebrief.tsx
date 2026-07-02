@@ -26,10 +26,13 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
   }, []);
 
   const isVictory = outcome === 'victory';
-  const headerText = isVictory ? 'NETWORK SECURED' : 'BREACH CONTAINED';
-  const headerColor = isVictory ? 'text-green-400' : 'text-amber-400';
-  const headerBg = isVictory ? 'bg-green-900/60 border-green-500/40' : 'bg-amber-900/60 border-amber-500/40';
-  const barColor = isVictory ? 'bg-green-500' : 'bg-amber-500';
+  // F-05 fix (Run 07): the defeat header used to read "BREACH CONTAINED" in
+  // victory-adjacent amber — a win banner over a 0/100 rating. Defeat is now
+  // honest (red, "SYSTEMS BREACHED") and points at the retry path.
+  const headerText = isVictory ? 'NETWORK SECURED' : 'SYSTEMS BREACHED';
+  const headerColor = isVictory ? 'text-green-400' : 'text-red-400';
+  const headerBg = isVictory ? 'bg-green-900/60 border-green-500/40' : 'bg-red-900/60 border-red-500/40';
+  const barColor = isVictory ? 'bg-green-500' : 'bg-red-500';
 
   return (
     <div
@@ -38,7 +41,7 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
       }`}
     >
       <div
-        className={`max-w-lg w-full mx-4 border-2 ${isVictory ? 'border-green-500/60' : 'border-amber-500/60'} bg-gray-900/95 shadow-[0_0_40px_rgba(0,200,100,0.1)] transform transition-all duration-400 ${
+        className={`max-w-lg w-full mx-4 border-2 ${isVictory ? 'border-green-500/60' : 'border-red-500/60'} bg-gray-900/95 shadow-[0_0_40px_rgba(0,200,100,0.1)] transform transition-all duration-400 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-95'
         }`}
       >
@@ -79,11 +82,22 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
 
           {/* Score contribution */}
           <p
-            className="text-green-400"
+            className={isVictory ? 'text-green-400' : 'text-gray-400'}
             style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}
           >
             + {scoreContribution} to Compliance Score
           </p>
+
+          {/* F-05: defeat is retryable now — say so */}
+          {!isVictory && (
+            <p
+              className="text-red-300"
+              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.7' }}
+            >
+              The attackers got through this time. Walk back to the workstation
+              cluster when you're ready to run the defense again.
+            </p>
+          )}
 
           {/* HIPAA takeaways */}
           <div>

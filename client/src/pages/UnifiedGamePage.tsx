@@ -66,6 +66,23 @@ const SORTER_LOCATION_LABELS: Record<string, string> = {
   'breach-triage-er': 'PRIYA',  // Phase 17: Breach Triage close button reads "BACK TO PRIYA"
 };
 
+// F-04 fix (Run 07): map encounterId → the NPC that hosts it, built from roomData.
+// Encounter-trigger NPCs (Aiyana, Marcus, Dr. Tovar, Priya) never went through the
+// dialogue flow, so they could never enter completedNPCs — capping completion at
+// 22/26 and making the win condition (talk to the CCO with all 26 done) unreachable.
+// Winning an encounter now marks its host NPC complete, same as finishing a dialogue.
+const ENCOUNTER_NPC_BY_ID: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const room of (roomDataJson as any).rooms ?? roomDataJson) {
+    for (const npc of room.npcs ?? []) {
+      if (npc.encounterTrigger?.encounterId) {
+        map[npc.encounterTrigger.encounterId] = npc.id;
+      }
+    }
+  }
+  return map;
+})();
+
 interface RoomWithDoors {
   id: string;
   name: string;
@@ -271,6 +288,8 @@ export default function UnifiedGamePage() {
 
   // Room cleared banner
   const [roomClearedBanner, setRoomClearedBanner] = useState<{ roomName: string } | null>(null);
+  // R7-05: celebration that must wait for an active encounter overlay to close
+  const [pendingCelebration, setPendingCelebration] = useState<{ roomId: string; roomName: string } | null>(null);
 
   // ── Standalone Tower Defense state (Phase 19 — TD-01..03) ─────
   // Result is null while the round is in progress, populated when BreachDefenseScene
@@ -376,7 +395,14 @@ export default function UnifiedGamePage() {
     // demo session.
     if (isDemoActive()) return;
     const currentMusicVolume = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+    // F-03 fix (Run 07): merge over the existing blob instead of writing a fixed
+    // 15-field shape. useGameState's own persistence effect stores 8 extended
+    // fields (currentAct, act1/2Complete, actFlags, decisions, encounterResults,
+    // unifiedScore, currentRoomId) in the same key; the old fixed-shape write ran
+    // AFTER it on every state change and wiped them all — no act ever survived a
+    // save, which made Act 3 (Priya / Breach Triage) unreachable.
     writeSave({
+      ...loadSave(),
       version: 2,
       completedRooms: gameState.state.completedRooms,
       collectedStories: gameState.state.collectedStories,
@@ -518,7 +544,18 @@ export default function UnifiedGamePage() {
     const params = new URLSearchParams(window.location.search);
     const qaRoom = params.get('qa-room');
     if (qaRoom && rooms.some(r => r.id === qaRoom)) {
-      const timer = setTimeout(() => {
+      // Run 07 (QA-infra fix): this used to blind-fire REACT_LOAD_ROOM on a
+      // fixed 2s timer. Two failure modes: (a) if Boot finished late the event
+      // fired before ExplorationScene registered its listener and was lost;
+      // (b) if the target room WAS the boot room, the redundant scene.restart
+      // landed 0–1.5s after the scene became playable and silently wiped any
+      // in-flight interaction (exposed by the F-10 boot-timing fix). Now we
+      // poll until the scene is actually up, and skip the redundant restart.
+      const poll = setInterval(() => {
+        const bridge = window.__QA__;
+        if (!bridge?.scenesVisited?.includes('Exploration') || !bridge.currentRoomId) return;
+        clearInterval(poll);
+        if (bridge.currentRoomId === qaRoom) return; // already there
         const targetRoom = rooms.find(r => r.id === qaRoom);
         if (!targetRoom) return;
         gameState.setCurrentRoom(qaRoom);
@@ -531,8 +568,8 @@ export default function UnifiedGamePage() {
           collectedItems: gameState.state.collectedItems,
           doorStates,
         });
-      }, 2000);
-      return () => clearTimeout(timer);
+      }, 200);
+      return () => clearInterval(poll);
     }
   }, []);
 
@@ -581,9 +618,22 @@ export default function UnifiedGamePage() {
     eventBridge.on(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
 
     // If Boot already fired before this effect registered (race condition),
-    // poll briefly for the game ref to become available
+    // poll briefly for the game ref to become available.
+    // F-10 fix (Run 07): the poll used to start Exploration ~50ms after mount —
+    // long before BootScene's preload finished downloading the music tracks —
+    // so every cold boot logged "music_hub not ready, skipping BGM" and the
+    // first room of every session was silent. Now the poll only fires once the
+    // qa-bridge has seen Boot's SCENE_READY (assets loaded); the SCENE_READY
+    // listener above covers the normal path.
+    // F-17 fix (Run 07): same pageModeRef guard as handleSceneReady — the poll
+    // used to boot Exploration underneath the standalone Tower Defense.
     const bootPoll = setInterval(() => {
-      if (gameRef.current && !sceneStartedRef.current) {
+      if (pageModeRef.current === 'tower-defense-standalone') return;
+      if (
+        gameRef.current &&
+        !sceneStartedRef.current &&
+        window.__QA__?.scenesVisited?.includes('Boot')
+      ) {
         clearInterval(bootPoll);
         startExploration();
       }
@@ -629,6 +679,33 @@ export default function UnifiedGamePage() {
       : completedRooms;
     if (justCompleted) {
       gameState.completeRoom(currentRoomId);
+      // F-03 fix (Run 07): checkActAdvance existed since Phase 14 but was never
+      // called from anywhere — acts could not advance even in memory. This is
+      // the single funnel through which every room completion flows.
+      gameState.checkActAdvance(effectiveCompleted);
+
+      // F-08 fix (Run 07): the room-complete celebration existed on both sides
+      // but was never wired — the Phaser fanfare listener had no emitter, and
+      // setRoomClearedBanner was only ever called with null, which also made
+      // the six authored patient stories unreachable (banner → GameBanner →
+      // handleRoomClearedComplete → PatientStoryReveal). Only celebrate rooms
+      // with real requirements — hallways auto-complete on entry and get no
+      // fanfare (Commandment 8: feedback scales with moment size).
+      const reqs = currentRoom.completionRequirements;
+      const earnedCompletion = reqs
+        ? reqs.requiredNpcs.length + reqs.requiredZones.length + reqs.requiredItems.length > 0
+        : currentRoom.npcs.length > 0;
+      if (earnedCompletion) {
+        if (encounterPhase === 'idle') {
+          eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: currentRoomId });
+          setRoomClearedBanner({ roomName: currentRoom.name });
+        } else {
+          // R7-05: an encounter overlay (sorter/triage/TD) is open — landing the
+          // banner + patient story on top of it blocks its inputs. Defer the
+          // celebration until the encounter closes.
+          setPendingCelebration({ roomId: currentRoomId, roomName: currentRoom.name });
+        }
+      }
     }
     const doorStates = computeDoorStates(currentRoom, effectiveCompleted);
     eventBridge.emit(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, { doorStates });
@@ -640,7 +717,17 @@ export default function UnifiedGamePage() {
     gameState.state.completedZones,
     gameState.state.collectedItems,
     checkRoomCompletion,
+    encounterPhase,
   ]);
+
+  // R7-05: fire a deferred room celebration once the encounter overlay closes.
+  useEffect(() => {
+    if (encounterPhase === 'idle' && pendingCelebration) {
+      eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: pendingCelebration.roomId });
+      setRoomClearedBanner({ roomName: pendingCelebration.roomName });
+      setPendingCelebration(null);
+    }
+  }, [encounterPhase, pendingCelebration]);
 
   // ── Door navigation handler (EXPLORATION_EXIT_ROOM) ───────────
   const handleExitRoom = useCallback(
@@ -1137,12 +1224,17 @@ export default function UnifiedGamePage() {
   const handleDismissDebrief = useCallback(() => {
     // BLOCKER 3: capture encounterId BEFORE state setters so async setState ordering doesn't lose it.
     const encounterId = encounterResult?.encounterId;
+    // F-05 fix (Run 07): only a VICTORY seals the encounter (registry write →
+    // no replay). A defeat used to be recorded as done too, locking the player
+    // to a 0 forever. Now defeat returns via the aborted path — the encounter
+    // stays replayable (walk back to the trigger / talk to the NPC again).
+    const wasVictory = encounterResult?.outcome === 'victory';
     setEncounterPhase('idle');
     setEncounterResult(null);
     setNarrativeCardData(null);
     eventBridge.emit(
       BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER,
-      encounterId ? { encounterId } : undefined,
+      wasVictory && encounterId ? { encounterId } : { aborted: true },
     );
   }, [encounterResult]);
 
@@ -1191,6 +1283,11 @@ export default function UnifiedGamePage() {
       score: result.correctCount,
       outcome,
     });
+    // F-04 fix (Run 07): a won encounter completes its host NPC (Priya),
+    // same as a finished dialogue — otherwise the 26-NPC win condition is unreachable.
+    if (outcome === 'victory' && ENCOUNTER_NPC_BY_ID[result.encounterId]) {
+      gameState.completeNPC(ENCOUNTER_NPC_BY_ID[result.encounterId]);
+    }
   }, [narrativeCardData, gameState]);
 
   // PHI Sorter encounter completion handler (Phase 16)
@@ -1225,6 +1322,12 @@ export default function UnifiedGamePage() {
       score: result.correctCount,
       outcome,
     });
+    // F-04 fix (Run 07): a won encounter completes its host NPC (Aiyana /
+    // Marcus / Dr. Tovar), same as a finished dialogue — otherwise the
+    // 26-NPC win condition is unreachable.
+    if (outcome === 'victory' && ENCOUNTER_NPC_BY_ID[result.encounterId]) {
+      gameState.completeNPC(ENCOUNTER_NPC_BY_ID[result.encounterId]);
+    }
   }, [narrativeCardData, gameState]);
 
   // ── Sync completion state to running Phaser scene ─────────────
@@ -1270,11 +1373,35 @@ export default function UnifiedGamePage() {
           eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
         }
 
-        // Win condition
-        if (
-          currentSceneId === 'final_boss_1' &&
-          gameState.state.completedNPCs.length + 1 >= totalScenarios + 1
-        ) {
+        // F-15 fix (Run 07): the choice gate asks "who do you assist FIRST?" —
+        // "first" promises you'll get to both. Once the chosen person's scenario
+        // completes, unlock the other option so their content (and the 26-NPC
+        // ending, which needs every NPC) stays reachable.
+        const gatesHere: Gate[] = currentRoom?.config?.gates || [];
+        for (const gate of gatesHere) {
+          if (gate.type !== 'choice') continue;
+          if (!gate.choiceOptions?.some(opt => opt.unlocksId === currentNPCId)) continue;
+          for (const opt of gate.choiceOptions) {
+            if (opt.unlocksId && opt.unlocksId !== currentNPCId && !unlockedNpcs.has(opt.unlocksId)) {
+              resolveGate(gate.id, opt.unlocksId);
+              const otherNpc = currentRoom?.npcs.find((n: any) => n.id === opt.unlocksId);
+              if (otherNpc) {
+                notify(`${otherNpc.name} is ready to talk now`, { label: 'NEW SCENARIO', type: 'info' });
+              }
+            }
+          }
+        }
+
+        // Win condition — F-04 fix (Run 07): count the boss conversation that is
+        // completing RIGHT NOW (state is stale until the next render).
+        // R7-06 (ported from twin run): the CCO now carries isFinalBoss, so
+        // totalScenarios counts only the 25 regular NPCs — the finale requires
+        // all of them plus the boss talk that is completing here. The boss is
+        // excluded from the count so a prior boss chat can't stand in for a
+        // missed scenario.
+        const completedRegulars = new Set(gameState.state.completedNPCs);
+        completedRegulars.delete(currentNPCId);
+        if (currentSceneId === 'final_boss_1' && completedRegulars.size >= totalScenarios) {
           if (gameState.state.privacyScore > 0) {
             setPageMode('win');
             return;
@@ -1287,7 +1414,7 @@ export default function UnifiedGamePage() {
       setPageMode('exploration');
       eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
     },
-    [currentNPCId, currentSceneId, gameState, totalScenarios, currentRoom, notify],
+    [currentNPCId, currentSceneId, gameState, totalScenarios, currentRoom, notify, unlockedNpcs, resolveGate],
   );
 
   const handleGameOver = useCallback(
@@ -1587,6 +1714,9 @@ export default function UnifiedGamePage() {
         isWin={pageMode === 'win'}
         finalScore={gameState.state.privacyScore}
         scenariosCompleted={gameState.state.completedNPCs.length}
+        // R7-06: totalScenarios counts only regular NPCs now that the CCO
+        // carries isFinalBoss; +1 folds the boss back in so a full run reads
+        // 26/26 (completedNPCs includes the boss at win time).
         totalScenarios={totalScenarios + 1}
         timeElapsed={formatElapsedTime()}
         onPlayAgain={handlePlayAgain}
@@ -1595,18 +1725,39 @@ export default function UnifiedGamePage() {
   }
 
   // ── Story reveal modal ────────────────────────────────────────
-  if (showStoryModal && currentStoryRoom?.patientStory) {
-    return (
-      <PatientStoryReveal
-        story={currentStoryRoom.patientStory}
-        roomName={currentStoryRoom.name}
-        onClose={handleCloseStoryModal}
-      />
-    );
-  }
+  // F-26 fix (Run 07, new finding): this used to be a full-page early return —
+  // it UNMOUNTED PhaserGame (which destroys the Game instance on unmount) for
+  // the duration of the story, and nothing ever rebooted the scene afterwards
+  // (sceneStartedRef stays true), leaving a dead black canvas. The path was
+  // unreachable while F-08 kept stories dead; fixing F-08 exposed it. The
+  // component is styled `absolute inset-0` — it was always meant to be an
+  // overlay. It now renders inside the canvas container below.
 
   // ── Main game view (Phaser canvas + React overlays) ───────────
-  const dialogueScenes = currentSceneId ? scenes.filter(s => s.id === currentSceneId) : [];
+  // F-22 fix (Run 07, new finding): pass the FULL nextSceneId chain, not just the
+  // entry scene. GameContainer resolves choice.nextSceneId by findIndex into this
+  // array; with only the entry scene present, every cross-scene jump fell through
+  // to "no next scene → onComplete", silently ending multi-scene dialogues after
+  // scene 1 — the CCO's 3-scenario final exam played only scenario 1.
+  const dialogueScenes = (() => {
+    if (!currentSceneId) return [];
+    const byId = new Map(scenes.map(s => [s.id, s]));
+    const out: Scene[] = [];
+    const seen = new Set<string>();
+    const queue = [currentSceneId];
+    while (queue.length) {
+      const id = queue.shift()!;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const s = byId.get(id);
+      if (!s) continue;
+      out.push(s);
+      for (const c of s.choices ?? []) {
+        if (c.nextSceneId) queue.push(c.nextSceneId);
+      }
+    }
+    return out;
+  })();
   const npc = currentRoom?.npcs.find((n: any) => n.id === currentNPCId);
 
   return (
@@ -1659,6 +1810,9 @@ export default function UnifiedGamePage() {
         {encounterPhase === 'encounter' && narrativeCardData?.config && (
           <EncounterGameUI
             availableTowerIds={narrativeCardData?.config?.availableTowerIds ?? []}
+            // F-06 (Run 07): same abort semantics as the sorter — no score
+            // change, no registry write, encounter replayable.
+            onExit={handleSorterAbort}
           />
         )}
 
@@ -1802,6 +1956,15 @@ export default function UnifiedGamePage() {
           />
         )}
 
+        {/* Patient story reveal — overlay, NOT a page swap (F-26, Run 07) */}
+        {showStoryModal && currentStoryRoom?.patientStory && (
+          <PatientStoryReveal
+            story={currentStoryRoom.patientStory}
+            roomName={currentStoryRoom.name}
+            onClose={handleCloseStoryModal}
+          />
+        )}
+
         {/* Room cleared banner */}
         {roomClearedBanner && (
           <GameBanner
@@ -1838,12 +2001,19 @@ export default function UnifiedGamePage() {
           />
         )}
 
-        {/* Intro modal */}
-        {showIntroModal && (
+        {/* Intro modal.
+            F-16 fix (Run 07): the demo flag is set at character-confirm, AFTER
+            this component's useState initializer ran — so demo sessions showed
+            the full-game onboarding despite the Phase 18 decision. Re-check at
+            render time.
+            F-11 fix (Run 07): the door instructions said "Walk to a door" but
+            standing at a door does nothing — SPACE is required. A first-timer's
+            literal first navigation attempt failed silently. */}
+        {showIntroModal && !isDemoActive() && (
           <TutorialModal
             title="Welcome to HIPAA General"
             description={
-              "You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nSPACE \u2014 Talk to people and interact\nWalk to a door \u2014 Go to the next area"
+              "You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nSPACE \u2014 Talk to people and interact\nSPACE at a door \u2014 Go to the next area"
             }
             onAcknowledge={handleDismissIntroModal}
             type="info"
@@ -1858,7 +2028,7 @@ export default function UnifiedGamePage() {
           className="text-[8px] text-gray-500"
           style={{ fontFamily: '"Press Start 2P"' }}
         >
-          WASD or Arrow Keys to move &bull; SPACE to interact &bull; Walk to doors to navigate
+          WASD or Arrow Keys to move &bull; SPACE to interact &bull; SPACE at a door to travel
         </p>
         <button
           onClick={handleShowHelpModal}

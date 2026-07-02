@@ -53,7 +53,14 @@ export function migrateV1toV2(roomIds: string[]): SaveDataV2 {
   const existing = localStorage.getItem(SAVE_KEY_V2);
   if (existing) {
     try {
-      return JSON.parse(existing) as SaveDataV2;
+      const parsed: unknown = JSON.parse(existing);
+      // Run 07: only trust the existing blob if it actually is a v2 object;
+      // validateSave repairs broken declared fields and keeps extended ones.
+      // A wrong-version/shape blob falls through to v1 migration, whose
+      // write-before-delete replaces it.
+      if (parsed && typeof parsed === 'object' && !Array.isArray(parsed) && (parsed as { version?: unknown }).version === 2) {
+        return validateSave(parsed);
+      }
     } catch {
       // Corrupted v2 — fall through to migrate from v1
     }
@@ -164,10 +171,66 @@ export function loadSave(): SaveDataV2 {
   const raw = localStorage.getItem(SAVE_KEY_V2);
   if (!raw) return { ...defaultSave, gameStartTime: Date.now() };
   try {
-    return JSON.parse(raw) as SaveDataV2;
+    return validateSave(JSON.parse(raw));
   } catch {
     return { ...defaultSave, gameStartTime: Date.now() };
   }
+}
+
+function isStringArray(v: unknown): v is string[] {
+  return Array.isArray(v) && v.every(x => typeof x === 'string');
+}
+
+/**
+ * Run 07 (save-shape validation): the old load was `JSON.parse(...) as SaveDataV2`
+ * — corrupt JSON fell back safely, but structurally-wrong-but-valid JSON (a
+ * hand-edited blob, a v1 object, a future v3) was trusted blindly and crashed
+ * on the first `.length`/`.map` downstream.
+ *
+ * IMPORTANT (per STATE_OF_TRUTH §6.2): validate against the REAL persisted
+ * shape, not just the interface. useGameState merges 8 extended fields
+ * (currentAct, act1/2Complete, actFlags, decisions, encounterResults,
+ * unifiedScore, currentRoomId) into this same blob — so unknown fields are
+ * PRESERVED, never stripped. Only broken *declared* fields are repaired to
+ * their defaults; a wrong version or a non-object resets gracefully.
+ */
+export function validateSave(parsed: unknown): SaveDataV2 {
+  if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
+    console.warn('[saveData] malformed save (not an object) — starting fresh');
+    return { ...defaultSave, gameStartTime: Date.now() };
+  }
+  const s = parsed as Record<string, unknown>;
+  if (s.version !== 2) {
+    console.warn(`[saveData] unsupported save version "${String(s.version)}" — starting fresh`);
+    return { ...defaultSave, gameStartTime: Date.now() };
+  }
+
+  const repaired: Record<string, unknown> = { ...s };
+  let repairs = 0;
+  for (const key of Object.keys(defaultSave) as (keyof SaveDataV2)[]) {
+    if (key === 'version') continue;
+    const def = defaultSave[key];
+    const val = repaired[key];
+    const ok = Array.isArray(def)
+      ? isStringArray(val)
+      : typeof def === 'object'
+        ? typeof val === 'object' && val !== null && !Array.isArray(val)
+        : typeof val === typeof def;
+    if (!ok) {
+      repaired[key] = Array.isArray(def)
+        ? []
+        : typeof def === 'object'
+          ? {}
+          : key === 'gameStartTime'
+            ? Date.now()
+            : def;
+      repairs++;
+    }
+  }
+  if (repairs > 0) {
+    console.warn(`[saveData] repaired ${repairs} malformed field(s) in save`);
+  }
+  return repaired as unknown as SaveDataV2;
 }
 
 /**

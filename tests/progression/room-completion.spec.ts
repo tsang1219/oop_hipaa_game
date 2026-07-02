@@ -38,7 +38,7 @@ test.describe('Room Completion', () => {
     await loadRoom(page, 'reception');
 
     // Talk to both NPCs
-    await talkToNPC(page, 10, 4); // riley
+    await talkToNPC(page, 10, 3); // riley — at (10,3); (10,4) was stale (run 07 fix, pre-existing baseline failure)
     await talkToNPC(page, 5, 8);  // nervous_patient
 
     // Examine zone
@@ -58,7 +58,7 @@ test.describe('Room Completion', () => {
     await loadRoom(page, 'reception');
 
     // Only talk to riley — skip nervous_patient, sign_in_sheet, patient_rights_poster
-    await talkToNPC(page, 10, 4); // riley
+    await talkToNPC(page, 10, 3); // riley — at (10,3); (10,4) was stale (run 07 fix, pre-existing baseline failure)
 
     // Exit room
     await goThroughDoor(page, 'reception_to_entrance', 'hospital_entrance');

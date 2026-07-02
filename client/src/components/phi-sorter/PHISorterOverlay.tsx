@@ -10,6 +10,7 @@ import { DeskDocument, type DocAnimState } from './DeskDocument';
 import {
   getNPCReactionForItem,
   getNPCFallbackReaction,
+  getNPCOpenerLine,
   accuracyToBand,
   type NPCReaction,
   type NPCSorterId,
@@ -216,7 +217,9 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // Phase 22: Seed bubble with opening line on mount so the NPC is "present" from frame one
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    const opener = getNPCFallbackReaction(npcDisplay.id, 'good');
+    // F-14 (Run 07): use the dedicated opener, not a good-band praise line —
+    // "Nice. You're getting the rhythm." at 0/10 read as mockery.
+    const opener = getNPCOpenerLine(npcDisplay.id);
     setCurrentReactionText(opener.text);
     setCurrentReactionVariant(opener.variant ?? 'neutral');
     // Intentionally keyed to docSet.id — runs once per document set
@@ -238,6 +241,19 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
       cascadeTimersRef.current.forEach(clearTimeout);
     };
   }, []);
+
+  // F-01 fix (Run 07): promote the current document from 'entering' to 'active'
+  // once its 300ms slide-in completes. The stamp cascade's t3 timer only covers
+  // documents 2..N — nothing ever activated the FIRST document (regression from
+  // the Phase 24 desk rewrite), so every stamp bailed on the docAnimState guard
+  // and the desk was soft-locked at 0/10. This effect is the sole activation
+  // path for doc 1 and a harmless duplicate for the rest (same value, idempotent).
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  useEffect(() => {
+    if (phase !== 'sorting' || docAnimState !== 'entering' || shiftOver) return;
+    const id = setTimeout(() => setDocAnimState('active'), 300);
+    return () => clearTimeout(id);
+  }, [phase, docAnimState, shiftOver, currentDocIndex]);
 
   // ── PHASE 24: Shift clock engine (SORTV2-14) ─────────────────────────────────
   // Interval keyed to [phase] — starts when sorting begins, stops otherwise.

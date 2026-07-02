@@ -1,4 +1,4 @@
-import { getNPCPortraitPath } from '@/data/spriteAssetPaths';
+import { getNPCPortraitPath, hasNPCPortrait } from '@/data/spriteAssetPaths';
 
 interface DialoguePortraitProps {
   npcId: string;
@@ -19,7 +19,11 @@ interface DialoguePortraitProps {
  * data-testid="npc-battle-sprite" preserved for QA bridge / visual tests.
  */
 export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitProps) {
-  const spriteUrl = getNPCPortraitPath(npcId);
+  // F-13 (Run 07): zone/item dialogues (sign-in sheet, shredder, …) have no
+  // character mapping — they're things, not people. Render a document plate
+  // instead of borrowing a random staff member's face.
+  const isCharacter = hasNPCPortrait(npcId);
+  const spriteUrl = isCharacter ? getNPCPortraitPath(npcId) : null;
 
   return (
     <>
@@ -38,20 +42,39 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
         }}
         data-testid="npc-battle-sprite"
       >
-        {/* 96px pixelated crop — frame 0 (idle-down) at 3x */}
-        <div
-          style={{
-            width: '96px',
-            height: '96px',
-            backgroundImage: `url(${spriteUrl})`,
-            backgroundSize: '288px 384px',
-            backgroundPosition: '0 0',
-            backgroundRepeat: 'no-repeat',
-            imageRendering: 'pixelated',
-            backgroundColor: '#1a1a2e',
-            animation: 'portrait-breathe 2.4s ease-in-out infinite',
-          }}
-        />
+        {/* 96px pixelated crop — frame 0 (idle-down) at 3x.
+            F-13: unmapped ids (zones/items) get a document glyph plate. */}
+        {isCharacter ? (
+          <div
+            style={{
+              width: '96px',
+              height: '96px',
+              backgroundImage: `url(${spriteUrl})`,
+              backgroundSize: '288px 384px',
+              backgroundPosition: '0 0',
+              backgroundRepeat: 'no-repeat',
+              imageRendering: 'pixelated',
+              backgroundColor: '#1a1a2e',
+              animation: 'portrait-breathe 2.4s ease-in-out infinite',
+            }}
+          />
+        ) : (
+          <div
+            style={{
+              width: '96px',
+              height: '96px',
+              backgroundColor: '#1a1a2e',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontSize: '40px',
+              animation: 'portrait-breathe 2.4s ease-in-out infinite',
+            }}
+            aria-label="Object of interest"
+          >
+            {'\u{1F4CB}'}
+          </div>
+        )}
 
         {/* Name plate strip — inside the frame, below the crop */}
         <div

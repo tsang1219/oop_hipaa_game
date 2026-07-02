@@ -187,6 +187,11 @@ export class ExplorationScene extends Phaser.Scene {
 
   // Encounter state
   private encounterTriggered = false;
+  // F-02 fix (Run 07): set when the player declines the TD narrative card while
+  // still standing inside the trigger radius. The trigger stays suppressed until
+  // they walk OUT of the radius — otherwise update() re-pops the card on the
+  // very next frame and "NOT RIGHT NOW" becomes an inescapable loop.
+  private encounterDeclined = false;
 
   // Door navigation state (Phase 12)
   private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
@@ -198,6 +203,10 @@ export class ExplorationScene extends Phaser.Scene {
 
   // Zone glow registry — stores ring arc + tween per zone id so we can kill glow on live completion (Phase 27 VIS-08)
   private zoneGlows: Map<string, { ring: Phaser.GameObjects.Arc; tween: Phaser.Tweens.Tween }> = new Map();
+
+  // F-21 (Run 07): speech-bubble "!" markers per NPC id — so live completion can
+  // clear them (they used to float over completed, faded-out NPCs forever).
+  private npcBubbles: Map<string, Phaser.GameObjects.Image> = new Map();
 
   // Previous completion sets — used by updateCompletionState to detect NEW completions
   private prevCompletedNPCs: Set<string> = new Set();
@@ -233,9 +242,11 @@ export class ExplorationScene extends Phaser.Scene {
     this.pendingInteraction = null;
     this.paused = false;
     this.encounterTriggered = false;
+    this.encounterDeclined = false;
 
     // Clear zone glow registry and prev-completion sets on scene restart (room re-render rebuilds all visuals)
     this.zoneGlows.clear();
+    this.npcBubbles.clear();
     this.prevCompletedNPCs = new Set();
     this.prevCompletedZones = new Set();
 
@@ -277,6 +288,19 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   create() {
+    // F-25 fix (Run 07, new finding): Phaser NEVER auto-calls a method named
+    // shutdown() — the whole cleanup block below was dead code. Consequences:
+    // every scene.restart() (every room transition) stacked a duplicate copy
+    // of ~17 eventBridge listeners on the singleton bridge, and destroyed Game
+    // instances (dev remounts) left permanently-stale listeners whose
+    // `this.scene.isActive()` guards THROW — aborting the emit chain before
+    // live listeners ran (observed live: QA door navigation dead, layered SFX,
+    // run 01's one-off door desync). Wire it for real, and de-dup defensively
+    // in case a previous create() didn't get its shutdown.
+    this.removeBridgeListeners();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdown, this);
+
     // Reset camera fade from previous room transition (fixes black screen on scene.restart)
     // The fadeOut effect from the previous room may still be active after scene.restart()
     (this.cameras.main as any).fadeEffect?.reset();
@@ -1234,6 +1258,8 @@ export class ExplorationScene extends Phaser.Scene {
           repeat: -1,
           ease: 'Sine.easeInOut',
         });
+        // F-21 (Run 07): register so live completion can clear the marker
+        this.npcBubbles.set(npc.id, bubble);
       }
 
       this.interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
@@ -2106,12 +2132,20 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // IT Office encounter zone check (Phase 13)
-    if (this.room.id === 'it_office' && !this.encounterTriggered && !this.paused && !isQANoEncounter()) {
+    if (this.room.id === 'it_office' && !this.paused && !isQANoEncounter()) {
       const alreadyDone = this.registry.get('encounterResult_td-it-office');
       if (!alreadyDone) {
         const dx = Math.abs(this.player.x - (9 * TILE + TILE / 2));
         const dy = Math.abs(this.player.y - (6 * TILE + TILE / 2));
-        if (dx < TILE * 1.5 && dy < TILE * 1.5) {
+        const inRadius = dx < TILE * 1.5 && dy < TILE * 1.5;
+        if (this.encounterDeclined) {
+          // F-02 fix (Run 07): player said "not right now" — re-arm the trigger
+          // only once they've stepped out of the radius, so declining actually works.
+          if (!inRadius) {
+            this.encounterDeclined = false;
+            this.encounterTriggered = false;
+          }
+        } else if (!this.encounterTriggered && inRadius) {
           this.triggerEncounter('td-it-office');
         }
       }
@@ -2138,10 +2172,21 @@ export class ExplorationScene extends Phaser.Scene {
     // QA state broadcast (throttled to 200ms)
     if (this.time.now - this.lastStateBroadcastTime > 200) {
       this.lastStateBroadcastTime = this.time.now;
+      // F-19 fix (Run 07): the payload now matches the shape qa-bridge actually
+      // consumes (playerPosition / roomNPCs / roomZones / roomItems / roomDoors).
+      // The old fields (playerTileX/interactables/doors) had drifted from the
+      // bridge contract, leaving those __QA__ fields permanently undefined —
+      // any test asserting on them was asserting on nothing. Legacy fields kept
+      // so external scripts reading the raw event don't break.
+      const byType = (t: string) =>
+        this.interactables
+          .filter(ia => ia.type === t)
+          .map(ia => ({ type: ia.type, id: ia.id, x: (ia.data as any).x, y: (ia.data as any).y }));
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_STATE_UPDATE, {
         currentRoomId: this.room.id,
         playerTileX: this.tileX,
         playerTileY: this.tileY,
+        playerPosition: { tileX: this.tileX, tileY: this.tileY },
         nearbyInteractable: this.nearbyInteractable
           ? { type: this.nearbyInteractable.type, id: this.nearbyInteractable.id }
           : null,
@@ -2149,11 +2194,21 @@ export class ExplorationScene extends Phaser.Scene {
           ? { id: this.nearDoor.id, targetRoomId: this.nearDoor.targetRoomId }
           : null,
         paused: this.paused,
+        roomNPCs: byType('npc').map(n => ({ ...n, completed: this.completedNPCs.has(n.id) })),
+        roomZones: byType('zone').map(z => ({ ...z, completed: this.completedZones.has(z.id) })),
+        roomItems: byType('item').map(i => ({ ...i, collected: this.collectedItems.has(i.id) })),
         interactables: this.interactables.map(ia => ({
           type: ia.type,
           id: ia.id,
           x: (ia.data as any).x,
           y: (ia.data as any).y,
+        })),
+        roomDoors: ((this.room as any).doors || []).map((d: any) => ({
+          id: d.id,
+          targetRoomId: d.targetRoomId,
+          x: d.x,
+          y: d.y,
+          state: this.doorStates[d.id] ?? 'available',
         })),
         doors: ((this.room as any).doors || []).map((d: any) => ({
           id: d.id,
@@ -2166,13 +2221,11 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
-  shutdown() {
-    // Don't stop music — create() will reclaim it if same track is needed,
-    // or crossfadeToMusic will clean it up if the act changed.
-    this.bgMusic = undefined;
-    // Clean up sound unlock listener
-    this.sound.off('unlocked');
-    // Clean up EventBridge listeners
+  /** F-25 (Run 07): all eventBridge listener removal in one idempotent place —
+   *  called from shutdown() AND defensively at the top of create() so a missed
+   *  shutdown can never stack duplicates on the singleton bridge.
+   *  (eventemitter3's off(event, fn, context) removes every matching copy.) */
+  private removeBridgeListeners(): void {
     eventBridge.off(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION, this.onResumeFromDecline, this);
@@ -2187,7 +2240,6 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, this.onUpdateDoorStates, this);
     // Encounter lifecycle listeners (Phase 13)
-    this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, this.onLaunchEncounter, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, this.onReturnFromEncounter, this);
     // QA command listeners cleanup
@@ -2195,21 +2247,50 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
     eventBridge.off(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     eventBridge.off(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
+  }
+
+  /** F-25 (Run 07): now actually invoked — wired in create() via
+   *  events.once(SHUTDOWN) + events.once(DESTROY). Phaser never auto-calls a
+   *  method named shutdown(); this was dead code since Phase 12. Body is
+   *  throw-proofed because the DESTROY path runs with plugins partly torn down. */
+  shutdown() {
+    // Don't stop music — create() will reclaim it if same track is needed,
+    // or crossfadeToMusic will clean it up if the act changed.
+    this.bgMusic = undefined;
+    // Clean up sound unlock listener
+    try { this.sound.off('unlocked'); } catch (_) {}
+    // Clean up EventBridge listeners
+    this.removeBridgeListeners();
+    try { this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this); } catch (_) {}
     // Clean up input handlers
-    this.input.off('pointerdown');
+    try { this.input.off('pointerdown'); } catch (_) {}
     // Kill all tweens to prevent leaked infinite loops
-    this.tweens.killAll();
-    if (this.moveTimer) this.moveTimer.destroy();
+    try { this.tweens.killAll(); } catch (_) {}
+    try { if (this.moveTimer) this.moveTimer.destroy(); } catch (_) {}
+    this.moveTimer = null;
     if (this.npcPulseTween) {
-      this.npcPulseTween.stop();
+      try { this.npcPulseTween.stop(); } catch (_) {}
       this.npcPulseTween = null;
     }
   }
 
   // ── QA Testing Commands ──────────────────────────────────────────
 
+  /** Run 07 (new finding): `this.scene.isActive()` itself THROWS on a scene
+   *  instance whose plugin was torn down (observed live: a stale listener from
+   *  a destroyed instance received QA_NAVIGATE_DOOR mid-transition and crashed
+   *  the page with "Cannot read properties of null (reading 'isActive')").
+   *  All QA handlers now use this throw-proof liveness check. */
+  private isSceneAlive(): boolean {
+    try {
+      return !!this.scene && !!this.sys && this.scene.isActive();
+    } catch {
+      return false;
+    }
+  }
+
   private onQATeleportTo = (data: { tileX: number; tileY: number }) => {
-    if (!this.scene.isActive()) return;
+    if (!this.isSceneAlive()) return;
     this.movePath = [];
     if (this.moveTimer) { this.moveTimer.destroy(); this.moveTimer = null; }
     this.player.setPosition(data.tileX * TILE + TILE / 2, data.tileY * TILE + TILE / 2);
@@ -2223,7 +2304,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onQAMoveTo = (data: { tileX: number; tileY: number }) => {
-    if (!this.scene.isActive()) return;
+    if (!this.isSceneAlive()) return;
     const path = this.findPath(
       { x: this.tileX, y: this.tileY },
       { x: data.tileX, y: data.tileY }
@@ -2234,7 +2315,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onQAPressSpace = () => {
-    if (!this.scene.isActive() || this.paused) return;
+    if (!this.isSceneAlive() || this.paused) return;
     // If near an interactable, trigger it
     if (this.nearbyInteractable) {
       this.triggerInteraction(this.nearbyInteractable);
@@ -2262,7 +2343,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onQANavigateDoor = (data: { doorId: string }) => {
-    if (!this.scene.isActive()) return;
+    if (!this.isSceneAlive()) return;
     const doors = (this.room as any).doors;
     if (!doors) return;
     const door = doors.find((d: any) => d.id === data.doorId);
@@ -2340,6 +2421,11 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
+      // F-24 fix (Run 07): kill any tween already targeting this sound before
+      // fading. A duplicate crossfade (or a still-running fade-in) would keep
+      // ticking after onComplete destroys the sound — "Cannot set properties
+      // of null (setting 'volume')".
+      try { this.tweens.killTweensOf(this.bgMusic); } catch (_) {}
       // Fade out current track, then start new one
       this.tweens.add({
         targets: this.bgMusic,
@@ -2404,9 +2490,12 @@ export class ExplorationScene extends Phaser.Scene {
 
   // ── Department completion fanfare (Phase 15) ─────────────────────
 
-  private handleFanfareEvent = (data: { roomId: string; playerX: number; playerY: number }) => {
+  private handleFanfareEvent = (data: { roomId: string; playerX?: number; playerY?: number }) => {
     if (!this.scene.isActive()) return;
-    const { playerX, playerY } = data;
+    // F-08 (Run 07): React doesn't track pixel coordinates — default the burst
+    // to the player's current position.
+    const playerX = data.playerX ?? this.player?.x ?? this.cameras.main.centerX;
+    const playerY = data.playerY ?? this.player?.y ?? this.cameras.main.centerY;
 
     // Beat 1: Camera flash — gold-white
     this.cameras.main.flash(350, 255, 220, 50, false);
@@ -2442,7 +2531,10 @@ export class ExplorationScene extends Phaser.Scene {
       const raw = localStorage.getItem('pq:save:v2');
       if (!raw) return 1;
       const save = JSON.parse(raw);
-      const act = save?.actProgress;
+      // F-03 fix (Run 07): the live save field is `currentAct` (written by
+      // useGameState). `actProgress` was a phantom — nothing ever wrote it.
+      // Kept as a fallback so hand-seeded QA saves keep working.
+      const act = save?.currentAct ?? save?.actProgress;
       if (act === 2 || act === 3) return act;
     } catch { /* ignore */ }
     return 1;
@@ -2534,9 +2626,17 @@ export class ExplorationScene extends Phaser.Scene {
     // the encounter remains replayable when the player walks back over the trigger tile.
     if (data?.encounterId || data?.aborted) {
       this.paused = false;
-      this.encounterTriggered = false;
       if (data.encounterId) {
+        this.encounterTriggered = false;
         this.registry.set(`encounterResult_${data.encounterId}`, true);
+      } else if (this.encounterTriggered) {
+        // F-05 fix (Run 07): abort/defeat on the radius-triggered TD encounter —
+        // re-arm only after the player leaves the trigger radius (same mechanism
+        // as declining, F-02). Clearing the flag here would re-pop the alert on
+        // the very next frame since the player is still standing on the tile.
+        this.encounterDeclined = true;
+      } else {
+        this.encounterTriggered = false;
       }
     }
   };
@@ -2807,6 +2907,19 @@ export class ExplorationScene extends Phaser.Scene {
         stroke: '#000000',
         strokeThickness: 1,
       }).setOrigin(0.5).setDepth(3);
+      // F-20 fix (Run 07): clamp inside the room bounds — edge-door labels used
+      // to truncate at the canvas edge ("Recepti", "Hallwa"). Same clamp the
+      // NPC nameplates already use.
+      {
+        const pad = 2;
+        const half = labelText.width / 2;
+        const roomPxWidth = (this.room.width ?? 20) * TILE;
+        const minX = half + pad;
+        const maxX = roomPxWidth - half - pad;
+        if (maxX >= minX) {
+          labelText.x = Phaser.Math.Clamp(labelText.x, minX, maxX);
+        }
+      }
       this.doorVisuals.push(labelText);
     }
   }
@@ -3014,7 +3127,14 @@ export class ExplorationScene extends Phaser.Scene {
       // Show door prompt if near a door and no other interactable
       if (this.nearDoor) {
         const doorLabel = this.nearDoor.label || this.nearDoor.targetRoomId.replace(/_/g, ' ');
-        this.promptText.setText(`[SPACE] Enter ${doorLabel}`);
+        // F-12 fix (Run 07): a locked door used to show the same inviting
+        // "[SPACE] Enter" prompt, then honk on the attempt. Tell the truth
+        // up front — the attempt feedback (red flash + alert) stays.
+        if (this.doorStates[this.nearDoor.id] === 'locked') {
+          this.promptText.setText(`[LOCKED] ${doorLabel} — finish this area first`);
+        } else {
+          this.promptText.setText(`[SPACE] Enter ${doorLabel}`);
+        }
         this.promptText.setVisible(true);
       } else {
         this.promptText.setVisible(false);
@@ -3058,8 +3178,20 @@ export class ExplorationScene extends Phaser.Scene {
         // Already-completed encounters skip the request modal entirely
         const alreadyDone = this.registry.get(`encounterResult_${npc.encounterTrigger.encounterId}`);
         if (alreadyDone) {
-          // Encounter is done — emit the standard NPC interaction so the player can still
-          // talk to the NPC (they may have a thank-you scene later). For now, no-op fallback.
+          // F-07 fix (Run 07): the old bare `return` left the scene paused with the
+          // dim overlay up — talking to a finished encounter NPC froze the game.
+          // Unpause, clear the dim, and give the NPC a short post-encounter line
+          // (Commandment 1: no silent interactions).
+          this.paused = false;
+          if (this.dialogueDimOverlay) {
+            this.tweens.killTweensOf(this.dialogueDimOverlay);
+            this.dialogueDimOverlay.destroy();
+            this.dialogueDimOverlay = undefined;
+          }
+          const doneLine =
+            (npc.encounterTrigger as { completedText?: string }).completedText ??
+            'All handled here — thanks for the help earlier!';
+          this.showNpcSpeechBubble(ia, doneLine);
           return;
         }
         // Pause input to prevent walking off mid-modal; do NOT sleep — the React modal
@@ -3255,11 +3387,58 @@ export class ExplorationScene extends Phaser.Scene {
     this.paused = true;
   };
 
-  /** Player declined the encounter narrative card — unpause and allow re-trigger on next approach. */
+  /** Player declined the encounter narrative card — unpause and allow re-trigger on next approach.
+   *  F-02 fix (Run 07): do NOT clear encounterTriggered here — the player is still standing
+   *  inside the trigger radius, so update() would re-pop the alert on the next frame.
+   *  Instead mark the decline; the update() loop re-arms once they leave the radius. */
   private onResumeFromDecline = () => {
     this.paused = false;
-    this.encounterTriggered = false;
+    if (this.encounterTriggered) {
+      this.encounterDeclined = true;
+    }
   };
+
+  // ── Lightweight NPC speech bubble (Run 07, F-07) ────────────────
+  /** Brief floating one-liner above an NPC — for post-encounter "talk again"
+   *  moments that don't warrant the full dialogue overlay. Auto-fades. */
+  private npcSpeechBubble?: Phaser.GameObjects.Container;
+  private showNpcSpeechBubble(ia: InteractableData, line: string): void {
+    // Replace any bubble already showing (rapid re-presses shouldn't stack)
+    if (this.npcSpeechBubble) {
+      this.tweens.killTweensOf(this.npcSpeechBubble);
+      this.npcSpeechBubble.destroy();
+      this.npcSpeechBubble = undefined;
+    }
+    const text = this.add.text(0, 0, line, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: '#222222',
+      wordWrap: { width: 180 },
+      align: 'center',
+    }).setOrigin(0.5, 1);
+    const pad = 6;
+    const bg = this.add.rectangle(
+      0, pad, text.width + pad * 2, text.height + pad * 2, 0xfffbe8, 0.95,
+    ).setStrokeStyle(2, 0x222222).setOrigin(0.5, 1);
+    const bubble = this.add.container(ia.sprite.x, ia.sprite.y - TILE * 1.1, [bg, text])
+      .setDepth(95)
+      .setAlpha(0);
+    this.npcSpeechBubble = bubble;
+    try { this.sound.play('sfx_interact', { volume: 0.3 }); } catch (_) {}
+    this.tweens.add({ targets: bubble, alpha: 1, y: bubble.y - 4, duration: 180, ease: 'Sine.easeOut' });
+    this.time.delayedCall(2400, () => {
+      if (this.npcSpeechBubble !== bubble) return;
+      this.tweens.add({
+        targets: bubble,
+        alpha: 0,
+        duration: 250,
+        onComplete: () => {
+          bubble.destroy();
+          if (this.npcSpeechBubble === bubble) this.npcSpeechBubble = undefined;
+        },
+      });
+    });
+  }
 
   // ── Stop NPC pulse on interaction ──────────────────────────────
   private stopNpcPulse(ia: InteractableData) {
@@ -3351,6 +3530,22 @@ export class ExplorationScene extends Phaser.Scene {
         ia.sprite.setTint(0x888888); // tint is subtle under fade — immediate is fine
         // Pop the live checkmark (same position as the at-render mark in the NPC loop)
         this.addCompletionCheck(ia.sprite.x, ia.sprite.y - 20, ia.sprite.depth + 1, true);
+      }
+
+      // F-21 fix (Run 07): clear the "talk to me!" speech-bubble marker — it
+      // used to keep bobbing over the faded-out NPC forever after completion.
+      const bubble = this.npcBubbles.get(id);
+      if (bubble) {
+        this.npcBubbles.delete(id);
+        this.tweens.killTweensOf(bubble);
+        this.tweens.add({
+          targets: bubble,
+          alpha: 0,
+          scale: 0.5,
+          duration: 300,
+          ease: 'Sine.easeOut',
+          onComplete: () => bubble.destroy(),
+        });
       }
     }
 

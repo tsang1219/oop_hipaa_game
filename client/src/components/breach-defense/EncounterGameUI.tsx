@@ -18,9 +18,15 @@ const TOWER_ICONS: Record<string, string> = {
 
 interface EncounterGameUIProps {
   availableTowerIds: string[];
+  /** F-06 (Run 07): exit hatch — accepting the encounter used to be a one-way
+   *  door into a 4-wave commitment (or an indefinite park if no tower was ever
+   *  placed). X button / Esc aborts with no score change; the encounter stays
+   *  replayable. Optional so the standalone TD (which has its own flow) is
+   *  unaffected. */
+  onExit?: () => void;
 }
 
-export function EncounterGameUI({ availableTowerIds }: EncounterGameUIProps) {
+export function EncounterGameUI({ availableTowerIds, onExit }: EncounterGameUIProps) {
   const pixelFont = { fontFamily: '"Press Start 2P", monospace' };
   const availableSet = new Set(availableTowerIds);
 
@@ -129,6 +135,16 @@ export function EncounterGameUI({ availableTowerIds }: EncounterGameUIProps) {
     return () => { eventBridge.off(BRIDGE_EVENTS.BREACH_TOWER_PLACED, onTowerPlaced); };
   }, [onboardingStep]);
 
+  // ── F-06 (Run 07): Esc exits the encounter (mirrors PHISorterOverlay) ──
+  useEffect(() => {
+    if (!onExit) return;
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onExit();
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, [onExit]);
+
   // ── Render ──────────────────────────────────────────────────────
   return (
     <>
@@ -148,6 +164,17 @@ export function EncounterGameUI({ availableTowerIds }: EncounterGameUIProps) {
             >
               DEFENSE: {securityScore}%
             </span>
+            {onExit && (
+              <button
+                onClick={onExit}
+                aria-label="Exit encounter"
+                data-testid="button-encounter-exit"
+                className="text-gray-400 hover:text-red-400 border border-gray-600 hover:border-red-500/60 px-2 py-1 transition-colors"
+                style={{ ...pixelFont, fontSize: '9px' }}
+              >
+                ✕ ESC
+              </button>
+            )}
           </div>
         </div>
       </div>
