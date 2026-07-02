@@ -1,103 +1,35 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
-import { generateAllTextures, furnitureTextureKey, npcTextureKey, npcTypeFromId, objectTextureKey } from '../SpriteFactory';
+import { generateAllTextures } from '../sprites';
 import {
   ENCOUNTER_WAVES_INBOUND,
   ENCOUNTER_WAVE_BUDGETS,
   ENCOUNTER_AVAILABLE_TOWERS,
 } from '../../game/breach-defense/constants';
-import { getHallwayBoard } from '../../data/hallwayContent';
-import { isDemoActive } from '@/lib/demoSession';
+import { findPath } from '../systems/exploration/pathfinding';
+import {
+  ensurePlayerFallbackTexture,
+  renderRoom,
+  renderVignette,
+  showRoomBanner,
+} from '../systems/exploration/roomRenderer';
+import { spawnInteractables } from '../systems/exploration/interactableFactory';
+import type { InteractableData } from '../systems/exploration/interactableFactory';
+import { addRoomAmbience, addFurnitureIdleAnimations } from '../systems/exploration/roomAmbience';
+import {
+  emitIdleHint,
+  IDLE_HINT_GRACE_MS,
+  IDLE_HINT_INTERVAL_MS,
+} from '../systems/exploration/idleHints';
+import { MusicController } from '../systems/exploration/MusicController';
+import { DoorSystem } from '../systems/exploration/DoorSystem';
 import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
 
-// ── Idle-hint sparkle system constants (Phase 27 VIS-07) ─────────────────────
-const IDLE_HINT_GRACE_MS = 9000;  // 9s without input before first sparkle
-const IDLE_HINT_INTERVAL_MS = 5000; // ~5s between individual sparkles
-
-// ── Per-room floor style configuration ───────────────────────────────────────
-// Each entry holds the four tile shade variants (checkerboard 2x2 pattern),
-// a bevel-highlight colour and a bevel-shadow/grout colour.
-const FLOOR_STYLES = {
-  er: {
-    tileShades: [0xd8e0e4, 0xd0d8de, 0xc8d2d8, 0xdce4e8],
-    highlightColor: 0xe8f0f4,
-    shadowColor: 0xa8b4bc,
-  },
-  lab: {
-    tileShades: [0xd4e0d4, 0xccdbcc, 0xc4d4c4, 0xdce8dc],
-    highlightColor: 0xe8f4e8,
-    shadowColor: 0xa4b4a4,
-  },
-  it: {
-    tileShades: [0x8890a0, 0x848c9c, 0x808898, 0x8c94a4],
-    highlightColor: 0x98a0b0,
-    shadowColor: 0x686e80,
-  },
-  break: {
-    tileShades: [0xd8c4a0, 0xd4c09c, 0xd0bc98, 0xdcc8a4],
-    highlightColor: 0xe8d8b8,
-    shadowColor: 0xb8a880,
-  },
-  records: {
-    tileShades: [0xb8b4a0, 0xb4b09c, 0xb0ac98, 0xbcb8a4],
-    highlightColor: 0xc8c4b0,
-    shadowColor: 0x989488,
-  },
-  entrance: {
-    tileShades: [0xe0dcd4, 0xdcd8d0, 0xd8d4cc, 0xe4e0d8],
-    highlightColor: 0xf0ece4,
-    shadowColor: 0xc0bcb4,
-  },
-  // Reception: warm cream porcelain — reads as 64px slabs, not individual tiles
-  reception: {
-    tileShades: [0xe2d8c4, 0xded4c0, 0xdad0bc, 0xe6dcc8],
-    highlightColor: 0xf2e8d4,
-    shadowColor: 0xbeb49e,
-  },
-  // Hallways: slightly cooler/dimmer beige base — runner strip added post-loop
-  hallway: {
-    tileShades: [0xccc2a6, 0xc8bea2, 0xc4ba9e, 0xd0c6aa],
-    highlightColor: 0xdcd2b6,
-    shadowColor: 0xaaa092,
-  },
-  default: {
-    tileShades: [0xd4c9a8, 0xd0c5a4, 0xccc0a0, 0xd8cdb0],
-    highlightColor: 0xe2d8bc,
-    shadowColor: 0xb8ad94,
-  },
-} as const;
-
-type FloorStyleKey = keyof typeof FLOOR_STYLES;
-
-/** Map a room id to its floor style key.
- *  Order matters: 'hallway' is checked FIRST so 'hallway_reception_break'
- *  resolves to 'hallway' rather than 'reception' or 'break'. */
-function floorStyleFor(roomId: string): FloorStyleKey {
-  if (roomId.includes('hallway'))                                 return 'hallway';
-  if (roomId.includes('er') || roomId.includes('emergency'))     return 'er';
-  if (roomId.includes('lab'))                                     return 'lab';
-  if (roomId.includes('it') || roomId.includes('server'))        return 'it';
-  if (roomId.includes('break'))                                   return 'break';
-  if (roomId.includes('records'))                                 return 'records';
-  if (roomId.includes('entrance') || roomId.includes('lobby'))   return 'entrance';
-  if (roomId.includes('reception'))                               return 'reception';
-  return 'default';
-}
-// ─────────────────────────────────────────────────────────────────────────────
-
-// All known music track keys — used to clean up other tracks when changing rooms
-const MUSIC_TRACK_KEYS = [
-  'music_hub',
-  'music_exploration',
-  'music_breach',
-  'music_demo_er',
-  'music_demo_break_room',
-  'music_demo_records_room',
-] as const;
+// MUSIC_TRACK_KEYS moved to systems/exploration/MusicController (Round 6)
 
 // PHI Sorter triggers — proximity polling removed 2026-05-08, replaced by
 // NPC-driven trigger via Aiyana (Reception, tile 10,6) and Marcus (Lab, tile 9,7).
@@ -119,12 +51,7 @@ function isQANoEncounter(): boolean {
   return __qaNoEncounter;
 }
 
-interface InteractableData {
-  type: 'npc' | 'zone' | 'item' | 'hallwayBoard';
-  id: string;
-  data: NPC | InteractionZone | EducationalItem | { x: number; y: number; title: string; content: string };
-  sprite: Phaser.GameObjects.Sprite;
-}
+// InteractableData interface moved to systems/exploration/interactableFactory (Round 4)
 
 /**
  * ExplorationScene: Renders a PrivacyQuest room in Phaser canvas.
@@ -170,7 +97,8 @@ export class ExplorationScene extends Phaser.Scene {
   private lastFootstepTime = 0;
 
   // Idle-hint sparkle system (Phase 27 VIS-07)
-  private lastActivityAt = 0;
+  // lastActivityAt is public: DoorSystem.enter() resets it on door entry (Round 6)
+  lastActivityAt = 0;
   private lastIdleHintAt = 0;
   private idleHintIndex = 0;
 
@@ -193,13 +121,14 @@ export class ExplorationScene extends Phaser.Scene {
   // very next frame and "NOT RIGHT NOW" becomes an inescapable loop.
   private encounterDeclined = false;
 
-  // Door navigation state (Phase 12)
-  private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
-  private doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> = {};
-  private doorVisuals: Phaser.GameObjects.GameObject[] = [];
+  // Door navigation state (Phase 12) — nearDoor/doorStates/doorVisuals moved
+  // to DoorSystem (Round 6); transitioning STAYS here (it also gates idle
+  // hints, movement, QA nav, and locked-door recovery) and is public so
+  // DoorSystem reads/writes it through the scene reference.
+  private doors!: DoorSystem;
   private pendingSpawnTileX: number | null = null;
   private pendingSpawnTileY: number | null = null;
-  private transitioning = false;
+  transitioning = false;
 
   // Zone glow registry — stores ring arc + tween per zone id so we can kill glow on live completion (Phase 27 VIS-08)
   private zoneGlows: Map<string, { ring: Phaser.GameObjects.Arc; tween: Phaser.Tweens.Tween }> = new Map();
@@ -212,9 +141,10 @@ export class ExplorationScene extends Phaser.Scene {
   private prevCompletedNPCs: Set<string> = new Set();
   private prevCompletedZones: Set<string> = new Set();
 
-  // Background music
-  private bgMusic?: Phaser.Sound.BaseSound;
-  private readonly musicBaseVolume = 0.13;
+  // Background music — bgMusic/musicBaseVolume/activeMusicBaseVolume moved to
+  // MusicController (Round 6). The scene keeps its eventBridge subscriptions
+  // (REACT_SET_MUSIC_VOLUME, ACT_ADVANCE) and delegates.
+  private readonly music = new MusicController(this);
 
   // QA state broadcast throttle
   private lastStateBroadcastTime = 0;
@@ -252,10 +182,12 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Reset transitioning so scene restart doesn't freeze movement
     this.transitioning = false;
-    this.nearDoor = null;
 
-    // Store door states for visual rendering
-    this.doorStates = data.doorStates ?? {};
+    // Fresh DoorSystem per room (Round 6) — resets nearDoor/doorVisuals; the
+    // previous room's visuals were already destroyed by the scene restart.
+    // Store door states for visual rendering.
+    this.doors = new DoorSystem(this, this.room, this.music);
+    this.doors.setStates(data.doorStates ?? {});
 
     // Read door-specific spawn position if provided
     this.pendingSpawnTileX = null;
@@ -313,101 +245,7 @@ export class ExplorationScene extends Phaser.Scene {
     // Generate extra textures if not already done (idempotent)
     generateAllTextures(this);
 
-    // Ensure player_down texture exists (fallback if BootScene hasn't generated it yet)
-    // Matches SpriteFactory drawCharacter() chibi style — blue shirt, brown hair "new employee"
-    if (!this.textures.exists('player_down')) {
-      const g = this.add.graphics();
-      const SKIN = 0xfdbcb4;
-      const SKIN_SHADOW = 0xdba49c;  // darken(SKIN, 30)
-      const SKIN_HIGHLIGHT = 0xffd0ce; // lighten(SKIN, 20)
-      const HAIR = 0x8b4513;
-      const HAIR_LIGHT = 0xa85d2c;   // lighten(HAIR, 25)
-      const HAIR_DARK = 0x6a2400;    // darken(HAIR, 35)
-      const SHIRT = 0x4a90e2;
-      const SHIRT_LIGHT = 0x6daaf7;  // lighten(SHIRT, 25)
-      const SHIRT_DARK = 0x2a70c2;   // darken(SHIRT, 30)
-
-      // Hair (chibi head — slightly larger)
-      g.fillStyle(HAIR);
-      g.fillRect(10, 3, 12, 5);   // top hair mass
-      g.fillRect(9, 5, 2, 5);     // left sideburns
-      g.fillRect(21, 5, 2, 5);    // right sideburns
-      // Hair highlight (top-left)
-      g.fillStyle(HAIR_LIGHT);
-      g.fillRect(11, 3, 3, 1);
-      g.fillRect(10, 4, 1, 2);
-      // Hair shadow (bottom-right)
-      g.fillStyle(HAIR_DARK);
-      g.fillRect(21, 4, 1, 4);
-      g.fillRect(18, 7, 4, 1);
-
-      // Head (larger chibi face)
-      g.fillStyle(SKIN);
-      g.fillRect(11, 5, 10, 9);
-      // Face highlight (left edge)
-      g.fillStyle(SKIN_HIGHLIGHT);
-      g.fillRect(11, 6, 1, 7);
-      // Face shadow (right edge + chin)
-      g.fillStyle(SKIN_SHADOW);
-      g.fillRect(20, 6, 1, 7);
-      g.fillRect(12, 13, 8, 1);
-
-      // Eyes with white sparkle
-      g.fillStyle(0x000000);
-      g.fillRect(13, 9, 2, 2);    // left eye
-      g.fillRect(17, 9, 2, 2);    // right eye
-      g.fillStyle(0xffffff);
-      g.fillRect(13, 9, 1, 1);    // left sparkle
-      g.fillRect(17, 9, 1, 1);    // right sparkle
-
-      // Mouth
-      g.fillStyle(0xd4937a);       // darken(SKIN, 45)
-      g.fillRect(15, 12, 2, 1);
-
-      // Neck
-      g.fillStyle(SKIN);
-      g.fillRect(14, 14, 4, 1);
-      g.fillStyle(SKIN_SHADOW);
-      g.fillRect(17, 14, 1, 1);
-
-      // Shirt body
-      g.fillStyle(SHIRT);
-      g.fillRect(10, 15, 12, 9);
-      // Shirt highlight (left edge)
-      g.fillStyle(SHIRT_LIGHT);
-      g.fillRect(10, 15, 1, 8);
-      // Shirt shadow (right edge + bottom)
-      g.fillStyle(SHIRT_DARK);
-      g.fillRect(21, 15, 1, 9);
-      g.fillRect(11, 23, 10, 1);
-      // Arms / sleeves
-      g.fillStyle(SHIRT);
-      g.fillRect(7, 16, 3, 6);
-      g.fillRect(22, 16, 3, 6);
-      g.fillStyle(SHIRT_DARK);
-      g.fillRect(9, 16, 1, 6);
-      g.fillRect(24, 16, 1, 6);
-      // Hands
-      g.fillStyle(SKIN);
-      g.fillRect(7, 22, 3, 2);
-      g.fillRect(22, 22, 3, 2);
-
-      // Pants
-      g.fillStyle(0x333333);
-      g.fillRect(11, 24, 4, 4);
-      g.fillRect(17, 24, 4, 4);
-
-      // Two-toned shoes
-      g.fillStyle(0x5d4037);        // shoe base (dark brown)
-      g.fillRect(11, 28, 4, 2);
-      g.fillRect(17, 28, 4, 2);
-      g.fillStyle(0x8d6e63);        // shoe highlight (lighter brown)
-      g.fillRect(11, 28, 4, 1);
-      g.fillRect(17, 28, 4, 1);
-
-      g.generateTexture('player_down', TILE, TILE);
-      g.destroy();
-    }
+    ensurePlayerFallbackTexture(this);
 
     // Resize camera/world to match room dimensions
     // For rooms shorter than the viewport, center them vertically via camera scroll
@@ -423,911 +261,26 @@ export class ExplorationScene extends Phaser.Scene {
       this.physics.world.setBounds(0, 0, w, h);
     }
 
-    // ── Floor — beveled hospital tiles with room-specific color variation ──
-    const floor = this.add.graphics();
-    const roomId = room.id.toLowerCase();
-    const floorStyle = FLOOR_STYLES[floorStyleFor(roomId)];
-    const { tileShades, highlightColor, shadowColor } = floorStyle;
+    this.walls = renderRoom(this, room).walls;
 
-    // Pre-compute door tiles for ER accent ring and contact-shadow exclusions
-    const doors: Array<{ x: number; y: number }> = (room as any).doors || [];
-
-    for (let y = 0; y < room.height; y++) {
-      for (let x = 0; x < room.width; x++) {
-        const shadeIdx = ((x % 2) + (y % 2) * 2) % tileShades.length;
-        const shade = tileShades[shadeIdx];
-        const px = x * TILE;
-        const py = y * TILE;
-
-        // Fill tile base
-        floor.fillStyle(shade, 1);
-        floor.fillRect(px, py, TILE, TILE);
-
-        // 1px highlight on top and left edges (beveled look)
-        floor.fillStyle(highlightColor, 0.5);
-        floor.fillRect(px, py, TILE, 1);       // top edge
-        floor.fillRect(px, py, 1, TILE);        // left edge
-
-        // 1px shadow on bottom and right edges
-        floor.fillStyle(shadowColor, 0.5);
-        floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom edge
-        floor.fillRect(px + TILE - 1, py, 1, TILE);  // right edge
-
-        // Subtle inner cross pattern on every other tile (linoleum texture)
-        // — Skipped for reception (large-format tile illusion uses 2x2 grout instead)
-        if ((x + y) % 2 === 0 && !roomId.includes('reception') && !roomId.includes('hallway')) {
-          floor.fillStyle(highlightColor, 0.15);
-          floor.fillRect(px + 8, py + 2, 16, 1);  // horizontal line
-          floor.fillRect(px + 14, py + 2, 1, 28);  // vertical line
-        }
-
-        // Specular highlight on ~20% of tiles (polished floor gleam)
-        const hashVal = ((x * 7 + y * 13 + 37) * 2654435761) >>> 0;
-        if (hashVal % 5 === 0) {
-          floor.fillStyle(0xffffff, 0.08);
-          floor.fillRect(px + 6 + (hashVal % 12), py + 4 + (hashVal % 10) % 8, 4, 2);
-        }
-
-        // Grout lines (thin dark lines between tiles)
-        // Reception uses large-format (2x2) grout only at slab boundaries
-        if (roomId.includes('reception')) {
-          // Large-format tile illusion — grout only at every 2nd boundary
-          floor.fillStyle(shadowColor, 0.35);
-          if (x % 2 === 1) {
-            floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout on odd x
-          }
-          if (y % 2 === 1) {
-            floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout on odd y
-          }
-        } else {
-          floor.fillStyle(shadowColor, 0.3);
-          floor.fillRect(px + TILE - 1, py, 1, TILE); // right grout
-          floor.fillRect(px, py + TILE - 1, TILE, 1); // bottom grout
-        }
-
-        // Room-specific floor pattern detail (boosted opacity for visibility)
-        if (roomId.includes('er') || roomId.includes('emergency')) {
-          // ER: Non-slip diamond pattern — visible safety texture
-          if ((x + y) % 2 === 0) {
-            floor.fillStyle(0xffffff, 0.12);
-            floor.fillRect(px + 10, py + 10, 12, 1);
-            floor.fillRect(px + 15, py + 5, 1, 12);
-          }
-          // ER: pale red accent ring near door tiles (urgency — hazard accents near entrances)
-          const nearDoor = doors.some(d => Math.abs(d.x - x) <= 1 && Math.abs(d.y - y) <= 1);
-          if (nearDoor) {
-            floor.fillStyle(0xff6b6b, 0.07);
-            floor.fillRect(px, py, TILE, TILE);
-          }
-        } else if (roomId.includes('lab')) {
-          // Lab: Grid dots + thin drain lines — clean room look
-          floor.fillStyle(0xffffff, 0.12);
-          floor.fillRect(px + 8, py + 8, 2, 2);
-          floor.fillRect(px + 22, py + 22, 2, 2);
-          if (y % 3 === 0) {
-            floor.fillStyle(shadowColor, 0.2);
-            floor.fillRect(px, py + TILE - 2, TILE, 1);
-          }
-        } else if (roomId.includes('break')) {
-          // Break room: Warm parquet wood planks — clearly different from tile
-          if (x % 2 === 0) {
-            floor.fillStyle(highlightColor, 0.25);
-            floor.fillRect(px + 1, py + 1, 14, 30);
-            // Wood grain lines
-            floor.fillStyle(shadowColor, 0.12);
-            floor.fillRect(px + 4, py + 2, 1, 28);
-            floor.fillRect(px + 10, py + 2, 1, 28);
-          } else {
-            floor.fillStyle(shadowColor, 0.15);
-            floor.fillRect(px + 16, py + 1, 14, 30);
-            floor.fillStyle(highlightColor, 0.08);
-            floor.fillRect(px + 20, py + 2, 1, 28);
-            floor.fillRect(px + 26, py + 2, 1, 28);
-          }
-        } else if (roomId.includes('it') || roomId.includes('server')) {
-          // Server room: Raised floor panel gaps — clearly technical
-          floor.fillStyle(0x000000, 0.15);
-          floor.fillRect(px, py, TILE, 1);
-          floor.fillRect(px, py, 1, TILE);
-          // Vent holes on every 3rd panel
-          if ((x + y) % 3 === 0) {
-            floor.fillStyle(0x000000, 0.12);
-            for (let vy = 0; vy < 3; vy++) {
-              floor.fillRect(px + 8, py + 8 + vy * 8, 16, 2);
-            }
-          }
-        } else if (roomId.includes('records')) {
-          // Records room: Commercial carpet weave — row-offset dot grid + pile lines
-          // Offset dot positions on odd rows to simulate carpet weave
-          const dotOffsetX = y % 2 === 1 ? 4 : 0;
-          floor.fillStyle(0x000000, 0.06);
-          floor.fillRect(px + 4 + dotOffsetX, py + 4, 2, 2);
-          floor.fillRect(px + 20 + dotOffsetX, py + 20, 2, 2);
-          floor.fillRect(px + 12 + dotOffsetX, py + 12, 2, 2);
-          floor.fillRect(px + 28 + dotOffsetX, py + 4, 2, 2);
-          floor.fillRect(px + 4 + dotOffsetX, py + 28, 2, 2);
-          // Faint horizontal pile lines every 8px
-          if (py % 8 < TILE) {
-            for (let pile = 0; pile < 4; pile++) {
-              floor.fillStyle(0x000000, 0.04);
-              floor.fillRect(px, py + pile * 8, TILE, 1);
-            }
-          }
-        } else if (roomId.includes('entrance') || roomId.includes('lobby')) {
-          // Lobby: Marble veining effect
-          if ((x + y) % 3 === 0) {
-            floor.fillStyle(0xffffff, 0.08);
-            floor.fillRect(px + 4, py + 12, 24, 1);
-            floor.fillRect(px + 8, py + 8, 1, 16);
-          }
-        } else if (roomId.includes('reception')) {
-          // Reception: Navy accent diamond at each 2x2 slab intersection
-          // Drawn at bottom-right corner of slab (odd x, odd y tile)
-          if (x % 2 === 1 && y % 2 === 1) {
-            floor.fillStyle(0x2c4a6e, 0.18);
-            // Four fillRects forming a 6px diamond
-            floor.fillRect(px + TILE - 3, py + TILE - 6, 6, 2); // top bar
-            floor.fillRect(px + TILE - 6, py + TILE - 4, 12, 2); // mid-top bar
-            floor.fillRect(px + TILE - 6, py + TILE - 2, 12, 2); // mid-bot bar
-            floor.fillRect(px + TILE - 3, py + TILE,     6, 2); // bottom bar
-          }
-        }
-      }
-    }
-
-    // Hallway runner strip — corridor identity down the walkway row (y=3)
-    if (roomId.includes('hallway')) {
-      const runnerRowY = 3; // middle walkway row of the 20x7 hallway
-      const runnerX = 1 * TILE;           // inset 1 tile from left
-      const runnerW = (room.width - 2) * TILE; // inset 1 tile from right
-      const runnerY = runnerRowY * TILE;
-      // Muted teal base
-      floor.fillStyle(0x3e6b6b, 0.55);
-      floor.fillRect(runnerX, runnerY, runnerW, TILE);
-      // Top border
-      floor.fillStyle(0x2a4a4a, 0.7);
-      floor.fillRect(runnerX, runnerY, runnerW, 2);
-      // Bottom border
-      floor.fillRect(runnerX, runnerY + TILE - 2, runnerW, 2);
-      // Stitch ticks every 16px along top border
-      floor.fillStyle(0x5a8a8a, 0.5);
-      for (let tx = runnerX; tx < runnerX + runnerW; tx += 16) {
-        floor.fillRect(tx, runnerY, 3, 2);
-        floor.fillRect(tx, runnerY + TILE - 2, 3, 2);
-      }
-    }
-
-    // ── Wall/floor contact shadow ─────────────────────────────────
-    // A 3-step vertical gradient at the top edge of each floor tile directly
-    // below a wall bottom — classic SNES ambient-occlusion strip.
-    // Drawn into the same `floor` Graphics object so depth is unchanged.
-    for (const obs of room.obstacles) {
-      if ((obs as any).type !== 'wall') continue;
-      const rowY = obs.y + obs.height; // floor row immediately below wall bottom
-      if (rowY >= room.height) continue; // off-map (no floor below)
-      for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
-        // Skip door-adjacent columns so walkable openings stay clean
-        const nearDoorH = doors.some(d => d.y === rowY - 1 && Math.abs(d.x - wx) <= 1);
-        if (nearDoorH) continue;
-        // Skip tiles occupied by another obstacle (furniture or wall above)
-        const blocked = room.obstacles.some((o: any) =>
-          wx >= o.x && wx < o.x + o.width && rowY >= o.y && rowY < o.y + o.height
-        );
-        if (blocked) continue;
-        const spx = wx * TILE;
-        const spy = rowY * TILE;
-        // Step 1 — darkest 3px at very top (directly below wall)
-        floor.fillStyle(0x000000, 0.18);
-        floor.fillRect(spx, spy, TILE, 3);
-        // Step 2 — medium band +3 to +5
-        floor.fillStyle(0x000000, 0.10);
-        floor.fillRect(spx, spy + 3, TILE, 2);
-        // Step 3 — lightest fade +5 to +8
-        floor.fillStyle(0x000000, 0.05);
-        floor.fillRect(spx, spy + 5, TILE, 3);
-      }
-    }
-    // ─────────────────────────────────────────────────────────────
-
-    // Room-specific ambient color overlay — visible mood tint
-    const roomTints: Record<string, { color: number; alpha: number }> = {
-      hospital_entrance: { color: 0xf5e6d0, alpha: 0.06 },  // Warm lobby glow
-      reception: { color: 0x4a90e2, alpha: 0.06 },           // Professional blue
-      records_room: { color: 0x8faa80, alpha: 0.06 },        // Archival green
-      er: { color: 0xff6b6b, alpha: 0.05 },                  // Urgent red
-      lab: { color: 0x9b59b6, alpha: 0.06 },                 // Scientific purple
-      break_room: { color: 0xf39c12, alpha: 0.08 },          // Warm amber — strongest
-      it_office: { color: 0x4488cc, alpha: 0.06 },           // Cool tech blue
-    };
-    const tintCfg = roomTints[this.room.id];
-    if (tintCfg) {
-      this.add.rectangle(
-        w / 2, h / 2, w, h, tintCfg.color, tintCfg.alpha
-      ).setDepth(0);
-    }
-
-    // ── Room-specific decorative details ────────────────────────
-    const decorGfx = this.add.graphics().setDepth(1);
-
-    // Baseboard strip along bottom of walls — universal room detail
-    decorGfx.fillStyle(0x4a3f2e, 0.5);
-    for (const obs of room.obstacles) {
-      if ((obs as any).type === 'wall') {
-        const bx = obs.x * TILE;
-        const by = (obs.y + obs.height) * TILE - 3;
-        const bw = obs.width * TILE;
-        decorGfx.fillRect(bx, by, bw, 3);
-        // Baseboard highlight
-        decorGfx.fillStyle(0x6a5b44, 0.4);
-        decorGfx.fillRect(bx, by, bw, 1);
-        decorGfx.fillStyle(0x4a3f2e, 0.5);
-      }
-    }
-
-    // Room-specific wall decorations — distinct visual identity per room
-    if (roomId.includes('reception')) {
-      // Welcome sign on north wall
-      decorGfx.fillStyle(0x4a90e2, 0.2);
-      decorGfx.fillRect(TILE * 2, TILE + 4, TILE * 3, TILE / 2);
-      decorGfx.lineStyle(1, 0x4a90e2, 0.35);
-      decorGfx.strokeRect(TILE * 2, TILE + 4, TILE * 3, TILE / 2);
-      // Clock on wall
-      decorGfx.fillStyle(0xffffff, 0.15);
-      decorGfx.fillCircle(TILE * 16, TILE + 10, 8);
-      decorGfx.lineStyle(1, 0x333333, 0.2);
-      decorGfx.strokeCircle(TILE * 16, TILE + 10, 8);
-    } else if (roomId.includes('er')) {
-      // Red cross symbol on wall — larger, more prominent
-      decorGfx.fillStyle(0xff0000, 0.18);
-      decorGfx.fillRect(w / 2 - 8, TILE + 2, 16, 6);
-      decorGfx.fillRect(w / 2 - 3, TILE - 2, 6, 16);
-      // "EMERGENCY" stripe along top
-      decorGfx.fillStyle(0xff0000, 0.08);
-      decorGfx.fillRect(TILE, TILE - 2, w - TILE * 2, 3);
-    } else if (roomId.includes('lab')) {
-      // Biohazard warning placard on north wall
-      decorGfx.fillStyle(0xf39c12, 0.2);
-      decorGfx.fillRect(TILE * 2, TILE + 4, TILE, TILE / 2);
-      decorGfx.lineStyle(1, 0xf39c12, 0.3);
-      decorGfx.strokeRect(TILE * 2, TILE + 4, TILE, TILE / 2);
-      // Safety shower sign
-      decorGfx.fillStyle(0x27ae60, 0.15);
-      decorGfx.fillRect(TILE * 15, TILE + 4, TILE, TILE / 2);
-    } else if (roomId.includes('it') || roomId.includes('server')) {
-      // Network status lights on north wall (server room feel)
-      for (let lx = 0; lx < 4; lx++) {
-        decorGfx.fillStyle(lx % 3 === 0 ? 0xff4444 : 0x44ff44, 0.2);
-        decorGfx.fillCircle(TILE * 5 + lx * TILE * 3, TILE + 8, 3);
-      }
-      // "RESTRICTED" label
-      decorGfx.fillStyle(0xff4444, 0.12);
-      decorGfx.fillRect(w - TILE * 4, TILE + 4, TILE * 2, TILE / 3);
-    } else if (roomId.includes('break')) {
-      // Menu board on north wall
-      decorGfx.fillStyle(0x2c2c2c, 0.2);
-      decorGfx.fillRect(TILE * 12, TILE + 2, TILE * 2, TILE - 4);
-      decorGfx.fillStyle(0xffffff, 0.12);
-      decorGfx.fillRect(TILE * 12 + 4, TILE + 6, TILE * 2 - 8, 3);
-      decorGfx.fillRect(TILE * 12 + 4, TILE + 12, TILE * 2 - 8, 2);
-      decorGfx.fillRect(TILE * 12 + 4, TILE + 17, TILE - 4, 2);
-    } else if (roomId.includes('records')) {
-      // "MEDICAL RECORDS" label strip on north wall
-      decorGfx.fillStyle(0x2ecc71, 0.12);
-      decorGfx.fillRect(TILE * 6, TILE + 2, TILE * 4, TILE / 3);
-      // Section labels (A, B, C indicators)
-      for (let s = 0; s < 3; s++) {
-        decorGfx.fillStyle(0xffffff, 0.1);
-        decorGfx.fillRect(TILE * (4 + s * 5), TILE + 4, TILE / 2, TILE / 3);
-      }
-    } else if (roomId.includes('entrance') || roomId.includes('lobby')) {
-      // Hospital logo placeholder on north wall
-      decorGfx.fillStyle(0x4a90e2, 0.15);
-      decorGfx.fillCircle(w / 2, TILE + 10, 10);
-      decorGfx.lineStyle(1, 0x4a90e2, 0.25);
-      decorGfx.strokeCircle(w / 2, TILE + 10, 10);
-      // "H" inside
-      decorGfx.fillStyle(0xffffff, 0.2);
-      decorGfx.fillRect(w / 2 - 4, TILE + 5, 2, 10);
-      decorGfx.fillRect(w / 2 + 2, TILE + 5, 2, 10);
-      decorGfx.fillRect(w / 2 - 4, TILE + 9, 10, 2);
-    }
-
-    // Room-specific floor details
-    if (roomId.includes('er') || roomId.includes('emergency')) {
-      // ER: floor warning stripes near edges
-      decorGfx.fillStyle(0xffcc00, 0.08);
-      decorGfx.fillRect(0, 0, w, 4);
-      decorGfx.fillRect(0, h - 4, w, 4);
-    } else if (roomId.includes('lab')) {
-      // Lab: biohazard symbol hint in corner
-      decorGfx.fillStyle(0xf39c12, 0.06);
-      decorGfx.fillCircle(w - 24, h - 24, 12);
-      decorGfx.fillStyle(0x000000, 0.04);
-      decorGfx.fillCircle(w - 24, h - 24, 6);
-    } else if (roomId.includes('it') || roomId.includes('server')) {
-      // Server room: floor cable channels
-      decorGfx.lineStyle(2, 0x333333, 0.15);
-      decorGfx.beginPath();
-      decorGfx.moveTo(TILE * 2, TILE);
-      decorGfx.lineTo(TILE * 2, h - TILE);
-      decorGfx.strokePath();
-      decorGfx.beginPath();
-      decorGfx.moveTo(w - TILE * 2, TILE);
-      decorGfx.lineTo(w - TILE * 2, h - TILE);
-      decorGfx.strokePath();
-    }
-
-    // ── Ceiling light pools (overhead lighting effect on floor) ──
-    const lightGfx = this.add.graphics().setDepth(0);
-    const lightSpacing = TILE * 4;
-    for (let ly = lightSpacing; ly < h - lightSpacing; ly += lightSpacing) {
-      for (let lx = lightSpacing; lx < w - lightSpacing; lx += lightSpacing) {
-        // Check we're not on a wall/obstacle
-        const tileX = Math.floor(lx / TILE);
-        const tileY = Math.floor(ly / TILE);
-        const onObstacle = room.obstacles.some((o: any) =>
-          tileX >= o.x && tileX < o.x + o.width && tileY >= o.y && tileY < o.y + o.height
-        );
-        if (!onObstacle) {
-          lightGfx.fillStyle(0xffffff, 0.04);
-          lightGfx.fillCircle(lx, ly, TILE * 1.5);
-          lightGfx.fillStyle(0xffffff, 0.02);
-          lightGfx.fillCircle(lx, ly, TILE * 2.5);
-        }
-      }
-    }
-
-    // ── Ambient dust particles — subtle floating motes ──────────
-    if (this.textures.exists('particle_circle')) {
-      this.add.particles(0, 0, 'particle_circle', {
-        x: { min: 0, max: w },
-        y: { min: 0, max: h },
-        speed: { min: 5, max: 15 },
-        angle: { min: 260, max: 280 },   // drift gently upward
-        scale: { min: 0.3, max: 0.6 },
-        alpha: { start: 0.1, end: 0.25, ease: 'Sine.easeInOut' },
-        tint: 0xd4c9a8,                  // warm tone matching floor
-        lifespan: { min: 4000, max: 8000 },
-        frequency: 500,
-        depth: 5,                         // above floor, below furniture
-      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
-
-      // Secondary ambient layer — slower, larger particles for depth
-      this.add.particles(w / 2, h / 2, 'particle_circle', {
-        x: { min: 0, max: w },
-        y: { min: 0, max: h },
-        speed: { min: 2, max: 8 },
-        angle: { min: 250, max: 290 },
-        scale: { start: 0.4, end: 0 },
-        alpha: { start: 0.15, end: 0 },
-        lifespan: { min: 6000, max: 10000 },
-        tint: 0xffffcc,
-        frequency: 3000,
-        quantity: 1,
-      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(0);
-
-      // Occasional sparkle — brief bright flash particles
-      this.add.particles(w / 2, h / 2, 'particle_circle', {
-        x: { min: 0, max: w },
-        y: { min: 0, max: h },
-        speed: { min: 0, max: 5 },
-        scale: { start: 0.5, end: 0 },
-        alpha: { start: 0.6, end: 0 },
-        lifespan: 400,
-        tint: 0xffffff,
-        frequency: 5000,
-        quantity: 1,
-      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(0);
-    }
-
-    // ── Obstacles / Walls ────────────────────────────────────────
-    this.walls = this.physics.add.staticGroup();
-    for (const obs of room.obstacles) {
-      const ox = obs.x * TILE;
-      const oy = obs.y * TILE;
-      const ow = obs.width * TILE;
-      const oh = obs.height * TILE;
-
-      const obsType = (obs as any).type as string | undefined;
-
-      if (obsType === 'wall') {
-        // Draw wall tiles with depth (highlight top, shadow base)
-        const wallG = this.add.graphics();
-
-        // Room-specific wall colors
-        let wallBase1: number, wallBase2: number, wallHighlight: number, wallShadow: number, wallMortar: number;
-        if (roomId.includes('er') || roomId.includes('emergency')) {
-          wallBase1 = 0x5c6570; wallBase2 = 0x566068;
-          wallHighlight = 0x7a858e; wallShadow = 0x3a4448; wallMortar = 0x4a5560;
-        } else if (roomId.includes('lab')) {
-          wallBase1 = 0x606860; wallBase2 = 0x5a6258;
-          wallHighlight = 0x7e867e; wallShadow = 0x3e4640; wallMortar = 0x4e564e;
-        } else if (roomId.includes('it') || roomId.includes('server')) {
-          wallBase1 = 0x4a5060; wallBase2 = 0x444a58;
-          wallHighlight = 0x687080; wallShadow = 0x2e3440; wallMortar = 0x3e4450;
-        } else {
-          wallBase1 = 0x5d4e37; wallBase2 = 0x574930;
-          wallHighlight = 0x7a6b52; wallShadow = 0x3a3124; wallMortar = 0x4a3f2e;
-        }
-
-        for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
-          for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
-            const wpx = wx * TILE;
-            const wpy = wy * TILE;
-
-            // Main wall fill — use two alternating shades for brick-like pattern
-            const isEvenTile = (wx + wy) % 2 === 0;
-            const wallBase = isEvenTile ? wallBase1 : wallBase2;
-            wallG.fillStyle(wallBase, 1);
-            wallG.fillRect(wpx, wpy, TILE, TILE);
-
-            // Horizontal mortar line at 1/3 and 2/3 height
-            wallG.fillStyle(wallMortar, 0.6);
-            wallG.fillRect(wpx, wpy + 10, TILE, 1);
-            wallG.fillRect(wpx, wpy + 21, TILE, 1);
-
-            // Vertical mortar offset (brick bond pattern)
-            const vOffset = wy % 2 === 0 ? 16 : 0;
-            wallG.fillStyle(wallMortar, 0.5);
-            wallG.fillRect(wpx + vOffset, wpy, 1, TILE);
-
-            // Top highlight
-            wallG.fillStyle(wallHighlight, 0.6);
-            wallG.fillRect(wpx, wpy, TILE, 1);
-            wallG.fillRect(wpx, wpy, 1, TILE); // left highlight
-
-            // Bottom shadow (wall meets floor)
-            wallG.fillStyle(wallShadow, 0.8);
-            wallG.fillRect(wpx, wpy + TILE - 2, TILE, 2);
-            wallG.fillRect(wpx + TILE - 1, wpy, 1, TILE); // right shadow
-
-            // Subtle surface texture — tiny noise dots
-            if ((wx * 3 + wy * 5) % 4 === 0) {
-              const textureTint = Phaser.Display.Color.IntegerToColor(wallHighlight).lighten(10).color;
-              wallG.fillStyle(textureTint, 0.3);
-              wallG.fillRect(wpx + 8, wpy + 6, 2, 1);
-              wallG.fillRect(wpx + 20, wpy + 14, 2, 1);
-            }
-
-            // Wainscoting/molding on top of walls (crown molding effect)
-            if (wy === obs.y) {
-              const moldingBase = Phaser.Display.Color.IntegerToColor(wallHighlight).lighten(15).color;
-              const moldingTop = Phaser.Display.Color.IntegerToColor(wallHighlight).lighten(25).color;
-              wallG.fillStyle(moldingBase, 0.7);
-              wallG.fillRect(wpx, wpy, TILE, 3);
-              wallG.fillStyle(moldingTop, 0.5);
-              wallG.fillRect(wpx, wpy, TILE, 1);
-            }
-          }
-        }
-      } else {
-        // Furniture — place a sprite at center of the obstacle area
-        const texKey = furnitureTextureKey(obsType);
-        if (obs.width === 1 && obs.height === 1) {
-          // Drop shadow beneath furniture
-          this.add.ellipse(ox + TILE / 2, oy + TILE / 2 + 12, TILE - 4, 8, 0x000000, 0.12);
-          this.add.sprite(ox + TILE / 2, oy + TILE / 2, texKey);
-          // Subtle furniture base highlight
-          this.add.rectangle(ox + TILE / 2, oy + TILE / 2, TILE - 2, TILE - 2)
-            .setStrokeStyle(1, 0x000000, 0.08)
-            .setFillStyle(0x000000, 0)
-            .setDepth(1);
-        } else {
-          // Drop shadow beneath large furniture
-          this.add.ellipse(ox + ow / 2, oy + oh / 2 + oh / 3, ow - 4, oh / 3, 0x000000, 0.15);
-          // For multi-tile furniture, tile the sprite across the area
-          for (let fy = obs.y; fy < obs.y + obs.height; fy++) {
-            for (let fx = obs.x; fx < obs.x + obs.width; fx++) {
-              this.add.sprite(fx * TILE + TILE / 2, fy * TILE + TILE / 2, texKey).setDepth(3);
-            }
-          }
-        }
-      }
-
-      // Physics collision body (invisible) — skip tiles occupied by doors
-      // (doors already declared above at floor render time — reuse same array)
-      if (obsType === 'wall' && doors.length > 0) {
-        // Build collision per-tile, skipping door tiles (and 1 tile adjacent inward)
-        for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
-          for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
-            const isDoorTile = doors.some((d: any) => {
-              // Skip the door tile itself and one tile of clearance
-              if (d.x === wx && d.y === wy) return true;
-              if (d.x === wx && Math.abs(d.y - wy) <= 1) return true;
-              if (d.y === wy && Math.abs(d.x - wx) <= 1) return true;
-              return false;
-            });
-            if (!isDoorTile) {
-              const wr = this.add.rectangle(wx * TILE + TILE / 2, wy * TILE + TILE / 2, TILE, TILE);
-              wr.setVisible(false);
-              this.walls.add(wr);
-            }
-          }
-        }
-      } else {
-        const wallRect = this.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh);
-        wallRect.setVisible(false);
-        this.walls.add(wallRect);
-      }
-    }
-
-    // ── Educational items ────────────────────────────────────────
-    for (const item of room.educationalItems) {
-      const collected = this.collectedItems.has(item.id);
-      const texKey = objectTextureKey(item.type);
-      const sprite = this.add.sprite(item.x * TILE + TILE / 2, item.y * TILE + TILE / 2, texKey);
-      sprite.setAlpha(collected ? 0.4 : 1);
-      if (collected) {
-        sprite.setTint(0x888888);
-      }
-      sprite.setDepth(10);
-      if (!collected) {
-        // Bob tween — keep as-is
-        this.tweens.add({
-          targets: sprite,
-          y: sprite.y - 4,
-          duration: 600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-
-        // Filled glow aura: additive gold pulsing behind the item sprite
-        // The aura stays anchored; the bob moves the sprite above it — glow reads as floor-glow
-        // glow_radial has soft alpha falloff so the gold tint stays gold (no white blob)
-        if (this.textures.exists('glow_radial')) {
-          // Deep amber + restrained alpha: additive gold clips to white over pale
-          // floors, so go darker on the tint and let the pulse carry the motion
-          const aura = this.add.image(sprite.x, sprite.y + 2, 'glow_radial')
-            .setTint(0xffa000)
-            .setBlendMode(Phaser.BlendModes.ADD)
-            .setAlpha(0.45)
-            .setDepth(sprite.depth - 1);
-          this.tweens.add({
-            targets: aura,
-            alpha: { from: 0.45, to: 0.75 },
-            scale: { from: 0.85, to: 1.1 },
-            duration: 1100,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-        } else {
-          // Fallback: filled circle alpha pulse (never stroke-only)
-          const auraFallback = this.add.circle(sprite.x, sprite.y + 2, 20, 0xffd700, 0.12)
-            .setDepth(sprite.depth - 1);
-          this.tweens.add({
-            targets: auraFallback,
-            alpha: { from: 0.12, to: 0.28 },
-            duration: 1100,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-        }
-
-        // Periodic sparkle — the Zelda "this thing matters" twinkle (Commandment 9)
-        if (this.textures.exists('particle_circle')) {
-          this.add.particles(sprite.x, sprite.y, 'particle_circle', {
-            speed: { min: 8, max: 20 },
-            scale: { start: 0.8, end: 0 },
-            alpha: { start: 0.9, end: 0 },
-            tint: [0xffffff, 0xffe9a0],
-            lifespan: 500,
-            frequency: 1400,
-            quantity: 2,
-            angle: { min: 0, max: 360 },
-          } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(sprite.depth + 1);
-        }
-      }
-      this.interactables.push({ type: 'item', id: item.id, data: item, sprite });
-    }
-
-    // ── Hallway bulletin board (Phase 15) ────────────────────────
-    if (this.room.id.startsWith('hallway_')) {
-      const act = this.getCurrentAct();
-      const board = getHallwayBoard(this.room.id, act);
-      if (board) {
-        const boardX = w / 2;
-        const boardY = 64;
-
-        // Board shadow (depth illusion)
-        this.add.rectangle(boardX + 2, boardY + 2, 60, 44, 0x000000, 0.3)
-          .setDepth(4);
-        // Cork board backing with wooden frame
-        const boardG = this.add.graphics().setDepth(5);
-        // Outer frame (dark wood)
-        boardG.fillStyle(0x5a3a1a, 1);
-        boardG.fillRect(boardX - 31, boardY - 23, 62, 46);
-        // Inner frame highlight
-        boardG.fillStyle(0x8B6914, 1);
-        boardG.fillRect(boardX - 29, boardY - 21, 58, 42);
-        // Cork texture — alternating shades
-        boardG.fillStyle(0xa07828, 1);
-        boardG.fillRect(boardX - 27, boardY - 19, 54, 38);
-        boardG.fillStyle(0x9a7020, 0.5);
-        for (let cy = 0; cy < 4; cy++) {
-          for (let cx = 0; cx < 6; cx++) {
-            if ((cx + cy) % 2 === 0) {
-              boardG.fillRect(boardX - 27 + cx * 9, boardY - 19 + cy * 10, 9, 10);
-            }
-          }
-        }
-        // Paper note — slightly tilted via offset
-        this.add.rectangle(boardX - 1, boardY + 1, 44, 28, 0xe8dcc4).setDepth(6);
-        this.add.rectangle(boardX, boardY, 44, 28, 0xF5E6C8).setDepth(6);
-        // Paper fold line
-        boardG.lineStyle(1, 0xd4c8a8, 0.4);
-        boardG.lineBetween(boardX - 20, boardY - 12, boardX - 20, boardY + 12);
-        boardG.setDepth(7);
-        // Push pins (red circles at corners)
-        this.add.circle(boardX - 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
-        this.add.circle(boardX + 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
-        // Pin highlights
-        this.add.circle(boardX - 19, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
-        this.add.circle(boardX + 17, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
-        // NOTICE label
-        this.add.text(boardX, boardY - 6, 'NOTICE', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '5px',
-          color: '#8B0000',
-        }).setOrigin(0.5).setDepth(7);
-
-        // Invisible interactive sprite overlapping the board
-        const boardSprite = this.add.sprite(boardX, boardY, objectTextureKey('poster'))
-          .setAlpha(0.01) // nearly invisible; visual is the rectangle above
-          .setDepth(8)
-          .setInteractive({ cursor: 'pointer' });
-
-        this.interactables.push({
-          type: 'hallwayBoard',
-          id: `hallway_board_${this.room.id}_act${act}`,
-          data: { x: Math.floor(boardX / TILE), y: Math.floor(boardY / TILE), title: board.title, content: board.text },
-          sprite: boardSprite,
-        });
-      }
-    }
-
-    // ── Interaction zones ────────────────────────────────────────
-    for (const zone of room.interactionZones) {
-      const texKey = objectTextureKey(zone.spriteType || 'computer');
-      const sprite = this.add.sprite(zone.x * TILE + TILE / 2, zone.y * TILE + TILE / 2, texKey);
-      sprite.setDepth(20);
-      this.tweens.add({
-        targets: sprite,
-        y: sprite.y - 3,
-        duration: 800,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-      // Interaction zone glow ring — pulsing blue aura for incomplete zones
-      // Ring + tween stored in zoneGlows map so live completion can kill it (Phase 27 VIS-08)
-      if (!this.completedZones.has(zone.id)) {
-        const zoneGlow = this.add.circle(
-          sprite.x, sprite.y, 20, 0x00aaff, 0
-        ).setStrokeStyle(1.5, 0x00aaff, 0).setDepth(sprite.depth - 1);
-
-        const glowTween = this.tweens.add({
-          targets: zoneGlow,
-          strokeAlpha: { from: 0, to: 0.4 },
-          scale: { from: 0.8, to: 1.2 },
-          duration: 1200,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
-        });
-
-        this.zoneGlows.set(zone.id, { ring: zoneGlow, tween: glowTween });
-      }
-
-      // Completed zone checkmark (at-render time, no pop — pop is for live completion)
-      if (this.completedZones.has(zone.id)) {
-        this.addCompletionCheck(sprite.x, sprite.y - 16, sprite.depth + 1, false);
-      }
-
-      this.interactables.push({ type: 'zone', id: zone.id, data: zone, sprite });
-    }
-
-    // ── NPCs ─────────────────────────────────────────────────────
-    for (const npc of room.npcs) {
-      // Phase 17 (2026-06-10): Act-gated and demo-excluded NPCs.
-      // If the NPC's encounterTrigger.minAct is set, skip spawning when the
-      // current act is too low OR when demo mode is active (demo runs in Act 1
-      // state, so Priya would appear without valid Act 3 context).
-      const minAct = (npc.encounterTrigger as { minAct?: number } | undefined)?.minAct;
-      if (minAct !== undefined) {
-        if (isDemoActive() || this.getCurrentAct() < minAct) continue;
-      }
-
-      const texKey = npcTextureKey(npc.id);
-      const completed = this.completedNPCs.has(npc.id);
-
-      // Drop shadow at feet level (behind the sprite)
-      const npcShadow = this.add.ellipse(
-        npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2 + TILE / 2 - 2,
-        20, 8,
-        0x000000, 0.3,
-      );
-      if (completed) npcShadow.setAlpha(0.15);
-
-      const sprite = this.add.sprite(npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2, texKey, 0);
-      const npcDepth = 5 + Math.floor(sprite.y / TILE);
-      sprite.setDepth(npcDepth);
-      npcShadow.setDepth(npcDepth - 1);
-      if (completed) {
-        sprite.setAlpha(0.7);
-      }
-
-      // Name label below sprite with dark background for readability
-      const labelX = npc.x * TILE + TILE / 2;
-      const labelY = npc.y * TILE + TILE + 2;
-      const nameLabel = this.add.text(
-        labelX, labelY,
-        npc.name,
-        {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '9px',
-          color: '#ffffff',
-          stroke: '#000000',
-          strokeThickness: 3,
-          backgroundColor: '#00000066',
-          padding: { x: 2, y: 1 },
-        },
-      ).setOrigin(0.5, 0).setDepth(npcDepth + 1);
-      // Clamp label horizontally so it never overflows the room/canvas bounds.
-      // With origin (0.5, 0), the label extends labelHalf in each direction from labelX.
-      const labelPad = 2;
-      const labelHalf = nameLabel.width / 2;
-      const roomPxWidth = room.width * TILE;
-      const minX = labelHalf + labelPad;
-      const maxX = roomPxWidth - labelHalf - labelPad;
-      if (maxX >= minX) {
-        nameLabel.x = Phaser.Math.Clamp(labelX, minX, maxX);
-      }
-      if (completed) nameLabel.setAlpha(0.4);
-
-      // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
-      this.tweens.add({
-        targets: sprite,
-        scaleY: { from: 1.0, to: 1.02 },
-        duration: 1500 + Math.random() * 500,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-
-      // Completed checkmark
-      if (completed) {
-        // At-render checkmark (no pop — pop is for live completion via updateCompletionState)
-        this.addCompletionCheck(sprite.x, sprite.y - 20, sprite.depth + 1, false);
-      }
-
-      // Boss indicator
-      if (npc.isFinalBoss && !completed) {
-        const bossText = this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 10, 'BOSS', {
-          fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#e74c3c',
-        }).setOrigin(0.5).setDepth(npcDepth + 3);
-        this.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
-
-        // Boss glow ring — pulsing aura that draws the player's attention
-        const bossGlow = this.add.circle(sprite.x, sprite.y, 24, 0xff4444, 0)
-          .setStrokeStyle(2, 0xff6644, 0.5)
-          .setDepth(sprite.depth - 1);
-        this.tweens.add({
-          targets: bossGlow,
-          scale: { from: 0.8, to: 1.3 },
-          alpha: { from: 0.5, to: 0 },
-          duration: 1500,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-      }
-
-      // Speech bubble indicator for uncompleted NPCs — "talk to me!" cue
-      if (!completed) {
-        const bubbleTexKey = '_npc_speech_bubble';
-        if (!this.textures.exists(bubbleTexKey)) {
-          const bg = this.add.graphics();
-          // Dark rounded rectangle body for high contrast (10x8)
-          bg.fillStyle(0x333333, 0.9);
-          bg.fillRoundedRect(0, 0, 10, 8, 2);
-          // Tiny triangular tail pointing down
-          bg.fillStyle(0x333333, 0.9);
-          bg.fillTriangle(3, 8, 7, 8, 5, 11);
-          // Subtle light border for definition
-          bg.lineStyle(1, 0x555555, 0.6);
-          bg.strokeRoundedRect(0, 0, 10, 8, 2);
-          // Inner dot detail (white exclamation hint)
-          bg.fillStyle(0xffffff, 0.9);
-          bg.fillRect(4, 2, 2, 3);
-          bg.fillRect(4, 6, 2, 1);
-          bg.generateTexture(bubbleTexKey, 10, 12);
-          bg.destroy();
-        }
-        const bubbleX = npc.x * TILE + TILE / 2;
-        const bubbleY = npc.y * TILE + TILE / 2 - 20;
-        const bubble = this.add.image(bubbleX, bubbleY, bubbleTexKey);
-        bubble.setAlpha(0.8);
-        bubble.setDepth(npcDepth + 2);
-        this.tweens.add({
-          targets: bubble,
-          y: bubbleY - 3,
-          duration: 1500,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        // F-21 (Run 07): register so live completion can clear the marker
-        this.npcBubbles.set(npc.id, bubble);
-      }
-
-      this.interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
-    }
-
-    // ── ER urgency cues (DESIGN-001) ────────────────────────────
-    if (this.room.id === 'er') {
-      // Flashing EMERGENCY status panel — wall-mounted near the top center
-      const panelX = 10 * TILE + TILE / 2;
-      const panelY = 1 * TILE + TILE / 2 + 4;
-      const panelBack = this.add.rectangle(panelX, panelY, 64, 18, 0x1a0000).setStrokeStyle(1, 0x4a0000).setDepth(4);
-      const panelGlow = this.add.rectangle(panelX, panelY, 64, 18, 0xff2222, 0.55).setDepth(4);
-      const panelLabel = this.add.text(panelX, panelY, 'EMERGENCY', {
-        fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#ffe6e6', stroke: '#660000', strokeThickness: 2,
-      }).setOrigin(0.5).setDepth(5);
-      this.tweens.add({ targets: [panelGlow, panelLabel], alpha: { from: 1, to: 0.35 }, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      void panelBack;
-
-      // Walking nurse — patrols horizontally between tile x=8 and x=11 at y=4
-      const nurseY = 4 * TILE + TILE / 2;
-      const nurseStartX = 8 * TILE + TILE / 2;
-      const nurseEndX = 11 * TILE + TILE / 2;
-      this.add.ellipse(nurseStartX, nurseY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
-      const nurseSprite = this.add.sprite(nurseStartX, nurseY, npcTextureKey('nurse_chen')).setDepth(5 + 4);
-      this.tweens.add({ targets: nurseSprite, x: nurseEndX, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => nurseSprite.setFlipX(true), onRepeat: () => nurseSprite.setFlipX(false) });
-      this.tweens.add({ targets: nurseSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 360, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-
-      // Idle fidget for officer + frantic family — subtle angle wobble
-      for (const fidgetId of ['officer', 'frantic_family']) {
-        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
-        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.5, to: 1.5 }, duration: 1100 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // Ambient monitor beep — heartbeat-like cadence (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 9000, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.6 }); } catch (_) {}
-      } });
-    }
-
-    // ── Reception life pass (DESIGN-005) ────────────────────────
-    if (this.room.id === 'reception') {
-      // Busy desk props — clipboard, coffee mug, papers stack riding on the desk surface
-      const deskSurfaceY = 2 * TILE + TILE / 2 - 6;
-      const clipboard = this.add.sprite(8 * TILE + TILE / 2, deskSurfaceY, objectTextureKey('manual')).setScale(0.55).setDepth(5).setAngle(-8);
-      const mug = this.add.sprite(9 * TILE + TILE / 2 + 6, deskSurfaceY + 2, furnitureTextureKey('coffee_mug')).setScale(0.6).setDepth(5);
-      const papers = this.add.sprite(11 * TILE + TILE / 2, deskSurfaceY, furnitureTextureKey('inbox_tray')).setScale(0.55).setDepth(5);
-      this.tweens.add({ targets: mug, y: mug.y - 1, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      void clipboard; void papers;
-
-      // Vary chair groupings — add a conversation pair facing each other (decorative, no collision)
-      const pairY = 11 * TILE + TILE / 2;
-      const chairA = this.add.sprite(10 * TILE + TILE / 2, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(15);
-      const chairB = this.add.sprite(11 * TILE + TILE / 2 + 4, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(-15).setFlipX(true);
-      // Angled corner chair near the right cluster, suggesting someone sat askew
-      const chairC = this.add.sprite(14 * TILE + TILE / 2, 8 * TILE + TILE / 2, furnitureTextureKey('chair')).setDepth(3).setAngle(-25);
-      void chairA; void chairB; void chairC;
-
-      // Interactable pulse — subtle scale yoyo on items + zones to signpost interactivity
-      for (const ia of this.interactables) {
-        if (ia.type !== 'zone' && ia.type !== 'item') continue;
-        this.tweens.add({ targets: ia.sprite, scaleX: { from: 1.0, to: 1.04 }, scaleY: { from: 1.0, to: 1.04 }, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // Ambient distant footsteps — visitor passing in the corridor (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 13000, loop: true, callback: () => {
-        try { this.sound.play('sfx_footstep', { volume: 0.04, rate: 0.9 + Math.random() * 0.2 }); } catch (_) {}
-      } });
-    }
+    // ── Interactables (Round 4 → systems/exploration/interactableFactory) ──
+    // Items + glow auras, hallway bulletin board, zones + zoneGlows, NPCs +
+    // labels + speech bubbles + boss ring. addCompletionCheck stays on the
+    // scene (updateCompletionState also calls it); npcBubbles is the scene's
+    // registry (updateCompletionState clears markers on live completion).
+    const spawned = spawnInteractables(this, room, {
+      completedNPCs: this.completedNPCs,
+      completedZones: this.completedZones,
+      collectedItems: this.collectedItems,
+      npcBubbles: this.npcBubbles,
+      getCurrentAct: () => this.getCurrentAct(),
+      addCompletionCheck: (x, y, depth, pop) => this.addCompletionCheck(x, y, depth, pop),
+    });
+    this.interactables = spawned.interactables;
+    this.zoneGlows = spawned.zoneGlows;
 
     // Pulse first NPC if this room hasn't been pulsed yet
+    // (stays in the scene per the refactor proposal — writes npcPulseTween/npcPulseTarget)
     const firstNpc = this.interactables.find(ia => ia.type === 'npc');
     const roomPulseKey = `pq:room:${this.room.id}:npcPulsed`;
     if (firstNpc && !localStorage.getItem(roomPulseKey)) {
@@ -1343,211 +296,10 @@ export class ExplorationScene extends Phaser.Scene {
       });
     }
 
-    // ── Hospital Lobby first-frame polish (DESIGN-004) ────────────
-    if (this.room.id === 'hospital_entrance') {
-      // (1) Coffee cart prop — non-interactable, rendered directly in scene
-      const cartTileX = 5, cartTileY = 5;
-      const cartCx = cartTileX * TILE + TILE / 2, cartCy = cartTileY * TILE + TILE / 2;
-      this.add.ellipse(cartCx, cartCy + 12, TILE - 4, 8, 0x000000, 0.18).setDepth(2);
-      this.add.sprite(cartCx, cartCy, furnitureTextureKey('coffee_station')).setDepth(3);
-      // Tiny steam puff every ~2.6s above the cart
-      this.time.addEvent({ delay: 2600, loop: true, callback: () => {
-        const puff = this.add.ellipse(cartCx + (Math.random() * 4 - 2), cartCy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
-        this.tweens.add({ targets: puff, y: puff.y - 12, alpha: 0, scaleX: 1.5, scaleY: 1.5, duration: 1400, ease: 'Sine.easeOut', onComplete: () => puff.destroy() });
-      } });
-      // (2) Riley idle micro-animation — subtle angle sway on top of breathing tween
-      const riley = this.interactables.find(ia => ia.type === 'npc' && ia.id === 'riley_entrance');
-      if (riley) {
-        this.tweens.add({ targets: riley.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // Plant leaf-sway is now handled generically by addFurnitureIdleAnimations() — no entrance-only block needed
-      // (3) Ambient lobby chatter — single subtle blip every 9-12s, max volume 0.08
-      this.time.addEvent({ delay: 10500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.55 + Math.random() * 0.2 }); } catch (_) {}
-      } });
-      // Ambient sliding-door whoosh — distant entry sound every ~20s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 19500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.8 }); } catch (_) {}
-      } });
-    }
-
-    // ── Break Room comedic life (DESIGN-003) ─────────────────────
-    if (this.room.id === 'break_room') {
-      const ledColors = [0xff4444, 0xffdd44, 0x44ff66, 0x44ccff];
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'vending_machine') continue;
-        const led = this.add.rectangle(obs.x * TILE + obs.width * TILE - 6, obs.y * TILE + 6, 2, 2, ledColors[0]).setDepth(20);
-        let li = 0;
-        this.time.addEvent({ delay: 700, loop: true, callback: () => { li = (li + 1) % ledColors.length; led.setFillStyle(ledColors[li]); } });
-      }
-      const mw = room.obstacles.find((o: any) => o.type === 'microwave');
-      if (mw) {
-        const mx = mw.x * TILE + TILE / 2, my = mw.y * TILE + TILE / 2;
-        this.time.addEvent({ delay: 9000, loop: true, callback: () => {
-          try { this.sound.play('sfx_interact', { volume: 0.12, rate: 1.6 }); } catch (_) {}
-          const f = this.add.rectangle(mx, my, TILE - 8, TILE - 8, 0xffeeaa, 0.5).setDepth(20);
-          this.tweens.add({ targets: f, alpha: 0, duration: 350, onComplete: () => f.destroy() });
-        } });
-      }
-      const gossip = this.interactables.find(ia => ia.type === 'npc' && ia.id === 'gossiping_coworker');
-      if (gossip) {
-        const glyphs = ['...', '!', '?'];
-        this.time.addEvent({ delay: 4500, loop: true, callback: () => {
-          const b = this.add.text(gossip.sprite.x + 10, gossip.sprite.y - 24, glyphs[Math.floor(Math.random() * glyphs.length)], {
-            fontFamily: '"Press Start 2P"', fontSize: '8px', color: '#ffffff', backgroundColor: '#222222cc', padding: { x: 3, y: 2 },
-          }).setOrigin(0.5).setDepth(gossip.sprite.depth + 3).setAlpha(0);
-          this.tweens.add({ targets: b, alpha: 1, y: b.y - 4, duration: 250, yoyo: true, hold: 900, onComplete: () => b.destroy() });
-        } });
-      }
-      // Ambient vending dispense — soft thunk every ~16s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 16000, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.05, rate: 0.5 }); } catch (_) {}
-      } });
-    }
-
-    // ── Records Room final-demo polish (DESIGN-006) ──────────────
-    if (this.room.id === 'records_room') {
-      // (1) Flickering fluorescent tube + dust motes in the upper filing aisle
-      const tubeCx = 10 * TILE + TILE / 2, tubeCy = 1 * TILE + TILE - 4;
-      const tube = this.add.rectangle(tubeCx, tubeCy, TILE * 3, 3, 0xfff7d8, 0.85).setDepth(4);
-      const tubeHalo = this.add.rectangle(tubeCx, tubeCy + 10, TILE * 4, 22, 0xfff2b8, 0.10).setDepth(3);
-      this.time.addEvent({ delay: 3200, loop: true, callback: () => {
-        // Brief flicker — dim then snap back
-        this.tweens.add({ targets: [tube, tubeHalo], alpha: { from: tube.alpha, to: 0.25 }, duration: 80, yoyo: true, repeat: 1, ease: 'Linear' });
-      } });
-      // Dust motes drifting in the light beam below the tube
-      this.time.addEvent({ delay: 1400, loop: true, callback: () => {
-        const mote = this.add.circle(tubeCx + (Math.random() * 80 - 40), tubeCy + 6, 1, 0xfff5c8, 0.7).setDepth(20);
-        this.tweens.add({ targets: mote, y: mote.y + 18, alpha: 0, duration: 4200, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
-      } });
-      // (2) Idle fidget on the two strongest NPCs — CCO and Attorney
-      for (const fidgetId of ['compliance_officer', 'attorney']) {
-        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
-        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1300 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // (3) Subpoena envelope prop next to Attorney — small obj_manual sprite, signals "official document"
-      const attorney = this.interactables.find(i => i.type === 'npc' && i.id === 'attorney');
-      if (attorney) {
-        const env = this.add.sprite(attorney.sprite.x + 14, attorney.sprite.y + 4, objectTextureKey('manual')).setScale(0.5).setDepth(attorney.sprite.depth - 1).setAngle(12);
-        this.tweens.add({ targets: env, y: env.y - 1, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // (4) Decorative document cart drifting slowly down the central aisle (separate from the static cart at (6,5))
-      const cartY = 9 * TILE + TILE / 2;
-      const cartStartX = 13 * TILE + TILE / 2, cartEndX = 16 * TILE + TILE / 2;
-      this.add.ellipse(cartStartX, cartY + 10, TILE - 6, 6, 0x000000, 0.18).setDepth(2);
-      const cart = this.add.sprite(cartStartX, cartY, furnitureTextureKey('document_cart')).setDepth(3).setScale(0.85);
-      this.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      // Ambient paper rustle / drawer slide — every ~12s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 12500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.04, rate: 0.7 }); } catch (_) {}
-      } });
-    }
-
-    // ── Laboratory life pass (DESIGN-002) ────────────────────────
-    if (this.room.id === 'lab') {
-      // (1) Microscope eyepiece glow — pulsing color-cycling circle on the microscope station (2,2)
-      const scopeCx = 2 * TILE + (3 * TILE) / 2, scopeCy = 2 * TILE + 6;
-      const eyepiece = this.add.circle(scopeCx, scopeCy, 4, 0x88ddff, 0.85).setDepth(5);
-      const scopeColors = [0x88ddff, 0xffe888, 0xff88dd, 0x88ffaa];
-      let sci = 0;
-      this.time.addEvent({ delay: 1200, loop: true, callback: () => { sci = (sci + 1) % scopeColors.length; eyepiece.setFillStyle(scopeColors[sci]); } });
-      this.tweens.add({ targets: eyepiece, scaleX: { from: 0.8, to: 1.3 }, scaleY: { from: 0.8, to: 1.3 }, alpha: { from: 0.5, to: 1 }, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      // (2) Idle fidget on lab_tech + courier — angle wobble matching ER pattern
-      for (const fidgetId of ['lab_tech', 'courier']) {
-        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
-        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.4, to: 1.4 }, duration: 1200 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // (3) Beaker bubble particles — periodic rising bubbles from chemical_shelf positions
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'chemical_shelf') continue;
-        const bx = obs.x * TILE + (obs.width * TILE) / 2, by = obs.y * TILE + 4;
-        this.time.addEvent({ delay: 6500 + Math.random() * 1500, loop: true, callback: () => {
-          for (let i = 0; i < 4; i++) {
-            const bubble = this.add.circle(bx + (Math.random() * 14 - 7), by, 1 + Math.random(), 0x88eeff, 0.8).setDepth(20);
-            this.tweens.add({ targets: bubble, y: bubble.y - 14, alpha: 0, duration: 1100 + i * 120, ease: 'Sine.easeOut', onComplete: () => bubble.destroy() });
-          }
-        } });
-      }
-      // Ambient bubble pop — chemistry-station blip every ~10s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 10500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.05, rate: 1.4 }); } catch (_) {}
-      } });
-    }
-
-    // ── IT Office tech-life polish (DESIGN-007) ─────────────────
-    if (this.room.id === 'it_office') {
-      // (1) Server-rack blinking LEDs — green/amber yoyo, slightly out of phase per rack
-      let rackIdx = 0;
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'server_rack') continue;
-        const lx = obs.x * TILE + obs.width * TILE - 5, lyTop = obs.y * TILE + 4;
-        const ledA = this.add.rectangle(lx, lyTop, 2, 2, 0x44ff66).setDepth(20);
-        const ledB = this.add.rectangle(lx, lyTop + 4, 2, 2, 0xffaa33).setDepth(20);
-        const phase = (rackIdx % 4) * 180;
-        this.tweens.add({ targets: ledA, alpha: { from: 1, to: 0.25 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: phase });
-        this.tweens.add({ targets: ledB, alpha: { from: 0.25, to: 1 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: phase + 90 });
-        rackIdx++;
-      }
-      // (2) Monitor flicker — single-frame cyan flash on each monitor_bank every 8-10s
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'monitor_bank') continue;
-        const mx = obs.x * TILE + (obs.width * TILE) / 2, my = obs.y * TILE + TILE / 2;
-        const flash = this.add.rectangle(mx, my, obs.width * TILE - 4, TILE - 4, 0x66ddff, 0).setDepth(6);
-        this.time.addEvent({ delay: 8500 + Math.random() * 1500, loop: true, callback: () => {
-          flash.setAlpha(0.55);
-          this.time.delayedCall(60, () => flash.setAlpha(0));
-        } });
-      }
-      // (3) Encounter trigger glow — subtle pulsing ring at tile (9,6) signposting the IT encounter
-      const alreadyDone = this.registry.get('encounterResult_td-it-office');
-      if (!alreadyDone) {
-        const tx = 9 * TILE + TILE / 2, ty = 6 * TILE + TILE / 2;
-        const ring = this.add.circle(tx, ty, 14, 0x66ddff, 0.0).setStrokeStyle(2, 0x66ddff, 0.7).setDepth(4);
-        this.tweens.add({ targets: ring, scale: { from: 0.8, to: 1.4 }, alpha: { from: 0.7, to: 0 }, duration: 1400, repeat: -1, ease: 'Sine.easeOut' });
-      }
-    }
-
-    // ── Hallway life pass (DESIGN-HALLWAY-001 + 002) ─────────────
-    // All 5 hallways: act-tinted bulletin ribbon + drifting dust motes in two light columns.
-    // Worst 2 only (break_lab + it_er): flickering sconces + walking employee NPC.
-    if (this.room.id.startsWith('hallway_')) {
-      const isHeavyHallway = this.room.id === 'hallway_break_lab' || this.room.id === 'hallway_it_er';
-      // (A) Shared — Act-aware poster accent on the existing bulletin board
-      const act = this.getCurrentAct();
-      const actTint = act === 1 ? 0x4a90e2 : act === 2 ? 0xe2a04a : 0xc83a3a;
-      const ribbon = this.add.rectangle(this.cameras.main.width / 2 + 18, 64 - 16, 10, 4, actTint, 1).setDepth(8).setAngle(-12);
-      this.tweens.add({ targets: ribbon, alpha: { from: 1, to: 0.65 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      // (B) Shared — Drifting dust motes in two light columns (atmospheric texture)
-      const moteColumns = [5 * TILE + TILE / 2, 14 * TILE + TILE / 2];
-      for (const cx of moteColumns) {
-        this.time.addEvent({ delay: 1700 + Math.random() * 900, loop: true, callback: () => {
-          const mote = this.add.circle(cx + (Math.random() * 28 - 14), TILE + 4, 1, 0xfff5c8, 0.7).setDepth(20);
-          this.tweens.add({ targets: mote, y: mote.y + 5 * TILE, alpha: 0, duration: 5200 + Math.random() * 800, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
-        } });
-      }
-      // (C) Heavy-only — Flickering ceiling sconces
-      if (isHeavyHallway) {
-        for (const obs of room.obstacles) {
-          if ((obs as any).type !== 'wall_sconce') continue;
-          const sx = obs.x * TILE + (obs.width * TILE) / 2;
-          const sy = obs.y * TILE + TILE - 2;
-          const halo = this.add.ellipse(sx, sy + 4, 22, 10, 0xffe6a8, 0.55).setDepth(4);
-          const cone = this.add.ellipse(sx, sy + 14, 30, 18, 0xfff2c8, 0.18).setDepth(3);
-          const flickerDelay = 2400 + Math.random() * 1800;
-          this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
-            this.tweens.add({ targets: [halo, cone], alpha: { from: 1, to: 0.35 }, duration: 70, yoyo: true, repeat: 1, ease: 'Linear' });
-          } });
-        }
-        // (D) Heavy-only — Walking employee NPC, non-interactable, patrols the corridor
-        const empY = 4 * TILE + TILE / 2;
-        const empStartX = 7 * TILE + TILE / 2;
-        const empEndX = 13 * TILE + TILE / 2;
-        this.add.ellipse(empStartX, empY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
-        const empSprite = this.add.sprite(empStartX, empY, 'npc_doctor').setDepth(5 + 4);
-        this.tweens.add({ targets: empSprite, x: empEndX, duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => empSprite.setFlipX(true), onRepeat: () => empSprite.setFlipX(false) });
-        this.tweens.add({ targets: empSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-    }
+    // ── Per-room life passes (Round 4 → systems/exploration/roomAmbience) ──
+    addRoomAmbience(this, room, this.interactables, {
+      getCurrentAct: () => this.getCurrentAct(),
+    });
 
     // ── Player ───────────────────────────────────────────────────
     // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
@@ -1645,7 +397,7 @@ export class ExplorationScene extends Phaser.Scene {
     });
 
     // ── Door visuals (Phase 12) — render all doors with state indicators ──
-    this.renderDoorStates();
+    this.doors.render();
 
     // ── Legacy exit door glow at spawn point (only if no doors[] present) ──
     if (!(room as any).doors || (room as any).doors.length === 0) {
@@ -1706,7 +458,7 @@ export class ExplorationScene extends Phaser.Scene {
         }
       }
 
-      const path = this.findPath({ x: this.tileX, y: this.tileY }, { x: goalTileX, y: goalTileY });
+      const path = findPath(this.room, { x: this.tileX, y: this.tileY }, { x: goalTileX, y: goalTileY });
       if (path.length > 0) {
         this.startPathMovement(path, clickedInteractable);
       }
@@ -1735,39 +487,7 @@ export class ExplorationScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    // ── Vignette overlay — subtle edge darkening to draw eye to center ──
-    const camW = this.cameras.main.width;
-    const camH = this.cameras.main.height;
-    const vignette = this.add.graphics();
-    // Outer ring: 16px border at 15% opacity
-    vignette.fillStyle(0x000000, 0.15);
-    vignette.fillRect(0, 0, camW, 16);               // top
-    vignette.fillRect(0, camH - 16, camW, 16);       // bottom
-    vignette.fillRect(0, 16, 16, camH - 32);         // left
-    vignette.fillRect(camW - 16, 16, 16, camH - 32); // right
-    // Inner ring: next 16px at 8% opacity
-    vignette.fillStyle(0x000000, 0.08);
-    vignette.fillRect(16, 16, camW - 32, 16);               // top inner
-    vignette.fillRect(16, camH - 32, camW - 32, 16);        // bottom inner
-    vignette.fillRect(16, 32, 16, camH - 64);               // left inner
-    vignette.fillRect(camW - 32, 32, 16, camH - 64);        // right inner
-    vignette.setDepth(50);
-    vignette.setScrollFactor(0);
-
-    // Subtle ambient vignette for depth
-    const vignetteGfx = this.add.graphics().setDepth(90).setScrollFactor(0);
-    // Corner shadows (subtle)
-    vignetteGfx.fillStyle(0x000000, 0.08);
-    vignetteGfx.fillRect(0, 0, 40, 40);
-    vignetteGfx.fillRect(camW - 40, 0, 40, 40);
-    vignetteGfx.fillRect(0, camH - 40, 40, 40);
-    vignetteGfx.fillRect(camW - 40, camH - 40, 40, 40);
-    // Edge darkening (very subtle)
-    vignetteGfx.fillStyle(0x000000, 0.03);
-    vignetteGfx.fillRect(0, 0, camW, 10);
-    vignetteGfx.fillRect(0, camH - 10, camW, 10);
-    vignetteGfx.fillRect(0, 0, 10, camH);
-    vignetteGfx.fillRect(camW - 10, 0, 10, camH);
+    renderVignette(this);
 
     // ── Listen for React events — MUST be before music to survive any audio errors ──
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
@@ -1799,110 +519,14 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // ── Background music — room override > act default; crossfade if track changed ──
-    const currentAct = this.getCurrentAct();
-    const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
-      1: { track: 'music_hub', baseVol: this.musicBaseVolume },
-      2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
-      3: { track: 'music_breach', baseVol: 0.15 },
-    };
-    const actCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
-    const roomTrack = (this.room as any).musicTrack as string | undefined;
-    const roomBaseVol = (this.room as any).musicBaseVolume as number | undefined;
-    const musicCfg = {
-      track: roomTrack ?? actCfg.track,
-      baseVol: roomBaseVol ?? actCfg.baseVol,
-    };
-    this.activeMusicBaseVolume = musicCfg.baseVol;
-    try {
-      const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-      const targetVol = musicCfg.baseVol * userVol;
-
-      // Same track survived from previous room — reclaim and fade up
-      const existing = this.findPlayingTrack(musicCfg.track);
-      if (existing) {
-        this.bgMusic = existing;
-        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 600, ease: 'Sine.easeIn' });
-      } else if (userVol > 0) {
-        // Different track (or first load) — stop any other music tracks left
-        // playing on the SoundManager, then fade in the new one from silence.
-        for (const k of MUSIC_TRACK_KEYS) {
-          if (k !== musicCfg.track) {
-            this.sound.getAll(k).forEach(s => { s.stop(); s.destroy(); });
-          }
-        }
-        // Clean up orphans of the target key too
-        this.sound.getAll(musicCfg.track).forEach(s => { s.stop(); s.destroy(); });
-        // Start muted to prevent any first-frame audio leak, then unmute at
-        // volume 0 and tween up on the next tick.
-        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0, mute: true });
-        const playMusic = () => {
-          if (!this.bgMusic || !this.scene.isActive()) return;
-          this.bgMusic.play();
-          this.time.delayedCall(0, () => {
-            if (!this.bgMusic || !this.scene.isActive()) return;
-            const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
-            ws.setMute(false);
-            ws.volume = 0;
-            this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 1800, ease: 'Sine.easeIn' });
-          });
-        };
-        if (this.sound.locked) {
-          this.sound.once('unlocked', playMusic);
-        } else {
-          this.time.delayedCall(300, playMusic);
-        }
-      }
-    } catch (e) {
-      console.warn(`[ExplorationScene] ${musicCfg.track} not ready, skipping BGM:`, e);
-    }
+    // (Round 6 → systems/exploration/MusicController.startRoomMusic; 1800ms
+    // room-entry fade preserved via parameter — wake-restore uses 800ms.)
+    this.music.startRoomMusic(this.room, this.getCurrentAct(), 1800);
 
     // Room entrance — fade in from black
     this.cameras.main.fadeIn(500, 0, 0, 0);
 
-    // Room name entrance banner — slides in and fades out
-    const roomBanner = this.add.text(
-      this.cameras.main.centerX, 40,
-      this.room.name || 'Unknown Room',
-      {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '10px',
-        color: '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 3,
-        align: 'center',
-      }
-    ).setOrigin(0.5).setDepth(100).setScrollFactor(0).setAlpha(0);
-
-    // Color banner based on room type
-    const bannerColors: Record<string, string> = {
-      reception: '#4a90e2',
-      records_room: '#2ecc71',
-      er: '#ff6b6b',
-      lab: '#9b59b6',
-      break_room: '#f39c12',
-      it_office: '#00d4aa',
-    };
-    const bannerColor = bannerColors[this.room.id] || '#ffffff';
-    roomBanner.setColor(bannerColor);
-
-    this.tweens.add({
-      targets: roomBanner,
-      alpha: 1,
-      y: 50,
-      duration: 400,
-      ease: 'Quad.easeOut',
-      delay: 300,
-      onComplete: () => {
-        this.tweens.add({
-          targets: roomBanner,
-          alpha: 0,
-          duration: 500,
-          delay: 1500,
-          ease: 'Quad.easeIn',
-          onComplete: () => roomBanner.destroy()
-        });
-      }
-    });
+    showRoomBanner(this, this.room);
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
 
@@ -1913,93 +537,12 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
 
     // ── Type-driven furniture idle animations (Phase 26-02) ──────
-    this.addFurnitureIdleAnimations(room);
+    // (Round 4 → systems/exploration/roomAmbience)
+    addFurnitureIdleAnimations(this, room);
 
     // Seed idle-hint timer to now so grace period starts fresh on room load
     this.lastActivityAt = this.time.now;
     this.lastIdleHintAt = this.time.now;
-  }
-
-  // ── Type-driven furniture idle animations (Phase 26-02) ─────────────────────
-  // Called once from create() after the obstacles render loop.
-  // Positions computed from obstacle tile coords so no sprite references needed.
-  // All tweens/timers use this.tweens.add / this.time.addEvent — Phaser cleans them on scene shutdown.
-  private addFurnitureIdleAnimations(room: any) {
-    for (const obs of room.obstacles) {
-      const obsType = (obs as any).type as string | undefined;
-      if (!obsType) continue;
-
-      // ── plant — leaf sway (14 instances across 9 rooms) ─────────────────
-      if (obsType === 'plant') {
-        const px = obs.x * TILE + (obs.width * TILE) / 2;
-        const py = obs.y * TILE + 4;
-        const leaf = this.add.ellipse(px, py, 14, 6, 0x4a8a3a, 0.45).setDepth(4);
-        this.tweens.add({
-          targets: leaf,
-          angle: { from: -6, to: 6 },
-          duration: 1900 + Math.random() * 400,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        continue;
-      }
-
-      // ── server_rack / monitor_bank / vital_monitor — screen flicker + LED blink ─
-      if (obsType === 'server_rack' || obsType === 'monitor_bank' || obsType === 'vital_monitor') {
-        const mx = obs.x * TILE + (obs.width * TILE) / 2;
-        const my = obs.y * TILE + (obs.height * TILE) / 2;
-
-        // Screen glow rect — sits over the upper half of the sprite
-        const glowColor = obsType === 'server_rack' ? 0x44ff66 : 0x66ccff;
-        const screenGlow = this.add.rectangle(mx, my - 4, 10, 6, glowColor, 0.30).setDepth(20);
-
-        // CRT flicker — brief dim then restore every 2-3.5s
-        const flickerDelay = 2400 + Math.random() * 1800;
-        this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
-          this.tweens.add({
-            targets: screenGlow,
-            alpha: 0.08,
-            duration: 60,
-            yoyo: true,
-            repeat: 1,
-            ease: 'Linear',
-            onComplete: () => { screenGlow.setAlpha(0.30); },
-          });
-        } });
-
-        // LED dot — toggles between bright green and dim green every ~900ms
-        const ledX = obs.x * TILE + obs.width * TILE - 4;
-        const ledY = obs.y * TILE + 5;
-        const led = this.add.rectangle(ledX, ledY, 2, 2, 0x44ff44).setDepth(20);
-        let ledOn = true;
-        this.time.addEvent({ delay: 880 + Math.random() * 200, loop: true, callback: () => {
-          ledOn = !ledOn;
-          led.setFillStyle(ledOn ? 0x44ff44 : 0x227722);
-        } });
-        continue;
-      }
-
-      // ── coffee_station — steam puffs (break_room's obstacle; entrance cart handled separately) ─
-      if (obsType === 'coffee_station') {
-        const cx = obs.x * TILE + (obs.width * TILE) / 2;
-        const cy = obs.y * TILE + 4;
-        this.time.addEvent({ delay: 2600 + Math.random() * 400, loop: true, callback: () => {
-          const puff = this.add.ellipse(cx + (Math.random() * 4 - 2), cy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
-          this.tweens.add({
-            targets: puff,
-            y: puff.y - 12,
-            alpha: 0,
-            scaleX: 1.5,
-            scaleY: 1.5,
-            duration: 1400,
-            ease: 'Sine.easeOut',
-            onComplete: () => puff.destroy(),
-          });
-        } });
-        continue;
-      }
-    }
   }
 
   update() {
@@ -2127,7 +670,16 @@ export class ExplorationScene extends Phaser.Scene {
         now - this.lastActivityAt > IDLE_HINT_GRACE_MS &&
         now - this.lastIdleHintAt > IDLE_HINT_INTERVAL_MS
       ) {
-        this.emitIdleHint();
+        // Round 4: emitIdleHint moved to systems/exploration/idleHints —
+        // the timestamp write + round-robin index stay scene fields.
+        this.lastIdleHintAt = this.time.now;
+        this.idleHintIndex = emitIdleHint(
+          this,
+          this.room,
+          this.interactables,
+          { npcs: this.completedNPCs, zones: this.completedZones, items: this.collectedItems },
+          this.idleHintIndex,
+        );
       }
     }
 
@@ -2157,9 +709,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Door proximity detection — requires SPACE to enter (Phase 12)
     if (!this.transitioning) {
-      this.checkDoorProximity();
-      if (this.nearDoor && interactPressed && !this.nearbyInteractable) {
-        this.handleDoorInteraction(this.nearDoor);
+      this.doors.checkProximity(this.player.x, this.player.y);
+      const nearDoor = this.doors.nearDoor;
+      if (nearDoor && interactPressed && !this.nearbyInteractable) {
+        this.doors.enter(nearDoor);
       }
     }
 
@@ -2190,8 +743,8 @@ export class ExplorationScene extends Phaser.Scene {
         nearbyInteractable: this.nearbyInteractable
           ? { type: this.nearbyInteractable.type, id: this.nearbyInteractable.id }
           : null,
-        nearDoor: this.nearDoor
-          ? { id: this.nearDoor.id, targetRoomId: this.nearDoor.targetRoomId }
+        nearDoor: this.doors.nearDoor
+          ? { id: this.doors.nearDoor.id, targetRoomId: this.doors.nearDoor.targetRoomId }
           : null,
         paused: this.paused,
         roomNPCs: byType('npc').map(n => ({ ...n, completed: this.completedNPCs.has(n.id) })),
@@ -2208,14 +761,14 @@ export class ExplorationScene extends Phaser.Scene {
           targetRoomId: d.targetRoomId,
           x: d.x,
           y: d.y,
-          state: this.doorStates[d.id] ?? 'available',
+          state: this.doors.states[d.id] ?? 'available',
         })),
         doors: ((this.room as any).doors || []).map((d: any) => ({
           id: d.id,
           targetRoomId: d.targetRoomId,
           x: d.x,
           y: d.y,
-          state: this.doorStates[d.id] ?? 'available',
+          state: this.doors.states[d.id] ?? 'available',
         })),
       });
     }
@@ -2255,10 +808,9 @@ export class ExplorationScene extends Phaser.Scene {
    *  throw-proofed because the DESTROY path runs with plugins partly torn down. */
   shutdown() {
     // Don't stop music — create() will reclaim it if same track is needed,
-    // or crossfadeToMusic will clean it up if the act changed.
-    this.bgMusic = undefined;
-    // Clean up sound unlock listener
-    try { this.sound.off('unlocked'); } catch (_) {}
+    // or crossfadeTo will clean it up if the act changed. release() drops the
+    // bgMusic ref and clears the sound 'unlocked' listener (Round 6).
+    this.music.release();
     // Clean up EventBridge listeners
     this.removeBridgeListeners();
     try { this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this); } catch (_) {}
@@ -2300,12 +852,13 @@ export class ExplorationScene extends Phaser.Scene {
     body.setVelocity(0);
     // Immediately update proximity so QA pressSpace can find nearby interactables
     this.checkProximity();
-    this.checkDoorProximity();
+    this.doors.checkProximity(this.player.x, this.player.y);
   };
 
   private onQAMoveTo = (data: { tileX: number; tileY: number }) => {
     if (!this.isSceneAlive()) return;
-    const path = this.findPath(
+    const path = findPath(
+      this.room,
       { x: this.tileX, y: this.tileY },
       { x: data.tileX, y: data.tileY }
     );
@@ -2322,8 +875,8 @@ export class ExplorationScene extends Phaser.Scene {
       return;
     }
     // If near a door, enter it
-    if (this.nearDoor && !this.transitioning) {
-      this.handleDoorInteraction(this.nearDoor);
+    if (this.doors.nearDoor && !this.transitioning) {
+      this.doors.enter(this.doors.nearDoor);
       return;
     }
     // Fallback: find closest interactable within 2 tiles and trigger it
@@ -2368,9 +921,10 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Small delay for proximity check to fire, then trigger door
     this.time.delayedCall(200, () => {
-      this.checkDoorProximity();
-      if (this.nearDoor && this.nearDoor.id === data.doorId) {
-        this.handleDoorInteraction(this.nearDoor);
+      this.doors.checkProximity(this.player.x, this.player.y);
+      const nearDoor = this.doors.nearDoor;
+      if (nearDoor && nearDoor.id === data.doorId) {
+        this.doors.enter(nearDoor);
       } else {
         // Force it — directly emit the door event
         this.transitioning = true;
@@ -2386,95 +940,17 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onMusicVolume = (vol: number) => {
-    if (!this.scene.isActive()) return;
-    if (this.bgMusic) {
-      (this.bgMusic as Phaser.Sound.WebAudioSound).volume = this.activeMusicBaseVolume * vol;
-    }
+    // Handler body moved to MusicController.setUserVolume (Round 6)
+    this.music.setUserVolume(vol);
   };
 
   // ── Act-based music crossfade (Phase 14) ──────────────────────────
-
-  /** Current effective base volume — may differ from musicBaseVolume for Act 3 */
-  private activeMusicBaseVolume = 0.25;
+  // crossfadeToMusic/findPlayingTrack/startMusicTrack + activeMusicBaseVolume
+  // moved to systems/exploration/MusicController (Round 6)
 
   private onActAdvance = (data: { newAct: number; track: string; baseVolume?: number }) => {
-    this.crossfadeToMusic(data.track, data.baseVolume);
+    this.music.crossfadeTo(data.track, data.baseVolume);
   };
-
-  /**
-   * Fade out current music over 2s, then fade in new track over 2s.
-   * Guards against scene shutdown mid-crossfade.
-   */
-  private crossfadeToMusic(newTrackKey: string, baseVolumeOverride?: number): void {
-    const effectiveBase = baseVolumeOverride ?? this.musicBaseVolume;
-    this.activeMusicBaseVolume = effectiveBase;
-    const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-    const targetVol = effectiveBase * userVol;
-
-    // Reclaim orphaned bgMusic ref (shutdown cleared it but sound still plays)
-    if (!this.bgMusic) {
-      const playing = this.sound.getAll('music_hub')
-        .concat(this.sound.getAll('music_exploration'))
-        .concat(this.sound.getAll('music_breach'))
-        .find(s => s.isPlaying);
-      if (playing) this.bgMusic = playing;
-    }
-
-    if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
-      // F-24 fix (Run 07): kill any tween already targeting this sound before
-      // fading. A duplicate crossfade (or a still-running fade-in) would keep
-      // ticking after onComplete destroys the sound — "Cannot set properties
-      // of null (setting 'volume')".
-      try { this.tweens.killTweensOf(this.bgMusic); } catch (_) {}
-      // Fade out current track, then start new one
-      this.tweens.add({
-        targets: this.bgMusic,
-        volume: 0,
-        duration: 2000,
-        ease: 'Sine.easeOut',
-        onComplete: () => {
-          // Guard: scene may have shut down while fade was running
-          if (!this.scene || !this.scene.isActive()) return;
-          if (this.bgMusic) {
-            this.bgMusic.stop();
-            this.bgMusic.destroy();
-            this.bgMusic = undefined;
-          }
-          this.startMusicTrack(newTrackKey, targetVol);
-        },
-      });
-    } else {
-      // No current track (or not playing) — start new track immediately
-      if (this.bgMusic) {
-        this.bgMusic.stop();
-        this.bgMusic.destroy();
-        this.bgMusic = undefined;
-      }
-      this.startMusicTrack(newTrackKey, targetVol);
-    }
-  }
-
-  /** Find an already-playing sound instance on the global SoundManager by key. */
-  private findPlayingTrack(key: string): Phaser.Sound.BaseSound | undefined {
-    return this.sound.getAll(key).find(s => s.isPlaying);
-  }
-
-  private startMusicTrack(key: string, targetVol: number): void {
-    if (!this.scene || !this.scene.isActive()) return;
-    try {
-      this.bgMusic = this.sound.add(key, { loop: true, volume: 0, mute: true });
-      this.bgMusic.play();
-      this.time.delayedCall(0, () => {
-        if (!this.bgMusic || !this.scene.isActive()) return;
-        const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
-        ws.setMute(false);
-        ws.volume = 0;
-        this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 2000, ease: 'Sine.easeIn' });
-      });
-    } catch (e) {
-      console.warn(`[ExplorationScene] crossfade to ${key} failed:`, e);
-    }
-  }
 
   private onPlaySfx = (data: { key: string; volume?: number; rate?: number }) => {
     if (!this.scene.isActive()) return;
@@ -2593,12 +1069,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.encounterLaunching = true;
 
     // Kill any active music tweens before destroying to avoid null volume errors
-    if (this.bgMusic) {
-      try { this.tweens.killTweensOf(this.bgMusic); } catch (_) {}
-      try { this.bgMusic.stop(); } catch (_) {}
-      try { this.bgMusic.destroy(); } catch (_) {}
-      this.bgMusic = undefined;
-    }
+    this.music.killForEncounter();
 
     // Launch directly — camera fade callbacks silently fail with scene.launch
     this.scene.setVisible(false);
@@ -2649,280 +1120,19 @@ export class ExplorationScene extends Phaser.Scene {
     // encounterTriggered stays true — prevents re-triggering on same room session
 
     // Restore exploration music after BreachDefense ends — honor room override
-    try {
-      const currentAct = this.getCurrentAct();
-      const ACT_MUSIC: Record<number, { track: string; baseVol: number }> = {
-        1: { track: 'music_hub', baseVol: this.musicBaseVolume },
-        2: { track: 'music_exploration', baseVol: this.musicBaseVolume },
-        3: { track: 'music_breach', baseVol: 0.15 },
-      };
-      const actCfg = ACT_MUSIC[currentAct] ?? ACT_MUSIC[2];
-      const roomTrack = (this.room as any).musicTrack as string | undefined;
-      const roomBaseVol = (this.room as any).musicBaseVolume as number | undefined;
-      const musicCfg = {
-        track: roomTrack ?? actCfg.track,
-        baseVol: roomBaseVol ?? actCfg.baseVol,
-      };
-      this.activeMusicBaseVolume = musicCfg.baseVol;
-      const userVol = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
-      const targetVol = musicCfg.baseVol * userVol;
-      if (userVol > 0) {
-        this.bgMusic = this.sound.add(musicCfg.track, { loop: true, volume: 0, mute: true });
-        this.bgMusic.play();
-        this.time.delayedCall(0, () => {
-          if (!this.bgMusic || !this.scene.isActive()) return;
-          const ws = this.bgMusic as Phaser.Sound.WebAudioSound;
-          ws.setMute(false);
-          ws.volume = 0;
-          this.tweens.add({ targets: this.bgMusic, volume: targetVol, duration: 800, ease: 'Sine.easeIn' });
-        });
-      }
-    } catch (e) {
-      // Sound manager may be in a bad state after encounter cleanup
-    }
+    // (Round 6 → MusicController.startRoomMusic; 800ms wake fade preserved via
+    // parameter — room-entry create() uses 1800ms.)
+    this.music.startRoomMusic(this.room, this.getCurrentAct(), 800);
   };
 
   // ── Door navigation (Phase 12) ──────────────────────────────────
+  // checkDoorProximity/handleDoorInteraction/renderDoorStates moved to
+  // systems/exploration/DoorSystem (Round 6) — the onLoadRoom /
+  // onUpdateDoorStates / onDoorLocked eventBridge handlers stay here and
+  // delegate. `transitioning` stays on the scene.
 
-  private checkDoorProximity(): void {
-    const doors = (this.room as any).doors;
-    if (!doors || doors.length === 0) return;
-    const px = this.player.x;
-    const py = this.player.y;
-    for (const door of doors) {
-      const dx = Math.abs(px - (door.x * TILE + TILE / 2));
-      const dy = Math.abs(py - (door.y * TILE + TILE / 2));
-      if (dx < TILE * 1.5 && dy < TILE * 1.5) {
-        this.nearDoor = door;
-        return;
-      }
-    }
-    this.nearDoor = null;
-  }
+  // emitIdleHint moved to systems/exploration/idleHints (Round 4) — called from update()
 
-  private handleDoorInteraction(door: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string }): void {
-    if (this.transitioning) return;
-    this.lastActivityAt = this.time.now; // Reset idle-hint grace period on door entry
-    this.transitioning = true;
-    this.sound.play('sfx_footstep', { volume: 0.35, rate: 0.8 });
-    // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
-    if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
-      this.tweens.add({ targets: this.bgMusic, volume: 0, duration: 300, ease: 'Sine.easeOut' });
-    }
-    this.cameras.main.fadeOut(300, 0, 0, 0);
-    this.time.delayedCall(300, () => {
-      eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
-        targetRoomId: door.targetRoomId,
-        fromDoorId: door.id,
-      });
-    });
-  }
-
-  /**
-   * Idle-hint sparkle system (Phase 27 VIS-07).
-   * After IDLE_HINT_GRACE_MS without player input, fire a single 3-particle sparkle
-   * on one un-met completion requirement (NPC/zone/item). Cycles round-robin.
-   * Stops when the room has no un-met requirements (hallways, completed rooms).
-   */
-  private emitIdleHint(): void {
-    this.lastIdleHintAt = this.time.now;
-
-    const reqs = (this.room as any).completionRequirements;
-    if (!reqs) return; // hallways and rooms without completionRequirements never sparkle
-
-    // Build list of un-met target ids
-    const targets: string[] = [];
-    for (const id of (reqs.requiredNpcs ?? [])) {
-      if (!this.completedNPCs.has(id)) targets.push(id);
-    }
-    for (const id of (reqs.requiredZones ?? [])) {
-      if (!this.completedZones.has(id)) targets.push(id);
-    }
-    for (const id of (reqs.requiredItems ?? [])) {
-      if (!this.collectedItems.has(id)) targets.push(id);
-    }
-    if (targets.length === 0) return; // room is complete — no shimmer
-
-    const targetId = targets[this.idleHintIndex % targets.length];
-    this.idleHintIndex++;
-
-    // Find the interactable sprite for this id
-    const ia = this.interactables.find(i => i.id === targetId);
-    if (!ia?.sprite) return; // act-gated NPC may not have spawned yet
-
-    const sprite = ia.sprite;
-    if (!this.textures.exists('particle_circle')) return; // texture not loaded — silently skip
-
-    const s = this.add.particles(sprite.x, sprite.y - 6, 'particle_circle', {
-      speed: { min: 10, max: 25 },
-      angle: { min: 0, max: 360 },
-      scale: { start: 0.6, end: 0 },
-      alpha: { start: 0.9, end: 0 },
-      tint: [0xffffff, 0xffe9a0],
-      lifespan: 450,
-      quantity: 3,
-      emitting: false,
-    });
-    s.setDepth(sprite.depth + 1);
-    s.explode(3);
-    this.time.delayedCall(500, () => { if (s.active) s.destroy(); });
-  }
-
-  private renderDoorStates(): void {
-    const doors = (this.room as any).doors;
-    if (!doors || doors.length === 0) return;
-
-    // Clear existing door visuals so we can re-render cleanly
-    for (const v of this.doorVisuals) {
-      v.destroy();
-    }
-    this.doorVisuals = [];
-
-    for (const door of doors) {
-      const doorPixelX = door.x * TILE + TILE / 2;
-      const doorPixelY = door.y * TILE + TILE / 2;
-      const state = this.doorStates[door.id] ?? 'available';
-
-      // Door frame — prominent wood frame with highlight and shadow
-      const frameG = this.add.graphics().setDepth(1);
-      this.doorVisuals.push(frameG);
-      const fx = door.x * TILE;
-      const fy = door.y * TILE - TILE / 2;
-      // Frame posts (solid wood)
-      frameG.fillStyle(0xa0845a, 1);
-      frameG.fillRect(fx - 3, fy, 5, TILE + TILE / 2);
-      frameG.fillRect(fx + TILE - 2, fy, 5, TILE + TILE / 2);
-      // Frame header
-      frameG.fillStyle(0xa0845a, 1);
-      frameG.fillRect(fx - 3, fy, TILE + 6, 5);
-      // Highlight (inner edge)
-      frameG.fillStyle(0xc4a870, 0.8);
-      frameG.fillRect(fx + 1, fy + 1, 1, TILE + TILE / 2 - 1);
-      frameG.fillRect(fx + TILE - 3, fy + 1, 1, TILE + TILE / 2 - 1);
-      frameG.fillRect(fx, fy + 1, TILE, 1);
-      // Shadow (outer edge)
-      frameG.fillStyle(0x5a4430, 0.7);
-      frameG.fillRect(fx - 3, fy + TILE + TILE / 2 - 1, TILE + 6, 2);
-
-      if (state === 'locked') {
-        // Dark overlay + lock icon
-        const overlay = this.add.graphics().setDepth(2);
-        overlay.fillStyle(0x000000, 0.55);
-        overlay.fillRect(door.x * TILE - TILE / 2, door.y * TILE - TILE, TILE * 2, TILE * 3);
-        const lockText = this.add.text(doorPixelX, doorPixelY, '[X]', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '10px',
-          color: '#ff4444',
-          stroke: '#000000',
-          strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(3);
-        this.doorVisuals.push(overlay, lockText);
-
-      } else if (state === 'next') {
-        // Breathing warm-gold filled aura (Phase 27 VIS-07) — critical-path "next" door
-        // Clearly distinct from the blue 'available' ring pulse: filled gold, slower breathe
-        if (this.textures.exists('glow_radial')) {
-          const aura = this.add.image(doorPixelX, doorPixelY, 'glow_radial')
-            .setTint(0xffa000)
-            .setBlendMode(Phaser.BlendModes.ADD)
-            .setAlpha(0.6)
-            .setDepth(2);
-          this.tweens.add({
-            targets: aura,
-            alpha: { from: 0.6, to: 0.95 },
-            scaleX: { from: 1.1, to: 1.5 },
-            scaleY: { from: 1.1, to: 1.5 },
-            duration: 1600,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-          this.doorVisuals.push(aura);
-        } else {
-          // Fallback: filled gold circle alpha pulse (never stroke-only)
-          const fallbackAura = this.add.circle(doorPixelX, doorPixelY, 20, 0xffd700, 0.22).setDepth(2);
-          this.tweens.add({
-            targets: fallbackAura,
-            alpha: { from: 0.22, to: 0.45 },
-            scaleX: { from: 1, to: 1.4 },
-            scaleY: { from: 1, to: 1.4 },
-            duration: 1600,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-          this.doorVisuals.push(fallbackAura);
-        }
-        // Gold stroke ring — slower (1600ms) vs the blue available ring (1000ms) for distinct read
-        const nextRing = this.add.circle(doorPixelX, doorPixelY, 18, 0xffd700, 0)
-          .setStrokeStyle(2, 0xffd700, 1).setDepth(2);
-        this.tweens.add({
-          targets: nextRing,
-          alpha: { from: 0.3, to: 0.9 },
-          scaleX: { from: 0.8, to: 1.4 },
-          scaleY: { from: 0.8, to: 1.4 },
-          duration: 1600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        this.doorVisuals.push(nextRing);
-
-      } else if (state === 'available') {
-        // Pulsing glow ring
-        const glow = this.add.circle(doorPixelX, doorPixelY, 18, 0x4a90e2, 0)
-          .setStrokeStyle(2, 0x4a90e2, 1).setDepth(2);
-        this.tweens.add({
-          targets: glow,
-          alpha: { from: 0.2, to: 0.8 },
-          scaleX: { from: 0.8, to: 1.3 },
-          scaleY: { from: 0.8, to: 1.3 },
-          duration: 1000,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        this.doorVisuals.push(glow);
-
-      } else if (state === 'completed') {
-        // Gold checkmark badge above door (Phase 15 upgrade — persistent fanfare badge)
-        const badge = this.add.circle(doorPixelX, doorPixelY - TILE, 9, 0x2a6a2a, 1)
-          .setDepth(3);
-        this.doorVisuals.push(badge);
-        const check = this.add.text(doorPixelX, doorPixelY - TILE, '\u2713', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '9px',
-          color: '#ffd700',
-          stroke: '#000000',
-          strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(4);
-        this.doorVisuals.push(check);
-      }
-
-      // Door label (always shown)
-      const labelText = this.add.text(doorPixelX, doorPixelY + TILE, door.label, {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '6px',
-        color: state === 'locked' ? '#888888' : '#ffffff',
-        stroke: '#000000',
-        strokeThickness: 1,
-      }).setOrigin(0.5).setDepth(3);
-      // F-20 fix (Run 07): clamp inside the room bounds — edge-door labels used
-      // to truncate at the canvas edge ("Recepti", "Hallwa"). Same clamp the
-      // NPC nameplates already use.
-      {
-        const pad = 2;
-        const half = labelText.width / 2;
-        const roomPxWidth = (this.room.width ?? 20) * TILE;
-        const minX = half + pad;
-        const maxX = roomPxWidth - half - pad;
-        if (maxX >= minX) {
-          labelText.x = Phaser.Math.Clamp(labelText.x, minX, maxX);
-        }
-      }
-      this.doorVisuals.push(labelText);
-    }
-  }
 
   private onLoadRoom = (data: {
     room: any;
@@ -2936,8 +1146,8 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onUpdateDoorStates = (data: { doorStates: Record<string, 'locked' | 'available' | 'completed' | 'next'> }) => {
-    this.doorStates = data.doorStates;
-    this.renderDoorStates();
+    this.doors.setStates(data.doorStates);
+    this.doors.render();
   };
 
   private onDoorLocked = () => {
@@ -2958,60 +1168,6 @@ export class ExplorationScene extends Phaser.Scene {
       // Ignore if sound not available
     }
   };
-
-  // ── Pathfinding (BFS on tile grid) ─────────────────────────────
-  private findPath(start: Position, goal: Position): Position[] {
-    const room = this.room;
-    const queue: { pos: Position; path: Position[] }[] = [{ pos: start, path: [start] }];
-    const visited = new Set<string>();
-    visited.add(`${start.x},${start.y}`);
-
-    let closestPath: Position[] = [];
-    let closestDist = Infinity;
-
-    while (queue.length > 0) {
-      const { pos, path } = queue.shift()!;
-      const dist = Math.abs(goal.x - pos.x) + Math.abs(goal.y - pos.y);
-
-      if (dist < closestDist) {
-        closestDist = dist;
-        closestPath = path;
-      }
-
-      if (pos.x === goal.x && pos.y === goal.y) return path.slice(1);
-
-      for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
-        const nx = pos.x + dx;
-        const ny = pos.y + dy;
-        const key = `${nx},${ny}`;
-        if (visited.has(key)) continue;
-        if (nx < 0 || ny < 0 || nx >= room.width || ny >= room.height) continue;
-        if (this.tileBlocked(nx, ny)) continue;
-        visited.add(key);
-        queue.push({ pos: { x: nx, y: ny }, path: [...path, { x: nx, y: ny }] });
-      }
-    }
-
-    return closestPath.slice(1);
-  }
-
-  private tileBlocked(tx: number, ty: number): boolean {
-    const doors: Array<{ x: number; y: number }> = (this.room as any).doors || [];
-    for (const obs of this.room.obstacles) {
-      if (tx >= obs.x && tx < obs.x + obs.width && ty >= obs.y && ty < obs.y + obs.height) {
-        // Wall tiles occupied by doors (or adjacent) are passable
-        if ((obs as any).type === 'wall' && doors.some((d: any) =>
-          (d.x === tx && d.y === ty) ||
-          (d.x === tx && Math.abs(d.y - ty) <= 1) ||
-          (d.y === ty && Math.abs(d.x - tx) <= 1)
-        )) {
-          continue;
-        }
-        return true;
-      }
-    }
-    return false;
-  }
 
   private startPathMovement(path: Position[], pending: InteractableData | null) {
     // Idle frame indices per direction: down=0, left=3, right=6, up=9 (row*3+0)
@@ -3125,12 +1281,13 @@ export class ExplorationScene extends Phaser.Scene {
     } else {
       this.nearbyInteractable = null;
       // Show door prompt if near a door and no other interactable
-      if (this.nearDoor) {
-        const doorLabel = this.nearDoor.label || this.nearDoor.targetRoomId.replace(/_/g, ' ');
+      const nearDoor = this.doors.nearDoor;
+      if (nearDoor) {
+        const doorLabel = nearDoor.label || nearDoor.targetRoomId.replace(/_/g, ' ');
         // F-12 fix (Run 07): a locked door used to show the same inviting
         // "[SPACE] Enter" prompt, then honk on the attempt. Tell the truth
         // up front — the attempt feedback (red flash + alert) stays.
-        if (this.doorStates[this.nearDoor.id] === 'locked') {
+        if (this.doors.states[nearDoor.id] === 'locked') {
           this.promptText.setText(`[LOCKED] ${doorLabel} — finish this area first`);
         } else {
           this.promptText.setText(`[SPACE] Enter ${doorLabel}`);

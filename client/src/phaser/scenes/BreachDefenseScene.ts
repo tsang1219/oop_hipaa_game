@@ -4,6 +4,15 @@ import {
   GRID_COLS, GRID_ROWS, CELL_SIZE, PATHS, TOWERS, THREATS, THREAT_COLORS, WAVES, WAVE_BUDGETS,
   ENCOUNTER_WAVES_INBOUND,
 } from '../../game/breach-defense/constants';
+import { renderBattlefield } from '../systems/breach/gridRenderer';
+import {
+  playTowerPlacementFx, spawnDeathParticles, playRecoilTween, playEnemySpawnFx,
+  playImpactFx, maybeSpawnTrailGhost, maybeSpawnProjectileTrail, showKillLabel,
+  playBreachBorderFlash,
+} from '../systems/breach/battleVfx';
+import {
+  playWaveClearedFx, playVictoryFx, playGameOverFx, runPrepCountdown,
+} from '../systems/breach/celebrationVfx';
 
 type TowerType = keyof typeof TOWERS;
 type ThreatType = keyof typeof THREATS;
@@ -232,386 +241,13 @@ export class BreachDefenseScene extends Phaser.Scene {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdown, this);
 
-    // ── Draw grid ──────────────────────────────────────────────
-    const pathSet = new Set<string>();
-    PATHS[0].forEach(p => pathSet.add(`${p.x},${p.y}`));
-
-    // Build a direction map for path cells so we can draw directional indicators
-    const pathDirMap = new Map<string, { dx: number; dy: number }>();
-    for (let i = 0; i < PATHS[0].length - 1; i++) {
-      const curr = PATHS[0][i];
-      const next = PATHS[0][i + 1];
-      pathDirMap.set(`${curr.x},${curr.y}`, { dx: next.x - curr.x, dy: next.y - curr.y });
-    }
-
-    const gridGfx = this.add.graphics().setDepth(0);
-
-    // Simple seeded random for deterministic circuit-trace placement
-    const seededRand = (x: number, y: number): number => {
-      let h = (x * 374761393 + y * 668265263 + 1274126177) | 0;
-      h = ((h ^ (h >> 13)) * 1274126177) | 0;
-      return (h >>> 0) / 4294967296;
-    };
-
-    for (let y = 0; y < GRID_ROWS; y++) {
-      for (let x = 0; x < GRID_COLS; x++) {
-        const isPath = pathSet.has(`${x},${y}`);
-        const cx = x * CELL_SIZE + CELL_SIZE / 2;
-        const cy = y * CELL_SIZE + CELL_SIZE / 2;
-
-        // Cell fill: tech-themed colors — path cells distinctly purple, non-path blue-gray
-        let shade: number;
-        if (isPath) {
-          shade = (x + y) % 2 === 0 ? 0x503d78 : 0x483870;
-        } else {
-          shade = (x + y) % 2 === 0 ? 0x1e2240 : 0x1a1e3a;
-        }
-
-        gridGfx.fillStyle(shade, 1);
-        gridGfx.fillRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-
-        // 1px grid lines between cells
-        gridGfx.lineStyle(1, 0x4a4d8e, 0.7);
-        gridGfx.strokeRect(x * CELL_SIZE, y * CELL_SIZE, CELL_SIZE, CELL_SIZE);
-
-        // Path cells get extra visual treatment
-        if (isPath) {
-          // Subtle inner border to highlight the path lane
-          gridGfx.lineStyle(1, 0x7b6ba5, 0.4);
-          gridGfx.strokeRect(x * CELL_SIZE + 3, y * CELL_SIZE + 3, CELL_SIZE - 6, CELL_SIZE - 6);
-
-          // Path channel glow — lighter center strip
-          gridGfx.fillStyle(0x6b5b8e, 0.2);
-          gridGfx.fillRect(cx - 20, cy - 20, 40, 40);
-
-          // Directional dot: larger and brighter so the path route is obvious
-          const dir = pathDirMap.get(`${x},${y}`);
-          if (dir) {
-            gridGfx.fillStyle(0x9b8bbf, 0.7);
-            gridGfx.fillCircle(cx + dir.dx * 14, cy + dir.dy * 14, 4);
-            // Secondary smaller dot closer to center for a "trail" feel
-            gridGfx.fillStyle(0x7b6b9f, 0.45);
-            gridGfx.fillCircle(cx + dir.dx * 4, cy + dir.dy * 4, 3);
-          } else {
-            // Last path cell: draw a target-like indicator
-            gridGfx.fillStyle(0xbb4444, 0.6);
-            gridGfx.fillCircle(cx, cy, 5);
-            gridGfx.fillStyle(0xff6666, 0.4);
-            gridGfx.fillCircle(cx, cy, 2);
-          }
-        } else {
-          // Non-path cells: PCB pad corners for a circuit board feel
-          gridGfx.fillStyle(0x4a5d7e, 0.2);
-          gridGfx.fillRect(x * CELL_SIZE, y * CELL_SIZE, 3, 3);
-          gridGfx.fillRect(x * CELL_SIZE + CELL_SIZE - 3, y * CELL_SIZE, 3, 3);
-          gridGfx.fillRect(x * CELL_SIZE, y * CELL_SIZE + CELL_SIZE - 3, 3, 3);
-          gridGfx.fillRect(x * CELL_SIZE + CELL_SIZE - 3, y * CELL_SIZE + CELL_SIZE - 3, 3, 3);
-
-          // Circuit-trace decoration on ~30% of empty cells
-          const rVal = seededRand(x, y);
-          if (rVal < 0.3) {
-            const cellLeft = x * CELL_SIZE;
-            const cellTop = y * CELL_SIZE;
-            gridGfx.lineStyle(1, 0x3a4d6e, 0.3);
-            if (rVal < 0.15) {
-              // Horizontal trace with dot at end
-              const traceY = cellTop + 20 + Math.floor(seededRand(x + 7, y + 3) * 24);
-              const startX = cellLeft + 8;
-              const traceLen = 18 + Math.floor(seededRand(x + 13, y + 5) * 20);
-              gridGfx.beginPath();
-              gridGfx.moveTo(startX, traceY);
-              gridGfx.lineTo(startX + traceLen, traceY);
-              gridGfx.strokePath();
-              gridGfx.fillStyle(0x4a6d8e, 0.35);
-              gridGfx.fillCircle(startX + traceLen, traceY, 1.5);
-            } else {
-              // Vertical trace with dot at end
-              const traceX = cellLeft + 20 + Math.floor(seededRand(x + 11, y + 7) * 24);
-              const startY = cellTop + 8;
-              const traceLen = 18 + Math.floor(seededRand(x + 17, y + 9) * 20);
-              gridGfx.beginPath();
-              gridGfx.moveTo(traceX, startY);
-              gridGfx.lineTo(traceX, startY + traceLen);
-              gridGfx.strokePath();
-              gridGfx.fillStyle(0x4a6d8e, 0.35);
-              gridGfx.fillCircle(traceX, startY + traceLen, 1.5);
-            }
-          }
-
-          // Data center rack indicator on ~15% of non-path cells
-          if (rVal >= 0.3 && rVal < 0.45) {
-            gridGfx.fillStyle(0x2a3d5e, 0.2);
-            gridGfx.fillRect(x * CELL_SIZE + 16, y * CELL_SIZE + 8, 32, 48);
-            gridGfx.fillStyle(0x3a5d8e, 0.15);
-            // Server LEDs
-            for (let led = 0; led < 3; led++) {
-              gridGfx.fillRect(x * CELL_SIZE + 20, y * CELL_SIZE + 14 + led * 12, 4, 2);
-            }
-          }
-        }
-      }
-    }
-
-    // Grid intersection nodes (circuit board feel)
-    for (let y = 0; y <= GRID_ROWS; y++) {
-      for (let x = 0; x <= GRID_COLS; x++) {
-        gridGfx.fillStyle(0x4a5d7e, 0.3);
-        gridGfx.fillCircle(x * CELL_SIZE, y * CELL_SIZE, 2);
-      }
-    }
-
-    // Path glow strip — a bright line along the path centerline
-    const pathGlow = this.add.graphics().setDepth(1);
-    pathGlow.lineStyle(2, 0x7b5baf, 0.15);
-    pathGlow.beginPath();
-    for (let i = 0; i < PATHS[0].length; i++) {
-      const p = PATHS[0][i];
-      const pcx = p.x * CELL_SIZE + CELL_SIZE / 2;
-      const pcy = p.y * CELL_SIZE + CELL_SIZE / 2;
-      if (i === 0) {
-        pathGlow.moveTo(pcx, pcy);
-      } else {
-        pathGlow.lineTo(pcx, pcy);
-      }
-    }
-    pathGlow.strokePath();
-
-    // Path edge highlights — thin brighter lines along path borders
-    const pathEdge = this.add.graphics().setDepth(1);
-    pathEdge.lineStyle(1, 0x9b7bdf, 0.1);
-    for (const p of PATHS[0]) {
-      const cx = p.x * CELL_SIZE;
-      const cy = p.y * CELL_SIZE;
-      // Check which sides are NOT adjacent to path
-      const hasLeft = pathSet.has(`${p.x - 1},${p.y}`);
-      const hasRight = pathSet.has(`${p.x + 1},${p.y}`);
-      const hasUp = pathSet.has(`${p.x},${p.y - 1}`);
-      const hasDown = pathSet.has(`${p.x},${p.y + 1}`);
-
-      if (!hasLeft) {
-        pathEdge.beginPath();
-        pathEdge.moveTo(cx, cy);
-        pathEdge.lineTo(cx, cy + CELL_SIZE);
-        pathEdge.strokePath();
-      }
-      if (!hasRight) {
-        pathEdge.beginPath();
-        pathEdge.moveTo(cx + CELL_SIZE, cy);
-        pathEdge.lineTo(cx + CELL_SIZE, cy + CELL_SIZE);
-        pathEdge.strokePath();
-      }
-      if (!hasUp) {
-        pathEdge.beginPath();
-        pathEdge.moveTo(cx, cy);
-        pathEdge.lineTo(cx + CELL_SIZE, cy);
-        pathEdge.strokePath();
-      }
-      if (!hasDown) {
-        pathEdge.beginPath();
-        pathEdge.moveTo(cx, cy + CELL_SIZE);
-        pathEdge.lineTo(cx + CELL_SIZE, cy + CELL_SIZE);
-        pathEdge.strokePath();
-      }
-    }
-
-    // Path entry portal glow (where enemies spawn)
-    const pathStart = PATHS[0][0];
-    const startX = (pathStart.x - 1) * CELL_SIZE + CELL_SIZE / 2;
-    const startY = pathStart.y * CELL_SIZE + CELL_SIZE / 2;
-    const entryGlow = this.add.circle(startX, startY, 20, 0x9b59b6, 0)
-      .setStrokeStyle(2, 0x9b59b6, 0.4)
-      .setDepth(2);
-    this.tweens.add({
-      targets: entryGlow,
-      scale: { from: 0.6, to: 1.4 },
-      strokeAlpha: { from: 0.5, to: 0 },
-      duration: 1500,
-      repeat: -1,
-      ease: 'Sine.easeOut'
-    });
-
-    // Path exit portal glow (breach point — red/danger)
-    const pathEnd = PATHS[0][PATHS[0].length - 1];
-    const endX = pathEnd.x * CELL_SIZE + CELL_SIZE / 2;
-    const endY = pathEnd.y * CELL_SIZE + CELL_SIZE / 2;
-    const exitGlow = this.add.circle(endX, endY, 20, 0xff4444, 0)
-      .setStrokeStyle(2, 0xff4444, 0.4)
-      .setDepth(2);
-    this.tweens.add({
-      targets: exitGlow,
-      scale: { from: 0.6, to: 1.4 },
-      strokeAlpha: { from: 0.5, to: 0 },
-      duration: 1500,
-      repeat: -1,
-      ease: 'Sine.easeOut'
-    });
-
-    // ── Header bar: network defense grid label ───────────────
-    const headerGfx = this.add.graphics().setDepth(8);
-    headerGfx.fillStyle(0x0e1020, 0.85);
-    headerGfx.fillRect(0, 0, GRID_COLS * CELL_SIZE, 20);
-    // Thin bottom border on the header
-    headerGfx.lineStyle(1, 0x3a5d8e, 0.6);
-    headerGfx.beginPath();
-    headerGfx.moveTo(0, 20);
-    headerGfx.lineTo(GRID_COLS * CELL_SIZE, 20);
-    headerGfx.strokePath();
-
-    this.headerText = this.add.text(GRID_COLS * CELL_SIZE / 2, 10, 'NETWORK DEFENSE GRID', {
-      fontFamily: '"Press Start 2P"',
-      fontSize: '7px',
-      color: '#00d4aa',
-      align: 'center'
-    }).setOrigin(0.5, 0.5).setDepth(9);
-
-    // Status LED indicators in header
-    const ledG = this.add.graphics().setDepth(9);
-    // Green status LED (left of header)
-    ledG.fillStyle(0x00ff00, 0.6);
-    ledG.fillCircle(20, 10, 3);
-    ledG.fillStyle(0x00ff00, 0.2);
-    ledG.fillCircle(20, 10, 5);
-    // Red status LED (right of header)
-    ledG.fillStyle(0xff4444, 0.4);
-    ledG.fillCircle(GRID_COLS * CELL_SIZE - 20, 10, 3);
-
-    // Pulse tween on header — subtle alpha oscillation like an active monitor
-    this.tweens.add({
-      targets: this.headerText,
-      alpha: 0.7,
-      duration: 2000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-
-    // Column labels (A-J) just below the header bar
-    const colLabels = 'ABCDEFGHIJ';
-    for (let c = 0; c < GRID_COLS; c++) {
-      this.add.text(c * CELL_SIZE + CELL_SIZE / 2, 26, colLabels[c], {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '5px',
-        color: '#3a5d8e',
-        align: 'center'
-      }).setOrigin(0.5, 0.5).setDepth(9).setAlpha(0.8);
-    }
-
-    // Row labels (1-6) along the left edge
-    for (let r = 0; r < GRID_ROWS; r++) {
-      this.add.text(4, r * CELL_SIZE + CELL_SIZE / 2, `${r + 1}`, {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '5px',
-        color: '#3a5d8e',
-        align: 'left'
-      }).setOrigin(0, 0.5).setDepth(1).setAlpha(0.8);
-    }
-
-    // ── Bottom area: terminal status panel ───────────────────
-    const bottomY = GRID_ROWS * CELL_SIZE;
-    const bottomH = 96;
-    const bottomGfx = this.add.graphics().setDepth(0);
-    // Dark background fill
-    bottomGfx.fillStyle(0x141628, 1);
-    bottomGfx.fillRect(0, bottomY, GRID_COLS * CELL_SIZE, bottomH);
-    // Thin bright separator line at the top
-    bottomGfx.lineStyle(1, 0x3a5d8e, 0.8);
-    bottomGfx.beginPath();
-    bottomGfx.moveTo(0, bottomY);
-    bottomGfx.lineTo(GRID_COLS * CELL_SIZE, bottomY);
-    bottomGfx.strokePath();
-    // Double-line border effect
-    bottomGfx.lineStyle(1, 0x2a3d5e, 0.4);
-    bottomGfx.beginPath();
-    bottomGfx.moveTo(0, bottomY + 3);
-    bottomGfx.lineTo(GRID_COLS * CELL_SIZE, bottomY + 3);
-    bottomGfx.strokePath();
-    // Faint scan lines for terminal aesthetic
-    for (let sy = bottomY + 2; sy < bottomY + bottomH; sy += 4) {
-      bottomGfx.fillStyle(0xffffff, 0.012);
-      bottomGfx.fillRect(0, sy, GRID_COLS * CELL_SIZE, 1);
-    }
-
-    // Terminal area is now covered by React HUD overlay — keep minimal decorations only
-    // Status text (hidden behind overlay but updated for state tracking)
-    const statusFont = { fontFamily: '"Press Start 2P"', fontSize: '6px', color: '#2a8a5a' };
-    this.statusText = this.add.text(10, bottomY + 14, 'AWAITING AUTHORIZATION...', statusFont)
-      .setDepth(1).setAlpha(0.2);
-    this.statusCursor = this.add.text(10, bottomY + 26, '_', statusFont)
-      .setDepth(1).setAlpha(0.2);
-
-    // Wave counter — top-right of bottom panel (peeks through semi-transparent overlay)
-    this.waveCounterText = this.add.text(
-      GRID_COLS * CELL_SIZE - 10, bottomY + 10,
-      `WAVE ${this.wave}/${this.getActiveWaves().length}`,
-      { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#00d4aa' }
-    ).setOrigin(1, 0).setDepth(9).setAlpha(0.3);
-
-    // ── Vignette overlay — subtle edge darkening for cinematic framing ──
-    const camW = this.cameras.main.width;
-    const camH = this.cameras.main.height;
-    const vignette = this.add.graphics();
-    // Outer ring: 16px border at 20% opacity
-    vignette.fillStyle(0x000000, 0.2);
-    vignette.fillRect(0, 0, camW, 16);               // top
-    vignette.fillRect(0, camH - 16, camW, 16);       // bottom
-    vignette.fillRect(0, 16, 16, camH - 32);         // left
-    vignette.fillRect(camW - 16, 16, 16, camH - 32); // right
-    // Inner ring: next 16px at 10% opacity
-    vignette.fillStyle(0x000000, 0.1);
-    vignette.fillRect(16, 16, camW - 32, 16);               // top inner
-    vignette.fillRect(16, camH - 32, camW - 32, 16);        // bottom inner
-    vignette.fillRect(16, 32, 16, camH - 64);               // left inner
-    vignette.fillRect(camW - 32, 32, 16, camH - 64);        // right inner
-    vignette.setDepth(50);
-    vignette.setScrollFactor(0);
-
-    // ── Animated scan line — faint horizontal sweep like a network monitor ──
-    const gridWidth = GRID_COLS * CELL_SIZE;
-    const scanTop = 20;
-    const scanBottom = GRID_ROWS * CELL_SIZE;
-    this.scanLine = this.add.rectangle(gridWidth / 2, scanTop, gridWidth, 2, 0x00d4aa, 0.08)
-      .setDepth(3);
-    this.tweens.add({
-      targets: this.scanLine,
-      y: scanBottom,
-      duration: 4000,
-      repeat: -1,
-      ease: 'Linear',
-      onRepeat: () => {
-        if (this.scanLine) this.scanLine.y = scanTop;
-      }
-    });
-
-    // ── Corner bracket decorations on the grid frame ──
-    const gridRight = GRID_COLS * CELL_SIZE;
-    const gridBottom = GRID_ROWS * CELL_SIZE;
-    const bracketGfx = this.add.graphics().setDepth(8);
-    const bracketLen = 12;
-    bracketGfx.lineStyle(1, 0x00d4aa, 0.4);
-    // Top-left bracket
-    bracketGfx.beginPath();
-    bracketGfx.moveTo(0, bracketLen);
-    bracketGfx.lineTo(0, 0);
-    bracketGfx.lineTo(bracketLen, 0);
-    bracketGfx.strokePath();
-    // Top-right bracket
-    bracketGfx.beginPath();
-    bracketGfx.moveTo(gridRight - bracketLen, 0);
-    bracketGfx.lineTo(gridRight, 0);
-    bracketGfx.lineTo(gridRight, bracketLen);
-    bracketGfx.strokePath();
-    // Bottom-left bracket
-    bracketGfx.beginPath();
-    bracketGfx.moveTo(0, gridBottom - bracketLen);
-    bracketGfx.lineTo(0, gridBottom);
-    bracketGfx.lineTo(bracketLen, gridBottom);
-    bracketGfx.strokePath();
-    // Bottom-right bracket
-    bracketGfx.beginPath();
-    bracketGfx.moveTo(gridRight - bracketLen, gridBottom);
-    bracketGfx.lineTo(gridRight, gridBottom);
-    bracketGfx.lineTo(gridRight, gridBottom - bracketLen);
-    bracketGfx.strokePath();
+    const { headerText, statusText, statusCursor, waveCounterText, scanLine, pathSet } =
+      renderBattlefield(this, this.wave, this.getActiveWaves().length);
+    this.headerText = headerText;
+    this.statusText = statusText;
+    this.statusCursor = statusCursor;
+    this.waveCounterText = waveCounterText;
+    this.scanLine = scanLine;
 
     // ── Hover indicator ────────────────────────────────────────
     this.hoverRect = this.add.rectangle(0, 0, CELL_SIZE - 2, CELL_SIZE - 2)
@@ -760,28 +396,6 @@ export class BreachDefenseScene extends Phaser.Scene {
     // Scene entrance fade-in (matching Hub and Exploration)
     this.cameras.main.fadeIn(400, 0, 0, 0);
 
-    // "System Online" startup text
-    const startupText = this.add.text(
-      GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
-      'SYSTEM ONLINE',
-      { fontFamily: '"Press Start 2P"', fontSize: '10px', color: '#00d4aa', stroke: '#000000', strokeThickness: 2 }
-    ).setOrigin(0.5).setDepth(50).setAlpha(0);
-
-    this.tweens.add({
-      targets: startupText,
-      alpha: { from: 0, to: 0.8 },
-      duration: 400,
-      delay: 200,
-      onComplete: () => {
-        this.tweens.add({
-          targets: startupText,
-          alpha: 0,
-          duration: 600,
-          delay: 800,
-          onComplete: () => startupText.destroy()
-        });
-      }
-    });
   }
 
   // ── Event handlers ─────────────────────────────────────────────
@@ -859,54 +473,10 @@ export class BreachDefenseScene extends Phaser.Scene {
     if (this.waveState.active) return;
     this.gameState = 'PLAYING';
 
-    const totalSeconds = 8;
-    const countdownText = this.add.text(
-      GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2 - 20,
-      '',
-      { fontFamily: '"Press Start 2P"', fontSize: '11px', color: '#00d4aa', stroke: '#000000', strokeThickness: 3 }
-    ).setOrigin(0.5).setDepth(50);
-
-    const hintText = this.add.text(
-      GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2 + 10,
-      'PLACE YOUR DEFENSES',
-      { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#8888aa', stroke: '#000000', strokeThickness: 2 }
-    ).setOrigin(0.5).setDepth(50);
-
-    this.tweens.add({
-      targets: hintText,
-      alpha: { from: 0.4, to: 1 },
-      duration: 800,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
+    runPrepCountdown(this, 8, () => {
+      this.activateWave();
+      this.waveState.nextSpawnTime = this.time.now + 1500;
     });
-
-    let remaining = totalSeconds;
-    const tick = () => {
-      if (remaining <= 0) {
-        countdownText.destroy();
-        hintText.destroy();
-        this.activateWave();
-        this.waveState.nextSpawnTime = this.time.now + 1500;
-        return;
-      }
-      countdownText.setText(`Wave starts in ${remaining}...`);
-      // Pulse effect on each tick
-      this.tweens.add({
-        targets: countdownText,
-        scale: { from: 1.15, to: 1 },
-        duration: 300,
-        ease: 'Back.easeOut'
-      });
-      if (remaining <= 3) {
-        countdownText.setColor('#ff6644');
-        this.sound.play('sfx_interact', { volume: 0.2 });
-      }
-      remaining--;
-      this.time.delayedCall(1000, tick);
-    };
-
-    tick();
     this.broadcastState();
   }
 
@@ -989,10 +559,6 @@ export class BreachDefenseScene extends Phaser.Scene {
       .setDisplaySize(56, 56)
       .setDepth(10);
 
-    // Capture the base scale set by setDisplaySize (varies per PNG resolution)
-    const baseScaleX = sprite.scaleX;
-    const baseScaleY = sprite.scaleY;
-
     const tower: TowerData = {
       id: Phaser.Math.RND.uuid(),
       type,
@@ -1005,111 +571,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     this.sound.play('sfx_tower_place', { volume: 0.5 });
 
-    // ── Tower placement visual burst ──
-    const towerColor = parseInt(stats.color.replace('#', ''), 16);
-    // Particle burst at placement point
-    const placeEmitter = this.add.particles(px, py, 'particle_circle', {
-      speed: { min: 30, max: 80 },
-      angle: { min: 0, max: 360 },
-      scale: { start: 0.8, end: 0 },
-      alpha: { start: 1, end: 0 },
-      lifespan: 250,
-      tint: towerColor,
-      frequency: -1
-    });
-    placeEmitter.setDepth(18);
-    placeEmitter.explode(8);
-    this.time.delayedCall(350, () => {
-      if (placeEmitter && placeEmitter.active) placeEmitter.destroy();
-    });
-
-    // Scale pulse on the newly placed tower sprite (relative to display size)
-    sprite.setScale(baseScaleX * 0.5, baseScaleY * 0.5);
-    this.tweens.add({
-      targets: sprite,
-      scaleX: { from: baseScaleX * 0.5, to: baseScaleX },
-      scaleY: { from: baseScaleY * 0.5, to: baseScaleY },
-      duration: 350,
-      ease: 'Back.easeOut',
-      onComplete: () => {
-        sprite.setScale(baseScaleX, baseScaleY);
-        // Idle breathing animation for placed towers
-        this.tweens.add({
-          targets: sprite,
-          y: py - 2,
-          duration: 1200 + Math.random() * 600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
-        });
-      }
-    });
-
-    // Tower base glow (placed beneath tower)
-    const baseGlow = this.add.ellipse(px, py + 20, 40, 16, towerColor, 0.15)
-      .setDepth(9);
-    // Subtle pulse on base glow
-    this.tweens.add({
-      targets: baseGlow,
-      alpha: { from: 0.15, to: 0.08 },
-      scaleX: { from: 1, to: 1.1 },
-      duration: 2000,
-      yoyo: true,
-      repeat: -1,
-      ease: 'Sine.easeInOut'
-    });
-
-    // Tower status ring (always-visible range indicator)
-    const statusRing = this.add.circle(px, py, stats.range * CELL_SIZE * 0.3, 0x000000, 0)
-      .setStrokeStyle(1, towerColor, 0.12)
-      .setDepth(8);
-
-    // Brief glow ring that scales up and fades out
-    const glowRing = this.add.circle(px, py, 8, towerColor, 0.4)
-      .setStrokeStyle(2, towerColor, 0.6)
-      .setDepth(9);
-    this.tweens.add({
-      targets: glowRing,
-      scale: 3,
-      alpha: 0,
-      duration: 400,
-      ease: 'Quad.easeOut',
-      onComplete: () => glowRing.destroy()
-    });
-
-    // Tower type label beneath sprite
-    const labelText = this.add.text(px, py + 28, type, {
-      fontFamily: '"Press Start 2P"',
-      fontSize: '4px',
-      color: stats.color,
-      stroke: '#000000',
-      strokeThickness: 1,
-    }).setOrigin(0.5).setDepth(11).setAlpha(0.6);
-
-    // Draw connection lines to nearby towers
-    for (const other of this.towers) {
-      if (other.id === tower.id) continue;
-      const dx = other.gridX - gridX;
-      const dy = other.gridY - gridY;
-      const dist = Math.sqrt(dx * dx + dy * dy);
-      if (dist <= 2) { // Adjacent or diagonal
-        const line = this.add.graphics().setDepth(1);
-        line.lineStyle(1, 0x3a5d8e, 0.2);
-        line.beginPath();
-        line.moveTo(px, py);
-        line.lineTo(other.gridX * CELL_SIZE + CELL_SIZE / 2, other.gridY * CELL_SIZE + CELL_SIZE / 2);
-        line.strokePath();
-
-        // Fade in
-        line.setAlpha(0);
-        this.tweens.add({
-          targets: line,
-          alpha: 1,
-          duration: 400,
-          ease: 'Sine.easeIn'
-        });
-      }
-    }
+    playTowerPlacementFx(this, sprite, px, py, type, stats, this.towers, tower.id, gridX, gridY);
 
     // Wave spawning is controlled by the prep countdown — not by tower placement
 
@@ -1150,15 +612,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       .setDepth(15);
 
     // Dramatic entrance animation — spawn from nothing
-    sprite.setAlpha(0).setScale(0.3);
-    this.tweens.add({
-      targets: sprite,
-      alpha: 1,
-      scaleX: enemySize / sprite.width,
-      scaleY: enemySize / sprite.height,
-      duration: 300,
-      ease: 'Back.easeOut'
-    });
+    playEnemySpawnFx(this, sprite, enemySize);
 
     // HP bar background
     const hpBarBg = this.add.rectangle(px, py - 30, 40, 5, 0x333333)
@@ -1198,39 +652,6 @@ export class BreachDefenseScene extends Phaser.Scene {
       strongFlashColor: 0
     };
     this.enemies.push(enemy);
-  }
-
-  // ── VFX Helpers ────────────────────────────────────────────────
-
-  private spawnDeathParticles(x: number, y: number, color: number): void {
-    if (!this.scene.isActive()) return;
-    const emitter = this.add.particles(x, y, 'particle_circle', {
-      speed: { min: 40, max: 110 },
-      angle: { min: 0, max: 360 },
-      scale: { start: 1.2, end: 0 },
-      alpha: { start: 1, end: 0 },
-      lifespan: 300,
-      tint: color,
-      frequency: -1
-    });
-    emitter.setDepth(18);
-    emitter.explode(10);
-    this.time.delayedCall(400, () => {
-      if (emitter && emitter.active) emitter.destroy();
-    });
-  }
-
-  private playRecoilTween(sprite: Phaser.GameObjects.Sprite): void {
-    // Use relative scale — tower PNGs are 1024x1024, displayed at 56x56
-    const baseX = sprite.scaleX;
-    const baseY = sprite.scaleY;
-    this.tweens.add({
-      targets: sprite,
-      scaleX: [baseX, baseX * 1.15, baseX * 0.95, baseX],
-      scaleY: [baseY, baseY * 1.15, baseY * 0.95, baseY],
-      duration: 200,
-      ease: 'Quad.easeOut'
-    });
   }
 
   // ── Helpers ────────────────────────────────────────────────────
@@ -1389,72 +810,7 @@ export class BreachDefenseScene extends Phaser.Scene {
           const waveKills = this.waveKillCount;
           this.waveKillCount = 0;
 
-          // ── Wave complete celebration effects ──
-          this.sound.play('sfx_wave_start', { volume: 0.5, rate: 1.2 });
-          this.cameras.main.flash(400, 100, 255, 100, false);
-          this.cameras.main.shake(200, 0.008);
-
-          const clearedText = this.add.text(
-            GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
-            `WAVE ${this.wave} CLEARED!`,
-            { fontFamily: '"Press Start 2P"', fontSize: '14px', color: '#44ff44', stroke: '#000000', strokeThickness: 3 }
-          ).setOrigin(0.5).setDepth(50).setAlpha(0);
-
-          this.tweens.add({
-            targets: clearedText,
-            alpha: 1, scale: { from: 0.3, to: 1.2 },
-            duration: 400, ease: 'Back.easeOut',
-            onComplete: () => {
-              this.tweens.add({
-                targets: clearedText,
-                alpha: 0, y: clearedText.y - 40,
-                duration: 600, delay: 800, ease: 'Quad.easeIn',
-                onComplete: () => clearedText.destroy()
-              });
-            }
-          });
-
-          // Wave stats beneath the cleared text
-          const statsText = this.add.text(
-            GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2 + 25,
-            `${waveKills} threats stopped`,
-            { fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#aaffaa', stroke: '#000000', strokeThickness: 2 }
-          ).setOrigin(0.5).setDepth(50).setAlpha(0);
-
-          this.tweens.add({
-            targets: statsText,
-            alpha: 1,
-            duration: 300,
-            delay: 400,
-            ease: 'Sine.easeOut',
-            onComplete: () => {
-              this.tweens.add({
-                targets: statsText,
-                alpha: 0,
-                duration: 400,
-                delay: 1000,
-                onComplete: () => statsText.destroy()
-              });
-            }
-          });
-
-          // Celebration particles at center of grid
-          const celebCenterX = GRID_COLS * CELL_SIZE / 2;
-          const celebCenterY = GRID_ROWS * CELL_SIZE / 2;
-          const celebEmitter = this.add.particles(celebCenterX, celebCenterY, 'particle_circle', {
-            speed: { min: 40, max: 110 },
-            angle: { min: 0, max: 360 },
-            scale: { start: 1.2, end: 0 },
-            alpha: { start: 1, end: 0 },
-            lifespan: 400,
-            tint: 0x44ff44,
-            frequency: -1
-          });
-          celebEmitter.setDepth(18);
-          celebEmitter.explode(20);
-          this.time.delayedCall(500, () => {
-            if (celebEmitter && celebEmitter.active) celebEmitter.destroy();
-          });
+          playWaveClearedFx(this, this.wave, waveKills);
 
           this.wave++;
 
@@ -1507,78 +863,7 @@ export class BreachDefenseScene extends Phaser.Scene {
           // Victory!
           this.gameState = 'VICTORY';
 
-          // ── Victory celebration effects ──
-          this.cameras.main.flash(800, 255, 215, 0, false);
-          this.cameras.main.shake(400, 0.012);
-
-          // Confetti-like particle bursts at random positions
-          const confettiColors = [0xffd700, 0x44ff44, 0x00d4aa, 0xffffff];
-          for (let i = 0; i < 5; i++) {
-            const cx = Phaser.Math.Between(CELL_SIZE * 2, (GRID_COLS - 2) * CELL_SIZE);
-            const cy = Phaser.Math.Between(CELL_SIZE * 2, (GRID_ROWS - 2) * CELL_SIZE);
-            const confettiEmitter = this.add.particles(cx, cy, 'particle_circle', {
-              speed: { min: 50, max: 140 },
-              angle: { min: 0, max: 360 },
-              scale: { start: 1.0, end: 0 },
-              alpha: { start: 1, end: 0 },
-              lifespan: 600,
-              tint: confettiColors[i % confettiColors.length],
-              frequency: -1
-            });
-            confettiEmitter.setDepth(18);
-            confettiEmitter.explode(12);
-            this.time.delayedCall(700, () => {
-              if (confettiEmitter && confettiEmitter.active) confettiEmitter.destroy();
-            });
-          }
-
-          // Second round of confetti after a beat — extended celebration
-          this.time.delayedCall(1500, () => {
-            if (!this.scene.isActive()) return;
-            for (let i = 0; i < 3; i++) {
-              const rx = Math.random() * GRID_COLS * CELL_SIZE;
-              const ry = Math.random() * GRID_ROWS * CELL_SIZE * 0.5;
-              const colors = [0xffd700, 0x44ff44, 0x00d4aa, 0xff6b9d];
-              this.spawnDeathParticles(rx, ry, colors[i % colors.length]);
-            }
-          });
-
-          // Golden victory screen tint
-          const victoryTint = this.add.rectangle(
-            GRID_COLS * CELL_SIZE / 2, (GRID_ROWS * CELL_SIZE + 96) / 2,
-            GRID_COLS * CELL_SIZE, GRID_ROWS * CELL_SIZE + 96,
-            0xffd700, 0
-          ).setDepth(40);
-          this.tweens.add({
-            targets: victoryTint,
-            fillAlpha: 0.05,
-            duration: 1000,
-            delay: 500,
-            yoyo: true,
-            repeat: 1,
-            onComplete: () => victoryTint.destroy()
-          });
-
-          // "NETWORK SECURED!" dramatic text
-          const victoryText = this.add.text(
-            GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
-            'NETWORK SECURED!',
-            { fontFamily: '"Press Start 2P"', fontSize: '18px', color: '#ffd700', stroke: '#000000', strokeThickness: 4 }
-          ).setOrigin(0.5).setDepth(50).setAlpha(0);
-
-          this.tweens.add({
-            targets: victoryText,
-            alpha: 1, scale: { from: 0.2, to: 1.3 },
-            duration: 500, ease: 'Back.easeOut',
-            onComplete: () => {
-              this.tweens.add({
-                targets: victoryText,
-                alpha: 0, y: victoryText.y - 50,
-                duration: 800, delay: 1200, ease: 'Quad.easeIn',
-                onComplete: () => victoryText.destroy()
-              });
-            }
-          });
+          playVictoryFx(this);
 
           if (this.encounterId === null) {
             eventBridge.emit(BRIDGE_EVENTS.BREACH_VICTORY, {
@@ -1625,20 +910,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       const py = ey * CELL_SIZE + CELL_SIZE / 2;
       enemy.sprite.setPosition(px, py);
       // Trail ghost for moving enemies (every ~200ms)
-      if (Math.random() < 0.08) { // ~8% chance per frame ≈ every 200ms at 60fps
-        const ghost = this.add.sprite(enemy.sprite.x, enemy.sprite.y, enemy.sprite.texture.key)
-          .setDisplaySize(48, 48)
-          .setAlpha(0.3)
-          .setTint(THREAT_COLORS[enemy.type] || 0xffffff)
-          .setDepth(14);
-        this.tweens.add({
-          targets: ghost,
-          alpha: 0,
-          scale: ghost.scaleX * 0.7,
-          duration: 400,
-          onComplete: () => ghost.destroy()
-        });
-      }
+      maybeSpawnTrailGhost(this, enemy.sprite, THREAT_COLORS[enemy.type] || 0xffffff);
       enemy.hpBarBg.setPosition(px, py - 30);
       enemy.hpBarFill.setPosition(px, py - 30);
       enemy.hpBarBorder.setPosition(px, py - 30);
@@ -1681,18 +953,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.sound.play('sfx_breach_alert', { volume: 0.85 });
 
       // ── Breach alert screen edge pulse ──
-      const borderFlash = this.add.rectangle(
-        GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
-        GRID_COLS * CELL_SIZE, GRID_ROWS * CELL_SIZE
-      ).setStrokeStyle(4, 0xff0000, 0.8).setFillStyle(0xff0000, 0.1).setDepth(40);
-
-      this.tweens.add({
-        targets: borderFlash,
-        alpha: 0, duration: 400, ease: 'Quad.easeOut',
-        onComplete: () => borderFlash.destroy()
-      });
-
-      this.cameras.main.shake(150, 0.005);
+      playBreachBorderFlash(this);
 
       for (const enemy of breaching) {
         enemy.sprite.destroy();
@@ -1705,47 +966,7 @@ export class BreachDefenseScene extends Phaser.Scene {
       if (this.securityScore <= 0) {
         this.gameState = 'GAMEOVER';
 
-        // ── Game over effects ──
-        this.cameras.main.flash(600, 255, 50, 50, false);
-        this.cameras.main.shake(500, 0.015);
-
-        // "SYSTEM COMPROMISED" text with red glitch-like entrance
-        const gameOverText = this.add.text(
-          GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2,
-          'SYSTEM COMPROMISED',
-          { fontFamily: '"Press Start 2P"', fontSize: '14px', color: '#ff3333', stroke: '#000000', strokeThickness: 4 }
-        ).setOrigin(0.5).setDepth(50).setAlpha(0);
-
-        // Glitch effect: rapid x-offset jitter then settle
-        this.tweens.add({
-          targets: gameOverText,
-          alpha: 1,
-          duration: 100,
-          onComplete: () => {
-            // Jitter phase
-            let jitterCount = 0;
-            const jitterEvent = this.time.addEvent({
-              delay: 50,
-              repeat: 7,
-              callback: () => {
-                jitterCount++;
-                gameOverText.x = GRID_COLS * CELL_SIZE / 2 + Phaser.Math.Between(-8, 8);
-                gameOverText.y = GRID_ROWS * CELL_SIZE / 2 + Phaser.Math.Between(-3, 3);
-              }
-            });
-            this.time.delayedCall(400, () => {
-              jitterEvent.destroy();
-              gameOverText.setPosition(GRID_COLS * CELL_SIZE / 2, GRID_ROWS * CELL_SIZE / 2);
-              // Fade out after settling
-              this.tweens.add({
-                targets: gameOverText,
-                alpha: 0,
-                duration: 800, delay: 1000, ease: 'Quad.easeIn',
-                onComplete: () => gameOverText.destroy()
-              });
-            });
-          }
-        });
+        playGameOverFx(this);
 
         if (this.encounterId === null) {
           eventBridge.emit(BRIDGE_EVENTS.BREACH_GAME_OVER, {
@@ -1859,7 +1080,7 @@ export class BreachDefenseScene extends Phaser.Scene {
 
         tower.lastFired = time;
         this.sound.play('sfx_tower_place', { volume: 0.15, rate: 1.5 });
-        this.playRecoilTween(tower.sprite);
+        playRecoilTween(this, tower.sprite);
 
         // Brief range flash on fire
         const rangeFlash = this.add.circle(
@@ -1900,44 +1121,7 @@ export class BreachDefenseScene extends Phaser.Scene {
           target.strongFlashColor = proj.color;
         }
 
-        // Impact particles at hit point
-        const impactEmitter = this.add.particles(proj.x, proj.y, 'particle_circle', {
-          speed: { min: 20, max: 60 },
-          angle: { min: 0, max: 360 },
-          scale: { start: 0.6, end: 0 },
-          alpha: { start: 0.8, end: 0 },
-          lifespan: 200,
-          tint: proj.color,
-          frequency: -1
-        });
-        impactEmitter.setDepth(20);
-        impactEmitter.explode(4);
-        this.time.delayedCall(300, () => {
-          if (impactEmitter && impactEmitter.active) impactEmitter.destroy();
-        });
-
-        // Screen shake on strong hits
-        if (proj.isStrong) {
-          this.cameras.main.shake(80, 0.003);
-        }
-
-        // Floating damage number
-        const dmgText = this.add.text(proj.x, proj.y - 10, `-${proj.damage}`, {
-          fontFamily: '"Press Start 2P"',
-          fontSize: proj.isStrong ? '8px' : '6px',
-          color: proj.isStrong ? '#ff6644' : '#ffffff',
-          stroke: '#000000',
-          strokeThickness: 2,
-        }).setDepth(25).setOrigin(0.5);
-
-        this.tweens.add({
-          targets: dmgText,
-          y: dmgText.y - 25,
-          alpha: 0,
-          duration: 600,
-          ease: 'Quad.easeOut',
-          onComplete: () => dmgText.destroy()
-        });
+        playImpactFx(this, proj.x, proj.y, proj.color, proj.isStrong, proj.damage);
 
         proj.damage = 0;
       } else {
@@ -1946,16 +1130,7 @@ export class BreachDefenseScene extends Phaser.Scene {
         proj.graphics.setPosition(proj.x, proj.y);
 
         // Projectile trail dot
-        if (Math.random() < 0.3) {
-          const trail = this.add.circle(proj.x, proj.y, 2, proj.color, 0.4).setDepth(19);
-          this.tweens.add({
-            targets: trail,
-            alpha: 0,
-            scale: 0.2,
-            duration: 200,
-            onComplete: () => trail.destroy()
-          });
-        }
+        maybeSpawnProjectileTrail(this, proj.x, proj.y, proj.color);
       }
     }
 
@@ -1972,45 +1147,19 @@ export class BreachDefenseScene extends Phaser.Scene {
       this.sound.play('sfx_enemy_death', { volume: 0.6 });
 
       const threatName = THREATS[e.type]?.name || e.type;
-      // Occasional witty kill messages for variety
-      const killMessages = [
-        'NEUTRALIZED!',
-        'ACCESS DENIED!',
-        'BLOCKED!',
-        'QUARANTINED!',
-        'PATCHED!',
-      ];
-      const displayText = Math.random() < 0.3
-        ? killMessages[Math.floor(Math.random() * killMessages.length)]
-        : threatName;
-      const label = this.add.text(e.sprite.x, e.sprite.y - 20, displayText, {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '7px',
-        color: '#44ff44',
-        stroke: '#000000',
-        strokeThickness: 2,
-      }).setDepth(30).setOrigin(0.5);
-
-      this.tweens.add({
-        targets: label,
-        y: label.y - 44,
-        alpha: 0,
-        duration: 900,
-        ease: 'Cubic.easeOut',
-        onComplete: () => { label.destroy(); }
-      });
+      showKillLabel(this, e.sprite.x, e.sprite.y, threatName);
 
       e.hpBarBg.destroy();
       e.hpBarFill.destroy();
       e.hpBarBorder.destroy();
       const dyingSprite = e.sprite;
-      this.spawnDeathParticles(dyingSprite.x, dyingSprite.y, THREAT_COLORS[e.type]);
+      spawnDeathParticles(this, dyingSprite.x, dyingSprite.y, THREAT_COLORS[e.type]);
 
       // Extra effects for high-HP threats (mini-bosses)
       if (e.maxHp >= 100) {
         this.cameras.main.shake(120, 0.006);
         // Extra particle burst
-        this.spawnDeathParticles(e.sprite.x, e.sprite.y, 0xffd700);
+        spawnDeathParticles(this, e.sprite.x, e.sprite.y, 0xffd700);
       }
 
       this.tweens.add({
