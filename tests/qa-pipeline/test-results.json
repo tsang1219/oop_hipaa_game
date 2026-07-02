@@ -27,7 +27,7 @@
         "testDir": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests",
         "testIgnore": [],
         "testMatch": [
-          "**/*.@(spec|test).?(c|m)[jt]s?(x)"
+          "**/*.spec.ts"
         ],
         "timeout": 60000
       }
@@ -113,7 +113,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:56:39.869Z",
+                      "startTime": "2026-07-02T19:19:54.913Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -165,7 +165,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:56:39.869Z",
+                      "startTime": "2026-07-02T19:19:54.913Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -217,7 +217,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:56:39.869Z",
+                      "startTime": "2026-07-02T19:19:54.913Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -269,7 +269,7 @@
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:56:39.869Z",
+                      "startTime": "2026-07-02T19:19:54.913Z",
                       "annotations": [
                         {
                           "type": "skip",
@@ -324,12 +324,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 8455,
+                      "duration": 10398,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:56:40.352Z",
+                      "startTime": "2026-07-02T19:19:55.457Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -358,12 +358,12 @@
                       "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5355,
+                      "duration": 4387,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:56:49.688Z",
+                      "startTime": "2026-07-02T19:20:06.476Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -378,7 +378,7 @@
             },
             {
               "title": "Break room unlocks after completing reception",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -391,91 +391,18 @@
                     {
                       "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 77965,
-                      "error": {
-                        "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.",
-                        "stack": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5",
-                        "location": {
-                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
-                          "column": 14,
-                          "line": 57
-                        },
-                        "snippet": "   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
-                            "column": 14,
-                            "line": 57
-                          },
-                          "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n\n   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 20160,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:56:55.055Z",
+                      "startTime": "2026-07-02T19:20:10.870Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-door-unlocks-D-37428--after-completing-reception/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
-                        "column": 14,
-                        "line": 57
-                      }
-                    },
-                    {
-                      "workerIndex": 1,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 78475,
-                      "error": {
-                        "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.",
-                        "stack": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5",
-                        "location": {
-                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
-                          "column": 14,
-                          "line": 57
-                        },
-                        "snippet": "   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
-                            "column": 14,
-                            "line": 57
-                          },
-                          "message": "TimeoutError: page.waitForFunction: Timeout 30000ms exceeded.\n\n   at helpers/qa-helpers.ts:57\n\n  55 | /** Wait for a specific room to appear in the QA bridge state */\n  56 | export async function waitForRoom(page: Page, roomId: string, timeoutMs = SCENE_TIMEOUT): Promise<void> {\n> 57 |   await page.waitForFunction(\n     |              ^\n  58 |     (id) => window.__QA__?.currentRoomId === id,\n  59 |     roomId,\n  60 |     { timeout: timeoutMs },\n    at waitForRoom (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:57:14)\n    at goThroughDoor (/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts:335:9)\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/door-unlocks.spec.ts:82:5"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-07-02T03:58:13.569Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-door-unlocks-D-37428--after-completing-reception-retry1/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/helpers/qa-helpers.ts",
-                        "column": 14,
-                        "line": 57
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-3ec92c42f9600adfd611",
@@ -496,15 +423,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 20976,
+                      "duration": 20056,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:59:33.189Z",
+                      "startTime": "2026-07-02T19:20:31.038Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -530,15 +457,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 18281,
+                      "duration": 17598,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T03:59:54.793Z",
+                      "startTime": "2026-07-02T19:20:51.102Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -564,15 +491,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 16637,
+                      "duration": 15446,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:00:13.083Z",
+                      "startTime": "2026-07-02T19:21:08.707Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -598,15 +525,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 18127,
+                      "duration": 16522,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:00:29.730Z",
+                      "startTime": "2026-07-02T19:21:24.160Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -632,15 +559,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 9884,
+                      "duration": 10012,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:00:47.865Z",
+                      "startTime": "2026-07-02T19:21:40.689Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -683,15 +610,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 24242,
+                      "duration": 25220,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:00:57.773Z",
+                      "startTime": "2026-07-02T19:21:50.723Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -717,15 +644,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 33292,
+                      "duration": 26057,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:01:22.021Z",
+                      "startTime": "2026-07-02T19:22:15.955Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -768,15 +695,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 50556,
+                      "duration": 7256,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:01:55.364Z",
+                      "startTime": "2026-07-02T19:22:42.034Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -802,15 +729,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 10427,
+                      "duration": 6314,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:02:45.961Z",
+                      "startTime": "2026-07-02T19:22:49.298Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -836,15 +763,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 19054,
+                      "duration": 11438,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:02:56.432Z",
+                      "startTime": "2026-07-02T19:22:55.620Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -870,15 +797,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 8826,
+                      "duration": 7148,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:03:15.549Z",
+                      "startTime": "2026-07-02T19:23:07.065Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -904,15 +831,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 17683,
+                      "duration": 13239,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:03:24.434Z",
+                      "startTime": "2026-07-02T19:23:14.217Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -955,15 +882,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 11377,
+                      "duration": 8835,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:03:42.202Z",
+                      "startTime": "2026-07-02T19:23:27.476Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -978,7 +905,7 @@
             },
             {
               "title": "Reception completes after all requirements met",
-              "ok": false,
+              "ok": true,
               "tags": [],
               "tests": [
                 {
@@ -989,93 +916,20 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 2,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 55103,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34",
-                        "location": {
-                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
-                          "column": 34,
-                          "line": 54
-                        },
-                        "snippet": "  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
-                            "column": 34,
-                            "line": 54
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n\n  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34"
-                        }
-                      ],
+                      "status": "passed",
+                      "duration": 18237,
+                      "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:03:53.602Z",
+                      "startTime": "2026-07-02T19:23:36.318Z",
                       "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-room-completio-aceea--after-all-requirements-met/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
-                        "column": 34,
-                        "line": 54
-                      }
-                    },
-                    {
-                      "workerIndex": 3,
-                      "parallelIndex": 0,
-                      "status": "failed",
-                      "duration": 52325,
-                      "error": {
-                        "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m",
-                        "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34",
-                        "location": {
-                          "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
-                          "column": 34,
-                          "line": 54
-                        },
-                        "snippet": "  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {"
-                      },
-                      "errors": [
-                        {
-                          "location": {
-                            "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
-                            "column": 34,
-                            "line": 54
-                          },
-                          "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mreceived\u001b[39m\u001b[2m).\u001b[22mtoContain\u001b[2m(\u001b[22m\u001b[32mexpected\u001b[39m\u001b[2m) // indexOf\u001b[22m\n\nExpected value: \u001b[32m\"reception\"\u001b[39m\nReceived array: \u001b[31m[]\u001b[39m\n\n  52 |\n  53 |     const state = await qaState(page);\n> 54 |     expect(state.completedRooms).toContain('reception');\n     |                                  ^\n  55 |   });\n  56 |\n  57 |   test('Incomplete room does NOT mark as complete', async ({ page }) => {\n    at /Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts:54:34"
-                        }
-                      ],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 1,
-                      "startTime": "2026-07-02T04:04:49.544Z",
-                      "annotations": [],
-                      "attachments": [
-                        {
-                          "name": "error-context",
-                          "contentType": "text/markdown",
-                          "path": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/test-results/progression-room-completio-aceea--after-all-requirements-met-retry1/error-context.md"
-                        }
-                      ],
-                      "errorLocation": {
-                        "file": "/Users/all/claude_code/oop_hipaa_games/PrivacyQuest/tests/progression/room-completion.spec.ts",
-                        "column": 34,
-                        "line": 54
-                      }
+                      "attachments": []
                     }
                   ],
-                  "status": "unexpected"
+                  "status": "expected"
                 }
               ],
               "id": "cd2f9af4161352775043-cd33e4d014b637780c5b",
@@ -1096,15 +950,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 40010,
+                      "duration": 8688,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:05:44.451Z",
+                      "startTime": "2026-07-02T19:23:54.561Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1130,15 +984,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15348,
+                      "duration": 11044,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:06:25.268Z",
+                      "startTime": "2026-07-02T19:24:03.256Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1181,15 +1035,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 5645,
+                      "duration": 2042,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:06:40.682Z",
+                      "startTime": "2026-07-02T19:24:14.317Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1215,15 +1069,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 15647,
+                      "duration": 8664,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:06:46.346Z",
+                      "startTime": "2026-07-02T19:24:16.365Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1249,15 +1103,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 7537,
+                      "duration": 3625,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:07:02.102Z",
+                      "startTime": "2026-07-02T19:24:25.034Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1283,15 +1137,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 3415,
+                      "duration": 2008,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:07:09.695Z",
+                      "startTime": "2026-07-02T19:24:28.665Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1317,15 +1171,15 @@
                   "projectName": "",
                   "results": [
                     {
-                      "workerIndex": 4,
+                      "workerIndex": 0,
                       "parallelIndex": 0,
                       "status": "passed",
-                      "duration": 10523,
+                      "duration": 8690,
                       "errors": [],
                       "stdout": [],
                       "stderr": [],
                       "retry": 0,
-                      "startTime": "2026-07-02T04:07:37.547Z",
+                      "startTime": "2026-07-02T19:24:45.298Z",
                       "annotations": [],
                       "attachments": []
                     }
@@ -1359,15 +1213,15 @@
                       "projectName": "",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 2210,
+                          "duration": 1985,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-07-02T04:07:13.119Z",
+                          "startTime": "2026-07-02T19:24:30.678Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1393,15 +1247,15 @@
                       "projectName": "",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3826,
+                          "duration": 1997,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-07-02T04:07:15.345Z",
+                          "startTime": "2026-07-02T19:24:32.667Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1427,15 +1281,15 @@
                       "projectName": "",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3822,
+                          "duration": 1982,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-07-02T04:07:19.194Z",
+                          "startTime": "2026-07-02T19:24:34.669Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1461,15 +1315,15 @@
                       "projectName": "",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3615,
+                          "duration": 2546,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-07-02T04:07:23.045Z",
+                          "startTime": "2026-07-02T19:24:36.657Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1495,15 +1349,15 @@
                       "projectName": "",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3646,
+                          "duration": 2091,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-07-02T04:07:26.681Z",
+                          "startTime": "2026-07-02T19:24:39.210Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1529,15 +1383,15 @@
                       "projectName": "",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3465,
+                          "duration": 1977,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-07-02T04:07:30.341Z",
+                          "startTime": "2026-07-02T19:24:41.309Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1563,15 +1417,15 @@
                       "projectName": "",
                       "results": [
                         {
-                          "workerIndex": 4,
+                          "workerIndex": 0,
                           "parallelIndex": 0,
                           "status": "passed",
-                          "duration": 3712,
+                          "duration": 2001,
                           "errors": [],
                           "stdout": [],
                           "stderr": [],
                           "retry": 0,
-                          "startTime": "2026-07-02T04:07:33.821Z",
+                          "startTime": "2026-07-02T19:24:43.292Z",
                           "annotations": [],
                           "attachments": []
                         }
@@ -1593,11 +1447,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-07-02T03:56:39.758Z",
-    "duration": 668531.6020000001,
-    "expected": 29,
+    "startTime": "2026-07-02T19:19:54.004Z",
+    "duration": 300110.20900000003,
+    "expected": 31,
     "skipped": 4,
-    "unexpected": 2,
+    "unexpected": 0,
     "flaky": 0
   }
 }
