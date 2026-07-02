@@ -204,6 +204,10 @@ export class ExplorationScene extends Phaser.Scene {
   // Zone glow registry — stores ring arc + tween per zone id so we can kill glow on live completion (Phase 27 VIS-08)
   private zoneGlows: Map<string, { ring: Phaser.GameObjects.Arc; tween: Phaser.Tweens.Tween }> = new Map();
 
+  // F-21 (Run 07): speech-bubble "!" markers per NPC id — so live completion can
+  // clear them (they used to float over completed, faded-out NPCs forever).
+  private npcBubbles: Map<string, Phaser.GameObjects.Image> = new Map();
+
   // Previous completion sets — used by updateCompletionState to detect NEW completions
   private prevCompletedNPCs: Set<string> = new Set();
   private prevCompletedZones: Set<string> = new Set();
@@ -242,6 +246,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Clear zone glow registry and prev-completion sets on scene restart (room re-render rebuilds all visuals)
     this.zoneGlows.clear();
+    this.npcBubbles.clear();
     this.prevCompletedNPCs = new Set();
     this.prevCompletedZones = new Set();
 
@@ -1240,6 +1245,8 @@ export class ExplorationScene extends Phaser.Scene {
           repeat: -1,
           ease: 'Sine.easeInOut',
         });
+        // F-21 (Run 07): register so live completion can clear the marker
+        this.npcBubbles.set(npc.id, bubble);
       }
 
       this.interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
@@ -2861,6 +2868,19 @@ export class ExplorationScene extends Phaser.Scene {
         stroke: '#000000',
         strokeThickness: 1,
       }).setOrigin(0.5).setDepth(3);
+      // F-20 fix (Run 07): clamp inside the room bounds — edge-door labels used
+      // to truncate at the canvas edge ("Recepti", "Hallwa"). Same clamp the
+      // NPC nameplates already use.
+      {
+        const pad = 2;
+        const half = labelText.width / 2;
+        const roomPxWidth = (this.room.width ?? 20) * TILE;
+        const minX = half + pad;
+        const maxX = roomPxWidth - half - pad;
+        if (maxX >= minX) {
+          labelText.x = Phaser.Math.Clamp(labelText.x, minX, maxX);
+        }
+      }
       this.doorVisuals.push(labelText);
     }
   }
@@ -3068,7 +3088,14 @@ export class ExplorationScene extends Phaser.Scene {
       // Show door prompt if near a door and no other interactable
       if (this.nearDoor) {
         const doorLabel = this.nearDoor.label || this.nearDoor.targetRoomId.replace(/_/g, ' ');
-        this.promptText.setText(`[SPACE] Enter ${doorLabel}`);
+        // F-12 fix (Run 07): a locked door used to show the same inviting
+        // "[SPACE] Enter" prompt, then honk on the attempt. Tell the truth
+        // up front — the attempt feedback (red flash + alert) stays.
+        if (this.doorStates[this.nearDoor.id] === 'locked') {
+          this.promptText.setText(`[LOCKED] ${doorLabel} — finish this area first`);
+        } else {
+          this.promptText.setText(`[SPACE] Enter ${doorLabel}`);
+        }
         this.promptText.setVisible(true);
       } else {
         this.promptText.setVisible(false);
@@ -3464,6 +3491,22 @@ export class ExplorationScene extends Phaser.Scene {
         ia.sprite.setTint(0x888888); // tint is subtle under fade — immediate is fine
         // Pop the live checkmark (same position as the at-render mark in the NPC loop)
         this.addCompletionCheck(ia.sprite.x, ia.sprite.y - 20, ia.sprite.depth + 1, true);
+      }
+
+      // F-21 fix (Run 07): clear the "talk to me!" speech-bubble marker — it
+      // used to keep bobbing over the faded-out NPC forever after completion.
+      const bubble = this.npcBubbles.get(id);
+      if (bubble) {
+        this.npcBubbles.delete(id);
+        this.tweens.killTweensOf(bubble);
+        this.tweens.add({
+          targets: bubble,
+          alpha: 0,
+          scale: 0.5,
+          duration: 300,
+          ease: 'Sine.easeOut',
+          onComplete: () => bubble.destroy(),
+        });
       }
     }
 

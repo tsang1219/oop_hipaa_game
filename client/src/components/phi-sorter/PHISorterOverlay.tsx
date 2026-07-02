@@ -10,6 +10,7 @@ import { DeskDocument, type DocAnimState } from './DeskDocument';
 import {
   getNPCReactionForItem,
   getNPCFallbackReaction,
+  getNPCOpenerLine,
   accuracyToBand,
   type NPCReaction,
   type NPCSorterId,
@@ -216,7 +217,9 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // Phase 22: Seed bubble with opening line on mount so the NPC is "present" from frame one
   // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
-    const opener = getNPCFallbackReaction(npcDisplay.id, 'good');
+    // F-14 (Run 07): use the dedicated opener, not a good-band praise line —
+    // "Nice. You're getting the rhythm." at 0/10 read as mockery.
+    const opener = getNPCOpenerLine(npcDisplay.id);
     setCurrentReactionText(opener.text);
     setCurrentReactionVariant(opener.variant ?? 'neutral');
     // Intentionally keyed to docSet.id — runs once per document set

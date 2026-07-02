@@ -373,6 +373,22 @@ export function getNPCFallbackReaction(
 }
 
 /**
+ * F-14 (Run 07): dedicated shift-opener lines. The overlay used to seed the
+ * bubble with a good-band fallback line ("Nice. You're getting the rhythm.")
+ * before the player had stamped anything — praise for work not yet done.
+ * Openers set the scene instead of grading it.
+ */
+const SORTER_OPENER_LINES: Record<NPCSorterId, NPCReaction> = {
+  aiyana: { text: "Okay — charts incoming. REDACT anything that could identify someone. KEEP what's safe.", variant: 'neutral' },
+  marcus: { text: "First one's on your desk. If it can point to a patient, it gets the REDACT stamp.", variant: 'neutral' },
+  tovar:  { text: "Same standard as always: if it identifies a patient, it does not leave this room.", variant: 'neutral' },
+};
+
+export function getNPCOpenerLine(npcId: NPCSorterId): NPCReaction {
+  return SORTER_OPENER_LINES[npcId] ?? { text: 'Ready when you are.', variant: 'neutral' };
+}
+
+/**
  * Convenience: convert a running correct/total ratio into the accuracy band used by fallback lookup.
  */
 export function accuracyToBand(correct: number, total: number): AccuracyBand {

@@ -67,6 +67,18 @@ const NPC_SPRITE_TYPE_BY_ID: Record<string, string> = (() => {
  * The fallback is intentionally loud — named characters should always resolve.
  * If you see the warning, add a sprite field to the NPC in roomData.json.
  */
+/** F-13 (Run 07): true when the id resolves to a real character sheet.
+ *  Zone/item dialogues (sign-in sheet, shredder, …) have no mapping — they are
+ *  THINGS, and should not borrow a random staff face. */
+export function hasNPCPortrait(npcId: string): boolean {
+  const spriteType = NPC_SPRITE_TYPE_BY_ID[npcId];
+  return !!(spriteType && SPONSOR_SPRITE_PATHS[`npc_${spriteType}_sheet`]);
+}
+
+// F-13 (Run 07): warn once per unmapped id — the old unconditional warn fired
+// dozens of times per playthrough for every zone dialogue.
+const warnedPortraitIds = new Set<string>();
+
 export function getNPCPortraitPath(npcId: string): string {
   const spriteType = NPC_SPRITE_TYPE_BY_ID[npcId];
   if (spriteType) {
@@ -77,7 +89,8 @@ export function getNPCPortraitPath(npcId: string): string {
     }
   }
 
-  if (import.meta.env.DEV) {
+  if (import.meta.env.DEV && !warnedPortraitIds.has(npcId)) {
+    warnedPortraitIds.add(npcId);
     console.warn(
       `[DialoguePortrait] No sprite mapping for NPC id "${npcId}" — falling back to staff sheet. ` +
       `Add a sprite field in roomData.json.`

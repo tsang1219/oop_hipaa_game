@@ -1961,12 +1961,19 @@ export default function UnifiedGamePage() {
           />
         )}
 
-        {/* Intro modal */}
-        {showIntroModal && (
+        {/* Intro modal.
+            F-16 fix (Run 07): the demo flag is set at character-confirm, AFTER
+            this component's useState initializer ran — so demo sessions showed
+            the full-game onboarding despite the Phase 18 decision. Re-check at
+            render time.
+            F-11 fix (Run 07): the door instructions said "Walk to a door" but
+            standing at a door does nothing — SPACE is required. A first-timer's
+            literal first navigation attempt failed silently. */}
+        {showIntroModal && !isDemoActive() && (
           <TutorialModal
             title="Welcome to HIPAA General"
             description={
-              "You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nSPACE \u2014 Talk to people and interact\nWalk to a door \u2014 Go to the next area"
+              "You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nSPACE \u2014 Talk to people and interact\nSPACE at a door \u2014 Go to the next area"
             }
             onAcknowledge={handleDismissIntroModal}
             type="info"
@@ -1981,7 +1988,7 @@ export default function UnifiedGamePage() {
           className="text-[8px] text-gray-500"
           style={{ fontFamily: '"Press Start 2P"' }}
         >
-          WASD or Arrow Keys to move &bull; SPACE to interact &bull; Walk to doors to navigate
+          WASD or Arrow Keys to move &bull; SPACE to interact &bull; SPACE at a door to travel
         </p>
         <button
           onClick={handleShowHelpModal}
