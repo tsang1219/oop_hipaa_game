@@ -542,7 +542,18 @@ export default function UnifiedGamePage() {
     const params = new URLSearchParams(window.location.search);
     const qaRoom = params.get('qa-room');
     if (qaRoom && rooms.some(r => r.id === qaRoom)) {
-      const timer = setTimeout(() => {
+      // Run 07 (QA-infra fix): this used to blind-fire REACT_LOAD_ROOM on a
+      // fixed 2s timer. Two failure modes: (a) if Boot finished late the event
+      // fired before ExplorationScene registered its listener and was lost;
+      // (b) if the target room WAS the boot room, the redundant scene.restart
+      // landed 0–1.5s after the scene became playable and silently wiped any
+      // in-flight interaction (exposed by the F-10 boot-timing fix). Now we
+      // poll until the scene is actually up, and skip the redundant restart.
+      const poll = setInterval(() => {
+        const bridge = window.__QA__;
+        if (!bridge?.scenesVisited?.includes('Exploration') || !bridge.currentRoomId) return;
+        clearInterval(poll);
+        if (bridge.currentRoomId === qaRoom) return; // already there
         const targetRoom = rooms.find(r => r.id === qaRoom);
         if (!targetRoom) return;
         gameState.setCurrentRoom(qaRoom);
@@ -555,8 +566,8 @@ export default function UnifiedGamePage() {
           collectedItems: gameState.state.collectedItems,
           doorStates,
         });
-      }, 2000);
-      return () => clearTimeout(timer);
+      }, 200);
+      return () => clearInterval(poll);
     }
   }, []);
 

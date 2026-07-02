@@ -73,7 +73,7 @@ test.describe('Door Unlocks', () => {
     await loadRoom(page, 'reception');
 
     // Complete all reception requirements
-    await talkToNPC(page, 10, 4); // riley
+    await talkToNPC(page, 10, 3); // riley — at (10,3); (10,4) was stale (run 07 fix)
     await talkToNPC(page, 5, 8);  // nervous_patient
     await examineZone(page, 8, 4); // sign_in_sheet
     await collectItem(page, 2, 4); // patient_rights_poster
