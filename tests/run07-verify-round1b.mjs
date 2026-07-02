@@ -15,7 +15,8 @@ function report(id, pass, note) {
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: 1280, height: 960 } });
-page.on('pageerror', (e) => console.log('[pageerror]', e.message.slice(0, 150)));
+page.on('console', (m) => { if (m.text().includes('CROSSFADE')) console.log('>>', m.text()); });
+page.on('pageerror', (e) => console.log('[pageerror]', (e.stack || e.message).slice(0, 900)));
 
 const qa = (fn, ...args) => page.evaluate(fn, ...args);
 const teleport = async (x, y) => { await qa(([a, b]) => window.__QA__.commands.teleportTo(a, b), [x, y]); await page.waitForTimeout(400); };
