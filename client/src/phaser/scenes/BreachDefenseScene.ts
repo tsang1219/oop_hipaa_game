@@ -224,6 +224,14 @@ export class BreachDefenseScene extends Phaser.Scene {
   }
 
   create() {
+    // F-25 fix (Run 07): Phaser never auto-calls a method named shutdown() —
+    // the cleanup block at the bottom of this class was dead code, so every
+    // scene start stacked duplicate eventBridge listeners on the singleton
+    // bridge. Wire it, and de-dup defensively (shutdown() is idempotent).
+    this.shutdown();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdown, this);
+
     // ── Draw grid ──────────────────────────────────────────────
     const pathSet = new Set<string>();
     PATHS[0].forEach(p => pathSet.add(`${p.x},${p.y}`));
@@ -2125,24 +2133,30 @@ export class BreachDefenseScene extends Phaser.Scene {
     }
   };
 
+  /** F-25 (Run 07): now actually invoked — wired in create() via
+   *  events.once(SHUTDOWN/DESTROY), plus called defensively at create() start
+   *  to de-dup. Throw-proofed since the DESTROY path runs with plugins
+   *  partially torn down. */
   shutdown() {
-    if (this.killStreakText) {
-      this.killStreakText.destroy();
-      this.killStreakText = undefined;
-    }
-    if (this.dangerVignette) {
-      this.dangerVignette.destroy();
-      this.dangerVignette = undefined;
-    }
-    if (this.bgMusic) {
-      this.bgMusic.stop();
-      this.bgMusic = undefined;
-    }
+    try {
+      if (this.killStreakText) {
+        this.killStreakText.destroy();
+        this.killStreakText = undefined;
+      }
+      if (this.dangerVignette) {
+        this.dangerVignette.destroy();
+        this.dangerVignette = undefined;
+      }
+      if (this.bgMusic) {
+        this.bgMusic.stop();
+        this.bgMusic = undefined;
+      }
+    } catch (_) { /* destroyed objects on the DESTROY path */ }
     // Clean up sound unlock listener
-    this.sound.off('unlocked');
+    try { this.sound.off('unlocked'); } catch (_) {}
     // Clean up input handlers
-    this.input.off('pointermove');
-    this.input.off('pointerdown');
+    try { this.input.off('pointermove'); } catch (_) {}
+    try { this.input.off('pointerdown'); } catch (_) {}
     // Clean up EventBridge listeners
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SELECT_TOWER_TYPE, this.onSelectTowerType, this);
@@ -2152,9 +2166,9 @@ export class BreachDefenseScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_START_NEXT_WAVE, this.onStartNextWave, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ONBOARDING_HIGHLIGHT, this.showPlacementHighlights, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ONBOARDING_CLEAR, this.clearPlacementHighlights, this);
-    this.clearPlacementHighlights();
+    try { this.clearPlacementHighlights(); } catch (_) {}
     eventBridge.off(BRIDGE_EVENTS.REACT_RESTART_BREACH, this.onRestart, this);
     // Kill all tweens to prevent leaked infinite loops
-    this.tweens.killAll();
+    try { this.tweens.killAll(); } catch (_) {}
   }
 }

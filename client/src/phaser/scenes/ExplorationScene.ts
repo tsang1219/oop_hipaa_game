@@ -288,6 +288,19 @@ export class ExplorationScene extends Phaser.Scene {
   }
 
   create() {
+    // F-25 fix (Run 07, new finding): Phaser NEVER auto-calls a method named
+    // shutdown() — the whole cleanup block below was dead code. Consequences:
+    // every scene.restart() (every room transition) stacked a duplicate copy
+    // of ~17 eventBridge listeners on the singleton bridge, and destroyed Game
+    // instances (dev remounts) left permanently-stale listeners whose
+    // `this.scene.isActive()` guards THROW — aborting the emit chain before
+    // live listeners ran (observed live: QA door navigation dead, layered SFX,
+    // run 01's one-off door desync). Wire it for real, and de-dup defensively
+    // in case a previous create() didn't get its shutdown.
+    this.removeBridgeListeners();
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.shutdown, this);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.shutdown, this);
+
     // Reset camera fade from previous room transition (fixes black screen on scene.restart)
     // The fadeOut effect from the previous room may still be active after scene.restart()
     (this.cameras.main as any).fadeEffect?.reset();
@@ -2208,13 +2221,11 @@ export class ExplorationScene extends Phaser.Scene {
     }
   }
 
-  shutdown() {
-    // Don't stop music — create() will reclaim it if same track is needed,
-    // or crossfadeToMusic will clean it up if the act changed.
-    this.bgMusic = undefined;
-    // Clean up sound unlock listener
-    this.sound.off('unlocked');
-    // Clean up EventBridge listeners
+  /** F-25 (Run 07): all eventBridge listener removal in one idempotent place —
+   *  called from shutdown() AND defensively at the top of create() so a missed
+   *  shutdown can never stack duplicates on the singleton bridge.
+   *  (eventemitter3's off(event, fn, context) removes every matching copy.) */
+  private removeBridgeListeners(): void {
     eventBridge.off(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION, this.onResumeFromDecline, this);
@@ -2229,7 +2240,6 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_DOOR_LOCKED, this.onDoorLocked, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, this.onUpdateDoorStates, this);
     // Encounter lifecycle listeners (Phase 13)
-    this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_LAUNCH_ENCOUNTER, this.onLaunchEncounter, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER, this.onReturnFromEncounter, this);
     // QA command listeners cleanup
@@ -2237,21 +2247,50 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
     eventBridge.off(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     eventBridge.off(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
+  }
+
+  /** F-25 (Run 07): now actually invoked — wired in create() via
+   *  events.once(SHUTDOWN) + events.once(DESTROY). Phaser never auto-calls a
+   *  method named shutdown(); this was dead code since Phase 12. Body is
+   *  throw-proofed because the DESTROY path runs with plugins partly torn down. */
+  shutdown() {
+    // Don't stop music — create() will reclaim it if same track is needed,
+    // or crossfadeToMusic will clean it up if the act changed.
+    this.bgMusic = undefined;
+    // Clean up sound unlock listener
+    try { this.sound.off('unlocked'); } catch (_) {}
+    // Clean up EventBridge listeners
+    this.removeBridgeListeners();
+    try { this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this); } catch (_) {}
     // Clean up input handlers
-    this.input.off('pointerdown');
+    try { this.input.off('pointerdown'); } catch (_) {}
     // Kill all tweens to prevent leaked infinite loops
-    this.tweens.killAll();
-    if (this.moveTimer) this.moveTimer.destroy();
+    try { this.tweens.killAll(); } catch (_) {}
+    try { if (this.moveTimer) this.moveTimer.destroy(); } catch (_) {}
+    this.moveTimer = null;
     if (this.npcPulseTween) {
-      this.npcPulseTween.stop();
+      try { this.npcPulseTween.stop(); } catch (_) {}
       this.npcPulseTween = null;
     }
   }
 
   // ── QA Testing Commands ──────────────────────────────────────────
 
+  /** Run 07 (new finding): `this.scene.isActive()` itself THROWS on a scene
+   *  instance whose plugin was torn down (observed live: a stale listener from
+   *  a destroyed instance received QA_NAVIGATE_DOOR mid-transition and crashed
+   *  the page with "Cannot read properties of null (reading 'isActive')").
+   *  All QA handlers now use this throw-proof liveness check. */
+  private isSceneAlive(): boolean {
+    try {
+      return !!this.scene && !!this.sys && this.scene.isActive();
+    } catch {
+      return false;
+    }
+  }
+
   private onQATeleportTo = (data: { tileX: number; tileY: number }) => {
-    if (!this.scene.isActive()) return;
+    if (!this.isSceneAlive()) return;
     this.movePath = [];
     if (this.moveTimer) { this.moveTimer.destroy(); this.moveTimer = null; }
     this.player.setPosition(data.tileX * TILE + TILE / 2, data.tileY * TILE + TILE / 2);
@@ -2265,7 +2304,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onQAMoveTo = (data: { tileX: number; tileY: number }) => {
-    if (!this.scene.isActive()) return;
+    if (!this.isSceneAlive()) return;
     const path = this.findPath(
       { x: this.tileX, y: this.tileY },
       { x: data.tileX, y: data.tileY }
@@ -2276,7 +2315,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onQAPressSpace = () => {
-    if (!this.scene.isActive() || this.paused) return;
+    if (!this.isSceneAlive() || this.paused) return;
     // If near an interactable, trigger it
     if (this.nearbyInteractable) {
       this.triggerInteraction(this.nearbyInteractable);
@@ -2304,7 +2343,7 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   private onQANavigateDoor = (data: { doorId: string }) => {
-    if (!this.scene.isActive()) return;
+    if (!this.isSceneAlive()) return;
     const doors = (this.room as any).doors;
     if (!doors) return;
     const door = doors.find((d: any) => d.id === data.doorId);

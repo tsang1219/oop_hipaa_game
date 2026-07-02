@@ -1692,15 +1692,13 @@ export default function UnifiedGamePage() {
   }
 
   // ── Story reveal modal ────────────────────────────────────────
-  if (showStoryModal && currentStoryRoom?.patientStory) {
-    return (
-      <PatientStoryReveal
-        story={currentStoryRoom.patientStory}
-        roomName={currentStoryRoom.name}
-        onClose={handleCloseStoryModal}
-      />
-    );
-  }
+  // F-26 fix (Run 07, new finding): this used to be a full-page early return —
+  // it UNMOUNTED PhaserGame (which destroys the Game instance on unmount) for
+  // the duration of the story, and nothing ever rebooted the scene afterwards
+  // (sceneStartedRef stays true), leaving a dead black canvas. The path was
+  // unreachable while F-08 kept stories dead; fixing F-08 exposed it. The
+  // component is styled `absolute inset-0` — it was always meant to be an
+  // overlay. It now renders inside the canvas container below.
 
   // ── Main game view (Phaser canvas + React overlays) ───────────
   // F-22 fix (Run 07, new finding): pass the FULL nextSceneId chain, not just the
@@ -1922,6 +1920,15 @@ export default function UnifiedGamePage() {
               setShowRoomIntro(false);
               eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
             }}
+          />
+        )}
+
+        {/* Patient story reveal — overlay, NOT a page swap (F-26, Run 07) */}
+        {showStoryModal && currentStoryRoom?.patientStory && (
+          <PatientStoryReveal
+            story={currentStoryRoom.patientStory}
+            roomName={currentStoryRoom.name}
+            onClose={handleCloseStoryModal}
           />
         )}
 
