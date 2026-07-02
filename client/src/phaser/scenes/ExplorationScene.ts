@@ -187,6 +187,11 @@ export class ExplorationScene extends Phaser.Scene {
 
   // Encounter state
   private encounterTriggered = false;
+  // F-02 fix (Run 07): set when the player declines the TD narrative card while
+  // still standing inside the trigger radius. The trigger stays suppressed until
+  // they walk OUT of the radius — otherwise update() re-pops the card on the
+  // very next frame and "NOT RIGHT NOW" becomes an inescapable loop.
+  private encounterDeclined = false;
 
   // Door navigation state (Phase 12)
   private nearDoor: { id: string; targetRoomId: string; x: number; y: number; side: string; label: string } | null = null;
@@ -233,6 +238,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.pendingInteraction = null;
     this.paused = false;
     this.encounterTriggered = false;
+    this.encounterDeclined = false;
 
     // Clear zone glow registry and prev-completion sets on scene restart (room re-render rebuilds all visuals)
     this.zoneGlows.clear();
@@ -2106,12 +2112,20 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // IT Office encounter zone check (Phase 13)
-    if (this.room.id === 'it_office' && !this.encounterTriggered && !this.paused && !isQANoEncounter()) {
+    if (this.room.id === 'it_office' && !this.paused && !isQANoEncounter()) {
       const alreadyDone = this.registry.get('encounterResult_td-it-office');
       if (!alreadyDone) {
         const dx = Math.abs(this.player.x - (9 * TILE + TILE / 2));
         const dy = Math.abs(this.player.y - (6 * TILE + TILE / 2));
-        if (dx < TILE * 1.5 && dy < TILE * 1.5) {
+        const inRadius = dx < TILE * 1.5 && dy < TILE * 1.5;
+        if (this.encounterDeclined) {
+          // F-02 fix (Run 07): player said "not right now" — re-arm the trigger
+          // only once they've stepped out of the radius, so declining actually works.
+          if (!inRadius) {
+            this.encounterDeclined = false;
+            this.encounterTriggered = false;
+          }
+        } else if (!this.encounterTriggered && inRadius) {
           this.triggerEncounter('td-it-office');
         }
       }
@@ -2138,10 +2152,21 @@ export class ExplorationScene extends Phaser.Scene {
     // QA state broadcast (throttled to 200ms)
     if (this.time.now - this.lastStateBroadcastTime > 200) {
       this.lastStateBroadcastTime = this.time.now;
+      // F-19 fix (Run 07): the payload now matches the shape qa-bridge actually
+      // consumes (playerPosition / roomNPCs / roomZones / roomItems / roomDoors).
+      // The old fields (playerTileX/interactables/doors) had drifted from the
+      // bridge contract, leaving those __QA__ fields permanently undefined —
+      // any test asserting on them was asserting on nothing. Legacy fields kept
+      // so external scripts reading the raw event don't break.
+      const byType = (t: string) =>
+        this.interactables
+          .filter(ia => ia.type === t)
+          .map(ia => ({ type: ia.type, id: ia.id, x: (ia.data as any).x, y: (ia.data as any).y }));
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_STATE_UPDATE, {
         currentRoomId: this.room.id,
         playerTileX: this.tileX,
         playerTileY: this.tileY,
+        playerPosition: { tileX: this.tileX, tileY: this.tileY },
         nearbyInteractable: this.nearbyInteractable
           ? { type: this.nearbyInteractable.type, id: this.nearbyInteractable.id }
           : null,
@@ -2149,11 +2174,21 @@ export class ExplorationScene extends Phaser.Scene {
           ? { id: this.nearDoor.id, targetRoomId: this.nearDoor.targetRoomId }
           : null,
         paused: this.paused,
+        roomNPCs: byType('npc').map(n => ({ ...n, completed: this.completedNPCs.has(n.id) })),
+        roomZones: byType('zone').map(z => ({ ...z, completed: this.completedZones.has(z.id) })),
+        roomItems: byType('item').map(i => ({ ...i, collected: this.collectedItems.has(i.id) })),
         interactables: this.interactables.map(ia => ({
           type: ia.type,
           id: ia.id,
           x: (ia.data as any).x,
           y: (ia.data as any).y,
+        })),
+        roomDoors: ((this.room as any).doors || []).map((d: any) => ({
+          id: d.id,
+          targetRoomId: d.targetRoomId,
+          x: d.x,
+          y: d.y,
+          state: this.doorStates[d.id] ?? 'available',
         })),
         doors: ((this.room as any).doors || []).map((d: any) => ({
           id: d.id,
@@ -2442,7 +2477,10 @@ export class ExplorationScene extends Phaser.Scene {
       const raw = localStorage.getItem('pq:save:v2');
       if (!raw) return 1;
       const save = JSON.parse(raw);
-      const act = save?.actProgress;
+      // F-03 fix (Run 07): the live save field is `currentAct` (written by
+      // useGameState). `actProgress` was a phantom — nothing ever wrote it.
+      // Kept as a fallback so hand-seeded QA saves keep working.
+      const act = save?.currentAct ?? save?.actProgress;
       if (act === 2 || act === 3) return act;
     } catch { /* ignore */ }
     return 1;
@@ -3058,8 +3096,20 @@ export class ExplorationScene extends Phaser.Scene {
         // Already-completed encounters skip the request modal entirely
         const alreadyDone = this.registry.get(`encounterResult_${npc.encounterTrigger.encounterId}`);
         if (alreadyDone) {
-          // Encounter is done — emit the standard NPC interaction so the player can still
-          // talk to the NPC (they may have a thank-you scene later). For now, no-op fallback.
+          // F-07 fix (Run 07): the old bare `return` left the scene paused with the
+          // dim overlay up — talking to a finished encounter NPC froze the game.
+          // Unpause, clear the dim, and give the NPC a short post-encounter line
+          // (Commandment 1: no silent interactions).
+          this.paused = false;
+          if (this.dialogueDimOverlay) {
+            this.tweens.killTweensOf(this.dialogueDimOverlay);
+            this.dialogueDimOverlay.destroy();
+            this.dialogueDimOverlay = undefined;
+          }
+          const doneLine =
+            (npc.encounterTrigger as { completedText?: string }).completedText ??
+            'All handled here — thanks for the help earlier!';
+          this.showNpcSpeechBubble(ia, doneLine);
           return;
         }
         // Pause input to prevent walking off mid-modal; do NOT sleep — the React modal
@@ -3255,11 +3305,58 @@ export class ExplorationScene extends Phaser.Scene {
     this.paused = true;
   };
 
-  /** Player declined the encounter narrative card — unpause and allow re-trigger on next approach. */
+  /** Player declined the encounter narrative card — unpause and allow re-trigger on next approach.
+   *  F-02 fix (Run 07): do NOT clear encounterTriggered here — the player is still standing
+   *  inside the trigger radius, so update() would re-pop the alert on the next frame.
+   *  Instead mark the decline; the update() loop re-arms once they leave the radius. */
   private onResumeFromDecline = () => {
     this.paused = false;
-    this.encounterTriggered = false;
+    if (this.encounterTriggered) {
+      this.encounterDeclined = true;
+    }
   };
+
+  // ── Lightweight NPC speech bubble (Run 07, F-07) ────────────────
+  /** Brief floating one-liner above an NPC — for post-encounter "talk again"
+   *  moments that don't warrant the full dialogue overlay. Auto-fades. */
+  private npcSpeechBubble?: Phaser.GameObjects.Container;
+  private showNpcSpeechBubble(ia: InteractableData, line: string): void {
+    // Replace any bubble already showing (rapid re-presses shouldn't stack)
+    if (this.npcSpeechBubble) {
+      this.tweens.killTweensOf(this.npcSpeechBubble);
+      this.npcSpeechBubble.destroy();
+      this.npcSpeechBubble = undefined;
+    }
+    const text = this.add.text(0, 0, line, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: '#222222',
+      wordWrap: { width: 180 },
+      align: 'center',
+    }).setOrigin(0.5, 1);
+    const pad = 6;
+    const bg = this.add.rectangle(
+      0, pad, text.width + pad * 2, text.height + pad * 2, 0xfffbe8, 0.95,
+    ).setStrokeStyle(2, 0x222222).setOrigin(0.5, 1);
+    const bubble = this.add.container(ia.sprite.x, ia.sprite.y - TILE * 1.1, [bg, text])
+      .setDepth(95)
+      .setAlpha(0);
+    this.npcSpeechBubble = bubble;
+    try { this.sound.play('sfx_interact', { volume: 0.3 }); } catch (_) {}
+    this.tweens.add({ targets: bubble, alpha: 1, y: bubble.y - 4, duration: 180, ease: 'Sine.easeOut' });
+    this.time.delayedCall(2400, () => {
+      if (this.npcSpeechBubble !== bubble) return;
+      this.tweens.add({
+        targets: bubble,
+        alpha: 0,
+        duration: 250,
+        onComplete: () => {
+          bubble.destroy();
+          if (this.npcSpeechBubble === bubble) this.npcSpeechBubble = undefined;
+        },
+      });
+    });
+  }
 
   // ── Stop NPC pulse on interaction ──────────────────────────────
   private stopNpcPulse(ia: InteractableData) {

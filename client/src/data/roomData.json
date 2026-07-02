@@ -197,7 +197,8 @@
           "encounterTrigger": {
             "encounterId": "phi-sort-reception",
             "documentSetId": "phi-sorter-set-1",
-            "requestText": "Hey — auditor's here in twenty minutes and I'm drowning. Can you help me sort what counts as PHI on these intake forms?"
+            "requestText": "Hey — auditor's here in twenty minutes and I'm drowning. Can you help me sort what counts as PHI on these intake forms?",
+            "completedText": "Front desk is quiet for once. You're my favorite person today."
           },
           "isFinalBoss": false
         }
@@ -1307,7 +1308,8 @@
             "documentSetId": "breach-triage-set-1",
             "encounterType": "breach-triage",
             "minAct": 3,
-            "requestText": "Priya hasn't looked up from her tablet in an hour. She slides it toward you without breaking her stare at the door. 'Fourteen incidents since midnight. OCR opens in three hours. I need someone who knows the 60-day rule to help me sort what's reportable before the lawyers get here. Please tell me you know the 60-day rule.'"
+            "requestText": "Priya hasn't looked up from her tablet in an hour. She slides it toward you without breaking her stare at the door. 'Fourteen incidents since midnight. OCR opens in three hours. I need someone who knows the 60-day rule to help me sort what's reportable before the lawyers get here. Please tell me you know the 60-day rule.'",
+            "completedText": "Queue's clear and the phones stopped ringing. Take the win."
           },
           "isFinalBoss": false
         }
@@ -1553,7 +1555,8 @@
           "encounterTrigger": {
             "encounterId": "phi-sort-lab",
             "documentSetId": "phi-sorter-set-2",
-            "requestText": "Need a second pair of eyes — these sample labels are headed to an external manifest and I'm not sure which fields we can include. PHI or not PHI?"
+            "requestText": "Need a second pair of eyes — these sample labels are headed to an external manifest and I'm not sure which fields we can include. PHI or not PHI?",
+            "completedText": "Charts are all where they belong. I can finally breathe."
           }
         },
         {
@@ -1861,7 +1864,8 @@
           "encounterTrigger": {
             "encounterId": "phi-sort-records",
             "documentSetId": "phi-sorter-set-3",
-            "requestText": "Got a minute? I'm reviewing a research data set for Safe Harbor compliance and some of these geographic and date fields are borderline. Want a fresh set of eyes before this goes out the door?"
+            "requestText": "Got a minute? I'm reviewing a research data set for Safe Harbor compliance and some of these geographic and date fields are borderline. Want a fresh set of eyes before this goes out the door?",
+            "completedText": "A clean stack. If only every audit went like that."
           },
           "isFinalBoss": false
         }
