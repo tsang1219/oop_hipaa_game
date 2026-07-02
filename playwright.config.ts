@@ -2,6 +2,10 @@ import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  // Run 07 (test-harness fix): only collect Playwright specs. The default
+  // pattern also matched tests/*.test.mts — node assert scripts with no
+  // test() calls, which Playwright mis-collected.
+  testMatch: '**/*.spec.ts',
   outputDir: './test-results',
   timeout: 60_000,
   retries: 1,

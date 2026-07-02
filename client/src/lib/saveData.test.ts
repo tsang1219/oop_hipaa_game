@@ -158,3 +158,76 @@ describe('saveData', () => {
     expect(localStorage.getItem('music_volume')).toBeNull();
   });
 });
+
+// Run 07 (save-shape validation): loadSave used to trust any valid JSON blindly
+// — structurally-wrong-but-valid JSON crashed downstream on `.length`/`.map`.
+describe('save-shape validation', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
+  it('resets gracefully when the blob is valid JSON but not an object', () => {
+    localStorage.setItem(SAVE_KEY_V2, JSON.stringify([1, 2, 3]));
+    const result = loadSave();
+    expect(result.version).toBe(2);
+    expect(result.completedRooms).toEqual([]);
+    expect(result.privacyScore).toBe(100);
+  });
+
+  it('resets gracefully on an unsupported version (v1 blob / future v3)', () => {
+    localStorage.setItem(SAVE_KEY_V2, JSON.stringify({ version: 3, completedRooms: 'everything' }));
+    const result = loadSave();
+    expect(result.version).toBe(2);
+    expect(result.completedRooms).toEqual([]);
+  });
+
+  it('repairs broken declared fields instead of crashing', () => {
+    localStorage.setItem(SAVE_KEY_V2, JSON.stringify({
+      ...defaultSave,
+      completedRooms: 'reception',        // string, not array
+      completedNPCs: [1, 2, 3],           // numbers, not strings
+      privacyScore: 'high',               // string, not number
+      resolvedGates: null,                // null, not record
+    }));
+    const result = loadSave();
+    expect(result.completedRooms).toEqual([]);
+    expect(result.completedNPCs).toEqual([]);
+    expect(result.privacyScore).toBe(100);
+    expect(result.resolvedGates).toEqual({});
+    // hasSaveData must not throw on the repaired blob
+    expect(() => result.completedNPCs.length).not.toThrow();
+  });
+
+  it('PRESERVES extended fields (the real persisted shape) while repairing', () => {
+    // useGameState stores these in the same blob via an `as SaveDataV2` cast —
+    // a validator that strips unknown fields would wipe act progress and
+    // encounter results while "fixing" the save (STATE_OF_TRUTH §6.2).
+    localStorage.setItem(SAVE_KEY_V2, JSON.stringify({
+      ...defaultSave,
+      completedRooms: 42, // one broken declared field to force the repair path
+      currentAct: 3,
+      act1Complete: true,
+      act2Complete: true,
+      actFlags: { vendorWarned: true },
+      decisions: { helpedPatientFirst: true },
+      encounterResults: { 'phi-sort-reception': { completed: true, score: 9, outcome: 'victory' } },
+      unifiedScore: 91,
+      currentRoomId: 'records_room',
+    }));
+    const result = loadSave() as SaveDataV2 & Record<string, unknown>;
+    expect(result.completedRooms).toEqual([]); // repaired
+    expect(result.currentAct).toBe(3);         // preserved
+    expect(result.act2Complete).toBe(true);
+    expect((result.encounterResults as any)['phi-sort-reception'].outcome).toBe('victory');
+    expect(result.unifiedScore).toBe(91);
+    expect(result.currentRoomId).toBe('records_room');
+  });
+
+  it('migrateV1toV2 does not blindly trust a wrong-version blob in the v2 key', () => {
+    localStorage.setItem(SAVE_KEY_V2, JSON.stringify({ version: 1, completedRooms: 'oops' }));
+    localStorage.setItem('completedRooms', JSON.stringify(['reception']));
+    const result = migrateV1toV2(['reception']);
+    expect(result.version).toBe(2);
+    expect(result.completedRooms).toEqual(['reception']); // migrated from v1 keys
+  });
+});
