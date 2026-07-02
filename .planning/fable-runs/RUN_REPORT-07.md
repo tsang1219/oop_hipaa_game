@@ -76,4 +76,92 @@ Scene broadcast now matches the bridge contract: `playerPosition`, `roomNPCs/roo
 
 ---
 
-*(Rounds 2+ appended below as they complete.)*
+## Round 2 — the majors (F-05, F-06, F-08, F-10) + F-24
+
+All verified by `tests/run07-verify-round2.mjs` — **9/9 PASS**.
+
+**F-05 · defeat mislabeled + permanent — FIXED** (commit `f326ba9`)
+Defeat header is now red **"SYSTEMS BREACHED"** (was victory-adjacent amber "BREACH CONTAINED" over 0/100) with an explicit retry hint. And defeat no longer seals the encounter: only VICTORY writes the registry; defeat returns via the aborted path, so TD / sorter / triage are all retryable. *Proof:* injected TD defeat renders the honest debrief (`F05-defeat-debrief.png`); a deliberately failed sorter re-offers the request modal on the next talk and does NOT complete the NPC (F-05b/c).
+→ **Flag for user (wording):** "SYSTEMS BREACHED" + the retry line are my copy.
+
+**F-06 · TD encounter had no exit — FIXED**
+`EncounterGameUI` gains an optional exit (✕ ESC button + Escape key) wired to the sorter's abort semantics — no score change, no registry write, replayable, no instant re-pop (uses the F-02 radius re-arm). Standalone TD untouched. *Proof:* `F06-td-exit-button.png`, `F06-after-esc-exit.png`, re-offer verified (F-06b).
+
+**F-08 · dead room celebration + 6 unreachable patient stories — FIXED**
+The auto-complete effect now emits `REACT_ROOM_COMPLETE_FANFARE` + the "Room Cleared!" GameBanner for rooms with real requirements (hallways stay quiet — Commandment 8), which chains into `PatientStoryReveal` as originally designed. *Proof:* banner on entrance completion (`F08-room-cleared-banner.png`); Elena's Story reveals after reception and `collectedStories` persists (`F08-patient-story-elena.png`, F-08c).
+
+**F-10 · silent cold boot — FIXED**
+Root cause was not a missing BGM retry: the `bootPoll` fallback started Exploration ~50ms after mount, before BootScene finished downloading the 2.6MB music. The poll now waits for Boot's SCENE_READY. Picked up the F-17 guard too (poll no longer boots Exploration under standalone TD). *Proof:* zero "not ready, skipping BGM" warns on cold boot (F-10a).
+
+**F-24 · NEW finding — act-advance crash — FIXED**
+Every act advance threw `Cannot set properties of null (setting 'volume')`: ACT_ADVANCE double-fired (the stateRef guard only updates next commit) and the duplicate crossfade left a tween ticking a destroyed WebAudioSound. Fixed with synchronous re-entrancy refs in `checkActAdvance` + `killTweensOf` before the fade. *Proof:* round1b re-run, no pageerror.
+
+## Round 3 — Run 02's three risks
+
+**Test harness (risk 1) — FIXED** (commit `5715128`)
+`npm test` now exists: `test:unit` (vitest, include limited to `client/src/**/*.test.{ts,tsx}` — a bare vitest used to collect the 14 Playwright specs) + `test:data` (tsx sorterData 188/188 + triage 26/26). Playwright `testMatch` limited to `*.spec.ts` (no more mis-collected `.test.mts`).
+
+**Save-shape validation (risk 2) — FIXED**
+New `validateSave` in `saveData.ts`: non-object / wrong-version blobs reset gracefully; broken *declared* fields are repaired to defaults; **extended fields (currentAct, decisions, encounterResults, …) are preserved, never stripped** — validated against the real persisted shape per STATE_OF_TRUTH §6.2. `migrateV1toV2`'s idempotent path routed through it. *Proof:* 5 new vitest cases (14/14) + live smoke — three hostile blobs boot clean, zero pageerrors (`run07-verify-round3.mjs`).
+
+**Build assets (risk 3) — VERIFIED**
+`npm run build` clean; `dist/public/attached_assets` materializes as a real 50MB directory, 302/302 files (243 ogg + 39 png + 1 svg). **Still open:** deployed-URL smoke on the live GitHub Pages site (needs the real URL).
+
+## Round 4 — minors (commit `6ed669c`, `run07-verify-round4.mjs` 6/6 PASS)
+
+- **F-11** onboarding + footer copy: "SPACE at a door" (doors don't work by walking).
+- **F-12** locked doors now prompt `[LOCKED] <room> — finish this area first` (`F12-locked-door-prompt.png`).
+- **F-13** zone/item dialogues get a document plate instead of a random staff face; unmapped-portrait warn fires once per id.
+- **F-14** sorter opens with per-NPC scene-setting openers instead of "Nice. You're getting the rhythm." at 0/10. → **Flag: new copy** (3 opener lines in `sorterReactions.ts`).
+- **F-16** demo no longer shows the full-game onboarding modal (render-time `isDemoActive()` check).
+- **F-20** door labels clamp inside room bounds (no more "Recepti").
+- **F-21** "!" speech-bubble markers fade out on live NPC completion (`F21-riley-marker-{before,after}.png`).
+
+## Round 5 — full-traversal regression: two NEW criticals found & fixed
+
+**F-25 · NEW (major) · both scenes' `shutdown()` was dead code — FIXED** (commit `5ee8a24`)
+Phaser never auto-calls a method named `shutdown()`. Every `scene.restart()` (= every room transition) stacked a duplicate copy of ~17 eventBridge listeners on the singleton bridge; destroyed Game instances left permanently-stale listeners whose `this.scene.isActive()` guards THROW, aborting emit chains before live listeners ran (observed killing QA door-nav dead; almost certainly behind run 01's one-off door desync and other flakiness). Fixed in ExplorationScene + BreachDefenseScene: cleanup wired via `events.once(SHUTDOWN/DESTROY)`, idempotent `removeBridgeListeners()` de-dup at create, throw-proof `isSceneAlive()` for QA handlers.
+
+**F-26 · NEW (breaks-the-game, exposed by F-08) · patient story unmounted the game — FIXED**
+`PatientStoryReveal` was a full-page early return — it unmounted `PhaserGame` (which destroys the Game on unmount) and nothing could reboot the scene, leaving a dead black canvas after every story. Unreachable while stories were dead content; F-08 exposed it. It's styled `absolute inset-0` — now rendered as the overlay it was meant to be.
+
+**QA-infra:** the `?qa-room` loader's blind 2s `REACT_LOAD_ROOM` timer replaced with a scene-aware poll (events were being lost before the listener existed, or restarting the room under the player's feet). Two PRE-EXISTING progression failures (STATE_OF_TRUTH baseline "29/2") root-caused to stale hardcoded Riley coordinates in the specs — fixed. (commit `3b99504`)
+
+**The proof (stop-condition pass):** `run07-verify-round5-traversal.mjs` — a full natural playthrough on a fresh save: 8 rooms door-to-door, **all 26 NPCs** (dialogues; social + observation + choice gates; 3 sorter wins; Breach Triage **21/21 · 100%**), acts advancing 1→2→3 live, **all 6 patient stories collected**, TD declined-and-retriable, the CCO's full 3-scenario final exam, and the **PRIVACY GUARDIAN win screen** — 9/9 sections PASS, **zero page errors** (`R5-final-win.png`).
+
+## Final regression status
+
+| Suite | Result |
+|---|---|
+| `npm test` (vitest 14 + sorterData 188 + triage 26) | **all pass** |
+| Playwright progression suite | **31 passed / 0 failed / 4 skipped** (baseline: 29/2/4; skips = retired `/breach` tests) |
+| run07 drivers (rounds 1–5) | **37/37 checks PASS** |
+| `tsc`, `npm run build` | clean |
+
+## Final punch list
+
+| ID | Status |
+|---|---|
+| F-01…F-16, F-19…F-22, F-24…F-26 | **FIXED + verified on screen** |
+| F-17 | fixed (folded into F-10's bootPoll guard) |
+| F-09 | fixed via F-04/F-15 counting (room HUDs can now fill; confirmed lobby 2/2 during traversal) |
+| F-23 (social gate double-toast under rapid input) | open, minor — behaves correctly at human pace (press 1 = gate toast, press 2 = dialogue); watch |
+| F-18 | (id never existed in run 01's list) |
+| Deployed-URL smoke (Pages base path) | open — needs the live URL |
+| run 01 open question #5 (reception chairs art intent) | untouched — art/taste call |
+
+## Flagged for the user (decisions made that deserve a look, plus pending calls)
+
+1. **New player-facing copy shipped** (all short, all tone-matched, none HIPAA-load-bearing — but review): 4 post-encounter NPC lines (`completedText`), 3 sorter opener lines, defeat header "SYSTEMS BREACHED" + retry hint, locked-door prompt "[LOCKED] … finish this area first", "\<NPC\> is ready to talk now" notify, onboarding "SPACE at a door".
+2. **F-15 design call made:** the records choice gate now unlocks the second person after the first completes ("who do you assist FIRST" is now literal). The decision flag still records who you chose. If permanent mutual exclusion was intended, revert that hunk — but then the 26-NPC ending needs a different threshold.
+3. **Defeat = retryable** (F-05): losing an encounter no longer locks in a 0. This changes scoring dynamics (a player can retry to victory). Felt clearly right (the sorter's own "KEEP PRACTICING" copy promises it), but it's a design change.
+4. **Win condition semantics:** ending requires all 26 NPCs including 4 encounter *victories*. TD remains optional (no NPC attached). If TD should count toward the ending, it needs a design decision.
+5. **The refactor proposal (Run 04) remains untouched** — no monolith splitting was done; every fix was surgical.
+
+## Handback
+
+- Branch: `fable/fix-loop` (12 commits, never touched main)
+- Report: `.planning/fable-runs/RUN_REPORT-07.md` (this file)
+- Proof screenshots: `screenshots/run07/` (30 files)
+- Reusable verification drivers: `tests/run07-verify-*.mjs` (6 scripts, committed)
+- Dev server: stopped.
