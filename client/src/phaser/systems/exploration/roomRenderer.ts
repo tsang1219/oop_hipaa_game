@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { furnitureTextureKey } from '../../SpriteFactory';
+import { furnitureTextureKey } from '../../sprites/furniture';
 import type { Room } from '@shared/schema';
 
 const TILE = 32;

@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
-import { npcTextureKey, objectTextureKey } from '../../SpriteFactory';
+import { npcTextureKey } from '../../sprites/npcTextures';
+import { objectTextureKey } from '../../sprites/objectTextures';
 import { getHallwayBoard } from '../../../data/hallwayContent';
 import { isDemoActive } from '@/lib/demoSession';
 import type { Room, NPC, InteractionZone, EducationalItem } from '@shared/schema';

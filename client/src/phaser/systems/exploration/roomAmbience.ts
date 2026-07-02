@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
-import { furnitureTextureKey, npcTextureKey, objectTextureKey } from '../../SpriteFactory';
+import { furnitureTextureKey } from '../../sprites/furniture';
+import { npcTextureKey } from '../../sprites/npcTextures';
+import { objectTextureKey } from '../../sprites/objectTextures';
 import type { Room } from '@shared/schema';
 import type { InteractableData } from './interactableFactory';
 

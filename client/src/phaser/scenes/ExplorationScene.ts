@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
-import { generateAllTextures } from '../SpriteFactory';
+import { generateAllTextures } from '../sprites';
 import {
   ENCOUNTER_WAVES_INBOUND,
   ENCOUNTER_WAVE_BUDGETS,
