@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-02, Fable Run 02): STALE — describes the pre-v2.0 three-route app.** Routes `/privacy`/`/breach`, `HubWorldPage`/`PrivacyQuestPage`/`BreachDefensePage`, `HubWorldScene`, and `HallwayHub` are all deleted; the live server default port is **8080**, not 5000 (5000 is only the Replit env). Dependency versions are still roughly right. See `.planning/STATE_OF_TRUTH.md` for what is actually true.
+
 # Technology Stack
 
 ## Languages and Runtime

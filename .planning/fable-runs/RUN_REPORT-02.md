@@ -43,3 +43,24 @@ _Executed 2026-07-01/02 · branch `fable/reconciliation` · mode: docs only (zer
 ## What I'd do next
 
 Morning order: read STATE_OF_TRUTH → triage Run 01's punch list into checklist §4 → run checklist §0 (build/asset check is 10 minutes and de-risks everything) → then the Nina proof-of-concept, because it's the cheapest test of whether the whole identity pivot works in practice.
+
+---
+
+# Second pass — twin Run-02 session (2026-07-02)
+
+**What happened:** Run 02 was launched in two chats at once. Both created/used `fable/reconciliation`; both worked in the *same checkout* (the overnight chats share one working directory — the README's "one branch/worktree per run" wasn't enough isolation). The first session committed its deliverables (`d70be8c`) and switched the shared checkout back to `main` mid-way through my pass; files appeared and vanished under me (I also watched Run 04's proposal and Run 05's character drafts land in the same tree). Rather than duplicate or clobber, this pass **independently re-verified the first session's claims and amended the deliverables in place.** Everything it asserted that I could test held up, with the corrections below.
+
+**Live verification this pass added (the first session ran none of these):**
+- `npm run build` → clean. Single 2.24 MB client chunk (562 KB gzip) — flagged, not fixed.
+- **Asset-symlink risk retired:** `dist/public/attached_assets/` materializes as real files in a local prod build; CI independently copies pre-build. Checklist §0 item checked off; residual = deployed-URL smoke (§6).
+- `npx tsx tests/sorterData.test.mts` → 188/188 · `breachTriageOverlay.test.mts` → 26/26.
+- **Playwright progression suite against the live game: 29 passed / 2 failed / 4 skipped-by-design (11 min).** The 2 failures share one root — Reception completion never registers (`room-completion.spec.ts:37`, cascading into `door-unlocks.spec.ts:71`). Entrance completion passes, so the mechanism works; drift is Reception-specific (riley at (10,3) vs test targeting (10,4); Phase-26 furniture or dialogue-completion drift are the suspects). New checklist §0 item with the full diagnosis; overlaps Run 07's lane.
+
+**Corrections/additions folded into the deliverables:**
+- STATE_OF_TRUTH: shipped public title is **"HIPAApocalypse"** (`client/index.html` — absent from every planning doc); Build-health section rewritten with the live results; save-shape divergence documented (`useGameState.ts:153-171` persists 8 fields the `SaveDataV2` interface doesn't declare — a naive validator would eat live saves); **deploy-target triad** added as hotspot #6 (GH Pages auto-deploys `main` on every push — the game is presumably already live; `.replit` deployment runs a `dist/index.cjs` that the build never produces; `vercel.json` is a third config); docs table: `codebase/STACK.md` re-verdicted **STALE** (port 5000 + three routes + deleted files) and bannered; room size settled (**20×15** per `roomData.json` — ROOM_DESIGN_STANDARDS right, CONVENTIONS-era "6×6–12×10" wrong); MILESTONES/ROADMAP link **nonexistent v1.1 archive files**; minor list extended (46 `rules-of-hooks` disables concentrated in the two encounter overlays; dual encounter engines with the TD trigger hardcoded at `ExplorationScene.ts:2109`; 7 stale 2026-03-11 worktrees/branches; vestigial GEMINI/drizzle scaffolding).
+- RELEASE_CHECKLIST: §0 build item checked (evidence inline) + failing-tests item added; save-guard item now warns about the extended fields; §3 gains the `characters.ts` blurb tone check ("Brown Brad Pitt" ships on screen two right now); §4 gains the conditional-hooks defusal; §5 gains the repo-hygiene sweep (worktrees, `.replit`, `vercel.json`, drizzle/GEMINI); §6 deploy item now states the auto-deploy-on-main reality.
+- One claim of the first pass I checked and **rejected**: "stale committed `dist/`" — `git ls-files dist` is empty; `dist/` is ignored, just a stale local build.
+
+**For next overnight batches:** don't run two chats against one checkout. Either one chat per clone, or have each run `EnterWorktree` first — the branch-per-run rule alone doesn't isolate the working tree, and tonight's collision cost an hour of re-derivation. (Run 07 writing game code in this same checkout while docs runs read it is the same hazard, one severity higher.)
+
+**Needs your eyes (additions):** the checked-off §0 build item (I verified locally — if you want the paranoid version, re-run `npm run build && npx serve dist/public` yourself); whether GH-Pages-on-every-push is your intended release cadence during ship month; the Reception test failure triage (game bug vs. helper drift) if Run 07 hasn't already taken it.
