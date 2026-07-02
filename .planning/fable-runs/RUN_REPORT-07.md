@@ -2,6 +2,23 @@
 
 **Date:** 2026-07-02 · **Branch:** `fable/fix-loop` · **Input:** RUN_REPORT-01 punch list (round-1 find phase) + Run 02's three risks · **Proof screenshots:** `screenshots/run07/` · **Verification drivers:** `tests/run07-verify-*.mjs` (run against `npm run dev` on :8080)
 
+> ## ⚠️ Two sessions ran this job in parallel — see also `fable/fix-loop-work`
+> A twin Run-07 session ran concurrently and finished on **`fable/fix-loop-work`**
+> (its report is `RUN_REPORT-07.md` on that branch, with its own pick-one guidance).
+> Discovered only at the very end of this session — early on, this session removed what
+> looked like a stale `PrivacyQuest-fixloop` worktree (same commit as main, one untracked
+> file); that was actually the twin's workspace, and it gracefully moved to its own branch.
+> **Both branches fix the same root causes with different code — pick ONE, do not merge both.**
+> Independent convergence on the deep bugs (this branch's F-25/F-26 ≙ its R7-02/R7-03),
+> and both end in a passing full traversal to the win screen.
+> Unique to THIS branch: F-19 qa-bridge state contract, F-24 act-crossfade crash fix,
+> the entire round-3 sweep (npm test wiring, save-shape validation w/ unit tests, build
+> asset verification), the qa-room loader race fix, and the two pre-existing progression
+> failures fixed (suite 31/0 green). Unique to the twin: R7-05 (defer the room-cleared
+> banner/story while an encounter overlay is open — a real edge this branch does not
+> handle) and R7-06 (`isFinalBoss: true` data flag for the CCO — cleaner semantics than
+> this branch's counting fix). Whichever branch wins, cherry-pick the other's unique fixes.
+
 Every fix below has scripted behavioral proof (Playwright + qa-bridge assertions) and/or a screenshot. Nothing is "fixed" on code-reading alone.
 
 ---
