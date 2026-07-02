@@ -66,6 +66,23 @@ const SORTER_LOCATION_LABELS: Record<string, string> = {
   'breach-triage-er': 'PRIYA',  // Phase 17: Breach Triage close button reads "BACK TO PRIYA"
 };
 
+// F-04 fix (Run 07): map encounterId → the NPC that hosts it, built from roomData.
+// Encounter-trigger NPCs (Aiyana, Marcus, Dr. Tovar, Priya) never went through the
+// dialogue flow, so they could never enter completedNPCs — capping completion at
+// 22/26 and making the win condition (talk to the CCO with all 26 done) unreachable.
+// Winning an encounter now marks its host NPC complete, same as finishing a dialogue.
+const ENCOUNTER_NPC_BY_ID: Record<string, string> = (() => {
+  const map: Record<string, string> = {};
+  for (const room of (roomDataJson as any).rooms ?? roomDataJson) {
+    for (const npc of room.npcs ?? []) {
+      if (npc.encounterTrigger?.encounterId) {
+        map[npc.encounterTrigger.encounterId] = npc.id;
+      }
+    }
+  }
+  return map;
+})();
+
 interface RoomWithDoors {
   id: string;
   name: string;
@@ -376,7 +393,14 @@ export default function UnifiedGamePage() {
     // demo session.
     if (isDemoActive()) return;
     const currentMusicVolume = parseFloat(localStorage.getItem('music_volume') ?? '0.6');
+    // F-03 fix (Run 07): merge over the existing blob instead of writing a fixed
+    // 15-field shape. useGameState's own persistence effect stores 8 extended
+    // fields (currentAct, act1/2Complete, actFlags, decisions, encounterResults,
+    // unifiedScore, currentRoomId) in the same key; the old fixed-shape write ran
+    // AFTER it on every state change and wiped them all — no act ever survived a
+    // save, which made Act 3 (Priya / Breach Triage) unreachable.
     writeSave({
+      ...loadSave(),
       version: 2,
       completedRooms: gameState.state.completedRooms,
       collectedStories: gameState.state.collectedStories,
@@ -629,6 +653,10 @@ export default function UnifiedGamePage() {
       : completedRooms;
     if (justCompleted) {
       gameState.completeRoom(currentRoomId);
+      // F-03 fix (Run 07): checkActAdvance existed since Phase 14 but was never
+      // called from anywhere — acts could not advance even in memory. This is
+      // the single funnel through which every room completion flows.
+      gameState.checkActAdvance(effectiveCompleted);
     }
     const doorStates = computeDoorStates(currentRoom, effectiveCompleted);
     eventBridge.emit(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, { doorStates });
@@ -1191,6 +1219,11 @@ export default function UnifiedGamePage() {
       score: result.correctCount,
       outcome,
     });
+    // F-04 fix (Run 07): a won encounter completes its host NPC (Priya),
+    // same as a finished dialogue — otherwise the 26-NPC win condition is unreachable.
+    if (outcome === 'victory' && ENCOUNTER_NPC_BY_ID[result.encounterId]) {
+      gameState.completeNPC(ENCOUNTER_NPC_BY_ID[result.encounterId]);
+    }
   }, [narrativeCardData, gameState]);
 
   // PHI Sorter encounter completion handler (Phase 16)
@@ -1225,6 +1258,12 @@ export default function UnifiedGamePage() {
       score: result.correctCount,
       outcome,
     });
+    // F-04 fix (Run 07): a won encounter completes its host NPC (Aiyana /
+    // Marcus / Dr. Tovar), same as a finished dialogue — otherwise the
+    // 26-NPC win condition is unreachable.
+    if (outcome === 'victory' && ENCOUNTER_NPC_BY_ID[result.encounterId]) {
+      gameState.completeNPC(ENCOUNTER_NPC_BY_ID[result.encounterId]);
+    }
   }, [narrativeCardData, gameState]);
 
   // ── Sync completion state to running Phaser scene ─────────────
@@ -1270,11 +1309,32 @@ export default function UnifiedGamePage() {
           eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
         }
 
-        // Win condition
-        if (
-          currentSceneId === 'final_boss_1' &&
-          gameState.state.completedNPCs.length + 1 >= totalScenarios + 1
-        ) {
+        // F-15 fix (Run 07): the choice gate asks "who do you assist FIRST?" —
+        // "first" promises you'll get to both. Once the chosen person's scenario
+        // completes, unlock the other option so their content (and the 26-NPC
+        // ending, which needs every NPC) stays reachable.
+        const gatesHere: Gate[] = currentRoom?.config?.gates || [];
+        for (const gate of gatesHere) {
+          if (gate.type !== 'choice') continue;
+          if (!gate.choiceOptions?.some(opt => opt.unlocksId === currentNPCId)) continue;
+          for (const opt of gate.choiceOptions) {
+            if (opt.unlocksId && opt.unlocksId !== currentNPCId && !unlockedNpcs.has(opt.unlocksId)) {
+              resolveGate(gate.id, opt.unlocksId);
+              const otherNpc = currentRoom?.npcs.find((n: any) => n.id === opt.unlocksId);
+              if (otherNpc) {
+                notify(`${otherNpc.name} is ready to talk now`, { label: 'NEW SCENARIO', type: 'info' });
+              }
+            }
+          }
+        }
+
+        // Win condition — F-04 fix (Run 07): count the boss conversation that is
+        // completing RIGHT NOW (state is stale until the next render). The CCO has
+        // no isFinalBoss flag, so he is one of the 26 counted scenarios; the old
+        // `length + 1 >= totalScenarios + 1` algebra required talking to him twice
+        // even with everything else done.
+        const completedAfterThis = new Set([...gameState.state.completedNPCs, currentNPCId]).size;
+        if (currentSceneId === 'final_boss_1' && completedAfterThis >= totalScenarios) {
           if (gameState.state.privacyScore > 0) {
             setPageMode('win');
             return;
@@ -1287,7 +1347,7 @@ export default function UnifiedGamePage() {
       setPageMode('exploration');
       eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
     },
-    [currentNPCId, currentSceneId, gameState, totalScenarios, currentRoom, notify],
+    [currentNPCId, currentSceneId, gameState, totalScenarios, currentRoom, notify, unlockedNpcs, resolveGate],
   );
 
   const handleGameOver = useCallback(
@@ -1587,7 +1647,10 @@ export default function UnifiedGamePage() {
         isWin={pageMode === 'win'}
         finalScore={gameState.state.privacyScore}
         scenariosCompleted={gameState.state.completedNPCs.length}
-        totalScenarios={totalScenarios + 1}
+        // F-04 follow-up (Run 07): the CCO has no isFinalBoss flag, so he is
+        // already inside totalScenarios — the old +1 rendered "26/27" on a
+        // 100% run.
+        totalScenarios={totalScenarios}
         timeElapsed={formatElapsedTime()}
         onPlayAgain={handlePlayAgain}
       />
@@ -1606,7 +1669,30 @@ export default function UnifiedGamePage() {
   }
 
   // ── Main game view (Phaser canvas + React overlays) ───────────
-  const dialogueScenes = currentSceneId ? scenes.filter(s => s.id === currentSceneId) : [];
+  // F-22 fix (Run 07, new finding): pass the FULL nextSceneId chain, not just the
+  // entry scene. GameContainer resolves choice.nextSceneId by findIndex into this
+  // array; with only the entry scene present, every cross-scene jump fell through
+  // to "no next scene → onComplete", silently ending multi-scene dialogues after
+  // scene 1 — the CCO's 3-scenario final exam played only scenario 1.
+  const dialogueScenes = (() => {
+    if (!currentSceneId) return [];
+    const byId = new Map(scenes.map(s => [s.id, s]));
+    const out: Scene[] = [];
+    const seen = new Set<string>();
+    const queue = [currentSceneId];
+    while (queue.length) {
+      const id = queue.shift()!;
+      if (seen.has(id)) continue;
+      seen.add(id);
+      const s = byId.get(id);
+      if (!s) continue;
+      out.push(s);
+      for (const c of s.choices ?? []) {
+        if (c.nextSceneId) queue.push(c.nextSceneId);
+      }
+    }
+    return out;
+  })();
   const npc = currentRoom?.npcs.find((n: any) => n.id === currentNPCId);
 
   return (
