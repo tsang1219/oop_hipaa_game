@@ -1,12 +1,11 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
-import { generateAllTextures, furnitureTextureKey, npcTextureKey, npcTypeFromId, objectTextureKey } from '../SpriteFactory';
+import { generateAllTextures } from '../SpriteFactory';
 import {
   ENCOUNTER_WAVES_INBOUND,
   ENCOUNTER_WAVE_BUDGETS,
   ENCOUNTER_AVAILABLE_TOWERS,
 } from '../../game/breach-defense/constants';
-import { getHallwayBoard } from '../../data/hallwayContent';
 import { findPath } from '../systems/exploration/pathfinding';
 import {
   ensurePlayerFallbackTexture,
@@ -14,16 +13,19 @@ import {
   renderVignette,
   showRoomBanner,
 } from '../systems/exploration/roomRenderer';
-import { isDemoActive } from '@/lib/demoSession';
+import { spawnInteractables } from '../systems/exploration/interactableFactory';
+import type { InteractableData } from '../systems/exploration/interactableFactory';
+import { addRoomAmbience, addFurnitureIdleAnimations } from '../systems/exploration/roomAmbience';
+import {
+  emitIdleHint,
+  IDLE_HINT_GRACE_MS,
+  IDLE_HINT_INTERVAL_MS,
+} from '../systems/exploration/idleHints';
 import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 const TILE = 32;
 const MOVE_SPEED = 160; // pixels/sec
-
-// ── Idle-hint sparkle system constants (Phase 27 VIS-07) ─────────────────────
-const IDLE_HINT_GRACE_MS = 9000;  // 9s without input before first sparkle
-const IDLE_HINT_INTERVAL_MS = 5000; // ~5s between individual sparkles
 
 // All known music track keys — used to clean up other tracks when changing rooms
 const MUSIC_TRACK_KEYS = [
@@ -55,12 +57,7 @@ function isQANoEncounter(): boolean {
   return __qaNoEncounter;
 }
 
-interface InteractableData {
-  type: 'npc' | 'zone' | 'item' | 'hallwayBoard';
-  id: string;
-  data: NPC | InteractionZone | EducationalItem | { x: number; y: number; title: string; content: string };
-  sprite: Phaser.GameObjects.Sprite;
-}
+// InteractableData interface moved to systems/exploration/interactableFactory (Round 4)
 
 /**
  * ExplorationScene: Renders a PrivacyQuest room in Phaser canvas.
@@ -267,383 +264,24 @@ export class ExplorationScene extends Phaser.Scene {
 
     this.walls = renderRoom(this, room).walls;
 
-    // ── Educational items ────────────────────────────────────────
-    for (const item of room.educationalItems) {
-      const collected = this.collectedItems.has(item.id);
-      const texKey = objectTextureKey(item.type);
-      const sprite = this.add.sprite(item.x * TILE + TILE / 2, item.y * TILE + TILE / 2, texKey);
-      sprite.setAlpha(collected ? 0.4 : 1);
-      if (collected) {
-        sprite.setTint(0x888888);
-      }
-      sprite.setDepth(10);
-      if (!collected) {
-        // Bob tween — keep as-is
-        this.tweens.add({
-          targets: sprite,
-          y: sprite.y - 4,
-          duration: 600,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-
-        // Filled glow aura: additive gold pulsing behind the item sprite
-        // The aura stays anchored; the bob moves the sprite above it — glow reads as floor-glow
-        // glow_radial has soft alpha falloff so the gold tint stays gold (no white blob)
-        if (this.textures.exists('glow_radial')) {
-          // Deep amber + restrained alpha: additive gold clips to white over pale
-          // floors, so go darker on the tint and let the pulse carry the motion
-          const aura = this.add.image(sprite.x, sprite.y + 2, 'glow_radial')
-            .setTint(0xffa000)
-            .setBlendMode(Phaser.BlendModes.ADD)
-            .setAlpha(0.45)
-            .setDepth(sprite.depth - 1);
-          this.tweens.add({
-            targets: aura,
-            alpha: { from: 0.45, to: 0.75 },
-            scale: { from: 0.85, to: 1.1 },
-            duration: 1100,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-        } else {
-          // Fallback: filled circle alpha pulse (never stroke-only)
-          const auraFallback = this.add.circle(sprite.x, sprite.y + 2, 20, 0xffd700, 0.12)
-            .setDepth(sprite.depth - 1);
-          this.tweens.add({
-            targets: auraFallback,
-            alpha: { from: 0.12, to: 0.28 },
-            duration: 1100,
-            yoyo: true,
-            repeat: -1,
-            ease: 'Sine.easeInOut',
-          });
-        }
-
-        // Periodic sparkle — the Zelda "this thing matters" twinkle (Commandment 9)
-        if (this.textures.exists('particle_circle')) {
-          this.add.particles(sprite.x, sprite.y, 'particle_circle', {
-            speed: { min: 8, max: 20 },
-            scale: { start: 0.8, end: 0 },
-            alpha: { start: 0.9, end: 0 },
-            tint: [0xffffff, 0xffe9a0],
-            lifespan: 500,
-            frequency: 1400,
-            quantity: 2,
-            angle: { min: 0, max: 360 },
-          } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(sprite.depth + 1);
-        }
-      }
-      this.interactables.push({ type: 'item', id: item.id, data: item, sprite });
-    }
-
-    // ── Hallway bulletin board (Phase 15) ────────────────────────
-    if (this.room.id.startsWith('hallway_')) {
-      const act = this.getCurrentAct();
-      const board = getHallwayBoard(this.room.id, act);
-      if (board) {
-        const boardX = w / 2;
-        const boardY = 64;
-
-        // Board shadow (depth illusion)
-        this.add.rectangle(boardX + 2, boardY + 2, 60, 44, 0x000000, 0.3)
-          .setDepth(4);
-        // Cork board backing with wooden frame
-        const boardG = this.add.graphics().setDepth(5);
-        // Outer frame (dark wood)
-        boardG.fillStyle(0x5a3a1a, 1);
-        boardG.fillRect(boardX - 31, boardY - 23, 62, 46);
-        // Inner frame highlight
-        boardG.fillStyle(0x8B6914, 1);
-        boardG.fillRect(boardX - 29, boardY - 21, 58, 42);
-        // Cork texture — alternating shades
-        boardG.fillStyle(0xa07828, 1);
-        boardG.fillRect(boardX - 27, boardY - 19, 54, 38);
-        boardG.fillStyle(0x9a7020, 0.5);
-        for (let cy = 0; cy < 4; cy++) {
-          for (let cx = 0; cx < 6; cx++) {
-            if ((cx + cy) % 2 === 0) {
-              boardG.fillRect(boardX - 27 + cx * 9, boardY - 19 + cy * 10, 9, 10);
-            }
-          }
-        }
-        // Paper note — slightly tilted via offset
-        this.add.rectangle(boardX - 1, boardY + 1, 44, 28, 0xe8dcc4).setDepth(6);
-        this.add.rectangle(boardX, boardY, 44, 28, 0xF5E6C8).setDepth(6);
-        // Paper fold line
-        boardG.lineStyle(1, 0xd4c8a8, 0.4);
-        boardG.lineBetween(boardX - 20, boardY - 12, boardX - 20, boardY + 12);
-        boardG.setDepth(7);
-        // Push pins (red circles at corners)
-        this.add.circle(boardX - 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
-        this.add.circle(boardX + 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
-        // Pin highlights
-        this.add.circle(boardX - 19, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
-        this.add.circle(boardX + 17, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
-        // NOTICE label
-        this.add.text(boardX, boardY - 6, 'NOTICE', {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '5px',
-          color: '#8B0000',
-        }).setOrigin(0.5).setDepth(7);
-
-        // Invisible interactive sprite overlapping the board
-        const boardSprite = this.add.sprite(boardX, boardY, objectTextureKey('poster'))
-          .setAlpha(0.01) // nearly invisible; visual is the rectangle above
-          .setDepth(8)
-          .setInteractive({ cursor: 'pointer' });
-
-        this.interactables.push({
-          type: 'hallwayBoard',
-          id: `hallway_board_${this.room.id}_act${act}`,
-          data: { x: Math.floor(boardX / TILE), y: Math.floor(boardY / TILE), title: board.title, content: board.text },
-          sprite: boardSprite,
-        });
-      }
-    }
-
-    // ── Interaction zones ────────────────────────────────────────
-    for (const zone of room.interactionZones) {
-      const texKey = objectTextureKey(zone.spriteType || 'computer');
-      const sprite = this.add.sprite(zone.x * TILE + TILE / 2, zone.y * TILE + TILE / 2, texKey);
-      sprite.setDepth(20);
-      this.tweens.add({
-        targets: sprite,
-        y: sprite.y - 3,
-        duration: 800,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-      // Interaction zone glow ring — pulsing blue aura for incomplete zones
-      // Ring + tween stored in zoneGlows map so live completion can kill it (Phase 27 VIS-08)
-      if (!this.completedZones.has(zone.id)) {
-        const zoneGlow = this.add.circle(
-          sprite.x, sprite.y, 20, 0x00aaff, 0
-        ).setStrokeStyle(1.5, 0x00aaff, 0).setDepth(sprite.depth - 1);
-
-        const glowTween = this.tweens.add({
-          targets: zoneGlow,
-          strokeAlpha: { from: 0, to: 0.4 },
-          scale: { from: 0.8, to: 1.2 },
-          duration: 1200,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut'
-        });
-
-        this.zoneGlows.set(zone.id, { ring: zoneGlow, tween: glowTween });
-      }
-
-      // Completed zone checkmark (at-render time, no pop — pop is for live completion)
-      if (this.completedZones.has(zone.id)) {
-        this.addCompletionCheck(sprite.x, sprite.y - 16, sprite.depth + 1, false);
-      }
-
-      this.interactables.push({ type: 'zone', id: zone.id, data: zone, sprite });
-    }
-
-    // ── NPCs ─────────────────────────────────────────────────────
-    for (const npc of room.npcs) {
-      // Phase 17 (2026-06-10): Act-gated and demo-excluded NPCs.
-      // If the NPC's encounterTrigger.minAct is set, skip spawning when the
-      // current act is too low OR when demo mode is active (demo runs in Act 1
-      // state, so Priya would appear without valid Act 3 context).
-      const minAct = (npc.encounterTrigger as { minAct?: number } | undefined)?.minAct;
-      if (minAct !== undefined) {
-        if (isDemoActive() || this.getCurrentAct() < minAct) continue;
-      }
-
-      const texKey = npcTextureKey(npc.id);
-      const completed = this.completedNPCs.has(npc.id);
-
-      // Drop shadow at feet level (behind the sprite)
-      const npcShadow = this.add.ellipse(
-        npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2 + TILE / 2 - 2,
-        20, 8,
-        0x000000, 0.3,
-      );
-      if (completed) npcShadow.setAlpha(0.15);
-
-      const sprite = this.add.sprite(npc.x * TILE + TILE / 2, npc.y * TILE + TILE / 2, texKey, 0);
-      const npcDepth = 5 + Math.floor(sprite.y / TILE);
-      sprite.setDepth(npcDepth);
-      npcShadow.setDepth(npcDepth - 1);
-      if (completed) {
-        sprite.setAlpha(0.7);
-      }
-
-      // Name label below sprite with dark background for readability
-      const labelX = npc.x * TILE + TILE / 2;
-      const labelY = npc.y * TILE + TILE + 2;
-      const nameLabel = this.add.text(
-        labelX, labelY,
-        npc.name,
-        {
-          fontFamily: '"Press Start 2P"',
-          fontSize: '9px',
-          color: '#ffffff',
-          stroke: '#000000',
-          strokeThickness: 3,
-          backgroundColor: '#00000066',
-          padding: { x: 2, y: 1 },
-        },
-      ).setOrigin(0.5, 0).setDepth(npcDepth + 1);
-      // Clamp label horizontally so it never overflows the room/canvas bounds.
-      // With origin (0.5, 0), the label extends labelHalf in each direction from labelX.
-      const labelPad = 2;
-      const labelHalf = nameLabel.width / 2;
-      const roomPxWidth = room.width * TILE;
-      const minX = labelHalf + labelPad;
-      const maxX = roomPxWidth - labelHalf - labelPad;
-      if (maxX >= minX) {
-        nameLabel.x = Phaser.Math.Clamp(labelX, minX, maxX);
-      }
-      if (completed) nameLabel.setAlpha(0.4);
-
-      // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
-      this.tweens.add({
-        targets: sprite,
-        scaleY: { from: 1.0, to: 1.02 },
-        duration: 1500 + Math.random() * 500,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut',
-      });
-
-      // Completed checkmark
-      if (completed) {
-        // At-render checkmark (no pop — pop is for live completion via updateCompletionState)
-        this.addCompletionCheck(sprite.x, sprite.y - 20, sprite.depth + 1, false);
-      }
-
-      // Boss indicator
-      if (npc.isFinalBoss && !completed) {
-        const bossText = this.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 10, 'BOSS', {
-          fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#e74c3c',
-        }).setOrigin(0.5).setDepth(npcDepth + 3);
-        this.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
-
-        // Boss glow ring — pulsing aura that draws the player's attention
-        const bossGlow = this.add.circle(sprite.x, sprite.y, 24, 0xff4444, 0)
-          .setStrokeStyle(2, 0xff6644, 0.5)
-          .setDepth(sprite.depth - 1);
-        this.tweens.add({
-          targets: bossGlow,
-          scale: { from: 0.8, to: 1.3 },
-          alpha: { from: 0.5, to: 0 },
-          duration: 1500,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-      }
-
-      // Speech bubble indicator for uncompleted NPCs — "talk to me!" cue
-      if (!completed) {
-        const bubbleTexKey = '_npc_speech_bubble';
-        if (!this.textures.exists(bubbleTexKey)) {
-          const bg = this.add.graphics();
-          // Dark rounded rectangle body for high contrast (10x8)
-          bg.fillStyle(0x333333, 0.9);
-          bg.fillRoundedRect(0, 0, 10, 8, 2);
-          // Tiny triangular tail pointing down
-          bg.fillStyle(0x333333, 0.9);
-          bg.fillTriangle(3, 8, 7, 8, 5, 11);
-          // Subtle light border for definition
-          bg.lineStyle(1, 0x555555, 0.6);
-          bg.strokeRoundedRect(0, 0, 10, 8, 2);
-          // Inner dot detail (white exclamation hint)
-          bg.fillStyle(0xffffff, 0.9);
-          bg.fillRect(4, 2, 2, 3);
-          bg.fillRect(4, 6, 2, 1);
-          bg.generateTexture(bubbleTexKey, 10, 12);
-          bg.destroy();
-        }
-        const bubbleX = npc.x * TILE + TILE / 2;
-        const bubbleY = npc.y * TILE + TILE / 2 - 20;
-        const bubble = this.add.image(bubbleX, bubbleY, bubbleTexKey);
-        bubble.setAlpha(0.8);
-        bubble.setDepth(npcDepth + 2);
-        this.tweens.add({
-          targets: bubble,
-          y: bubbleY - 3,
-          duration: 1500,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        // F-21 (Run 07): register so live completion can clear the marker
-        this.npcBubbles.set(npc.id, bubble);
-      }
-
-      this.interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
-    }
-
-    // ── ER urgency cues (DESIGN-001) ────────────────────────────
-    if (this.room.id === 'er') {
-      // Flashing EMERGENCY status panel — wall-mounted near the top center
-      const panelX = 10 * TILE + TILE / 2;
-      const panelY = 1 * TILE + TILE / 2 + 4;
-      const panelBack = this.add.rectangle(panelX, panelY, 64, 18, 0x1a0000).setStrokeStyle(1, 0x4a0000).setDepth(4);
-      const panelGlow = this.add.rectangle(panelX, panelY, 64, 18, 0xff2222, 0.55).setDepth(4);
-      const panelLabel = this.add.text(panelX, panelY, 'EMERGENCY', {
-        fontFamily: '"Press Start 2P"', fontSize: '7px', color: '#ffe6e6', stroke: '#660000', strokeThickness: 2,
-      }).setOrigin(0.5).setDepth(5);
-      this.tweens.add({ targets: [panelGlow, panelLabel], alpha: { from: 1, to: 0.35 }, duration: 600, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      void panelBack;
-
-      // Walking nurse — patrols horizontally between tile x=8 and x=11 at y=4
-      const nurseY = 4 * TILE + TILE / 2;
-      const nurseStartX = 8 * TILE + TILE / 2;
-      const nurseEndX = 11 * TILE + TILE / 2;
-      this.add.ellipse(nurseStartX, nurseY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
-      const nurseSprite = this.add.sprite(nurseStartX, nurseY, npcTextureKey('nurse_chen')).setDepth(5 + 4);
-      this.tweens.add({ targets: nurseSprite, x: nurseEndX, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => nurseSprite.setFlipX(true), onRepeat: () => nurseSprite.setFlipX(false) });
-      this.tweens.add({ targets: nurseSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 360, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-
-      // Idle fidget for officer + frantic family — subtle angle wobble
-      for (const fidgetId of ['officer', 'frantic_family']) {
-        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
-        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.5, to: 1.5 }, duration: 1100 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // Ambient monitor beep — heartbeat-like cadence (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 9000, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.6 }); } catch (_) {}
-      } });
-    }
-
-    // ── Reception life pass (DESIGN-005) ────────────────────────
-    if (this.room.id === 'reception') {
-      // Busy desk props — clipboard, coffee mug, papers stack riding on the desk surface
-      const deskSurfaceY = 2 * TILE + TILE / 2 - 6;
-      const clipboard = this.add.sprite(8 * TILE + TILE / 2, deskSurfaceY, objectTextureKey('manual')).setScale(0.55).setDepth(5).setAngle(-8);
-      const mug = this.add.sprite(9 * TILE + TILE / 2 + 6, deskSurfaceY + 2, furnitureTextureKey('coffee_mug')).setScale(0.6).setDepth(5);
-      const papers = this.add.sprite(11 * TILE + TILE / 2, deskSurfaceY, furnitureTextureKey('inbox_tray')).setScale(0.55).setDepth(5);
-      this.tweens.add({ targets: mug, y: mug.y - 1, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      void clipboard; void papers;
-
-      // Vary chair groupings — add a conversation pair facing each other (decorative, no collision)
-      const pairY = 11 * TILE + TILE / 2;
-      const chairA = this.add.sprite(10 * TILE + TILE / 2, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(15);
-      const chairB = this.add.sprite(11 * TILE + TILE / 2 + 4, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(-15).setFlipX(true);
-      // Angled corner chair near the right cluster, suggesting someone sat askew
-      const chairC = this.add.sprite(14 * TILE + TILE / 2, 8 * TILE + TILE / 2, furnitureTextureKey('chair')).setDepth(3).setAngle(-25);
-      void chairA; void chairB; void chairC;
-
-      // Interactable pulse — subtle scale yoyo on items + zones to signpost interactivity
-      for (const ia of this.interactables) {
-        if (ia.type !== 'zone' && ia.type !== 'item') continue;
-        this.tweens.add({ targets: ia.sprite, scaleX: { from: 1.0, to: 1.04 }, scaleY: { from: 1.0, to: 1.04 }, duration: 1500, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // Ambient distant footsteps — visitor passing in the corridor (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 13000, loop: true, callback: () => {
-        try { this.sound.play('sfx_footstep', { volume: 0.04, rate: 0.9 + Math.random() * 0.2 }); } catch (_) {}
-      } });
-    }
+    // ── Interactables (Round 4 → systems/exploration/interactableFactory) ──
+    // Items + glow auras, hallway bulletin board, zones + zoneGlows, NPCs +
+    // labels + speech bubbles + boss ring. addCompletionCheck stays on the
+    // scene (updateCompletionState also calls it); npcBubbles is the scene's
+    // registry (updateCompletionState clears markers on live completion).
+    const spawned = spawnInteractables(this, room, {
+      completedNPCs: this.completedNPCs,
+      completedZones: this.completedZones,
+      collectedItems: this.collectedItems,
+      npcBubbles: this.npcBubbles,
+      getCurrentAct: () => this.getCurrentAct(),
+      addCompletionCheck: (x, y, depth, pop) => this.addCompletionCheck(x, y, depth, pop),
+    });
+    this.interactables = spawned.interactables;
+    this.zoneGlows = spawned.zoneGlows;
 
     // Pulse first NPC if this room hasn't been pulsed yet
+    // (stays in the scene per the refactor proposal — writes npcPulseTween/npcPulseTarget)
     const firstNpc = this.interactables.find(ia => ia.type === 'npc');
     const roomPulseKey = `pq:room:${this.room.id}:npcPulsed`;
     if (firstNpc && !localStorage.getItem(roomPulseKey)) {
@@ -659,211 +297,10 @@ export class ExplorationScene extends Phaser.Scene {
       });
     }
 
-    // ── Hospital Lobby first-frame polish (DESIGN-004) ────────────
-    if (this.room.id === 'hospital_entrance') {
-      // (1) Coffee cart prop — non-interactable, rendered directly in scene
-      const cartTileX = 5, cartTileY = 5;
-      const cartCx = cartTileX * TILE + TILE / 2, cartCy = cartTileY * TILE + TILE / 2;
-      this.add.ellipse(cartCx, cartCy + 12, TILE - 4, 8, 0x000000, 0.18).setDepth(2);
-      this.add.sprite(cartCx, cartCy, furnitureTextureKey('coffee_station')).setDepth(3);
-      // Tiny steam puff every ~2.6s above the cart
-      this.time.addEvent({ delay: 2600, loop: true, callback: () => {
-        const puff = this.add.ellipse(cartCx + (Math.random() * 4 - 2), cartCy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
-        this.tweens.add({ targets: puff, y: puff.y - 12, alpha: 0, scaleX: 1.5, scaleY: 1.5, duration: 1400, ease: 'Sine.easeOut', onComplete: () => puff.destroy() });
-      } });
-      // (2) Riley idle micro-animation — subtle angle sway on top of breathing tween
-      const riley = this.interactables.find(ia => ia.type === 'npc' && ia.id === 'riley_entrance');
-      if (riley) {
-        this.tweens.add({ targets: riley.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // Plant leaf-sway is now handled generically by addFurnitureIdleAnimations() — no entrance-only block needed
-      // (3) Ambient lobby chatter — single subtle blip every 9-12s, max volume 0.08
-      this.time.addEvent({ delay: 10500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.55 + Math.random() * 0.2 }); } catch (_) {}
-      } });
-      // Ambient sliding-door whoosh — distant entry sound every ~20s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 19500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.06, rate: 0.8 }); } catch (_) {}
-      } });
-    }
-
-    // ── Break Room comedic life (DESIGN-003) ─────────────────────
-    if (this.room.id === 'break_room') {
-      const ledColors = [0xff4444, 0xffdd44, 0x44ff66, 0x44ccff];
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'vending_machine') continue;
-        const led = this.add.rectangle(obs.x * TILE + obs.width * TILE - 6, obs.y * TILE + 6, 2, 2, ledColors[0]).setDepth(20);
-        let li = 0;
-        this.time.addEvent({ delay: 700, loop: true, callback: () => { li = (li + 1) % ledColors.length; led.setFillStyle(ledColors[li]); } });
-      }
-      const mw = room.obstacles.find((o: any) => o.type === 'microwave');
-      if (mw) {
-        const mx = mw.x * TILE + TILE / 2, my = mw.y * TILE + TILE / 2;
-        this.time.addEvent({ delay: 9000, loop: true, callback: () => {
-          try { this.sound.play('sfx_interact', { volume: 0.12, rate: 1.6 }); } catch (_) {}
-          const f = this.add.rectangle(mx, my, TILE - 8, TILE - 8, 0xffeeaa, 0.5).setDepth(20);
-          this.tweens.add({ targets: f, alpha: 0, duration: 350, onComplete: () => f.destroy() });
-        } });
-      }
-      const gossip = this.interactables.find(ia => ia.type === 'npc' && ia.id === 'gossiping_coworker');
-      if (gossip) {
-        const glyphs = ['...', '!', '?'];
-        this.time.addEvent({ delay: 4500, loop: true, callback: () => {
-          const b = this.add.text(gossip.sprite.x + 10, gossip.sprite.y - 24, glyphs[Math.floor(Math.random() * glyphs.length)], {
-            fontFamily: '"Press Start 2P"', fontSize: '8px', color: '#ffffff', backgroundColor: '#222222cc', padding: { x: 3, y: 2 },
-          }).setOrigin(0.5).setDepth(gossip.sprite.depth + 3).setAlpha(0);
-          this.tweens.add({ targets: b, alpha: 1, y: b.y - 4, duration: 250, yoyo: true, hold: 900, onComplete: () => b.destroy() });
-        } });
-      }
-      // Ambient vending dispense — soft thunk every ~16s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 16000, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.05, rate: 0.5 }); } catch (_) {}
-      } });
-    }
-
-    // ── Records Room final-demo polish (DESIGN-006) ──────────────
-    if (this.room.id === 'records_room') {
-      // (1) Flickering fluorescent tube + dust motes in the upper filing aisle
-      const tubeCx = 10 * TILE + TILE / 2, tubeCy = 1 * TILE + TILE - 4;
-      const tube = this.add.rectangle(tubeCx, tubeCy, TILE * 3, 3, 0xfff7d8, 0.85).setDepth(4);
-      const tubeHalo = this.add.rectangle(tubeCx, tubeCy + 10, TILE * 4, 22, 0xfff2b8, 0.10).setDepth(3);
-      this.time.addEvent({ delay: 3200, loop: true, callback: () => {
-        // Brief flicker — dim then snap back
-        this.tweens.add({ targets: [tube, tubeHalo], alpha: { from: tube.alpha, to: 0.25 }, duration: 80, yoyo: true, repeat: 1, ease: 'Linear' });
-      } });
-      // Dust motes drifting in the light beam below the tube
-      this.time.addEvent({ delay: 1400, loop: true, callback: () => {
-        const mote = this.add.circle(tubeCx + (Math.random() * 80 - 40), tubeCy + 6, 1, 0xfff5c8, 0.7).setDepth(20);
-        this.tweens.add({ targets: mote, y: mote.y + 18, alpha: 0, duration: 4200, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
-      } });
-      // (2) Idle fidget on the two strongest NPCs — CCO and Attorney
-      for (const fidgetId of ['compliance_officer', 'attorney']) {
-        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
-        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1300 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // (3) Subpoena envelope prop next to Attorney — small obj_manual sprite, signals "official document"
-      const attorney = this.interactables.find(i => i.type === 'npc' && i.id === 'attorney');
-      if (attorney) {
-        const env = this.add.sprite(attorney.sprite.x + 14, attorney.sprite.y + 4, objectTextureKey('manual')).setScale(0.5).setDepth(attorney.sprite.depth - 1).setAngle(12);
-        this.tweens.add({ targets: env, y: env.y - 1, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // (4) Decorative document cart drifting slowly down the central aisle (separate from the static cart at (6,5))
-      const cartY = 9 * TILE + TILE / 2;
-      const cartStartX = 13 * TILE + TILE / 2, cartEndX = 16 * TILE + TILE / 2;
-      this.add.ellipse(cartStartX, cartY + 10, TILE - 6, 6, 0x000000, 0.18).setDepth(2);
-      const cart = this.add.sprite(cartStartX, cartY, furnitureTextureKey('document_cart')).setDepth(3).setScale(0.85);
-      this.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      // Ambient paper rustle / drawer slide — every ~12s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 12500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.04, rate: 0.7 }); } catch (_) {}
-      } });
-    }
-
-    // ── Laboratory life pass (DESIGN-002) ────────────────────────
-    if (this.room.id === 'lab') {
-      // (1) Microscope eyepiece glow — pulsing color-cycling circle on the microscope station (2,2)
-      const scopeCx = 2 * TILE + (3 * TILE) / 2, scopeCy = 2 * TILE + 6;
-      const eyepiece = this.add.circle(scopeCx, scopeCy, 4, 0x88ddff, 0.85).setDepth(5);
-      const scopeColors = [0x88ddff, 0xffe888, 0xff88dd, 0x88ffaa];
-      let sci = 0;
-      this.time.addEvent({ delay: 1200, loop: true, callback: () => { sci = (sci + 1) % scopeColors.length; eyepiece.setFillStyle(scopeColors[sci]); } });
-      this.tweens.add({ targets: eyepiece, scaleX: { from: 0.8, to: 1.3 }, scaleY: { from: 0.8, to: 1.3 }, alpha: { from: 0.5, to: 1 }, duration: 1200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      // (2) Idle fidget on lab_tech + courier — angle wobble matching ER pattern
-      for (const fidgetId of ['lab_tech', 'courier']) {
-        const ia = this.interactables.find(i => i.type === 'npc' && i.id === fidgetId);
-        if (ia) this.tweens.add({ targets: ia.sprite, angle: { from: -1.4, to: 1.4 }, duration: 1200 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-      // (3) Beaker bubble particles — periodic rising bubbles from chemical_shelf positions
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'chemical_shelf') continue;
-        const bx = obs.x * TILE + (obs.width * TILE) / 2, by = obs.y * TILE + 4;
-        this.time.addEvent({ delay: 6500 + Math.random() * 1500, loop: true, callback: () => {
-          for (let i = 0; i < 4; i++) {
-            const bubble = this.add.circle(bx + (Math.random() * 14 - 7), by, 1 + Math.random(), 0x88eeff, 0.8).setDepth(20);
-            this.tweens.add({ targets: bubble, y: bubble.y - 14, alpha: 0, duration: 1100 + i * 120, ease: 'Sine.easeOut', onComplete: () => bubble.destroy() });
-          }
-        } });
-      }
-      // Ambient bubble pop — chemistry-station blip every ~10s (DESIGN-LIFT-001)
-      this.time.addEvent({ delay: 10500, loop: true, callback: () => {
-        try { this.sound.play('sfx_interact', { volume: 0.05, rate: 1.4 }); } catch (_) {}
-      } });
-    }
-
-    // ── IT Office tech-life polish (DESIGN-007) ─────────────────
-    if (this.room.id === 'it_office') {
-      // (1) Server-rack blinking LEDs — green/amber yoyo, slightly out of phase per rack
-      let rackIdx = 0;
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'server_rack') continue;
-        const lx = obs.x * TILE + obs.width * TILE - 5, lyTop = obs.y * TILE + 4;
-        const ledA = this.add.rectangle(lx, lyTop, 2, 2, 0x44ff66).setDepth(20);
-        const ledB = this.add.rectangle(lx, lyTop + 4, 2, 2, 0xffaa33).setDepth(20);
-        const phase = (rackIdx % 4) * 180;
-        this.tweens.add({ targets: ledA, alpha: { from: 1, to: 0.25 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: phase });
-        this.tweens.add({ targets: ledB, alpha: { from: 0.25, to: 1 }, duration: 700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', delay: phase + 90 });
-        rackIdx++;
-      }
-      // (2) Monitor flicker — single-frame cyan flash on each monitor_bank every 8-10s
-      for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'monitor_bank') continue;
-        const mx = obs.x * TILE + (obs.width * TILE) / 2, my = obs.y * TILE + TILE / 2;
-        const flash = this.add.rectangle(mx, my, obs.width * TILE - 4, TILE - 4, 0x66ddff, 0).setDepth(6);
-        this.time.addEvent({ delay: 8500 + Math.random() * 1500, loop: true, callback: () => {
-          flash.setAlpha(0.55);
-          this.time.delayedCall(60, () => flash.setAlpha(0));
-        } });
-      }
-      // (3) Encounter trigger glow — subtle pulsing ring at tile (9,6) signposting the IT encounter
-      const alreadyDone = this.registry.get('encounterResult_td-it-office');
-      if (!alreadyDone) {
-        const tx = 9 * TILE + TILE / 2, ty = 6 * TILE + TILE / 2;
-        const ring = this.add.circle(tx, ty, 14, 0x66ddff, 0.0).setStrokeStyle(2, 0x66ddff, 0.7).setDepth(4);
-        this.tweens.add({ targets: ring, scale: { from: 0.8, to: 1.4 }, alpha: { from: 0.7, to: 0 }, duration: 1400, repeat: -1, ease: 'Sine.easeOut' });
-      }
-    }
-
-    // ── Hallway life pass (DESIGN-HALLWAY-001 + 002) ─────────────
-    // All 5 hallways: act-tinted bulletin ribbon + drifting dust motes in two light columns.
-    // Worst 2 only (break_lab + it_er): flickering sconces + walking employee NPC.
-    if (this.room.id.startsWith('hallway_')) {
-      const isHeavyHallway = this.room.id === 'hallway_break_lab' || this.room.id === 'hallway_it_er';
-      // (A) Shared — Act-aware poster accent on the existing bulletin board
-      const act = this.getCurrentAct();
-      const actTint = act === 1 ? 0x4a90e2 : act === 2 ? 0xe2a04a : 0xc83a3a;
-      const ribbon = this.add.rectangle(this.cameras.main.width / 2 + 18, 64 - 16, 10, 4, actTint, 1).setDepth(8).setAngle(-12);
-      this.tweens.add({ targets: ribbon, alpha: { from: 1, to: 0.65 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      // (B) Shared — Drifting dust motes in two light columns (atmospheric texture)
-      const moteColumns = [5 * TILE + TILE / 2, 14 * TILE + TILE / 2];
-      for (const cx of moteColumns) {
-        this.time.addEvent({ delay: 1700 + Math.random() * 900, loop: true, callback: () => {
-          const mote = this.add.circle(cx + (Math.random() * 28 - 14), TILE + 4, 1, 0xfff5c8, 0.7).setDepth(20);
-          this.tweens.add({ targets: mote, y: mote.y + 5 * TILE, alpha: 0, duration: 5200 + Math.random() * 800, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
-        } });
-      }
-      // (C) Heavy-only — Flickering ceiling sconces
-      if (isHeavyHallway) {
-        for (const obs of room.obstacles) {
-          if ((obs as any).type !== 'wall_sconce') continue;
-          const sx = obs.x * TILE + (obs.width * TILE) / 2;
-          const sy = obs.y * TILE + TILE - 2;
-          const halo = this.add.ellipse(sx, sy + 4, 22, 10, 0xffe6a8, 0.55).setDepth(4);
-          const cone = this.add.ellipse(sx, sy + 14, 30, 18, 0xfff2c8, 0.18).setDepth(3);
-          const flickerDelay = 2400 + Math.random() * 1800;
-          this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
-            this.tweens.add({ targets: [halo, cone], alpha: { from: 1, to: 0.35 }, duration: 70, yoyo: true, repeat: 1, ease: 'Linear' });
-          } });
-        }
-        // (D) Heavy-only — Walking employee NPC, non-interactable, patrols the corridor
-        const empY = 4 * TILE + TILE / 2;
-        const empStartX = 7 * TILE + TILE / 2;
-        const empEndX = 13 * TILE + TILE / 2;
-        this.add.ellipse(empStartX, empY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
-        const empSprite = this.add.sprite(empStartX, empY, 'npc_doctor').setDepth(5 + 4);
-        this.tweens.add({ targets: empSprite, x: empEndX, duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => empSprite.setFlipX(true), onRepeat: () => empSprite.setFlipX(false) });
-        this.tweens.add({ targets: empSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-      }
-    }
+    // ── Per-room life passes (Round 4 → systems/exploration/roomAmbience) ──
+    addRoomAmbience(this, room, this.interactables, {
+      getCurrentAct: () => this.getCurrentAct(),
+    });
 
     // ── Player ───────────────────────────────────────────────────
     // Frame 0 = idle facing down (row 0, col 0 from CREDITS.md layout)
@@ -1154,93 +591,12 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
 
     // ── Type-driven furniture idle animations (Phase 26-02) ──────
-    this.addFurnitureIdleAnimations(room);
+    // (Round 4 → systems/exploration/roomAmbience)
+    addFurnitureIdleAnimations(this, room);
 
     // Seed idle-hint timer to now so grace period starts fresh on room load
     this.lastActivityAt = this.time.now;
     this.lastIdleHintAt = this.time.now;
-  }
-
-  // ── Type-driven furniture idle animations (Phase 26-02) ─────────────────────
-  // Called once from create() after the obstacles render loop.
-  // Positions computed from obstacle tile coords so no sprite references needed.
-  // All tweens/timers use this.tweens.add / this.time.addEvent — Phaser cleans them on scene shutdown.
-  private addFurnitureIdleAnimations(room: any) {
-    for (const obs of room.obstacles) {
-      const obsType = (obs as any).type as string | undefined;
-      if (!obsType) continue;
-
-      // ── plant — leaf sway (14 instances across 9 rooms) ─────────────────
-      if (obsType === 'plant') {
-        const px = obs.x * TILE + (obs.width * TILE) / 2;
-        const py = obs.y * TILE + 4;
-        const leaf = this.add.ellipse(px, py, 14, 6, 0x4a8a3a, 0.45).setDepth(4);
-        this.tweens.add({
-          targets: leaf,
-          angle: { from: -6, to: 6 },
-          duration: 1900 + Math.random() * 400,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-        continue;
-      }
-
-      // ── server_rack / monitor_bank / vital_monitor — screen flicker + LED blink ─
-      if (obsType === 'server_rack' || obsType === 'monitor_bank' || obsType === 'vital_monitor') {
-        const mx = obs.x * TILE + (obs.width * TILE) / 2;
-        const my = obs.y * TILE + (obs.height * TILE) / 2;
-
-        // Screen glow rect — sits over the upper half of the sprite
-        const glowColor = obsType === 'server_rack' ? 0x44ff66 : 0x66ccff;
-        const screenGlow = this.add.rectangle(mx, my - 4, 10, 6, glowColor, 0.30).setDepth(20);
-
-        // CRT flicker — brief dim then restore every 2-3.5s
-        const flickerDelay = 2400 + Math.random() * 1800;
-        this.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
-          this.tweens.add({
-            targets: screenGlow,
-            alpha: 0.08,
-            duration: 60,
-            yoyo: true,
-            repeat: 1,
-            ease: 'Linear',
-            onComplete: () => { screenGlow.setAlpha(0.30); },
-          });
-        } });
-
-        // LED dot — toggles between bright green and dim green every ~900ms
-        const ledX = obs.x * TILE + obs.width * TILE - 4;
-        const ledY = obs.y * TILE + 5;
-        const led = this.add.rectangle(ledX, ledY, 2, 2, 0x44ff44).setDepth(20);
-        let ledOn = true;
-        this.time.addEvent({ delay: 880 + Math.random() * 200, loop: true, callback: () => {
-          ledOn = !ledOn;
-          led.setFillStyle(ledOn ? 0x44ff44 : 0x227722);
-        } });
-        continue;
-      }
-
-      // ── coffee_station — steam puffs (break_room's obstacle; entrance cart handled separately) ─
-      if (obsType === 'coffee_station') {
-        const cx = obs.x * TILE + (obs.width * TILE) / 2;
-        const cy = obs.y * TILE + 4;
-        this.time.addEvent({ delay: 2600 + Math.random() * 400, loop: true, callback: () => {
-          const puff = this.add.ellipse(cx + (Math.random() * 4 - 2), cy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
-          this.tweens.add({
-            targets: puff,
-            y: puff.y - 12,
-            alpha: 0,
-            scaleX: 1.5,
-            scaleY: 1.5,
-            duration: 1400,
-            ease: 'Sine.easeOut',
-            onComplete: () => puff.destroy(),
-          });
-        } });
-        continue;
-      }
-    }
   }
 
   update() {
@@ -1368,7 +724,16 @@ export class ExplorationScene extends Phaser.Scene {
         now - this.lastActivityAt > IDLE_HINT_GRACE_MS &&
         now - this.lastIdleHintAt > IDLE_HINT_INTERVAL_MS
       ) {
-        this.emitIdleHint();
+        // Round 4: emitIdleHint moved to systems/exploration/idleHints —
+        // the timestamp write + round-robin index stay scene fields.
+        this.lastIdleHintAt = this.time.now;
+        this.idleHintIndex = emitIdleHint(
+          this,
+          this.room,
+          this.interactables,
+          { npcs: this.completedNPCs, zones: this.completedZones, items: this.collectedItems },
+          this.idleHintIndex,
+        );
       }
     }
 
@@ -1960,55 +1325,7 @@ export class ExplorationScene extends Phaser.Scene {
     });
   }
 
-  /**
-   * Idle-hint sparkle system (Phase 27 VIS-07).
-   * After IDLE_HINT_GRACE_MS without player input, fire a single 3-particle sparkle
-   * on one un-met completion requirement (NPC/zone/item). Cycles round-robin.
-   * Stops when the room has no un-met requirements (hallways, completed rooms).
-   */
-  private emitIdleHint(): void {
-    this.lastIdleHintAt = this.time.now;
-
-    const reqs = (this.room as any).completionRequirements;
-    if (!reqs) return; // hallways and rooms without completionRequirements never sparkle
-
-    // Build list of un-met target ids
-    const targets: string[] = [];
-    for (const id of (reqs.requiredNpcs ?? [])) {
-      if (!this.completedNPCs.has(id)) targets.push(id);
-    }
-    for (const id of (reqs.requiredZones ?? [])) {
-      if (!this.completedZones.has(id)) targets.push(id);
-    }
-    for (const id of (reqs.requiredItems ?? [])) {
-      if (!this.collectedItems.has(id)) targets.push(id);
-    }
-    if (targets.length === 0) return; // room is complete — no shimmer
-
-    const targetId = targets[this.idleHintIndex % targets.length];
-    this.idleHintIndex++;
-
-    // Find the interactable sprite for this id
-    const ia = this.interactables.find(i => i.id === targetId);
-    if (!ia?.sprite) return; // act-gated NPC may not have spawned yet
-
-    const sprite = ia.sprite;
-    if (!this.textures.exists('particle_circle')) return; // texture not loaded — silently skip
-
-    const s = this.add.particles(sprite.x, sprite.y - 6, 'particle_circle', {
-      speed: { min: 10, max: 25 },
-      angle: { min: 0, max: 360 },
-      scale: { start: 0.6, end: 0 },
-      alpha: { start: 0.9, end: 0 },
-      tint: [0xffffff, 0xffe9a0],
-      lifespan: 450,
-      quantity: 3,
-      emitting: false,
-    });
-    s.setDepth(sprite.depth + 1);
-    s.explode(3);
-    this.time.delayedCall(500, () => { if (s.active) s.destroy(); });
-  }
+  // emitIdleHint moved to systems/exploration/idleHints (Round 4) — called from update()
 
   private renderDoorStates(): void {
     const doors = (this.room as any).doors;
