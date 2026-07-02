@@ -1393,12 +1393,15 @@ export default function UnifiedGamePage() {
         }
 
         // Win condition — F-04 fix (Run 07): count the boss conversation that is
-        // completing RIGHT NOW (state is stale until the next render). The CCO has
-        // no isFinalBoss flag, so he is one of the 26 counted scenarios; the old
-        // `length + 1 >= totalScenarios + 1` algebra required talking to him twice
-        // even with everything else done.
-        const completedAfterThis = new Set([...gameState.state.completedNPCs, currentNPCId]).size;
-        if (currentSceneId === 'final_boss_1' && completedAfterThis >= totalScenarios) {
+        // completing RIGHT NOW (state is stale until the next render).
+        // R7-06 (ported from twin run): the CCO now carries isFinalBoss, so
+        // totalScenarios counts only the 25 regular NPCs — the finale requires
+        // all of them plus the boss talk that is completing here. The boss is
+        // excluded from the count so a prior boss chat can't stand in for a
+        // missed scenario.
+        const completedRegulars = new Set(gameState.state.completedNPCs);
+        completedRegulars.delete(currentNPCId);
+        if (currentSceneId === 'final_boss_1' && completedRegulars.size >= totalScenarios) {
           if (gameState.state.privacyScore > 0) {
             setPageMode('win');
             return;
@@ -1711,10 +1714,10 @@ export default function UnifiedGamePage() {
         isWin={pageMode === 'win'}
         finalScore={gameState.state.privacyScore}
         scenariosCompleted={gameState.state.completedNPCs.length}
-        // F-04 follow-up (Run 07): the CCO has no isFinalBoss flag, so he is
-        // already inside totalScenarios — the old +1 rendered "26/27" on a
-        // 100% run.
-        totalScenarios={totalScenarios}
+        // R7-06: totalScenarios counts only regular NPCs now that the CCO
+        // carries isFinalBoss; +1 folds the boss back in so a full run reads
+        // 26/26 (completedNPCs includes the boss at win time).
+        totalScenarios={totalScenarios + 1}
         timeElapsed={formatElapsedTime()}
         onPlayAgain={handlePlayAgain}
       />

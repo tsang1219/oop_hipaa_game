@@ -1851,7 +1851,8 @@
           "sprite": "officer",
           "x": 8,
           "y": 12,
-          "sceneId": "final_boss_1"
+          "sceneId": "final_boss_1",
+          "isFinalBoss": true
         },
         {
           "id": "dr_tovar",
