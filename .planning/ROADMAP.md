@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): STALE — status columns, plan checkboxes, and Active/Paused/TBD tags are wrong.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 # Roadmap: PrivacyQuest + BreachDefense
 
 ## Milestones

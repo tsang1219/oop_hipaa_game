@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): HISTORICAL — describes the dead two-game architecture as current; §4.1 Sorter and §4.4 Triage shipped despite the DEFERRED tags.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 # Enhancement Brief: Unified RPG Experience
 
 **Status:** Draft

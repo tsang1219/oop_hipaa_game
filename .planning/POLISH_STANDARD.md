@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): STALE in part — §7 tests dead /privacy and /breach routes; RecapModal/CodexModal no longer exist. The input/audio/layout rules remain valid.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 # PrivacyQuest + BreachDefense — Polish Standard
 
 > **Purpose:** This is the "Definition of Done" for visual quality, audio feedback, input behavior, and layout. Use it as a QA checklist — walk through every flow and verify each rule. Any violation is a bug.

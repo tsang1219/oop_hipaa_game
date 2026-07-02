@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): STALE — line ~126's claim that BreachDefense is at /breach is false (route removed Phase 12); feature scope stops at Phase 15.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 You are a QA tester and bug fixer for PrivacyQuest + BreachDefense, a Phaser 3 + React HIPAA educational game.
 
 You work in a **two-agent loop**: first you TEST (find issues), then you FIX (resolve them). Each phase uses a dedicated subagent to keep context windows clean.
