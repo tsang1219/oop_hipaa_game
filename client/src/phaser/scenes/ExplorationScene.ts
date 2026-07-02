@@ -2375,6 +2375,11 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     if (this.bgMusic && (this.bgMusic as Phaser.Sound.BaseSound).isPlaying) {
+      // F-24 fix (Run 07): kill any tween already targeting this sound before
+      // fading. A duplicate crossfade (or a still-running fade-in) would keep
+      // ticking after onComplete destroys the sound — "Cannot set properties
+      // of null (setting 'volume')".
+      try { this.tweens.killTweensOf(this.bgMusic); } catch (_) {}
       // Fade out current track, then start new one
       this.tweens.add({
         targets: this.bgMusic,
@@ -2439,9 +2444,12 @@ export class ExplorationScene extends Phaser.Scene {
 
   // ── Department completion fanfare (Phase 15) ─────────────────────
 
-  private handleFanfareEvent = (data: { roomId: string; playerX: number; playerY: number }) => {
+  private handleFanfareEvent = (data: { roomId: string; playerX?: number; playerY?: number }) => {
     if (!this.scene.isActive()) return;
-    const { playerX, playerY } = data;
+    // F-08 (Run 07): React doesn't track pixel coordinates — default the burst
+    // to the player's current position.
+    const playerX = data.playerX ?? this.player?.x ?? this.cameras.main.centerX;
+    const playerY = data.playerY ?? this.player?.y ?? this.cameras.main.centerY;
 
     // Beat 1: Camera flash — gold-white
     this.cameras.main.flash(350, 255, 220, 50, false);
@@ -2572,9 +2580,17 @@ export class ExplorationScene extends Phaser.Scene {
     // the encounter remains replayable when the player walks back over the trigger tile.
     if (data?.encounterId || data?.aborted) {
       this.paused = false;
-      this.encounterTriggered = false;
       if (data.encounterId) {
+        this.encounterTriggered = false;
         this.registry.set(`encounterResult_${data.encounterId}`, true);
+      } else if (this.encounterTriggered) {
+        // F-05 fix (Run 07): abort/defeat on the radius-triggered TD encounter —
+        // re-arm only after the player leaves the trigger radius (same mechanism
+        // as declining, F-02). Clearing the flag here would re-pop the alert on
+        // the very next frame since the player is still standing on the tile.
+        this.encounterDeclined = true;
+      } else {
+        this.encounterTriggered = false;
       }
     }
   };

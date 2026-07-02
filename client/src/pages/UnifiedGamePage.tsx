@@ -605,9 +605,22 @@ export default function UnifiedGamePage() {
     eventBridge.on(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
 
     // If Boot already fired before this effect registered (race condition),
-    // poll briefly for the game ref to become available
+    // poll briefly for the game ref to become available.
+    // F-10 fix (Run 07): the poll used to start Exploration ~50ms after mount —
+    // long before BootScene's preload finished downloading the music tracks —
+    // so every cold boot logged "music_hub not ready, skipping BGM" and the
+    // first room of every session was silent. Now the poll only fires once the
+    // qa-bridge has seen Boot's SCENE_READY (assets loaded); the SCENE_READY
+    // listener above covers the normal path.
+    // F-17 fix (Run 07): same pageModeRef guard as handleSceneReady — the poll
+    // used to boot Exploration underneath the standalone Tower Defense.
     const bootPoll = setInterval(() => {
-      if (gameRef.current && !sceneStartedRef.current) {
+      if (pageModeRef.current === 'tower-defense-standalone') return;
+      if (
+        gameRef.current &&
+        !sceneStartedRef.current &&
+        window.__QA__?.scenesVisited?.includes('Boot')
+      ) {
         clearInterval(bootPoll);
         startExploration();
       }
@@ -657,6 +670,22 @@ export default function UnifiedGamePage() {
       // called from anywhere — acts could not advance even in memory. This is
       // the single funnel through which every room completion flows.
       gameState.checkActAdvance(effectiveCompleted);
+
+      // F-08 fix (Run 07): the room-complete celebration existed on both sides
+      // but was never wired — the Phaser fanfare listener had no emitter, and
+      // setRoomClearedBanner was only ever called with null, which also made
+      // the six authored patient stories unreachable (banner → GameBanner →
+      // handleRoomClearedComplete → PatientStoryReveal). Only celebrate rooms
+      // with real requirements — hallways auto-complete on entry and get no
+      // fanfare (Commandment 8: feedback scales with moment size).
+      const reqs = currentRoom.completionRequirements;
+      const earnedCompletion = reqs
+        ? reqs.requiredNpcs.length + reqs.requiredZones.length + reqs.requiredItems.length > 0
+        : currentRoom.npcs.length > 0;
+      if (earnedCompletion) {
+        eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: currentRoomId });
+        setRoomClearedBanner({ roomName: currentRoom.name });
+      }
     }
     const doorStates = computeDoorStates(currentRoom, effectiveCompleted);
     eventBridge.emit(BRIDGE_EVENTS.REACT_UPDATE_DOOR_STATES, { doorStates });
@@ -1165,12 +1194,17 @@ export default function UnifiedGamePage() {
   const handleDismissDebrief = useCallback(() => {
     // BLOCKER 3: capture encounterId BEFORE state setters so async setState ordering doesn't lose it.
     const encounterId = encounterResult?.encounterId;
+    // F-05 fix (Run 07): only a VICTORY seals the encounter (registry write →
+    // no replay). A defeat used to be recorded as done too, locking the player
+    // to a 0 forever. Now defeat returns via the aborted path — the encounter
+    // stays replayable (walk back to the trigger / talk to the NPC again).
+    const wasVictory = encounterResult?.outcome === 'victory';
     setEncounterPhase('idle');
     setEncounterResult(null);
     setNarrativeCardData(null);
     eventBridge.emit(
       BRIDGE_EVENTS.REACT_RETURN_FROM_ENCOUNTER,
-      encounterId ? { encounterId } : undefined,
+      wasVictory && encounterId ? { encounterId } : { aborted: true },
     );
   }, [encounterResult]);
 
@@ -1745,6 +1779,9 @@ export default function UnifiedGamePage() {
         {encounterPhase === 'encounter' && narrativeCardData?.config && (
           <EncounterGameUI
             availableTowerIds={narrativeCardData?.config?.availableTowerIds ?? []}
+            // F-06 (Run 07): same abort semantics as the sorter — no score
+            // change, no registry write, encounter replayable.
+            onExit={handleSorterAbort}
           />
         )}
 

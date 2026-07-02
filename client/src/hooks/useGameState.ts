@@ -248,6 +248,14 @@ export function useGameState() {
   const stateRef = useRef(state);
   useEffect(() => { stateRef.current = state; }, [state]);
 
+  // F-24 fix (Run 07): synchronous re-entrancy guards. stateRef only updates on
+  // the NEXT commit, so two effect runs in quick succession could both pass the
+  // `!act1Complete` check and emit ACT_ADVANCE twice — the double music
+  // crossfade left a tween ticking a destroyed WebAudioSound ("Cannot set
+  // properties of null (setting 'volume')" on every act change).
+  const act1AdvanceFired = useRef(state.act1Complete);
+  const act2AdvanceFired = useRef(state.act2Complete);
+
   /**
    * Check if department completion triggers an act advance.
    * Call with the UPDATED completedRooms array (including the just-completed room)
@@ -257,8 +265,9 @@ export function useGameState() {
     const s = stateRef.current;
 
     // Act 1 -> 2: Reception + Break Room both completed
-    if (s.currentAct === 1 && !s.act1Complete) {
+    if (s.currentAct === 1 && !s.act1Complete && !act1AdvanceFired.current) {
       if (updatedCompletedRooms.includes('reception') && updatedCompletedRooms.includes('break_room')) {
+        act1AdvanceFired.current = true;
         setState(prev => ({
           ...prev,
           currentAct: 2,
@@ -273,8 +282,9 @@ export function useGameState() {
     }
 
     // Act 2 -> 3: Lab + Records both completed
-    if (s.currentAct === 2 && !s.act2Complete) {
+    if (s.currentAct === 2 && !s.act2Complete && !act2AdvanceFired.current) {
       if (updatedCompletedRooms.includes('lab') && updatedCompletedRooms.includes('records_room')) {
+        act2AdvanceFired.current = true;
         setState(prev => ({
           ...prev,
           currentAct: 3,
