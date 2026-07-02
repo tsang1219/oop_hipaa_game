@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): STALE — lists deleted files (NPCSprite, BucketZone, SorterItem, SorterTakeawaysPanel) and omits the shipped desk components and DialoguePortrait.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 # File Catalog — Live Source
 
 A one-line index of every live source file under `client/src/`, `server/`, and `shared/` after the dead-code cleanup that moved 16 unused files to `_trash/`. **63 files documented.** Use this as a "where do I look?" reference: skim the section for the directory you need, find the file by name, read the description, then open the file. Tags are a coarse filter — `#ui` for React components, `#phaser-scene`/`#phaser-system` for canvas-side code, `#data` for content/constants, `#bridge` for React↔Phaser glue, `#hook`/`#util`/`#config`/`#type`, plus `#server`, `#shared`, `#test`, `#dev` for non-client code.

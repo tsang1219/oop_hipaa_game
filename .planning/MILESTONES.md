@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): HISTORICAL — ledger stops at v1.1; v2.0–v2.3 shipped but are not recorded here.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 # Milestones
 
 ## v1.1 Sprite Overhaul (Archived: 2026-03-26 — Partial)

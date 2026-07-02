@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): HISTORICAL — this design SHIPPED as Phases 22–24 (2026-06-10); the queued/no-code-touched framing and file-structure sketch are outdated.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 # PHI Sorter Redesign — "Papers, Please" Reimagining
 
 **Status:** Spec — Phase 18 starting; Phases 19 + 20 queued

@@ -1,3 +1,5 @@
+> **⚠️ RECONCILIATION NOTICE (2026-07-01, Fable Run 02): STALE — documents the pre-v2.0 three-route architecture (HubWorldPage, /privacy, /breach), all removed in Phase 12.** Phases 11–27 all shipped 2026-06-10; the game is a single route `/`. Do not act on status claims here — see `.planning/STATE_OF_TRUTH.md` ("Docs that lie" table) for what is actually true.
+
 # Architecture Overview
 
 ## 1. High-Level Pattern: React + Phaser Hybrid
