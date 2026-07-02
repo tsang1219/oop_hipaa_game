@@ -288,6 +288,8 @@ export default function UnifiedGamePage() {
 
   // Room cleared banner
   const [roomClearedBanner, setRoomClearedBanner] = useState<{ roomName: string } | null>(null);
+  // R7-05: celebration that must wait for an active encounter overlay to close
+  const [pendingCelebration, setPendingCelebration] = useState<{ roomId: string; roomName: string } | null>(null);
 
   // ── Standalone Tower Defense state (Phase 19 — TD-01..03) ─────
   // Result is null while the round is in progress, populated when BreachDefenseScene
@@ -694,8 +696,15 @@ export default function UnifiedGamePage() {
         ? reqs.requiredNpcs.length + reqs.requiredZones.length + reqs.requiredItems.length > 0
         : currentRoom.npcs.length > 0;
       if (earnedCompletion) {
-        eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: currentRoomId });
-        setRoomClearedBanner({ roomName: currentRoom.name });
+        if (encounterPhase === 'idle') {
+          eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: currentRoomId });
+          setRoomClearedBanner({ roomName: currentRoom.name });
+        } else {
+          // R7-05: an encounter overlay (sorter/triage/TD) is open — landing the
+          // banner + patient story on top of it blocks its inputs. Defer the
+          // celebration until the encounter closes.
+          setPendingCelebration({ roomId: currentRoomId, roomName: currentRoom.name });
+        }
       }
     }
     const doorStates = computeDoorStates(currentRoom, effectiveCompleted);
@@ -708,7 +717,17 @@ export default function UnifiedGamePage() {
     gameState.state.completedZones,
     gameState.state.collectedItems,
     checkRoomCompletion,
+    encounterPhase,
   ]);
+
+  // R7-05: fire a deferred room celebration once the encounter overlay closes.
+  useEffect(() => {
+    if (encounterPhase === 'idle' && pendingCelebration) {
+      eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: pendingCelebration.roomId });
+      setRoomClearedBanner({ roomName: pendingCelebration.roomName });
+      setPendingCelebration(null);
+    }
+  }, [encounterPhase, pendingCelebration]);
 
   // ── Door navigation handler (EXPLORATION_EXIT_ROOM) ───────────
   const handleExitRoom = useCallback(
