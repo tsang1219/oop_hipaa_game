@@ -1,6 +1,13 @@
 # Run 08 — Cast identity pass (faces, colors, directory) + likeness pipeline
 **Mode:** hybrid — agent preps unattended, user approves every face/font · **My checkpoint:** I approve portrait style, per-character colors, and any font change before they ship
 
+> **STATUS 2026-07-02 — item 2 (signature colors) SHIPPED as the generic initial pass**, user-directed:
+> 9-hue type wheel + 26 persona-matched per-NPC colors in `spriteAssetPaths.ts` (`getNPCColor`),
+> wired into the dialogue portrait frame/name/panel stripe, sorter reaction bubble + portrait,
+> and encounter request modal. Proof: `screenshots/run08/color-*.png`, driver
+> `tests/run08-capture-cast-colors.mjs`. Suite 31/0/4 after. Items 1 (portraits), 3 (directory),
+> 4 (overworld dedupe), 5 (font) + the likeness pipeline remain open.
+
 ## The problem (from live feedback, 2026-07-02)
 The arcs and copy are good; the *presentation* erases them. 26 named NPCs share 9
 spritesheets, the dialogue portrait is a 32×32 walk-frame upscaled 3×, and every word

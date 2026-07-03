@@ -19,6 +19,9 @@ export type EncounterRequestModalProps = {
   requestText: string;     // The NPC's ask
   acceptLabel?: string;    // Default: "Sure, let's do this"
   declineLabel?: string;   // Default: "Maybe later"
+  /** Run 08 cast identity — the asking NPC's signature color (frame + name).
+   *  Defaults to the pre-Run-08 teal so uncolored callers render unchanged. */
+  accentColor?: string;
   onAccept: () => void;
   onDecline: () => void;
 };
@@ -29,6 +32,7 @@ export function EncounterRequestModal({
   requestText,
   acceptLabel = 'SURE, LET’S DO THIS',
   declineLabel = 'MAYBE LATER',
+  accentColor = '#4FB3D9',
   onAccept,
   onDecline,
 }: EncounterRequestModalProps) {
@@ -60,15 +64,15 @@ export function EncounterRequestModal({
       data-testid="encounter-request-modal"
     >
       <div
-        className={`max-w-md w-full mx-4 border-4 border-[#4FB3D9] bg-[#1a2a3e] shadow-[0_0_40px_rgba(79,179,217,0.2)] transform transition-all duration-300 ${
+        className={`max-w-md w-full mx-4 border-4 bg-[#1a2a3e] transform transition-all duration-300 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
         }`}
+        style={{ borderColor: accentColor, boxShadow: `0 0 40px ${accentColor}33` }}
       >
-        {/* NPC name header */}
-        <div className="bg-[#0f1a2a] border-b-2 border-[#4FB3D9]/40 px-4 py-3">
+        {/* NPC name header — name in the asker's signature color (Run 08) */}
+        <div className="bg-[#0f1a2a] border-b-2 px-4 py-3" style={{ borderBottomColor: `${accentColor}66` }}>
           <p
-            className="text-[#4FB3D9]"
-            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}
+            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px', color: accentColor }}
             data-testid="encounter-request-npc-name"
           >
             {npcName}

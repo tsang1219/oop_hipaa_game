@@ -50,6 +50,7 @@ import { SorterContextCard } from '@/components/phi-sorter/SorterContextCard';
 import { SorterDebrief } from '@/components/phi-sorter/SorterDebrief';
 import { EncounterRequestModal } from '@/components/phi-sorter/EncounterRequestModal';
 import { getSorterDocumentSet } from '@/data/sorterData';
+import { getNPCColor } from '@/data/spriteAssetPaths';
 import { BreachTriageOverlay } from '@/components/breach-triage/BreachTriageOverlay';
 import { TriageDebrief } from '@/components/breach-triage/TriageDebrief';
 import { getTriageIncidentSet } from '@/data/triageData';
@@ -1660,6 +1661,7 @@ export default function UnifiedGamePage() {
             npcName={encounterRequest.npcName}
             npcRole={encounterRequest.npcRole}
             requestText={encounterRequest.requestText}
+            accentColor={getNPCColor(encounterRequest.npcId)}
             onAccept={handleAcceptEncounterRequest}
             onDecline={handleDeclineEncounterRequest}
           />

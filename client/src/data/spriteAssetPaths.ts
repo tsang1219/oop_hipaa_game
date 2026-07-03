@@ -107,3 +107,89 @@ export function getNPCPortraitPath(npcId: string): string {
 export function getSponsorSpritePath(spriteKey: string): string {
   return SPONSOR_SPRITE_PATHS[spriteKey] ?? SPONSOR_SPRITE_PATHS.npc_staff_sheet;
 }
+
+// ── Cast identity colors (Run 08 initial pass) ──────────────────────────────
+//
+// Every named NPC gets a signature color used wherever they speak: dialogue
+// portrait frame + name plate, dialogue panel top stripe, sorter reaction
+// bubble, encounter request modal. System chrome stays UI pink (#FF6B9D) —
+// speaker color means "a person is talking," pink means "the game is talking."
+//
+// Two layers:
+//   1. NPC_TYPE_COLORS — one hue per spritesheet type (the 9-hue wheel).
+//      Fallback for any future NPC that ships without an explicit color.
+//   2. NPC_COLOR_BY_ID — persona-matched per-npcId assignment for the named
+//      cast, hand-spread so no two NPCs in the same room share a hue and the
+//      major cast (Riley/Aiyana/Marcus/Tovar/Priya) never collide anywhere.
+//
+// All values chosen for contrast on the dark dialogue navy (#1a1a2e/#16213e).
+
+export const NPC_TYPE_COLORS: Record<string, string> = {
+  receptionist: '#FF7A6B', // front-desk coral — the warm first hello
+  nurse:        '#FF9EC4', // scrub pink
+  doctor:       '#45D483', // scrub green
+  it_tech:      '#38E5FF', // terminal cyan
+  officer:      '#FFC94D', // badge gold
+  boss:         '#C77DFF', // executive orchid
+  staff:        '#FFA94D', // hi-vis apricot
+  patient:      '#9FB4FF', // gown periwinkle
+  visitor:      '#B4E33D', // visitor-badge lime
+};
+
+const NPC_COLOR_BY_ID: Record<string, string> = {
+  // ── Major cast — maximally separated on the wheel ──
+  riley_entrance:        '#FF7A6B', // Riley — coral; greets you twice, same warmth both times
+  riley:                 '#FF7A6B',
+  aiyana_intake:         '#4FB3D9', // Aiyana — sky teal; calm sorter precision (matches her context card)
+  marcus_lab_aide:       '#FFAA33', // Marcus — amber; deadpan warmth, nickname energy
+  dr_tovar:              '#2DD4BF', // Dr. Tovar — mint; Safe-Harbor scholar, cool and exact
+  priya_privacy_officer: '#FB6489', // Priya — triage rose; urgency worn calmly
+  dr_martinez:           '#45D483', // rushed ER doctor — scrub green at a jog
+
+  // ── Reception ──
+  nervous_patient:       '#9FB4FF', // gown periwinkle, fidgeting
+  chatty_visitor:        '#B4E33D', // visitor lime, will not stop talking
+
+  // ── ER ──
+  officer:               '#FFC94D', // police officer — literal badge gold
+  frantic_family:        '#FFB59E', // anxious peach
+
+  // ── Lab ──
+  lab_tech:              '#38E5FF', // terminal cyan
+  researcher:            '#7FE3A8', // curious spearmint (reads apart from Martinez's green)
+  courier:               '#B4E33D', // visitor lime, in and out
+
+  // ── Records ──
+  records_clerk:         '#F4978E', // dusty salmon — reception family, not Riley's coral
+  patient_request:       '#9FB4FF', // gown periwinkle
+  attorney:              '#94A3B8', // courtroom slate
+  compliance_officer:    '#5B8DEF', // by-the-book azure
+
+  // ── IT Office ──
+  security_analyst:      '#38E5FF', // terminal cyan
+  vendor:                '#B4E33D', // visitor lime with a contract
+  workaround_employee:   '#FFA94D', // hi-vis apricot, in a hurry
+
+  // ── Break Room ──
+  gossiping_coworker:    '#FF9EC4', // gossip pink
+  friend_fishing:        '#F59E6C', // warm apricot-deep, overly friendly
+  tired_employee:        '#9FB4FF', // running on periwinkle fumes
+  hr_director:           '#C77DFF', // executive orchid, holding coffee
+  selfie_coworker:       '#B4E33D', // visitor-energy lime, phone out
+};
+
+/** UI pink — what the game itself speaks in. Fallback when no NPC color resolves. */
+export const DEFAULT_SPEAKER_COLOR = '#FF6B9D';
+
+/**
+ * Resolve an npcId to its signature color.
+ * Chain: per-NPC assignment → sprite-type wheel → UI pink.
+ * Never warns — unlike portraits, a fallback color is not a content bug.
+ */
+export function getNPCColor(npcId: string): string {
+  const assigned = NPC_COLOR_BY_ID[npcId];
+  if (assigned) return assigned;
+  const spriteType = NPC_SPRITE_TYPE_BY_ID[npcId];
+  if (spriteType && NPC_TYPE_COLORS[spriteType]) return NPC_TYPE_COLORS[spriteType];
+  return DEFAULT_SPEAKER_COLOR;
+}

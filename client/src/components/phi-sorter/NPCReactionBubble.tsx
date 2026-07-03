@@ -21,6 +21,13 @@ export type NPCReactionBubbleProps = {
    * When absent: original Phase 22/23 behavior (component returns null when no text/holdIt).
    */
   spriteUrl?: string;
+  /**
+   * Run 08 cast identity — the NPC's signature color (name header, portrait
+   * border, bubble tail, neutral-variant border). HOLD IT gold and the
+   * enthusiastic/thoughtful variant tints still win over it. Defaults to the
+   * pre-Run-08 teal so uncolored callers render unchanged.
+   */
+  color?: string;
 };
 
 /**
@@ -43,7 +50,7 @@ export type NPCReactionBubbleProps = {
  *
  * Positioned absolute/fixed at top-center by the parent overlay layout.
  */
-export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral', holdIt, spriteUrl }: NPCReactionBubbleProps) {
+export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral', holdIt, spriteUrl, color = '#4FB3D9' }: NPCReactionBubbleProps) {
   // Track which text version is currently visible — drives fade-in on change
   const [visibleText, setVisibleText] = useState(text);
   const [opacity, setOpacity] = useState(text ? 1 : 0);
@@ -76,13 +83,19 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
   if (!spriteUrl && !visibleText && !holdIt) return null;
 
   const isHoldIt = !!holdIt;
-  const borderColor = isHoldIt
-    ? 'border-[#FFD93D]'                    // gold for HOLD IT
+  // Bubble border: HOLD IT gold and tone-variant tints win; otherwise the
+  // NPC's signature color (Run 08). Runtime values → inline style, not classes.
+  const bubbleBorderColor = isHoldIt
+    ? '#FFD93D'                             // gold for HOLD IT
     : variant === 'enthusiastic'
-      ? 'border-[#7FE3A8]'                  // soft green for enthusiastic
+      ? '#7FE3A8'                           // soft green for enthusiastic
       : variant === 'thoughtful'
-        ? 'border-[#9B8CE0]'                // soft purple for thoughtful
-        : 'border-[#4FB3D9]';               // teal default
+        ? '#9B8CE0'                         // soft purple for thoughtful
+        : color;                            // signature color default
+
+  // Identity anchors (name, portrait frame, tail) stay in the NPC's color even
+  // during tone variants — only HOLD IT's gold overrides them.
+  const identityColor = isHoldIt ? '#FFD93D' : color;
 
   const ringClass = isHoldIt ? 'ring-4 ring-[#FFD93D]/40' : '';
 
@@ -93,23 +106,23 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
         'bg-[#1a2a3e] border-4 px-5 py-4',
         'shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]',
         'transition-all duration-200 ease-out',
-        borderColor,
         ringClass,
         // Scale only when no portrait (portrait row already provides stable anchor)
         !spriteUrl ? scaleClass : '',
       ].join(' ')}
       style={{
         fontFamily: '"Press Start 2P", monospace',
+        borderColor: bubbleBorderColor,
         opacity: spriteUrl ? opacity : opacity,
         maxWidth: spriteUrl ? undefined : undefined,
       }}
       data-testid="npc-reaction-bubble"
       data-hold-it={isHoldIt ? 'true' : 'false'}
     >
-      {/* NPC name + role header */}
+      {/* NPC name + role header — name in the NPC's signature color (Run 08) */}
       <div
-        className="text-[#4FB3D9] mb-2"
-        style={{ fontSize: '8px' }}
+        className="mb-2"
+        style={{ fontSize: '8px', color: identityColor }}
         data-testid="npc-reaction-bubble-header"
       >
         {npcName} <span className="text-white/60">&middot; {npcRole}</span>
@@ -143,7 +156,7 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
           style={{
             borderTop: '8px solid transparent',
             borderBottom: '8px solid transparent',
-            borderRight: `12px solid ${isHoldIt ? '#FFD93D' : '#4FB3D9'}`,
+            borderRight: `12px solid ${identityColor}`,
           }}
         />
       ) : (
@@ -153,7 +166,7 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
           style={{
             borderLeft: '8px solid transparent',
             borderRight: '8px solid transparent',
-            borderTop: `12px solid ${isHoldIt ? '#FFD93D' : '#4FB3D9'}`,
+            borderTop: `12px solid ${identityColor}`,
           }}
         />
       )}
@@ -162,8 +175,6 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
 
   // ── Layout: portrait row (Phase 24) vs standalone bubble (Phase 22/23) ───
   if (spriteUrl) {
-    const portraitBorderClass = isHoldIt ? 'border-[#FFD93D]' : 'border-[#4FB3D9]';
-
     return (
       <div
         className={[
@@ -176,12 +187,14 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
       >
         {/* Portrait block — always visible when spriteUrl is present */}
         <div className="flex flex-col items-center">
-          {/* 64px pixelated portrait — Phase 21 CertificateOverlay pattern */}
+          {/* 64px pixelated portrait — Phase 21 CertificateOverlay pattern.
+              Border carries the NPC's signature color (gold during HOLD IT). */}
           <div
-            className={['border-4', portraitBorderClass].join(' ')}
+            className="border-4"
             style={{
               width: '64px',
               height: '64px',
+              borderColor: identityColor,
               backgroundImage: `url(${spriteUrl})`,
               backgroundSize: '192px 256px',
               backgroundPosition: '0 0',
@@ -191,10 +204,10 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
             }}
             data-testid="sorter-npc-portrait"
           />
-          {/* Name plate */}
+          {/* Name plate — signature color (Run 08; was gold) */}
           <div
-            className="mt-1 text-[#FFD93D] text-center"
-            style={{ fontSize: '7px', maxWidth: '68px', wordBreak: 'break-word' }}
+            className="mt-1 text-center"
+            style={{ fontSize: '7px', maxWidth: '68px', wordBreak: 'break-word', color: identityColor }}
           >
             {npcName}
           </div>
@@ -214,21 +227,21 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
         'bg-[#1a2a3e] border-4 px-5 py-4 max-w-md',
         'shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]',
         'transition-all duration-200 ease-out',
-        borderColor,
         ringClass,
         scaleClass,
       ].join(' ')}
       style={{
         fontFamily: '"Press Start 2P", monospace',
+        borderColor: bubbleBorderColor,
         opacity,
       }}
       data-testid="npc-reaction-bubble"
       data-hold-it={isHoldIt ? 'true' : 'false'}
     >
-      {/* NPC name + role header */}
+      {/* NPC name + role header — name in the NPC's signature color (Run 08) */}
       <div
-        className="text-[#4FB3D9] mb-2"
-        style={{ fontSize: '8px' }}
+        className="mb-2"
+        style={{ fontSize: '8px', color: identityColor }}
         data-testid="npc-reaction-bubble-header"
       >
         {npcName} <span className="text-white/60">&middot; {npcRole}</span>

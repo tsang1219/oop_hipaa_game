@@ -1,4 +1,4 @@
-import { getNPCPortraitPath, hasNPCPortrait } from '@/data/spriteAssetPaths';
+import { getNPCPortraitPath, hasNPCPortrait, getNPCColor, DEFAULT_SPEAKER_COLOR } from '@/data/spriteAssetPaths';
 
 interface DialoguePortraitProps {
   npcId: string;
@@ -25,6 +25,10 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
   const isCharacter = hasNPCPortrait(npcId);
   const spriteUrl = isCharacter ? getNPCPortraitPath(npcId) : null;
 
+  // Run 08 cast identity: characters speak in their signature color — frame,
+  // glow, and name plate. Things (zones/items) keep the neutral UI pink.
+  const speakerColor = isCharacter ? getNPCColor(npcId) : DEFAULT_SPEAKER_COLOR;
+
   return (
     <>
       <style>{`
@@ -36,9 +40,10 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
 
       {/* Outer frame plate — stays rock-still; only the crop bobs */}
       <div
-        className="flex-shrink-0 flex flex-col items-center bg-[#16213e] border-4 border-[#FF6B9D]"
+        className="flex-shrink-0 flex flex-col items-center bg-[#16213e] border-4"
         style={{
-          boxShadow: 'inset 0 0 0 1px rgba(255,107,157,0.25)',
+          borderColor: speakerColor,
+          boxShadow: `inset 0 0 0 1px ${speakerColor}40`,
         }}
         data-testid="npc-battle-sprite"
       >
@@ -76,13 +81,15 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
           </div>
         )}
 
-        {/* Name plate strip — inside the frame, below the crop */}
+        {/* Name plate strip — inside the frame, below the crop.
+            Run 08: the name reads in the speaker's signature color — the single
+            strongest "who is talking" signal on the screen. */}
         <div
           className="w-full bg-[#1a1a2e] text-center px-1 py-1"
           style={{
             fontFamily: '"Press Start 2P", monospace',
             fontSize: '7px',
-            color: '#FFD93D',
+            color: isCharacter ? speakerColor : '#FFD93D',
             wordBreak: 'break-word',
             minWidth: '96px',
           }}

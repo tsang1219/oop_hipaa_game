@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { getSorterDocumentSet } from '@/data/sorterData';
-import { getSponsorSpritePath } from '@/data/spriteAssetPaths';
+import { getSponsorSpritePath, getNPCColor } from '@/data/spriteAssetPaths';
 import { DeskSurface } from './DeskSurface';
 import { ShiftClock } from './ShiftClock';
 import { OutgoingTray } from './OutgoingTray';
@@ -53,16 +53,18 @@ type NPCDisplay = {
   name: string;
   role: string;
   spriteKey: string;
+  /** roomData.json npcId — resolves the signature color via getNPCColor (Run 08). */
+  roomNpcId: string;
 };
 
 const NPC_DISPLAY_BY_SET: Record<string, NPCDisplay> = {
-  'phi-sorter-set-1': { id: 'aiyana',  name: 'Aiyana',    role: 'Intake Volunteer', spriteKey: 'npc_officer_sheet' },
-  'phi-sorter-set-2': { id: 'marcus',  name: 'Marcus',    role: 'Lab Aide',         spriteKey: 'npc_staff_sheet'   },
-  'phi-sorter-set-3': { id: 'tovar',   name: 'Dr. Tovar', role: 'Compliance Lead',  spriteKey: 'npc_officer_sheet' },
+  'phi-sorter-set-1': { id: 'aiyana',  name: 'Aiyana',    role: 'Intake Volunteer', spriteKey: 'npc_officer_sheet', roomNpcId: 'aiyana_intake'   },
+  'phi-sorter-set-2': { id: 'marcus',  name: 'Marcus',    role: 'Lab Aide',         spriteKey: 'npc_staff_sheet',   roomNpcId: 'marcus_lab_aide' },
+  'phi-sorter-set-3': { id: 'tovar',   name: 'Dr. Tovar', role: 'Compliance Lead',  spriteKey: 'npc_officer_sheet', roomNpcId: 'dr_tovar'        },
 };
 
 // Defensive default — should never fire if Plan 22-02 wired roomData correctly.
-const FALLBACK_NPC_DISPLAY: NPCDisplay = { id: 'aiyana', name: 'Co-worker', role: 'Staff', spriteKey: 'npc_staff_sheet' };
+const FALLBACK_NPC_DISPLAY: NPCDisplay = { id: 'aiyana', name: 'Co-worker', role: 'Staff', spriteKey: 'npc_staff_sheet', roomNpcId: '' };
 
 // Shift-over NPC lines — voice-matched per Phase 22 banks (Record<NPCSorterId, string>).
 // These fire when secondsLeft hits 0 during the sort. Soft and honest — no fail language.
@@ -560,6 +562,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         variant={currentReactionVariant}
         holdIt={holdItReveal ?? undefined}
         spriteUrl={npcSpriteUrl}
+        color={getNPCColor(npcDisplay.roomNpcId)}
       />
 
       {/* PHASE 23: Shake surface — wraps only the main content (progress header + desk + keyboard hint).

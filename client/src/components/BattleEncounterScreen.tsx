@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import DialoguePortrait from './DialoguePortrait';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
+import { getNPCColor, hasNPCPortrait, DEFAULT_SPEAKER_COLOR } from '@/data/spriteAssetPaths';
 
 interface BattleEncounterScreenProps {
   npcId: string;
@@ -179,11 +180,15 @@ export default function BattleEncounterScreen({
         />
       )}
 
-      {/* Bottom-anchored dialogue panel */}
+      {/* Bottom-anchored dialogue panel.
+          Run 08 cast identity: the top stripe carries the SPEAKER's signature
+          color (things/zones keep UI pink) — the panel visibly changes hands
+          when a different character talks. */}
       <div
-        className={`relative bg-[#1a1a2e] border-t-4 border-[#FF6B9D] max-h-[60vh] overflow-y-auto transform transition-all duration-300 ease-out ${
+        className={`relative bg-[#1a1a2e] border-t-4 max-h-[60vh] overflow-y-auto transform transition-all duration-300 ease-out ${
           isVisible ? 'translate-y-0 opacity-100' : 'translate-y-8 opacity-0'
         }`}
+        style={{ borderTopColor: hasNPCPortrait(npcId) ? getNPCColor(npcId) : DEFAULT_SPEAKER_COLOR }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header: NPC portrait + optional privacy meter */}
