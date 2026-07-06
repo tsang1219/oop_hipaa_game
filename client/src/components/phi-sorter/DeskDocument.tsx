@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import type { SorterItem as SorterItemData } from '@/data/sorterData';
+import { getSorterItemIcon } from '@/data/sorterData';
 import type { StampKind } from './StampPad';
 
 /**
@@ -44,10 +45,14 @@ function getInkRot(id: string): number {
   return ((id.length * 7) % 13) - 6;
 }
 
-/** ChartLine — restyled for cream paper (dark text, warm label color) */
+/** ChartLine — restyled for cream paper (dark text, warm label color).
+ *  Feel pass: legible body font, larger — the player shouldn't decode pixels. */
 function ChartLine({ label, value }: { label: string; value: string }) {
   return (
-    <div className="mb-1" style={{ fontSize: '8px', lineHeight: '1.6' }}>
+    <div
+      className="mb-1"
+      style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.35' }}
+    >
       <span style={{ color: '#8a6d3b' }}>{label}:</span>{' '}
       <span style={{ color: '#2a2a3e' }}>{value}</span>
     </div>
@@ -112,22 +117,38 @@ export function DeskDocument({ item, animState, stampedKind, wasCorrect }: DeskD
       }}
       data-testid={`sorter-desk-doc-${item.id}`}
     >
-      {/* Paper header */}
-      <div
-        className="mb-3 pb-2 border-b-2 border-[#b8a87e]"
-        style={{ fontSize: '8px', color: '#6B4A2F', letterSpacing: '0.05em' }}
-      >
-        PATIENT CHART
+      {/* Paper header — big icon for at-a-glance recognition + doc kind.
+          Patient records say PATIENT CHART; institutional paperwork shows its
+          own kind (SUPPLY ORDER, CAFETERIA MENU) and carries no patient name. */}
+      <div className="mb-3 pb-2 border-b-2 border-[#b8a87e] flex items-center gap-3">
+        <span
+          style={{ fontSize: '30px', lineHeight: 1, imageRendering: 'auto' }}
+          aria-hidden
+        >
+          {getSorterItemIcon(item)}
+        </span>
+        <span
+          style={{
+            fontFamily: '"Press Start 2P", monospace',
+            fontSize: '8px',
+            color: '#6B4A2F',
+            letterSpacing: '0.05em',
+          }}
+        >
+          {(item.docKind ?? (chart.patientName ? 'Patient Chart' : 'Document')).toUpperCase()}
+        </span>
       </div>
 
-      {/* Patient name + age */}
-      <div
-        className="mb-2"
-        style={{ fontSize: '11px', color: '#1a1a2e' }}
-      >
-        {chart.patientName}
-        {chart.age !== undefined ? `, ${chart.age}` : ''}
-      </div>
+      {/* Patient name + age — only for actual patient records */}
+      {chart.patientName && (
+        <div
+          className="mb-2"
+          style={{ fontFamily: 'var(--font-body)', fontSize: '19px', fontWeight: 600, color: '#1a1a2e' }}
+        >
+          {chart.patientName}
+          {chart.age !== undefined ? `, ${chart.age}` : ''}
+        </div>
+      )}
 
       {/* Optional chart fields — same order as SorterItem.tsx */}
       {chart.role && <ChartLine label="Role" value={chart.role} />}

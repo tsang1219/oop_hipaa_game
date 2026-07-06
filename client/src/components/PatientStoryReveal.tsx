@@ -44,7 +44,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
       const timer = setTimeout(() => {
         setDisplayedText(prev => prev + story.text[textIndex]);
         setTextIndex(prev => prev + 1);
-      }, 25);
+      }, 16);
       return () => clearTimeout(timer);
     } else if (phase === 'story' && textIndex >= story.text.length) {
       setPhase('complete');
@@ -104,7 +104,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
 
             {(phase === 'story' || phase === 'complete') && (
               <div className="bg-black/50 border-2 border-[#4ECDC4] rounded-[4px] p-6 mt-6">
-                <p className="text-white font-['Press_Start_2P'] text-[10px] leading-relaxed text-left">
+                <p className="text-white font-body leading-snug text-left" style={{ fontSize: '18px', letterSpacing: '0.01em' }}>
                   {displayedText}
                   {phase === 'story' && <span className="animate-pulse">▌</span>}
                 </p>

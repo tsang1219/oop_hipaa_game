@@ -70,8 +70,9 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
         }`}
         style={{ fontFamily: "'Press Start 2P', cursive" }}
       >
-        <p 
-          className="text-sm text-foreground mb-6 text-center leading-relaxed"
+        <p
+          className="font-body text-foreground mb-6 text-center leading-snug"
+          style={{ fontSize: '18px', letterSpacing: '0.01em' }}
           data-testid="text-choice-description"
         >
           {gate.description}

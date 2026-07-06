@@ -5,6 +5,7 @@ import CharacterPortrait from './CharacterPortrait';
 import BattleEncounterScreen from './BattleEncounterScreen';
 import type { Scene, Choice } from '@shared/schema';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
+import { resolveSpeakerNpcId } from '@/data/spriteAssetPaths';
 import nurseNinaImg from '@assets/generated_images/Nurse_Nina_pixel_portrait_6f9bfea3.png';
 
 type GamePhase = 'dialogue' | 'choices' | 'feedback';
@@ -197,12 +198,20 @@ export default function GameContainer({ scenes, onComplete, onGameOver, npcId, n
     scoreChange: selectedChoice.score,
   } : null;
 
+  // Portrait + nameplate follow the *scene's* speaker, not the NPC the player
+  // first walked up to. A named speaker ("Nina", "Dr. Tovar") resolves to that
+  // character; narration/inner-monologue scenes ("Observation", "You …") resolve
+  // to null and fall back to the interacted NPC so their portrait stays put.
+  const sceneSpeakerId = resolveSpeakerNpcId(currentScene.character);
+  const effectiveNpcId = sceneSpeakerId || npcId || currentScene.character.toLowerCase().replace(/\s+/g, '_');
+  const effectiveNpcName = sceneSpeakerId ? currentScene.character : (npcName || currentScene.character);
+
   return (
     <div style={{ border: '2px solid rgba(255, 107, 157, 0.3)', boxShadow: '0 0 20px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.1)', borderRadius: '4px', overflow: 'hidden' }}>
       {/* Dialogue Overlay — room visible through transparent wrapper */}
       <BattleEncounterScreen
-        npcId={npcId || currentScene.character.toLowerCase().replace(/\s+/g, '_')}
-        npcName={npcName || currentScene.character}
+        npcId={effectiveNpcId}
+        npcName={effectiveNpcName}
         dialogue={currentScene.dialogue}
         choices={gamePhase === 'choices' ? battleChoices : undefined}
         feedback={gamePhase === 'feedback' ? battleFeedback : null}

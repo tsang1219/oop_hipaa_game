@@ -64,7 +64,8 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
 
         <div className="bg-[#F0F0F0] border-2 border-black p-4 md:p-6 mb-6">
           <p
-            className="font-['Press_Start_2P'] text-[10px] md:text-xs leading-relaxed text-black"
+            className="font-body leading-snug text-black"
+            style={{ fontSize: '17px', letterSpacing: '0.01em' }}
             data-testid="text-item-fact"
           >
             {fact}

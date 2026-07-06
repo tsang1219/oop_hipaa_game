@@ -64,42 +64,21 @@
         },
         {
           "x": 2,
-          "y": 7,
+          "y": 1,
           "width": 2,
           "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 2,
-          "y": 9,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
+          "type": "bulletin_board"
         },
         {
           "x": 16,
-          "y": 7,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 16,
-          "y": 9,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 1,
-          "y": 2,
+          "y": 3,
           "width": 2,
           "height": 2,
-          "type": "plant"
+          "type": "info_kiosk"
         },
         {
           "x": 17,
-          "y": 2,
+          "y": 1,
           "width": 2,
           "height": 2,
           "type": "plant"
@@ -119,39 +98,60 @@
           "type": "plant"
         },
         {
-          "x": 6,
-          "y": 7,
-          "width": 2,
-          "height": 2,
-          "type": "table"
-        },
-        {
-          "x": 12,
-          "y": 7,
-          "width": 2,
-          "height": 2,
-          "type": "table"
-        },
-        {
-          "x": 3,
-          "y": 1,
+          "x": 2,
+          "y": 8,
           "width": 2,
           "height": 1,
-          "type": "bulletin_board"
+          "type": "chairs"
         },
         {
-          "x": 14,
-          "y": 2,
+          "x": 16,
+          "y": 8,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 16,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 4,
+          "y": 9,
           "width": 1,
           "height": 1,
-          "type": "flower_arrangement"
+          "type": "table"
         },
         {
-          "x": 5,
-          "y": 10,
+          "x": 15,
+          "y": 9,
+          "width": 1,
+          "height": 1,
+          "type": "table"
+        },
+        {
+          "x": 6,
+          "y": 11,
           "width": 1,
           "height": 1,
           "type": "hand_sanitizer"
+        },
+        {
+          "x": 13,
+          "y": 11,
+          "width": 1,
+          "height": 1,
+          "type": "umbrella_stand"
         },
         {
           "x": 9,
@@ -159,20 +159,6 @@
           "width": 3,
           "height": 1,
           "type": "welcome_mat"
-        },
-        {
-          "x": 2,
-          "y": 11,
-          "width": 1,
-          "height": 1,
-          "type": "umbrella_stand"
-        },
-        {
-          "x": 15,
-          "y": 10,
-          "width": 2,
-          "height": 2,
-          "type": "info_kiosk"
         }
       ],
       "npcs": [
@@ -190,14 +176,14 @@
           "id": "aiyana_intake",
           "name": "Aiyana",
           "role": "Intake Volunteer",
-          "x": 10,
-          "y": 6,
-          "sprite": "officer",
+          "x": 8,
+          "y": 4,
+          "sprite": "staff",
           "sceneId": "_encounter_phi_sort_reception",
           "encounterTrigger": {
             "encounterId": "phi-sort-reception",
             "documentSetId": "phi-sorter-set-1",
-            "requestText": "Hey — auditor's here in twenty minutes and I'm drowning. Can you help me sort what counts as PHI on these intake forms?",
+            "requestText": "Hey \u2014 auditor's here in twenty minutes and I'm drowning. Can you help me sort what counts as PHI on these intake forms?",
             "completedText": "Front desk is quiet for once. You're my favorite person today."
           },
           "isFinalBoss": false
@@ -207,7 +193,7 @@
         {
           "id": "welcome_board",
           "name": "Staff Directory",
-          "x": 5,
+          "x": 2,
           "y": 2,
           "sceneId": "welcome_board_scene",
           "spriteType": "poster"
@@ -218,8 +204,8 @@
           "id": "hipaa_brochure",
           "title": "What is HIPAA?",
           "type": "document",
-          "x": 15,
-          "y": 4,
+          "x": 16,
+          "y": 5,
           "fact": "HIPAA \u2014 the Health Insurance Portability and Accountability Act of 1996 \u2014 isn't just about privacy. It has five titles, but Title II is the one that matters to you: it sets national standards for protecting patient health information (PHI). Two key rules: the Privacy Rule (who can see PHI) and the Security Rule (how to protect electronic PHI). Every person in this hospital \u2014 from the CEO to the janitor \u2014 has a role in keeping patient data safe."
         }
       ],
@@ -884,22 +870,15 @@
           "x": 7,
           "y": 2,
           "width": 6,
+          "height": 2,
+          "type": "desk"
+        },
+        {
+          "x": 1,
+          "y": 3,
+          "width": 2,
           "height": 1,
-          "type": "desk"
-        },
-        {
-          "x": 6,
-          "y": 2,
-          "width": 1,
-          "height": 2,
-          "type": "desk"
-        },
-        {
-          "x": 13,
-          "y": 2,
-          "width": 1,
-          "height": 2,
-          "type": "desk"
+          "type": "notice_board"
         },
         {
           "x": 4,
@@ -916,83 +895,6 @@
           "type": "filing_cabinet"
         },
         {
-          "x": 6,
-          "y": 6,
-          "width": 2,
-          "height": 1,
-          "type": "privacy_screen"
-        },
-        {
-          "x": 12,
-          "y": 6,
-          "width": 2,
-          "height": 1,
-          "type": "privacy_screen"
-        },
-        {
-          "x": 2,
-          "y": 8,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 2,
-          "y": 10,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 5,
-          "y": 10,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 4,
-          "y": 8,
-          "width": 1,
-          "height": 1,
-          "type": "magazine_rack"
-        },
-        {
-          "x": 8,
-          "y": 10,
-          "width": 1,
-          "height": 1,
-          "type": "tissue_box"
-        },
-        {
-          "x": 15,
-          "y": 6,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 15,
-          "y": 10,
-          "width": 2,
-          "height": 1,
-          "type": "chairs"
-        },
-        {
-          "x": 2,
-          "y": 12,
-          "width": 1,
-          "height": 1,
-          "type": "water_dispenser"
-        },
-        {
-          "x": 4,
-          "y": 12,
-          "width": 2,
-          "height": 1,
-          "type": "notice_board"
-        },
-        {
           "x": 1,
           "y": 1,
           "width": 1,
@@ -1000,11 +902,74 @@
           "type": "plant"
         },
         {
-          "x": 17,
-          "y": 2,
+          "x": 18,
+          "y": 1,
           "width": 1,
           "height": 1,
           "type": "plant"
+        },
+        {
+          "x": 6,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "privacy_screen"
+        },
+        {
+          "x": 13,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "privacy_screen"
+        },
+        {
+          "x": 2,
+          "y": 8,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 16,
+          "y": 8,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 2,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 16,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "chairs"
+        },
+        {
+          "x": 5,
+          "y": 11,
+          "width": 1,
+          "height": 1,
+          "type": "tissue_box"
+        },
+        {
+          "x": 2,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "type": "magazine_rack"
+        },
+        {
+          "x": 17,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "type": "water_dispenser"
         }
       ],
       "npcs": [
@@ -1013,7 +978,7 @@
           "name": "Front Desk Coordinator",
           "sprite": "receptionist",
           "x": 10,
-          "y": 3,
+          "y": 4,
           "sceneId": "riley_scene1"
         },
         {
@@ -1021,15 +986,15 @@
           "name": "Nervous New Patient",
           "sprite": "patient",
           "x": 5,
-          "y": 8,
+          "y": 9,
           "sceneId": "concerned_husband"
         },
         {
           "id": "chatty_visitor",
           "name": "Chatty Visitor",
           "sprite": "visitor",
-          "x": 15,
-          "y": 8,
+          "x": 14,
+          "y": 9,
           "sceneId": "celebrity_crisis"
         }
       ],
@@ -1166,10 +1131,17 @@
         },
         {
           "x": 8,
-          "y": 5,
+          "y": 4,
           "width": 4,
           "height": 3,
           "type": "nurse_station"
+        },
+        {
+          "x": 8,
+          "y": 9,
+          "width": 4,
+          "height": 1,
+          "type": "triage_desk"
         },
         {
           "x": 2,
@@ -1186,6 +1158,20 @@
           "type": "patient_bay"
         },
         {
+          "x": 6,
+          "y": 2,
+          "width": 1,
+          "height": 3,
+          "type": "curtain_partition"
+        },
+        {
+          "x": 13,
+          "y": 2,
+          "width": 1,
+          "height": 3,
+          "type": "curtain_partition"
+        },
+        {
           "x": 2,
           "y": 9,
           "width": 3,
@@ -1200,62 +1186,6 @@
           "type": "gurney"
         },
         {
-          "x": 5,
-          "y": 12,
-          "width": 2,
-          "height": 1,
-          "type": "equipment"
-        },
-        {
-          "x": 13,
-          "y": 12,
-          "width": 2,
-          "height": 1,
-          "type": "equipment"
-        },
-        {
-          "x": 6,
-          "y": 2,
-          "width": 1,
-          "height": 3,
-          "type": "curtain_partition"
-        },
-        {
-          "x": 13,
-          "y": 2,
-          "width": 1,
-          "height": 3,
-          "type": "curtain_partition"
-        },
-        {
-          "x": 6,
-          "y": 9,
-          "width": 1,
-          "height": 3,
-          "type": "curtain_partition"
-        },
-        {
-          "x": 5,
-          "y": 5,
-          "width": 1,
-          "height": 1,
-          "type": "iv_stand"
-        },
-        {
-          "x": 18,
-          "y": 5,
-          "width": 1,
-          "height": 1,
-          "type": "vital_monitor"
-        },
-        {
-          "x": 13,
-          "y": 10,
-          "width": 2,
-          "height": 1,
-          "type": "crash_cart"
-        },
-        {
           "x": 1,
           "y": 10,
           "width": 1,
@@ -1263,11 +1193,25 @@
           "type": "iv_stand"
         },
         {
-          "x": 8,
-          "y": 13,
-          "width": 3,
+          "x": 18,
+          "y": 4,
+          "width": 1,
           "height": 1,
-          "type": "triage_desk"
+          "type": "vital_monitor"
+        },
+        {
+          "x": 5,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "type": "equipment"
+        },
+        {
+          "x": 13,
+          "y": 11,
+          "width": 2,
+          "height": 1,
+          "type": "crash_cart"
         }
       ],
       "npcs": [
@@ -1275,7 +1219,7 @@
           "id": "dr_martinez",
           "name": "Rushed ER Doctor",
           "sprite": "doctor",
-          "x": 10,
+          "x": 9,
           "y": 8,
           "sceneId": "dr_martinez_scene1"
         },
@@ -1283,25 +1227,25 @@
           "id": "officer",
           "name": "Police Officer",
           "sprite": "officer",
-          "x": 2,
-          "y": 7,
+          "x": 7,
+          "y": 8,
           "sceneId": "police_records"
         },
         {
           "id": "frantic_family",
           "name": "Frantic Family Member",
           "sprite": "visitor",
-          "x": 17,
-          "y": 7,
+          "x": 12,
+          "y": 8,
           "sceneId": "family_pressure"
         },
         {
           "id": "priya_privacy_officer",
           "name": "Priya",
           "role": "Privacy Officer",
-          "sprite": "officer",
-          "x": 8,
-          "y": 12,
+          "sprite": "boss",
+          "x": 12,
+          "y": 11,
           "sceneId": "_encounter_breach_triage_er",
           "encounterTrigger": {
             "encounterId": "breach-triage-er",
@@ -1326,7 +1270,7 @@
         {
           "id": "unlocked_computer",
           "name": "Computer Left Logged In",
-          "x": 7,
+          "x": 6,
           "y": 6,
           "sceneId": "unlocked_workstation",
           "spriteType": "computer"
@@ -1338,7 +1282,7 @@
           "title": "When You CAN Share PHI",
           "type": "whiteboard",
           "x": 17,
-          "y": 12,
+          "y": 11,
           "fact": "HIPAA isn't trying to STOP healthcare\u2014it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (court orders, subpoenas, for suspect identification, crime on premises, or medical emergencies\u2014a warrant isn't always required), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
         }
       ],
@@ -1444,9 +1388,16 @@
           "type": "wall"
         },
         {
-          "x": 5,
+          "x": 3,
           "y": 5,
-          "width": 10,
+          "width": 5,
+          "height": 2,
+          "type": "lab_bench"
+        },
+        {
+          "x": 12,
+          "y": 5,
+          "width": 5,
           "height": 2,
           "type": "lab_bench"
         },
@@ -1465,6 +1416,20 @@
           "type": "centrifuge"
         },
         {
+          "x": 5,
+          "y": 2,
+          "width": 3,
+          "height": 1,
+          "type": "fume_hood"
+        },
+        {
+          "x": 8,
+          "y": 1,
+          "width": 4,
+          "height": 1,
+          "type": "results_board"
+        },
+        {
           "x": 2,
           "y": 10,
           "width": 2,
@@ -1477,34 +1442,6 @@
           "width": 2,
           "height": 2,
           "type": "bio_cabinet"
-        },
-        {
-          "x": 8,
-          "y": 1,
-          "width": 4,
-          "height": 1,
-          "type": "results_board"
-        },
-        {
-          "x": 5,
-          "y": 1,
-          "width": 3,
-          "height": 1,
-          "type": "fume_hood"
-        },
-        {
-          "x": 1,
-          "y": 4,
-          "width": 2,
-          "height": 1,
-          "type": "chemical_shelf"
-        },
-        {
-          "x": 17,
-          "y": 12,
-          "width": 2,
-          "height": 1,
-          "type": "chemical_shelf"
         },
         {
           "x": 7,
@@ -1521,18 +1458,32 @@
           "type": "eyewash_station"
         },
         {
-          "x": 12,
-          "y": 11,
+          "x": 11,
+          "y": 10,
           "width": 2,
           "height": 1,
           "type": "sample_rack"
         },
         {
-          "x": 14,
-          "y": 11,
+          "x": 13,
+          "y": 10,
           "width": 2,
           "height": 1,
           "type": "autoclave"
+        },
+        {
+          "x": 1,
+          "y": 8,
+          "width": 1,
+          "height": 1,
+          "type": "chemical_shelf"
+        },
+        {
+          "x": 18,
+          "y": 8,
+          "width": 1,
+          "height": 1,
+          "type": "chemical_shelf"
         }
       ],
       "npcs": [
@@ -1540,7 +1491,7 @@
           "id": "lab_tech",
           "name": "Lab Technician",
           "sprite": "it_tech",
-          "x": 10,
+          "x": 5,
           "y": 7,
           "sceneId": "lab_tech_scene"
         },
@@ -1548,14 +1499,14 @@
           "id": "marcus_lab_aide",
           "name": "Marcus",
           "role": "Lab Aide",
-          "x": 9,
+          "x": 14,
           "y": 7,
           "sprite": "staff",
           "sceneId": "_encounter_phi_sort_lab",
           "encounterTrigger": {
             "encounterId": "phi-sort-lab",
             "documentSetId": "phi-sorter-set-2",
-            "requestText": "Need a second pair of eyes — these sample labels are headed to an external manifest and I'm not sure which fields we can include. PHI or not PHI?",
+            "requestText": "Need a second pair of eyes \u2014 these sample labels are headed to an external manifest and I'm not sure which fields we can include. PHI or not PHI?",
             "completedText": "Charts are all where they belong. I can finally breathe."
           }
         },
@@ -1564,7 +1515,7 @@
           "name": "Curious Researcher",
           "sprite": "doctor",
           "x": 3,
-          "y": 5,
+          "y": 4,
           "sceneId": "research_request"
         },
         {
@@ -1572,7 +1523,7 @@
           "name": "Sample Courier",
           "sprite": "visitor",
           "x": 16,
-          "y": 5,
+          "y": 4,
           "sceneId": "third_party_access"
         }
       ],
@@ -1580,7 +1531,7 @@
         {
           "id": "sample_labels",
           "name": "Sample Labels",
-          "x": 7,
+          "x": 4,
           "y": 7,
           "sceneId": "sample_phi",
           "spriteType": "manual"
@@ -1588,7 +1539,7 @@
         {
           "id": "results_printout",
           "name": "Results Left on Counter",
-          "x": 13,
+          "x": 15,
           "y": 7,
           "sceneId": "exposed_results",
           "spriteType": "poster"
@@ -1725,42 +1676,28 @@
           "x": 3,
           "y": 2,
           "width": 1,
-          "height": 5,
+          "height": 4,
           "type": "filing_cabinet"
         },
         {
-          "x": 5,
+          "x": 6,
           "y": 2,
-          "width": 1,
-          "height": 5,
-          "type": "filing_cabinet"
-        },
-        {
-          "x": 8,
-          "y": 3,
           "width": 1,
           "height": 3,
           "type": "filing_cabinet"
         },
         {
-          "x": 12,
-          "y": 3,
-          "width": 1,
-          "height": 3,
-          "type": "filing_cabinet"
-        },
-        {
-          "x": 14,
+          "x": 13,
           "y": 2,
           "width": 1,
-          "height": 5,
+          "height": 3,
           "type": "filing_cabinet"
         },
         {
           "x": 16,
           "y": 2,
           "width": 1,
-          "height": 5,
+          "height": 4,
           "type": "filing_cabinet"
         },
         {
@@ -1814,7 +1751,7 @@
         },
         {
           "x": 6,
-          "y": 5,
+          "y": 11,
           "width": 1,
           "height": 1,
           "type": "document_cart"
@@ -1848,7 +1785,7 @@
         {
           "id": "compliance_officer",
           "name": "Chief Compliance Officer",
-          "sprite": "officer",
+          "sprite": "boss",
           "x": 8,
           "y": 12,
           "sceneId": "final_boss_1",
@@ -1860,7 +1797,7 @@
           "role": "Compliance Lead",
           "x": 14,
           "y": 10,
-          "sprite": "officer",
+          "sprite": "boss",
           "sceneId": "_encounter_phi_sort_records",
           "encounterTrigger": {
             "encounterId": "phi-sort-records",
@@ -2067,102 +2004,81 @@
           "type": "cable_tray"
         },
         {
+          "x": 1,
+          "y": 5,
+          "width": 1,
+          "height": 2,
+          "type": "monitor_bank"
+        },
+        {
+          "x": 18,
+          "y": 5,
+          "width": 1,
+          "height": 2,
+          "type": "monitor_bank"
+        },
+        {
           "x": 8,
           "y": 5,
           "width": 4,
-          "height": 1,
+          "height": 2,
           "type": "monitoring_desk"
         },
         {
           "x": 7,
-          "y": 5,
+          "y": 6,
           "width": 1,
           "height": 1,
           "type": "coffee_mug"
         },
         {
           "x": 12,
-          "y": 5,
+          "y": 6,
           "width": 1,
           "height": 1,
           "type": "headphones"
         },
         {
           "x": 2,
-          "y": 5,
+          "y": 8,
           "width": 2,
           "height": 1,
           "type": "workstation_cluster"
         },
         {
-          "x": 1,
-          "y": 4,
-          "width": 1,
-          "height": 1,
-          "type": "cable_tray"
-        },
-        {
           "x": 16,
-          "y": 5,
+          "y": 8,
           "width": 2,
           "height": 1,
           "type": "workstation_cluster"
-        },
-        {
-          "x": 18,
-          "y": 4,
-          "width": 1,
-          "height": 1,
-          "type": "cable_tray"
-        },
-        {
-          "x": 1,
-          "y": 6,
-          "width": 3,
-          "height": 1,
-          "type": "monitor_bank"
-        },
-        {
-          "x": 16,
-          "y": 6,
-          "width": 3,
-          "height": 1,
-          "type": "monitor_bank"
         },
         {
           "x": 2,
-          "y": 9,
+          "y": 10,
           "width": 3,
           "height": 1,
           "type": "whiteboard_wall"
         },
         {
-          "x": 2,
-          "y": 10,
-          "width": 2,
-          "height": 1,
-          "type": "chair"
-        },
-        {
           "x": 15,
-          "y": 9,
+          "y": 10,
           "width": 3,
           "height": 2,
           "type": "printer_station"
         },
         {
-          "x": 17,
-          "y": 11,
+          "x": 7,
+          "y": 12,
+          "width": 2,
+          "height": 1,
+          "type": "table"
+        },
+        {
+          "x": 16,
+          "y": 12,
           "width": 2,
           "height": 1,
           "type": "locked_cabinet"
-        },
-        {
-          "x": 1,
-          "y": 11,
-          "width": 1,
-          "height": 1,
-          "type": "cable_tray"
         },
         {
           "x": 1,
@@ -2177,20 +2093,6 @@
           "width": 1,
           "height": 1,
           "type": "trash"
-        },
-        {
-          "x": 7,
-          "y": 11,
-          "width": 2,
-          "height": 1,
-          "type": "table"
-        },
-        {
-          "x": 11,
-          "y": 11,
-          "width": 2,
-          "height": 1,
-          "type": "table"
         }
       ],
       "npcs": [
@@ -2207,7 +2109,7 @@
           "name": "Vendor Requesting Access",
           "sprite": "visitor",
           "x": 3,
-          "y": 8,
+          "y": 9,
           "sceneId": "vendor_access"
         },
         {
@@ -2215,7 +2117,7 @@
           "name": "Employee Needs Workaround",
           "sprite": "staff",
           "x": 16,
-          "y": 8,
+          "y": 9,
           "sceneId": "convenience_vs_security"
         }
       ],
@@ -2231,24 +2133,24 @@
         {
           "id": "breach_playbook",
           "name": "Breach Response Playbook",
-          "x": 5,
-          "y": 10,
+          "x": 7,
+          "y": 11,
           "sceneId": "breach_response",
           "spriteType": "manual"
         },
         {
           "id": "fax_machine",
           "name": "Fax Machine",
-          "x": 12,
-          "y": 10,
+          "x": 14,
+          "y": 9,
           "sceneId": "fax_machine_freddy",
           "spriteType": "computer"
         },
         {
           "id": "vendor_agreement",
           "name": "Unsigned Vendor Agreements",
-          "x": 14,
-          "y": 8,
+          "x": 5,
+          "y": 9,
           "sceneId": "vendor_baa",
           "spriteType": "manual"
         }
@@ -2393,11 +2295,53 @@
           "type": "vending_machine"
         },
         {
+          "x": 8,
+          "y": 2,
+          "width": 2,
+          "height": 2,
+          "type": "open_fridge"
+        },
+        {
+          "x": 14,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "type": "microwave"
+        },
+        {
           "x": 15,
           "y": 2,
           "width": 3,
           "height": 2,
           "type": "coffee_station"
+        },
+        {
+          "x": 10,
+          "y": 1,
+          "width": 2,
+          "height": 1,
+          "type": "notice_board"
+        },
+        {
+          "x": 1,
+          "y": 5,
+          "width": 1,
+          "height": 1,
+          "type": "coat_rack"
+        },
+        {
+          "x": 13,
+          "y": 6,
+          "width": 1,
+          "height": 2,
+          "type": "trash_bin"
+        },
+        {
+          "x": 7,
+          "y": 10,
+          "width": 2,
+          "height": 1,
+          "type": "tv_stand"
         },
         {
           "x": 2,
@@ -2414,60 +2358,18 @@
           "type": "couch"
         },
         {
-          "x": 13,
-          "y": 6,
-          "width": 1,
-          "height": 2,
-          "type": "trash_bin"
-        },
-        {
-          "x": 14,
-          "y": 2,
-          "width": 1,
-          "height": 1,
-          "type": "microwave"
-        },
-        {
-          "x": 8,
-          "y": 2,
-          "width": 2,
-          "height": 2,
-          "type": "open_fridge"
-        },
-        {
-          "x": 10,
-          "y": 1,
-          "width": 2,
-          "height": 1,
-          "type": "notice_board"
-        },
-        {
           "x": 5,
           "y": 12,
           "width": 1,
           "height": 1,
           "type": "lost_and_found_box"
-        },
-        {
-          "x": 7,
-          "y": 10,
-          "width": 2,
-          "height": 1,
-          "type": "tv_stand"
-        },
-        {
-          "x": 1,
-          "y": 6,
-          "width": 1,
-          "height": 1,
-          "type": "coat_rack"
         }
       ],
       "npcs": [
         {
           "id": "gossiping_coworker",
           "name": "Gossiping Coworker",
-          "sprite": "nurse",
+          "sprite": "staff",
           "x": 7,
           "y": 7,
           "sceneId": "gary_gossip"
@@ -2517,7 +2419,7 @@
         {
           "id": "unlocked_phone",
           "name": "Phone Left Unlocked",
-          "x": 6,
+          "x": 12,
           "y": 7,
           "sceneId": "phone_security",
           "spriteType": "computer"

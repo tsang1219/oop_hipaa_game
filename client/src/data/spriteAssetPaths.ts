@@ -56,6 +56,44 @@ const NPC_SPRITE_TYPE_BY_ID: Record<string, string> = (() => {
 })();
 
 /**
+ * Index: normalized NPC display-name → npcId, built from roomData.json.
+ * Lets us resolve a gameData scene's `character` string ("Nina", "Dr. Tovar")
+ * back to the roomData NPC whose sprite/color/portrait we should show.
+ */
+const NPC_ID_BY_NAME: Record<string, string> = (() => {
+  const index: Record<string, string> = {};
+  const rooms = (roomData as { rooms: Array<{ npcs?: Array<{ id: string; name?: string }> }> }).rooms;
+  for (const room of rooms) {
+    for (const npc of room.npcs ?? []) {
+      if (npc.id && npc.name) index[npc.name.trim().toLowerCase()] = npc.id;
+    }
+  }
+  return index;
+})();
+
+const slugifyName = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_|_$/g, '');
+
+/**
+ * Resolve a dialogue scene's `character` string to the npcId whose portrait,
+ * name colour, and sprite it should drive. Fixes the bug where a multi-speaker
+ * dialogue chain kept showing the first (interacted) NPC's portrait.
+ *
+ * Returns null for narration/internal-monologue speakers ("Observation",
+ * "You …") and any string that doesn't map to a real character — callers should
+ * then fall back to the interacted NPC.
+ */
+export function resolveSpeakerNpcId(character: string | undefined | null): string | null {
+  if (!character) return null;
+  const raw = character.trim();
+  if (/^(observation|narrat|you\b|you\s*\()/i.test(raw)) return null;
+  const byName = NPC_ID_BY_NAME[raw.toLowerCase()];
+  if (byName) return byName;
+  const slug = slugifyName(raw);
+  if (NPC_SPRITE_TYPE_BY_ID[slug]) return slug;
+  return null;
+}
+
+/**
  * Resolve a dialogue speaker's npcId to the PNG sheet path BootScene preloads.
  *
  * Resolution chain:

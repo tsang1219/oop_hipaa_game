@@ -658,8 +658,8 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
             NOT QUITE &mdash; {wrongFeedback.label}
           </div>
           <div
-            className="text-white leading-relaxed"
-            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.8' }}
+            className="text-white"
+            style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.4', letterSpacing: '0.01em' }}
           >
             {wrongFeedback.explanation}
           </div>

@@ -55,7 +55,7 @@ export default function BattleEncounterScreen({
       const timer = setTimeout(() => {
         setDisplayedText(dialogue.slice(0, currentIndex + 1));
         setCurrentIndex(currentIndex + 1);
-      }, 25);
+      }, 7); // snappy RPG crawl; press/hold SPACE to skip to full
       return () => clearTimeout(timer);
     } else if (isTyping) {
       setIsTyping(false);
@@ -228,17 +228,24 @@ export default function BattleEncounterScreen({
             onClick={handleDialogueClick}
             data-testid="container-battle-dialogue"
           >
-            <div className="font-['Press_Start_2P'] text-white text-xs leading-relaxed min-h-[3rem]">
+            <div
+              className="font-body text-white leading-snug min-h-[3rem]"
+              style={{ fontSize: '19px', letterSpacing: '0.01em' }}
+            >
               {displayedText}
               {isTyping && <span className="animate-pulse">|</span>}
             </div>
-            {!isTyping && (
-              <div className="mt-3 text-right">
-                <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-[10px] animate-pulse">
+            <div className="mt-3 text-right">
+              {isTyping ? (
+                <span className="font-['Press_Start_2P'] text-[#FF6B9D]/70 text-[8px]">
+                  ▸ SPACE to skip
+                </span>
+              ) : (
+                <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-[9px] animate-pulse">
                   SPACE / Click to continue ...
                 </span>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         )}
 
@@ -247,7 +254,7 @@ export default function BattleEncounterScreen({
           <div className="px-4 pb-4">
             {/* Repeat dialogue context */}
             <div className="mb-3">
-              <p className="font-['Press_Start_2P'] text-white text-xs leading-relaxed">
+              <p className="font-body text-white leading-snug" style={{ fontSize: '19px', letterSpacing: '0.01em' }}>
                 {dialogue}
               </p>
             </div>
@@ -269,8 +276,8 @@ export default function BattleEncounterScreen({
                       {idx + 1}.
                     </span>
                     <span
-                      className="font-['Press_Start_2P'] text-white text-[10px] leading-relaxed text-left"
-                      style={{ wordBreak: 'break-word', whiteSpace: 'normal' }}
+                      className="font-body text-white leading-snug text-left"
+                      style={{ wordBreak: 'break-word', whiteSpace: 'normal', fontSize: '16px' }}
                     >
                       {choice.text}
                     </span>
@@ -309,7 +316,7 @@ export default function BattleEncounterScreen({
                   </span>
                 )}
               </div>
-              <p className="font-['Press_Start_2P'] text-white text-xs leading-relaxed">
+              <p className="font-body text-white leading-snug" style={{ fontSize: '17px', letterSpacing: '0.01em' }}>
                 {feedback.text}
               </p>
             </Card>

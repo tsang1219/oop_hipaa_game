@@ -80,8 +80,8 @@ export function RoomIntroOverlay({ roomName, subtitle, introText, onDismiss }: R
         )}
         {introText && (
           <p
-            className="text-xs text-gray-300 max-w-md italic"
-            style={{ fontFamily: '"Press Start 2P", monospace', textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
+            className="text-gray-300 max-w-md italic mx-auto"
+            style={{ fontFamily: 'var(--font-body)', fontSize: '17px', lineHeight: '1.45', textShadow: '1px 1px 4px rgba(0,0,0,0.8)' }}
           >
             {introText}
           </p>

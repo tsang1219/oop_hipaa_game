@@ -52,8 +52,9 @@ export default function ObservationHint({ gate, onAcknowledge }: ObservationHint
             >
               You notice something...
             </p>
-            <p 
-              className="text-xs text-foreground leading-relaxed"
+            <p
+              className="font-body text-foreground leading-snug"
+              style={{ fontSize: '17px', letterSpacing: '0.01em' }}
               data-testid="text-observation-detail"
             >
               {gate.observationHint || gate.description}

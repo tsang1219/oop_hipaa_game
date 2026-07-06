@@ -130,8 +130,8 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
 
       {/* Main reaction text */}
       <div
-        className="text-white leading-relaxed"
-        style={{ fontSize: '9px', lineHeight: '1.7' }}
+        className="text-white"
+        style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.4', letterSpacing: '0.01em' }}
         data-testid="npc-reaction-bubble-text"
       >
         {visibleText}
@@ -140,8 +140,8 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
       {/* HOLD IT educational beat — second line, gold tint */}
       {holdIt && holdIt.educationalBeat && (
         <div
-          className="text-[#FFD93D] mt-3 pt-3 border-t-2 border-[#FFD93D]/30 leading-relaxed"
-          style={{ fontSize: '8px', lineHeight: '1.7' }}
+          className="text-[#FFD93D] mt-3 pt-3 border-t-2 border-[#FFD93D]/30"
+          style={{ fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '1.4', letterSpacing: '0.01em' }}
           data-testid="npc-reaction-bubble-holdit-beat"
         >
           {holdIt.educationalBeat}
@@ -249,8 +249,8 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
 
       {/* Main reaction text */}
       <div
-        className="text-white leading-relaxed"
-        style={{ fontSize: '9px', lineHeight: '1.7' }}
+        className="text-white"
+        style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.4', letterSpacing: '0.01em' }}
         data-testid="npc-reaction-bubble-text"
       >
         {visibleText}
@@ -259,8 +259,8 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
       {/* HOLD IT educational beat — second line, gold tint */}
       {holdIt && holdIt.educationalBeat && (
         <div
-          className="text-[#FFD93D] mt-3 pt-3 border-t-2 border-[#FFD93D]/30 leading-relaxed"
-          style={{ fontSize: '8px', lineHeight: '1.7' }}
+          className="text-[#FFD93D] mt-3 pt-3 border-t-2 border-[#FFD93D]/30"
+          style={{ fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '1.4', letterSpacing: '0.01em' }}
           data-testid="npc-reaction-bubble-holdit-beat"
         >
           {holdIt.educationalBeat}

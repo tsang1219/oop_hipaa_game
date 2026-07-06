@@ -41,8 +41,8 @@ export function SorterContextCard({ title, body, onConfirm }: SorterContextCardP
           {title}
         </div>
         <div
-          className="text-white leading-relaxed mb-6 whitespace-pre-wrap"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', lineHeight: '1.8' }}
+          className="text-white mb-6 whitespace-pre-wrap"
+          style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.55', letterSpacing: '0.01em' }}
         >
           {body}
         </div>

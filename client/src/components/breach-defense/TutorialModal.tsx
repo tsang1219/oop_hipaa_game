@@ -37,7 +37,10 @@ export function TutorialModal({ title, description, onAcknowledge, type = 'info'
         </div>
 
         <div className="p-6">
-          <div className="text-sm leading-relaxed whitespace-pre-line mb-6">
+          <div
+            className="font-body leading-snug whitespace-pre-line mb-6"
+            style={{ fontSize: '17px', letterSpacing: '0.01em' }}
+          >
             {description}
           </div>
 

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -81,6 +81,9 @@
   --font-sans: 'Press Start 2P', 'Courier New', monospace;
   --font-serif: 'Press Start 2P', 'Courier New', monospace;
   --font-mono: 'Press Start 2P', 'Courier New', monospace;
+  /* Legible pixel/RPG face for long-form body text (dialogue, instructions,
+     modals). Press Start 2P stays on headers + UI chrome for identity. */
+  --font-body: 'Pixelify Sans', 'Press Start 2P', 'Courier New', sans-serif;
   --radius: .125rem;
   --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 0% / 0.20);
   --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.30);

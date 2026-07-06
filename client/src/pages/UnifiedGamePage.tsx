@@ -1832,7 +1832,7 @@ export default function UnifiedGamePage() {
           <TutorialModal
             title="Welcome to HIPAA General"
             description={
-              "You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nSPACE \u2014 Talk to people and interact\nSPACE at a door \u2014 Go to the next area"
+              "You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nHold SHIFT \u2014 Run\nSPACE \u2014 Talk to people and interact\nSPACE at a door \u2014 Go to the next area"
             }
             onAcknowledge={handleDismissIntroModal}
             type="info"
@@ -1847,7 +1847,7 @@ export default function UnifiedGamePage() {
           className="text-[8px] text-gray-500"
           style={{ fontFamily: '"Press Start 2P"' }}
         >
-          WASD or Arrow Keys to move &bull; SPACE to interact &bull; SPACE at a door to travel
+          WASD / Arrows to move &bull; <span className="text-gray-300">SHIFT to run</span> &bull; SPACE to interact &bull; SPACE at a door to travel
         </p>
         <button
           onClick={handleShowHelpModal}

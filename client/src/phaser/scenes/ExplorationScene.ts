@@ -27,7 +27,8 @@ import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
 const TILE = 32;
-const MOVE_SPEED = 160; // pixels/sec
+const MOVE_SPEED = 190; // pixels/sec — snappy default walk
+const RUN_MULT = 1.8;   // hold SHIFT to run (~340 px/s); rooms are big, running is the natural pace
 
 // MUSIC_TRACK_KEYS moved to systems/exploration/MusicController (Round 6)
 
@@ -67,6 +68,7 @@ export class ExplorationScene extends Phaser.Scene {
   private wasd!: Record<string, Phaser.Input.Keyboard.Key>;
   private interactKey!: Phaser.Input.Keyboard.Key;
   private escKey!: Phaser.Input.Keyboard.Key;
+  private runKey!: Phaser.Input.Keyboard.Key;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private interactables: InteractableData[] = [];
   private nearbyInteractable: InteractableData | null = null;
@@ -437,6 +439,8 @@ export class ExplorationScene extends Phaser.Scene {
       S: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.S),
       D: this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.D),
     };
+    this.runKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SHIFT);
+    this.input.keyboard!.addCapture([Phaser.Input.Keyboard.KeyCodes.SHIFT]);
     this.interactKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     this.escKey = this.input.keyboard!.addKey(Phaser.Input.Keyboard.KeyCodes.ESC);
 
@@ -572,24 +576,29 @@ export class ExplorationScene extends Phaser.Scene {
       const up = this.cursors.up.isDown || this.wasd.W.isDown;
       const down = this.cursors.down.isDown || this.wasd.S.isDown;
 
+      // Hold SHIFT to run. Rooms are large, so running is the natural pace —
+      // the default walk is already brisk, this is the extra gear.
+      const running = this.runKey.isDown;
+      const speed = running ? MOVE_SPEED * RUN_MULT : MOVE_SPEED;
+
       if (left) {
-        body.setVelocityX(-MOVE_SPEED);
+        body.setVelocityX(-speed);
         this.player.anims.play('walk_left', true);
         this.lastFacingFrame = IDLE_LEFT;
       } else if (right) {
-        body.setVelocityX(MOVE_SPEED);
+        body.setVelocityX(speed);
         this.player.anims.play('walk_right', true);
         this.lastFacingFrame = IDLE_RIGHT;
       }
 
       if (up) {
-        body.setVelocityY(-MOVE_SPEED);
+        body.setVelocityY(-speed);
         if (!left && !right) {
           this.player.anims.play('walk_up', true);
           this.lastFacingFrame = IDLE_UP;
         }
       } else if (down) {
-        body.setVelocityY(MOVE_SPEED);
+        body.setVelocityY(speed);
         if (!left && !right) {
           this.player.anims.play('walk_down', true);
           this.lastFacingFrame = IDLE_DOWN;
@@ -597,12 +606,15 @@ export class ExplorationScene extends Phaser.Scene {
       }
 
       if ((left || right) && (up || down)) {
-        body.velocity.normalize().scale(MOVE_SPEED);
+        body.velocity.normalize().scale(speed);
       }
 
       const isMoving = left || right || up || down;
+      // Legs churn faster while running — sells the speed without new art.
+      if (isMoving) this.player.anims.timeScale = running ? 1.5 : 1;
       if (isMoving) this.lastActivityAt = this.time.now;
-      if (isMoving && !this.paused && this.time.now - this.lastFootstepTime > 350) {
+      const footstepGap = running ? 240 : 350;
+      if (isMoving && !this.paused && this.time.now - this.lastFootstepTime > footstepGap) {
         this.sound.play('sfx_footstep', { volume: 0.25 });
         this.lastFootstepTime = this.time.now;
 
@@ -1239,11 +1251,13 @@ export class ExplorationScene extends Phaser.Scene {
       this.tileX = next.x;
       this.tileY = next.y;
 
+      // Click-move is snappy by default; holding SHIFT while clicking runs the path.
+      const perTile = this.runKey?.isDown ? 62 : 95;
       this.tweens.add({
         targets: this.player,
         x: next.x * TILE + TILE / 2,
         y: next.y * TILE + TILE / 2,
-        duration: 120,
+        duration: perTile,
         ease: 'Linear',
         onComplete: () => {
           (this.player.body as Phaser.Physics.Arcade.Body).reset(this.player.x, this.player.y);

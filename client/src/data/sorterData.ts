@@ -43,7 +43,9 @@ export type SorterIdentifierType =
 
 /** Patient chart fields rendered in the sortable card. Humor lives in optional free-text fields. */
 export type SorterChart = {
-  patientName: string;          // "Henderson, Margaret" — deadpan, recurring-when-intentional
+  patientName?: string;         // "Henderson, Margaret" — deadpan, recurring-when-intentional.
+                                // OPTIONAL: clearly-institutional docs (supply orders, menus)
+                                // carry NO patient name — that's the whole point of a KEEP.
   age?: number;                 // numeric; for Set 3 age-90+ edge case, store as 91/92
   role?: string;                // "Retired postal inspector" — humor surface
   emergencyContact?: string;    // "Mr. Whiskers (cat) — no phone, lives in same house" — humor surface
@@ -68,7 +70,31 @@ export type SorterItem = {
   // PHASE 22 ADDITIONS:
   chart: SorterChart;          // REQUIRED on every item
   holdIt?: SorterHoldIt;       // PRESENT on exactly one item per set
+  // FEEL PASS: at-a-glance recognition so the player reads an ICON, not a wall
+  // of text, under the shift clock.
+  icon?: string;               // Emoji glyph. Falls back to identifier-type default.
+  docKind?: string;            // "Intake Form", "Supply Order" — card sub-header.
+                               // When set AND chart.patientName is absent, the card
+                               // renders as a non-patient document (a clear KEEP).
 };
+
+/** Default glyph per Safe Harbor identifier — used when an item omits `icon`. */
+const ICON_BY_IDENTIFIER: Record<SorterIdentifierType, string> = {
+  name: '🧑', geographic: '🏠', date: '📅', phone: '📞', fax: '📠',
+  email: '✉️', ssn: '🔢', mrn: '🏷️', plan_id: '🪪', account: '💳',
+  license: '📜', vehicle: '🚗', device_serial: '🔧', url: '🔗',
+  ip_address: '🌐', biometric: '👁️', photo: '📷', other: '📄',
+};
+
+/** At-a-glance icon for a sortable item. Explicit `icon` wins; then identifier
+ *  default (PHI); then a neutral document glyph for non-PHI paperwork. */
+export function getSorterItemIcon(item: SorterItem): string {
+  if (item.icon) return item.icon;
+  if (item.category === 'phi' && item.identifierType) {
+    return ICON_BY_IDENTIFIER[item.identifierType];
+  }
+  return '📋';
+}
 
 /** A full document set for one PHI Sorter encounter instance. */
 export type SorterDocumentSet = {
@@ -247,9 +273,34 @@ const SET_1: SorterDocumentSet = {
         doctorNote: 'Patient asked if this field was legally required. Reasonable question, honestly.',
       },
     },
+    {
+      // Clearly-safe, NO patient name — breaks the "everything has a name, always redact" reflex.
+      id: 's1-supply-order',
+      label: 'Supply Order: Exam gloves, size M ×4 boxes',
+      category: 'not_phi',
+      icon: '📦',
+      docKind: 'Supply Order',
+      explanation: 'A stockroom reorder for gloves. No patient, no identifier, no health information — ' +
+        'this is inventory paperwork, not PHI.',
+      chart: {
+        miscField: { label: 'Requested by', value: 'Front desk. "We are ALWAYS out of mediums."' },
+      },
+    },
+    {
+      id: 's1-cafeteria-menu',
+      label: 'Cafeteria Menu: Thursday',
+      category: 'not_phi',
+      icon: '🍽️',
+      docKind: 'Cafeteria Menu',
+      explanation: 'Thursday\'s lunch special is not Protected Health Information. ' +
+        'No individual, no identifier — nothing to redact.',
+      chart: {
+        miscField: { label: 'Special', value: 'Meatloaf. Again. Pudding cups while supplies last.' },
+      },
+    },
   ],
   passingAccuracy: 0.7,
-  shiftSeconds: 90,
+  shiftSeconds: 96,
   takeaways: [
     'PHI = an identifier PLUS a connection to health care or payment. ' +
       'In a hospital intake form, that health link is always implied for patient-specific fields.',
@@ -434,9 +485,34 @@ const SET_2: SorterDocumentSet = {
         },
       },
     },
+    {
+      // Clearly-safe, NO patient name — equipment paperwork, obvious KEEP.
+      id: 's2-centrifuge-log',
+      label: 'Equipment Log: Centrifuge #3 calibration',
+      category: 'not_phi',
+      icon: '⚙️',
+      docKind: 'Equipment Log',
+      explanation: 'Calibration records for lab equipment contain no patient and no identifier. ' +
+        'Machine maintenance is not Protected Health Information.',
+      chart: {
+        miscField: { label: 'Note', value: 'Calibrated. Still makes that noise. Tech says it\'s "fine."' },
+      },
+    },
+    {
+      id: 's2-biohazard-notice',
+      label: 'Biohazard Disposal Schedule',
+      category: 'not_phi',
+      icon: '☣️',
+      docKind: 'Facility Notice',
+      explanation: 'A posted disposal schedule is facility signage — no individual is identified. ' +
+        'Not PHI under §164.514(b)(2).',
+      chart: {
+        miscField: { label: 'Pickup', value: 'Tuesdays & Fridays. Do NOT prop the red door open again.' },
+      },
+    },
   ],
   passingAccuracy: 0.7,
-  shiftSeconds: 75,
+  shiftSeconds: 82,
   takeaways: [
     'Device serials, IP addresses, and biometric identifiers are all PHI under §164.514(b)(2) — ' +
       'even when a patient\'s name doesn\'t appear on the document.',
@@ -627,9 +703,34 @@ const SET_3: SorterDocumentSet = {
         },
       },
     },
+    {
+      // Clearly-safe, NO patient name — internal ops memo, obvious KEEP even at Act 3.
+      id: 's3-shredder-schedule',
+      label: 'Records Room: Shredder pickup schedule',
+      category: 'not_phi',
+      icon: '🗑️',
+      docKind: 'Ops Memo',
+      explanation: 'The schedule for when the shred bins get collected names no patient and no identifier. ' +
+        'It\'s an operations memo — keep it.',
+      chart: {
+        miscField: { label: 'Reminder', value: 'Bin 2 is for SHRED, bin 3 is recycling. This matters, Kevin.' },
+      },
+    },
+    {
+      id: 's3-office-plant-roster',
+      label: 'Break Room: Plant watering roster',
+      category: 'not_phi',
+      icon: '🪴',
+      docKind: 'Break Room Notice',
+      explanation: 'Whose turn it is to water the ficus is not Protected Health Information. ' +
+        'No individual is identified in a health context — nothing to redact.',
+      chart: {
+        miscField: { label: 'This week', value: 'Marcus. The ficus remembers who forgot last time.' },
+      },
+    },
   ],
   passingAccuracy: 0.7,
-  shiftSeconds: 60,
+  shiftSeconds: 68,
   takeaways: [
     'Safe Harbor lets you keep the year and 3-digit ZIP prefixes (in populous areas). ' +
       'Full dates, full ZIP codes, and ages 90 and above must be removed.',
