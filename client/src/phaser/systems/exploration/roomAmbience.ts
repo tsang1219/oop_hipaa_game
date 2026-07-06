@@ -241,13 +241,10 @@ export function addRoomAmbience(
         scene.time.delayedCall(60, () => flash.setAlpha(0));
       } });
     }
-    // (3) Encounter trigger glow — subtle pulsing ring at tile (9,6) signposting the IT encounter
-    const alreadyDone = scene.registry.get('encounterResult_td-it-office');
-    if (!alreadyDone) {
-      const tx = 9 * TILE + TILE / 2, ty = 6 * TILE + TILE / 2;
-      const ring = scene.add.circle(tx, ty, 14, 0x66ddff, 0.0).setStrokeStyle(2, 0x66ddff, 0.7).setDepth(4);
-      scene.tweens.add({ targets: ring, scale: { from: 0.8, to: 1.4 }, alpha: { from: 0.7, to: 0 }, duration: 1400, repeat: -1, ease: 'Sine.easeOut' });
-    }
+    // (3) Encounter signpost ring removed (HIPAA-is-the-game pass) — the
+    // Threat Console interactable (ExplorationScene.spawnDefenseConsole) is
+    // the visible invitation now; a ring at the old (9,6) trigger tile would
+    // point at nothing.
   }
 
   // ── Hallway life pass (DESIGN-HALLWAY-001 + 002) ─────────────

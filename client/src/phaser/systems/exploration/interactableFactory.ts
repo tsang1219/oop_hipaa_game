@@ -8,7 +8,7 @@ import type { Room, NPC, InteractionZone, EducationalItem } from '@shared/schema
 const TILE = 32;
 
 export interface InteractableData {
-  type: 'npc' | 'zone' | 'item' | 'hallwayBoard';
+  type: 'npc' | 'zone' | 'item' | 'hallwayBoard' | 'console';
   id: string;
   data: NPC | InteractionZone | EducationalItem | { x: number; y: number; title: string; content: string };
   sprite: Phaser.GameObjects.Sprite;

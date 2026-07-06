@@ -235,6 +235,13 @@ export default function UnifiedGamePage() {
     documentSetId: string;
     encounterType?: 'phi-sorter' | 'breach-triage';  // Phase 17: discriminates which overlay to launch
   } | null>(null);
+  // Mirror of encounterResults for listeners registered once on mount —
+  // onEncounterComplete needs current completion state to gate replay scoring.
+  const encounterResultsRef = useRef(gameState.state.encounterResults);
+  useEffect(() => {
+    encounterResultsRef.current = gameState.state.encounterResults;
+  }, [gameState.state.encounterResults]);
+
   // ── The Eighteen codex (HIPAA-is-the-game pass) ────────────────
   const [showCodex, setShowCodex] = useState(false);
   const [recentIdentifierKey, setRecentIdentifierKey] = useState<string | null>(null);
@@ -1029,8 +1036,11 @@ export default function UnifiedGamePage() {
     }) => {
       setEncounterResult(data);
       setEncounterPhase('debrief');
-      // Feed encounter score into unified compliance score
-      if (data.scoreContribution > 0) {
+      // Feed encounter score into unified compliance score — first completion
+      // only. The Threat Console re-runs the TD encounter as a simulation
+      // (HIPAA-is-the-game pass); replays are for mastery, not score farming.
+      const alreadyCompleted = encounterResultsRef.current[data.encounterId]?.completed;
+      if (data.scoreContribution > 0 && !alreadyCompleted) {
         gameState.addScore(data.scoreContribution);
       }
       // Record encounter result in game state

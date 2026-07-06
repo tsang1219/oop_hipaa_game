@@ -100,6 +100,7 @@ export function furnitureTextureKey(obstacleType?: string): string {
     archive_box: 'furn_archive_box',
     // IT Office
     monitoring_desk: 'furn_monitoring_desk',
+    defense_console: 'furn_defense_console',
     printer_station: 'furn_printer_station',
     cable_tray: 'furn_cable_tray',
     locked_cabinet: 'furn_locked_cabinet',

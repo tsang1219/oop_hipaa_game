@@ -830,4 +830,51 @@ export function generateOfficeFurniture(scene: Phaser.Scene) {
     g.generateTexture('furn_bench', TILE, TILE);
     g.destroy();
   }
+
+  // Threat console — the BreachDefense encounter kiosk (HIPAA-is-the-game pass).
+  // Free-standing SOC kiosk: pedestal base, angled body, big screen head.
+  // The screen face is deliberately dark here — ExplorationScene.spawnDefenseConsole
+  // layers the animated threat-map, beacon, glow, and label on top.
+  if (!scene.textures.exists('furn_defense_console')) {
+    const g = scene.add.graphics();
+    const steel = 0x2a3244;
+    // Pedestal base + feet
+    g.fillStyle(darken(steel, 20));
+    g.fillRect(6, 27, 20, 4);
+    g.fillStyle(darken(steel, 35));
+    g.fillRect(4, 30, 6, 2);
+    g.fillRect(22, 30, 6, 2);
+    // Body column
+    g.fillStyle(steel);
+    g.fillRect(10, 18, 12, 9);
+    g.fillStyle(lighten(steel, 15));
+    g.fillRect(10, 18, 1, 9);
+    g.fillStyle(darken(steel, 25));
+    g.fillRect(21, 18, 1, 9);
+    // Cable run into the floor
+    g.fillStyle(0x11151f);
+    g.fillRect(22, 29, 7, 2);
+    // Screen head — wide bezel
+    g.fillStyle(0x11151f);
+    g.fillRect(2, 2, 28, 17);
+    g.fillStyle(lighten(0x11151f, 20));
+    g.fillRect(2, 2, 28, 1);
+    g.fillRect(2, 2, 1, 17);
+    // Screen face — dark glass
+    g.fillStyle(0x081420);
+    g.fillRect(4, 4, 24, 13);
+    // Faint scan grid
+    g.fillStyle(0x1a3a4a);
+    g.fillRect(4, 8, 24, 1);
+    g.fillRect(4, 12, 24, 1);
+    g.fillRect(12, 4, 1, 13);
+    g.fillRect(20, 4, 1, 13);
+    // Status LED strip on the bezel
+    g.fillStyle(0xe74c3c);
+    g.fillRect(25, 3, 2, 1);
+    g.fillStyle(0xf39c12);
+    g.fillRect(22, 3, 2, 1);
+    g.generateTexture('furn_defense_console', TILE, TILE);
+    g.destroy();
+  }
 }

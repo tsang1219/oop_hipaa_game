@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures } from '../sprites';
+import { objectTextureKey } from '../sprites/objectTextures';
 import {
   ENCOUNTER_WAVES_INBOUND,
   ENCOUNTER_WAVE_BUDGETS,
@@ -32,25 +33,16 @@ const RUN_MULT = 1.8;   // hold SHIFT to run (~340 px/s); rooms are big, running
 
 // MUSIC_TRACK_KEYS moved to systems/exploration/MusicController (Round 6)
 
+// Threat Console (HIPAA-is-the-game pass): the IT Office BreachDefense
+// encounter is interactable-driven — spawnDefenseConsole() builds the visible
+// console; the update()-loop proximity radius is gone. The old
+// ?qa_no_encounter=1 gate existed to stop that radius auto-firing under QA
+// walks; with no auto-fire left it has nothing to gate, so it was removed.
+// (Tests still passing the param are unaffected — it's simply ignored.)
+
 // PHI Sorter triggers — proximity polling removed 2026-05-08, replaced by
 // NPC-driven trigger via Aiyana (Reception, tile 10,6) and Marcus (Lab, tile 9,7).
 // See `triggerInteraction` for the npc.encounterTrigger handler.
-
-// QA test gate (BUG-009): when `?qa_no_encounter=1` is on the URL, suppress
-// auto-firing encounter triggers (PHI Sorter Reception/Lab + IT Office TD) so
-// progression tests can walk through trigger tiles without the sorter racing
-// talkToNPC's BFS path. Production has no such param — behavior unchanged.
-// Module-level cache: read once per page load (tests reload between specs).
-let __qaNoEncounter: boolean | null = null;
-function isQANoEncounter(): boolean {
-  if (__qaNoEncounter !== null) return __qaNoEncounter;
-  try {
-    __qaNoEncounter = new URLSearchParams(window.location.search).get('qa_no_encounter') === '1';
-  } catch {
-    __qaNoEncounter = false;
-  }
-  return __qaNoEncounter;
-}
 
 // InteractableData interface moved to systems/exploration/interactableFactory (Round 4)
 
@@ -281,6 +273,12 @@ export class ExplorationScene extends Phaser.Scene {
     this.interactables = spawned.interactables;
     this.zoneGlows = spawned.zoneGlows;
 
+    // Threat Console — the visible, interactable BreachDefense launcher
+    // (HIPAA-is-the-game pass; replaces the old hidden proximity trigger)
+    if (room.id === 'it_office') {
+      this.spawnDefenseConsole();
+    }
+
     // Pulse first NPC if this room hasn't been pulsed yet
     // (stays in the scene per the refactor proposal — writes npcPulseTween/npcPulseTarget)
     const firstNpc = this.interactables.find(ia => ia.type === 'npc');
@@ -462,7 +460,33 @@ export class ExplorationScene extends Phaser.Scene {
         }
       }
 
-      const path = findPath(this.room, { x: this.tileX, y: this.tileY }, { x: goalTileX, y: goalTileY });
+      // Already adjacent to the clicked interactable → trigger directly.
+      // Needed for obstacle-mounted interactables (Threat Console): their own
+      // tile is unwalkable, so pathing to it fails by design.
+      if (clickedInteractable) {
+        const d = clickedInteractable.data as { x: number; y: number };
+        if (Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y) <= 1) {
+          this.nearbyInteractable = clickedInteractable;
+          this.triggerInteraction(clickedInteractable);
+          return;
+        }
+      }
+
+      let path = findPath(this.room, { x: this.tileX, y: this.tileY }, { x: goalTileX, y: goalTileY });
+      // Obstacle-mounted interactable: walk to the nearest adjacent walkable tile
+      if (path.length === 0 && clickedInteractable) {
+        for (const [ax, ay] of [[0, 1], [1, 0], [-1, 0], [0, -1]] as const) {
+          const alt = findPath(
+            this.room,
+            { x: this.tileX, y: this.tileY },
+            { x: goalTileX + ax, y: goalTileY + ay },
+          );
+          if (alt.length > 0) {
+            path = alt;
+            break;
+          }
+        }
+      }
       if (path.length > 0) {
         this.startPathMovement(path, clickedInteractable);
       }
@@ -695,25 +719,10 @@ export class ExplorationScene extends Phaser.Scene {
       }
     }
 
-    // IT Office encounter zone check (Phase 13)
-    if (this.room.id === 'it_office' && !this.paused && !isQANoEncounter()) {
-      const alreadyDone = this.registry.get('encounterResult_td-it-office');
-      if (!alreadyDone) {
-        const dx = Math.abs(this.player.x - (9 * TILE + TILE / 2));
-        const dy = Math.abs(this.player.y - (6 * TILE + TILE / 2));
-        const inRadius = dx < TILE * 1.5 && dy < TILE * 1.5;
-        if (this.encounterDeclined) {
-          // F-02 fix (Run 07): player said "not right now" — re-arm the trigger
-          // only once they've stepped out of the radius, so declining actually works.
-          if (!inRadius) {
-            this.encounterDeclined = false;
-            this.encounterTriggered = false;
-          }
-        } else if (!this.encounterTriggered && inRadius) {
-          this.triggerEncounter('td-it-office');
-        }
-      }
-    }
+    // IT Office encounter: the hidden proximity trigger at (9,6) is GONE
+    // (HIPAA-is-the-game pass). The BreachDefense encounter now launches from
+    // the visible Threat Console interactable — see spawnDefenseConsole() and
+    // the 'console' branch of triggerInteraction. Player agency, not ambush.
 
     // PHI Sorter triggers are now NPC-driven (Phase 16, 2026-05-08).
     // Player presses SPACE on Aiyana (Reception) or Marcus (Lab) — see triggerInteraction.
@@ -1030,12 +1039,14 @@ export class ExplorationScene extends Phaser.Scene {
 
   // ── Encounter lifecycle (Phase 13) ──────────────────────────────
 
-  /** Called when the IT Office encounter zone is activated. */
-  private triggerEncounter(encounterId: string): void {
-    // Guard: only fire once per room session and only if not already completed
+  /** Launch the IT Office BreachDefense flow. Interactable-driven (Threat
+   *  Console) since the HIPAA-is-the-game pass. `replay` re-runs a completed
+   *  encounter as a simulation — calmer copy, no alarm theatrics. */
+  private triggerEncounter(encounterId: string, opts?: { replay?: boolean }): void {
+    // Guard: only fire once per interaction; console interaction resets this
     if (this.encounterTriggered) return;
     const alreadyDone = this.registry.get(`encounterResult_${encounterId}`);
-    if (alreadyDone) return;
+    if (alreadyDone && !opts?.replay) return;
 
     this.encounterTriggered = true;
     this.paused = true;
@@ -1048,24 +1059,146 @@ export class ExplorationScene extends Phaser.Scene {
     };
 
     // Commandment 2: Anticipation before reward — brief screen shake + SFX before alert
-    this.cameras.main.shake(300, 0.006);
+    // (replays skip the shake: a chosen simulation isn't an emergency)
+    if (!opts?.replay) {
+      this.cameras.main.shake(300, 0.006);
+    }
     // FIX-03 (Phase 20): drop volume from 0.6 → 0.35 — the alert was a jarring honk
     // when the player simply walked near the IT Office workstation cluster. The shake
     // already conveys urgency; the SFX should be a soft cue, not a horn (Commandment 8).
-    try { this.sound.play('sfx_breach_alert', { volume: 0.35 }); } catch (_) {}
+    try { this.sound.play('sfx_breach_alert', { volume: opts?.replay ? 0.2 : 0.35 }); } catch (_) {}
+
+    const narrativeText = opts?.replay
+      ? 'The console boots into simulation mode. Same threat patterns, fresh network — ' +
+        'the analyst says every clean run "makes the real thing more boring, which is the goal."'
+      : 'The threat console is screaming. Suspicious login attempts on the patient records ' +
+        'server — something is actively probing your network. You need to defend the systems. Now.';
 
     // Delay the narrative card slightly so the shake lands first
-    this.time.delayedCall(400, () => {
+    this.time.delayedCall(opts?.replay ? 150 : 400, () => {
       eventBridge.emit(BRIDGE_EVENTS.ENCOUNTER_TRIGGERED, {
         encounterId,
-        narrativeText:
-          "The security analyst just flagged suspicious login attempts on the patient records server. " +
-          "Something is actively probing your network. You need to defend the systems — now.",
+        narrativeText,
         config,
       });
     });
     // React shows the narrative context card. On user confirmation,
     // React emits REACT_LAUNCH_ENCOUNTER and ExplorationScene handles it below.
+  }
+
+  // ── Threat Console (HIPAA-is-the-game pass) ─────────────────────
+  // The visible BreachDefense launcher in the IT Office. The furniture base
+  // (furn_defense_console at the roomData obstacle) is drawn by roomRenderer;
+  // this method layers the living parts — animated threat-map, beacon, glow,
+  // sparkles, floating label — and registers the interactable.
+  private spawnDefenseConsole(): void {
+    const CONSOLE_TILE_X = 11;
+    const CONSOLE_TILE_Y = 11;
+    const cx = CONSOLE_TILE_X * TILE + TILE / 2;
+    const cy = CONSOLE_TILE_Y * TILE + TILE / 2;
+    const done = !!this.registry.get('encounterResult_td-it-office');
+    const depth = 5 + CONSOLE_TILE_Y; // y-sorted with NPCs
+    const accent = done ? 0x2ecc71 : 0xe74c3c;
+
+    // Alert glow pooling under the console — red while the threat is live,
+    // calm green once handled
+    if (this.textures.exists('glow_radial')) {
+      const glow = this.add.image(cx, cy + 4, 'glow_radial')
+        .setTint(accent)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setAlpha(done ? 0.2 : 0.4)
+        .setScale(1.3)
+        .setDepth(depth - 1);
+      this.tweens.add({
+        targets: glow,
+        alpha: { from: done ? 0.2 : 0.4, to: done ? 0.35 : 0.75 },
+        scale: { from: 1.3, to: 1.55 },
+        duration: done ? 1600 : 750,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+
+    // Animated threat-map blips on the screen face (screen spans y-12..y+1 of the tile)
+    const blipSpots: [number, number][] = [[-8, -9], [3, -6], [8, -11], [-2, -12]];
+    blipSpots.forEach(([bx, by], i) => {
+      const blip = this.add.rectangle(cx + bx, cy + by, 2, 2, done ? 0x2ecc71 : 0xff5544, 1)
+        .setDepth(depth + 1);
+      this.tweens.add({
+        targets: blip,
+        alpha: { from: 1, to: 0.15 },
+        duration: done ? 900 : 420,
+        yoyo: true,
+        repeat: -1,
+        delay: i * 170,
+        ease: 'Sine.easeInOut',
+      });
+    });
+
+    // Scanline sweeping down the screen
+    const scan = this.add.rectangle(cx, cy - 12, 22, 1, 0x66ddff, 0.5).setDepth(depth + 1);
+    this.tweens.add({
+      targets: scan,
+      y: cy + 0,
+      duration: 1300,
+      repeat: -1,
+      ease: 'Linear',
+    });
+
+    // Floating label — the "wait, what's that?" invitation
+    const label = this.add.text(cx, cy - 30, done ? 'SIM READY' : '⚠ THREATS', {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: done ? '#7FE5C0' : '#ff6655',
+      stroke: '#000000',
+      strokeThickness: 3,
+      backgroundColor: '#00000088',
+      padding: { x: 3, y: 2 },
+    }).setOrigin(0.5, 1).setDepth(depth + 2);
+    this.tweens.add({
+      targets: label,
+      y: label.y - 3,
+      duration: 900,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+    if (!done) {
+      this.tweens.add({
+        targets: label,
+        alpha: { from: 1, to: 0.55 },
+        duration: 600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+
+    // Periodic sparkle — same "this thing matters" twinkle items get
+    if (!done && this.textures.exists('particle_circle')) {
+      this.add.particles(cx, cy - 8, 'particle_circle', {
+        speed: { min: 8, max: 22 },
+        scale: { start: 0.7, end: 0 },
+        alpha: { start: 0.9, end: 0 },
+        tint: [0xff8877, 0xffd0c0],
+        lifespan: 500,
+        frequency: 1500,
+        quantity: 2,
+        angle: { min: 0, max: 360 },
+      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(depth + 1);
+    }
+
+    // Interactable anchor — invisible sprite; visuals above carry the look
+    const anchor = this.add.sprite(cx, cy, objectTextureKey('computer'))
+      .setAlpha(0.01)
+      .setDepth(depth);
+    this.interactables.push({
+      type: 'console',
+      id: 'defense_console',
+      data: { x: CONSOLE_TILE_X, y: CONSOLE_TILE_Y, title: 'Threat Console', content: '' },
+      sprite: anchor,
+    });
   }
 
   // triggerPHISorterEncounter removed 2026-05-08 — replaced by NPC-driven trigger
@@ -1289,6 +1422,10 @@ export class ExplorationScene extends Phaser.Scene {
         ? `[SPACE] Talk to ${(closest.data as NPC).name}`
         : closest.type === 'zone'
         ? `[SPACE] Examine ${(closest.data as InteractionZone).name}`
+        : closest.type === 'console'
+        ? (this.registry.get('encounterResult_td-it-office')
+            ? '[SPACE] Re-run threat simulation'
+            : '[SPACE] Check the threat console')
         : `[SPACE] Read ${(closest.data as EducationalItem).title}`;
       this.promptText.setText(label);
       this.promptText.setVisible(true);
@@ -1337,6 +1474,24 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Store reference so we can fade it out when dialogue completes
     this.dialogueDimOverlay = dimOverlay;
+
+    if (ia.type === 'console') {
+      // Threat Console → BreachDefense encounter (HIPAA-is-the-game pass).
+      // triggerEncounter owns pacing (shake → alert → narrative card), so drop
+      // the dialogue dim; paused stays true until the card resolves.
+      if (this.dialogueDimOverlay) {
+        this.tweens.killTweensOf(this.dialogueDimOverlay);
+        this.dialogueDimOverlay.destroy();
+        this.dialogueDimOverlay = undefined;
+      }
+      const done = !!this.registry.get('encounterResult_td-it-office');
+      // Interaction is explicit — always re-arm before firing so declining or
+      // aborting earlier never bricks the console.
+      this.encounterTriggered = false;
+      this.encounterDeclined = false;
+      this.triggerEncounter('td-it-office', { replay: done });
+      return;
+    }
 
     if (ia.type === 'npc') {
       const npc = ia.data as NPC;
