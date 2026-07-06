@@ -17,16 +17,20 @@ export type IdentifierGetBannerProps = {
   entry: Phi18Entry;
   /** Codex count AFTER this find. */
   count: number;
+  /** Vertical offset in px (default 56). The sorter passes a lower offset so the
+   *  banner clears the NPC reaction bubble that owns the top of that overlay. */
+  topPx?: number;
 };
 
-export function IdentifierGetBanner({ entry, count }: IdentifierGetBannerProps) {
+export function IdentifierGetBanner({ entry, count, topPx = 56 }: IdentifierGetBannerProps) {
   const complete = count >= PHI18_TOTAL;
   const accent = complete ? '#FFD93D' : '#7FE5C0';
 
   return (
     <div
-      className="absolute top-14 left-1/2 z-[55] pointer-events-none border-4 px-4 py-2 flex items-center gap-3"
+      className="absolute left-1/2 z-[55] pointer-events-none border-4 px-4 py-2 flex items-center gap-3"
       style={{
+        top: `${topPx}px`,
         borderColor: accent,
         backgroundColor: complete ? 'rgba(42,34,0,0.96)' : 'rgba(10,32,24,0.96)',
         boxShadow: `0 0 30px ${accent}44`,

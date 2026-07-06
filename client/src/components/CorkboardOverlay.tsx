@@ -208,10 +208,11 @@ export function CorkboardOverlay({
                 }}
                 data-testid={`corkboard-note-${note.id}`}
               >
-                {/* Push pin */}
+                {/* Push pin — decorative rotation only; NEVER color-code by kind
+                    (a red-pin-means-pull tell would answer the puzzle) */}
                 <span
                   className="absolute -top-1.5 left-1/2 -translate-x-1/2 w-3 h-3 rounded-full border border-black/40"
-                  style={{ backgroundColor: note.kind === 'violation' ? '#cc2222' : '#2266cc' }}
+                  style={{ backgroundColor: ['#cc2222', '#2266cc', '#22aa44', '#ccaa22'][idx % 4] }}
                 />
                 {/* Key hint */}
                 <span

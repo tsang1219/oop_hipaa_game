@@ -414,15 +414,20 @@ export async function loadFresh(page: Page): Promise<void> {
 
 /** All department rooms with their completion requirements and interactable positions */
 export const ROOMS = {
+  // Positions refreshed 2026-07-06 against roomData.json after the feel-pass
+  // 12-room redesign (9397d61) moved NPCs/zones — stale coordinates made
+  // pressSpace's closest-within-2-tiles fallback hit the WRONG interactable
+  // (e.g. lab results_printout's old tile now sits next to Marcus, whose
+  // encounter modal then blocks the whole spec).
   hospital_entrance: {
     npcs: { riley_entrance: { x: 10, y: 4 } },
-    zones: { welcome_board: { x: 5, y: 2 } },
-    items: { hipaa_brochure: { x: 15, y: 4 } },
+    zones: { welcome_board: { x: 2, y: 2 } },
+    items: { hipaa_brochure: { x: 16, y: 5 } },
     requirements: { npcs: ['riley_entrance'], zones: [], items: [] },
     doors: { entrance_to_reception: 'reception' },
   },
   reception: {
-    npcs: { riley: { x: 10, y: 3 }, nervous_patient: { x: 5, y: 8 }, chatty_visitor: { x: 15, y: 8 } },
+    npcs: { riley: { x: 10, y: 4 }, nervous_patient: { x: 5, y: 9 }, chatty_visitor: { x: 14, y: 9 } },
     zones: { sign_in_sheet: { x: 8, y: 4 }, privacy_notice: { x: 12, y: 4 } },
     items: { patient_rights_poster: { x: 2, y: 4 } },
     requirements: { npcs: ['riley', 'nervous_patient'], zones: ['sign_in_sheet'], items: ['patient_rights_poster'] },
@@ -433,14 +438,14 @@ export const ROOMS = {
       gossiping_coworker: { x: 7, y: 7 }, friend_fishing: { x: 16, y: 5 },
       tired_employee: { x: 4, y: 12 }, hr_director: { x: 14, y: 4 }, selfie_coworker: { x: 14, y: 10 },
     },
-    zones: { overheard_conversation: { x: 10, y: 9 }, unlocked_phone: { x: 6, y: 7 } },
+    zones: { overheard_conversation: { x: 10, y: 9 }, unlocked_phone: { x: 12, y: 7 }, staff_corkboard: { x: 11, y: 2 } },
     items: { verbal_disclosure: { x: 17, y: 4 } },
     requirements: { npcs: ['gossiping_coworker', 'friend_fishing'], zones: ['overheard_conversation'], items: ['verbal_disclosure'] },
     doors: { break_to_hallway_reception: 'hallway_reception_break', break_to_hallway_lab: 'hallway_break_lab' },
   },
   lab: {
-    npcs: { lab_tech: { x: 10, y: 7 }, researcher: { x: 3, y: 5 }, courier: { x: 16, y: 5 } },
-    zones: { sample_labels: { x: 7, y: 7 }, results_printout: { x: 13, y: 7 } },
+    npcs: { lab_tech: { x: 5, y: 7 }, researcher: { x: 3, y: 4 }, courier: { x: 16, y: 4 } },
+    zones: { sample_labels: { x: 4, y: 7 }, results_printout: { x: 15, y: 7 } },
     items: { phi_identifiers: { x: 2, y: 8 } },
     requirements: { npcs: ['lab_tech', 'researcher'], zones: ['results_printout'], items: ['phi_identifiers'] },
     doors: { lab_to_hallway_break: 'hallway_break_lab', lab_to_hallway_records: 'hallway_lab_records' },
@@ -456,16 +461,16 @@ export const ROOMS = {
     doors: { records_to_hallway_lab: 'hallway_lab_records', records_to_hallway_it: 'hallway_records_it' },
   },
   it_office: {
-    npcs: { security_analyst: { x: 10, y: 7 }, vendor: { x: 3, y: 8 }, workaround_employee: { x: 16, y: 8 } },
-    zones: { password_note: { x: 9, y: 7 }, breach_playbook: { x: 5, y: 10 }, fax_machine: { x: 12, y: 10 }, vendor_agreement: { x: 14, y: 8 } },
+    npcs: { security_analyst: { x: 10, y: 7 }, vendor: { x: 3, y: 9 }, workaround_employee: { x: 16, y: 9 } },
+    zones: { password_note: { x: 9, y: 7 }, breach_playbook: { x: 7, y: 11 }, fax_machine: { x: 14, y: 9 }, vendor_agreement: { x: 5, y: 9 } },
     items: { security_safeguards: { x: 10, y: 2 } },
     requirements: { npcs: ['security_analyst', 'vendor'], zones: ['password_note'], items: ['security_safeguards'] },
     doors: { it_to_hallway_records: 'hallway_records_it', it_to_hallway_er: 'hallway_it_er' },
   },
   er: {
-    npcs: { dr_martinez: { x: 10, y: 8 }, officer: { x: 2, y: 7 }, frantic_family: { x: 17, y: 7 } },
-    zones: { whiteboard: { x: 10, y: 2 }, unlocked_computer: { x: 7, y: 6 } },
-    items: { emergency_exceptions: { x: 17, y: 12 } },
+    npcs: { dr_martinez: { x: 9, y: 8 }, officer: { x: 7, y: 8 }, frantic_family: { x: 12, y: 8 } },
+    zones: { whiteboard: { x: 10, y: 2 }, unlocked_computer: { x: 6, y: 6 } },
+    items: { emergency_exceptions: { x: 17, y: 11 } },
     requirements: { npcs: ['dr_martinez', 'officer'], zones: ['whiteboard'], items: ['emergency_exceptions'] },
     doors: { er_to_hallway_it: 'hallway_it_er' },
   },

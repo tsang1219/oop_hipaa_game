@@ -734,6 +734,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound,
           key={identifierBanner.nonce}
           entry={identifierBanner.entry}
           count={identifierBanner.count}
+          topPx={236}
         />
       )}
 

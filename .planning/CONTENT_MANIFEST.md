@@ -285,17 +285,41 @@ Each set has: `id`, `act`, `triggerLocation`, `npcId`, `contextCard`, `items[]`,
 
 Format: PHI Sorter document set
 HIPAA topic tags: "PHI Definition", "18 Identifiers (45 CFR §164.514(b)(2))", "Safe Harbor De-identification"
-Item counts (Phase 22): 10 / 10 / 10 (Set 1 / Set 2 / Set 3)
+Item counts (HIPAA-is-the-game pass, 2026-07-06): 12 / 13 / 14 (Set 1 / Set 2 / Set 3)
 
 | ID | File | Act | Trigger Location | NPC | Items | PHI Items | Not PHI | Coverage | Summary |
 |----|------|-----|-----------------|-----|-------|-----------|---------|----------|---------|
-| `phi-sorter-set-1` | `client/src/data/sorterData.ts` | 1 | reception | `receptionist_riley` | 10 | 7 | 3 | GOOD | Obvious identifiers: name, SSN, DOB, home address, phone, email, employer name vs. hospital address, room temp, marital status. Every item is a fake patient chart with deadpan humor fields. |
-| `phi-sorter-set-2` | `client/src/data/sorterData.ts` | 2 | lab | `lab_tech` | 10 | 6 | 4 | GOOD | Subtle identifiers: device serial, IP address, biometric, MRN+diagnosis pair, license plate, health plan ID vs. bare ICD-10 code, test type, sample volume, specimen type. Teaches the two-part PHI rule. |
-| `phi-sorter-set-3` | `client/src/data/sorterData.ts` | 3 | medical_records | `records_clerk` | 10 | 5 | 5 | GOOD | Edge cases: ZIP5, admission month+year, age 90+, fax number, account number vs. ZIP3 prefix, year-only, email domain, URL without identifiers, partial vehicle ID fragment. Teaches Safe Harbor nuance. |
+| `phi-sorter-set-1` | `client/src/data/sorterData.ts` | 1 | reception | `receptionist_riley` | 12 | 7 | 5 | GOOD | Obvious identifiers: name, SSN, DOB, home address, phone, email + employer (deliberately NOT one of the 18 — teaches PHI > the checklist, §160.103) vs. hospital address, room temp, marital status, supply order, cafeteria menu. Station: INTAKE DESK. |
+| `phi-sorter-set-2` | `client/src/data/sorterData.ts` | 2 | lab | `lab_tech` | 13 | 7 | 6 | GOOD | Subtle identifiers: device serial, IP address, biometric, MRN+diagnosis pair, license plate, health plan ID, portal URL w/ record token (#14) vs. bare ICD-10 code, test type, sample volume, specimen type, equipment log, biohazard notice. Station: LAB MANIFEST STATION. |
+| `phi-sorter-set-3` | `client/src/data/sorterData.ts` | 3 | medical_records | `records_clerk` | 14 | 7 | 7 | GOOD | Edge cases: ZIP5, admission month+year, age 90+ (dates element), fax, account number, CDL on DOT physical (#11), study code w/ live roster crosswalk (#18, §164.514(c)) vs. ZIP3, year-only, email domain, public URL, VIN fragment, ops memos. Station: DE-ID REVIEW DESK. |
 
 > **Humor coverage (Phase 22):** ≥30% of items contain a humor beat in a free-text chart field (`doctorNote`, `emergencyContact`, `reasonForVisit`, or `miscField`) that does NOT affect HIPAA classification. Tone calibration: deadpan (Daria/Veep), grounded in admin-system absurdity, never punching down at patient demographics. See `.planning/phases/22-phi-sorter-content-connection/22-CONTEXT.md` for examples.
 
 > **HOLD IT reveals (Phase 22):** Each set has exactly one item flagged with `holdIt: { npcLine, educationalBeat }` for the Phoenix-Wright-style dramatic reveal on correct classification. Set 1 = `s1-dob` (full birth date vs. year-only Safe Harbor rule); Set 2 = `s2-diagnosis-with-mrn` (MRN as the identifier that turns a code into PHI); Set 3 = `s3-zip3` (ZIP3 passes Safe Harbor — but only because 902 covers >20,000 people). NPC delivers the line with distinct visual treatment (scaled bubble, gold flash) — stays in flow.
+
+---
+
+## The Eighteen — Identifier Codex (HIPAA-is-the-game pass, 2026-07-06)
+
+Canonical list: **`client/src/data/phi18.ts`** → `PHI18_ENTRIES` (18 entries, §164.514(b)(2)(i)(A)-(R) order)
+
+Collection mechanic: first correct redaction of each `identifierType` in the PHI Sorter (17 of 18)
++ the break-room corkboard baby wall (#17 full-face photos) fills a persistent codex
+(`identifiersFound` in the save blob). UI: `Phi18Codex.tsx` (open with [I] / HUD chip),
+`IdentifierGetBanner.tsx` (item-get moment). Completion: +10 compliance, SAFE HARBOR CERTIFIED state.
+Coverage per set: S1 → #1,2,3,4,6,7 · S2 → #8,9,12,13,14,15,16 · S3 → #2,3,5,10,11,18 · corkboard → #17.
+
+## Staff Corkboard Minigame (break_room)
+
+Content: **`client/src/data/corkboardData.ts`** → `CORKBOARD_NOTES` (6 notes, 3 violations).
+HIPAA topic tags: "Reasonable Safeguards (§164.530(c))", "PHI in staff spaces", "Full-face photos (#17)", "MRN (#8)", "Secure disposal".
+
+| ID | Kind | Teaches |
+|----|------|---------|
+| `baby-wall` | VIOLATION | Full-face photos = identifier #17; display requires authorization. Grants codex #17. |
+| `shredder-parking` | VIOLATION | Secure disposal chain — PHI can't park on a shared-space board |
+| `mystery-labs` | VIOLATION | Posting an MRN to find its owner broadcasts PHI |
+| `potluck` / `plant-roster` / `cpr-class` | FINE | Not everything pinned is PHI — no identifier + no health link |
 
 ---
 
@@ -339,3 +363,4 @@ Context card: Priya's Triage Queue — she's on her third queue today, precise a
 | 2026-03-11 | Wired all unassigned scenes into rooms. Added new scenes: npp_notice, social_media_slip, vendor_baa. Added hipaa_penalties educational item. Fixed privacy_notice zone link. Updated all tables. | Claude |
 | 2026-05-01 | Added 3 PHI Sorter document sets (Phase 16) — phi-sorter-set-1..3 covering PHI Definition, 18 Identifiers, and Safe Harbor De-identification. | Claude |
 | 2026-06-09 | Phase 22: Rewrote 30 PHI Sorter items as fake patient charts with deadpan humor. Extended SorterItem schema with `chart` + `holdIt` fields. Set counts: 6/8/5 → 10/10/10 (30 total). All 19 Phase-16 item IDs preserved with original category (HIPAA accuracy gate). 45 humor-bearing chart fields. Recurring patients: Mrs. Henderson (s1+s3), Mr. Okonkwo (s2+s3). | Claude |
+| 2026-07-06 | HIPAA-is-the-game pass: (1) Triage incidents gained named rules (`rule.tag/short`) + 3 fact chips each; set gained `ruleStrip` cheat sheet — §164.402 presumption/exceptions structure now pinned on screen. (2) The Eighteen codex (phi18.ts) + corkboard minigame (corkboardData.ts). (3) Sorter: +3 items closing identifier coverage gaps (s2-portal-url #14, s3-cdl-number #11, s3-study-code #18); ACCURACY FIX: employer item no longer claims to be "identifier #11" (it's not on the 18 — now teaches §160.103 definition vs. de-ID checklist); age-90+ retyped into dates element. Set counts 12/13/14. Lab `phi_identifiers` manual rewritten to point at the codex. Per-set station placards. | Claude |

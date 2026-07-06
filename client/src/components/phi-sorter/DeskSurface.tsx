@@ -25,9 +25,12 @@ export function DeskSurface({
       className="relative border-4 overflow-visible"
       style={{
         borderColor: edge,
-        background: [
-          // Station base material
-          base,
+        // NOTE: base color must be backgroundColor, NOT a layer in the
+        // background shorthand — a bare <color> is only valid in the final
+        // background layer, so the old combined declaration was invalid CSS
+        // and the whole desk rendered transparent (the room showed through).
+        backgroundColor: base,
+        backgroundImage: [
           // Plank/panel seams — horizontal repeating
           'repeating-linear-gradient(90deg, rgba(0,0,0,0.12) 0 2px, transparent 2px 48px)',
           // Subtle grain — vertical
