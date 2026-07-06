@@ -26,6 +26,15 @@ const ROOT = join(__dirname, '..');
 const OUT_DIR = join(ROOT, 'client/public/attached_assets/generated_images/privacyquest/portraits');
 const CHAR_DIR = join(ROOT, 'client/public/attached_assets/generated_images/privacyquest/characters');
 
+// Auto-load a repo-root .env (zero-dep) so the key in .env "just works" without
+// having to `export` it first. Real env vars still win over the file.
+if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY && existsSync(join(ROOT, '.env'))) {
+  for (const line of readFileSync(join(ROOT, '.env'), 'utf8').split('\n')) {
+    const m = line.match(/^\s*(?:export\s+)?([A-Z0-9_]+)\s*=\s*(.*)\s*$/);
+    if (m && !process.env[m[1]]) process.env[m[1]] = m[2].replace(/^["']|["']$/g, '');
+  }
+}
+
 const KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 const MODEL = process.env.MODEL || 'gemini-2.5-flash-image';
 const USE_REFERENCE = process.env.USE_REFERENCE === '1';
