@@ -38,20 +38,30 @@ if (!process.env.GEMINI_API_KEY && !process.env.GOOGLE_API_KEY && existsSync(joi
 const KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
 const MODEL = process.env.MODEL || 'gemini-2.5-flash-image';
 const USE_REFERENCE = process.env.USE_REFERENCE === '1';
+// STYLE_ANCHOR=<npcId> — the single most important knob for a consistent set.
+// Point it at ONE approved portrait; every other generation is told to match its
+// exact style/palette/framing. Workflow: make + approve the anchor first, then
+// run again with STYLE_ANCHOR set (the anchor file is skipped as "already done").
+const STYLE_ANCHOR = process.env.STYLE_ANCHOR;
 
 if (!KEY) {
   console.error('✗ Set GEMINI_API_KEY (get one free at https://aistudio.google.com/apikey), then re-run.');
   process.exit(1);
 }
 
-// Shared style — prepended to every character so the whole cast matches.
+// Shared style — prepended to every character. Written to be as DETERMINISTIC
+// as possible (locked palette/framing/lighting/outline) so independent
+// generations drift as little as possible even before the STYLE_ANCHOR pass.
 const SHARED_STYLE =
-  '16-bit SNES-era pixel-art portrait, head-and-shoulders bust, chunky visible pixels, ' +
-  'limited palette with clean dithering, bold 1px dark outline, soft top-left key light. ' +
-  'Friendly, readable, Chrono Trigger / EarthBound / Stardew Valley character-portrait energy. ' +
-  'Character centered, facing forward with a slight 3/4 turn, eyes in the upper third. ' +
-  'Solid dark navy #1a1a2e background. Square 1:1. No text, no logo, no border, no watermark. ' +
-  'Subject: ';
+  '16-bit SNES-era pixel-art character portrait in a consistent house style. ' +
+  'STYLE (identical every time): chunky visible pixels as if drawn on a ~64x64 grid, ' +
+  'flat cel-shading, a limited ~24-color palette, 1px near-black outline, NO anti-aliasing, ' +
+  'NO smooth gradients. LIGHTING (identical): one soft key light from the top-left. ' +
+  'FRAMING (identical): head-and-shoulders bust, subject fills ~70% of the frame, centered, ' +
+  'facing forward with a slight 3/4 turn, eyes at ~40% from the top. ' +
+  'BACKGROUND (identical): solid dark navy #1a1a2e, nothing else in frame. ' +
+  'Square 1:1. Friendly, readable, Chrono Trigger / EarthBound / Stardew Valley energy. ' +
+  'No text, no logo, no border, no watermark. Subject: ';
 
 // id = output filename (matches roomData npcId). type = walk-sheet ref (npc_<type>.png).
 const CHARACTERS = [
@@ -88,7 +98,18 @@ const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODE
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
 async function generateOne(id, type, subject) {
-  const parts = [{ text: SHARED_STYLE + subject }];
+  const parts = [];
+  // Style anchor first (strongest influence): match an approved portrait exactly.
+  if (STYLE_ANCHOR && id !== STYLE_ANCHOR) {
+    const anchor = join(OUT_DIR, `${STYLE_ANCHOR}.png`);
+    if (existsSync(anchor)) {
+      parts.push({ text: 'CRITICAL — match the attached reference image EXACTLY: same art style, ' +
+        'color palette, pixel size, outline weight, cel-shading, framing, lighting, and #1a1a2e ' +
+        'background. Reproduce that identical house style. Change ONLY the person, to the subject below.' });
+      parts.push({ inlineData: { mimeType: 'image/png', data: readFileSync(anchor).toString('base64') } });
+    }
+  }
+  parts.push({ text: SHARED_STYLE + subject });
   if (USE_REFERENCE) {
     const ref = join(CHAR_DIR, `npc_${type}.png`);
     if (existsSync(ref)) {
@@ -134,7 +155,10 @@ async function main() {
   const todo = CHARACTERS.filter(([id]) => (only.length ? only.includes(id) : true))
                          .filter(([id]) => force || !existsSync(join(OUT_DIR, `${id}.png`)));
 
-  console.log(`Model: ${MODEL}  ·  reference: ${USE_REFERENCE ? 'on' : 'off'}  ·  ${todo.length} to generate\n`);
+  console.log(`Model: ${MODEL}  ·  style-anchor: ${STYLE_ANCHOR || 'none'}  ·  ref: ${USE_REFERENCE ? 'on' : 'off'}  ·  ${todo.length} to generate\n`);
+  if (!STYLE_ANCHOR && todo.length > 1) {
+    console.log('TIP: for a consistent set, generate + approve ONE portrait first, then re-run with\n     STYLE_ANCHOR=<that_npcId> so the rest match its style.\n');
+  }
   let ok = 0, fail = 0;
   for (const [id, type, subject] of todo) {
     process.stdout.write(`  ${id.padEnd(24)} … `);

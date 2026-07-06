@@ -10,9 +10,14 @@ API ("nano banana") with the prompts, and writes each PNG into the portraits
 folder. **Zero npm installs** (raw fetch).
 
 ```bash
-export GEMINI_API_KEY=your_key        # free at https://aistudio.google.com/apikey
+# Key auto-loads from repo .env (GEMINI_API_KEY). Or export it.
 node scripts/generate-portraits.mjs   # generates all missing portraits (~a few min)
 ```
+
+> ⚠️ **The API image model needs billing enabled.** The free API tier is
+> `limit: 0` for image generation (429 RESOURCE_EXHAUSTED). Enable billing on the
+> key's Google project (~$0.03–0.04/image → ~$1 for all 27), **or** use the free
+> **web/paste route** below — image gen is free in the AI Studio / Gemini UI.
 
 - Re-run anytime — **skips files that already exist** (resumable). `--force` redoes all.
 - Just some: `node scripts/generate-portraits.mjs aiyana_intake marcus_lab_aide`
@@ -21,6 +26,34 @@ node scripts/generate-portraits.mjs   # generates all missing portraits (~a few 
 
 The per-character prompts + shared style live **inside the script**
 (`scripts/generate-portraits.mjs`) — edit there to tweak a character.
+
+## ⭐ Keeping all 27 the SAME style (this is the important part)
+
+A shared text prompt is **not enough** — 27 independent generations drift in
+palette, framing, zoom, outline weight, and lighting. To get one coherent cast,
+use a **style anchor**: make ONE portrait you love, then force every other one
+to match that *image*. (Nano banana is built for this image-to-image consistency.)
+
+**Script route:**
+```bash
+# 1. Make + eyeball a single hero portrait (pick a clear, central character)
+node scripts/generate-portraits.mjs aiyana_intake
+# 2. Approve it. Then generate the rest, matched to it:
+STYLE_ANCHOR=aiyana_intake node scripts/generate-portraits.mjs
+```
+Every generation is told to reproduce the anchor's exact style/palette/framing/
+background and change only the person. The anchor file is skipped (already done).
+If one comes out off-style, delete it and re-run — it'll re-match the anchor.
+
+**Web / paste route (free, no billing):** do it all in **one AI Studio chat**.
+Generate the hero first; once you like it, for each next character say
+_"Same exact art style, palette, framing, and background as the image above —
+now draw: `<subject>`."_ Keeping them in one conversation (with the hero visible)
+is what holds the style together. Don't start a fresh chat per character.
+
+The shared prompt is also written to be as deterministic as possible (locked
+~64×64 pixel grid, ~24-color palette, 1px outline, no anti-aliasing, single
+top-left light, fixed 70%-fill framing, #1a1a2e background) — belt and suspenders.
 
 ## How the game consumes them (already wired)
 
