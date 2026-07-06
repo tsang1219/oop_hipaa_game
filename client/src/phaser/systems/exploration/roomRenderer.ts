@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { furnitureTextureKey } from '../../sprites/furniture';
+import { drawCompositeFurniture, hasComposite } from './compositeFurniture';
 import type { Room } from '@shared/schema';
 
 const TILE = 32;
@@ -666,15 +667,15 @@ export function renderRoom(scene: Phaser.Scene, room: Room): { walls: Phaser.Phy
           .setStrokeStyle(1, 0x000000, 0.08)
           .setFillStyle(0x000000, 0)
           .setDepth(1);
+      } else if (hasComposite(obsType)) {
+        // Multi-tile obstacle → draw ONE coherent object sized to the footprint
+        // (a single long counter / bed / couch), not a grid of cloned 32px tiles.
+        drawCompositeFurniture(scene, obsType, obs.x, obs.y, obs.width, obs.height);
       } else {
-        // Drop shadow beneath large furniture
-        scene.add.ellipse(ox + ow / 2, oy + oh / 2 + oh / 3, ow - 4, oh / 3, 0x000000, 0.15);
-        // For multi-tile furniture, tile the sprite across the area
-        for (let fy = obs.y; fy < obs.y + obs.height; fy++) {
-          for (let fx = obs.x; fx < obs.x + obs.width; fx++) {
-            scene.add.sprite(fx * TILE + TILE / 2, fy * TILE + TILE / 2, texKey).setDepth(3);
-          }
-        }
+        // No composite for this type — center a single sprite in the footprint
+        // rather than tiling it. One shadow, one object.
+        scene.add.ellipse(ox + ow / 2, oy + oh - 4, ow - 6, Math.max(8, oh * 0.28), 0x000000, 0.15);
+        scene.add.sprite(ox + ow / 2, oy + oh / 2, texKey).setDepth(3);
       }
     }
 

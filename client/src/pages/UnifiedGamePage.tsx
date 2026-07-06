@@ -55,6 +55,8 @@ import { BreachTriageOverlay } from '@/components/breach-triage/BreachTriageOver
 import { TriageDebrief } from '@/components/breach-triage/TriageDebrief';
 import { Phi18Codex } from '@/components/Phi18Codex';
 import { phi18Count, PHI18_TOTAL, phi18Complete } from '@/data/phi18';
+import { CorkboardOverlay } from '@/components/CorkboardOverlay';
+import { CORKBOARD_SCORE } from '@/data/corkboardData';
 import { getTriageIncidentSet } from '@/data/triageData';
 import { computeDoorStates, type RoomWithDoors } from '@/lib/doorGraph';
 import { StandaloneTDView, type TDStandaloneResult } from '../components/breach-defense/StandaloneTDView';
@@ -246,6 +248,9 @@ export default function UnifiedGamePage() {
   const [showCodex, setShowCodex] = useState(false);
   const [recentIdentifierKey, setRecentIdentifierKey] = useState<string | null>(null);
   const [codexChipPulse, setCodexChipPulse] = useState(0);
+
+  // ── Break-room corkboard minigame (HIPAA-is-the-game pass) ─────
+  const [corkboardOpen, setCorkboardOpen] = useState(false);
 
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
@@ -780,6 +785,13 @@ export default function UnifiedGamePage() {
     };
 
     const onInteractZone = (data: { zoneId: string; zoneName: string; sceneId: string }) => {
+      // Minigame zones (HIPAA-is-the-game pass) bypass the dialogue-scene path.
+      // Zone completion + scene resume are owned by the minigame overlay.
+      if (data.sceneId === 'minigame:corkboard') {
+        setCorkboardOpen(true);
+        return;
+      }
+
       const room = rooms.find(r => r.id === currentRoomId);
       const gates: Gate[] = room?.config?.gates || [];
       for (const gate of gates) {
@@ -1290,13 +1302,34 @@ export default function UnifiedGamePage() {
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'i' && e.key !== 'I') return;
-      if (showCodex || pageMode !== 'exploration' || encounterPhase !== 'idle') return;
+      if (showCodex || corkboardOpen || pageMode !== 'exploration' || encounterPhase !== 'idle') return;
       e.preventDefault();
       handleOpenCodex();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [pageMode, encounterPhase, showCodex, handleOpenCodex]);
+  }, [pageMode, encounterPhase, showCodex, corkboardOpen, handleOpenCodex]);
+
+  // ── Corkboard minigame handlers ────────────────────────────────
+  const handleCorkboardComplete = useCallback((result: { mistakes: number }) => {
+    const first = !gameState.state.completedZones.includes('staff_corkboard');
+    gameState.completeZone('staff_corkboard');
+    if (first) {
+      gameState.addScore(CORKBOARD_SCORE);
+      notify(
+        result.mistakes === 0
+          ? 'Corkboard cleared — not a single wrong pull'
+          : 'Corkboard cleared',
+        { label: 'PHI TAKEN DOWN', type: 'success' },
+      );
+    }
+  }, [gameState, notify]);
+
+  const handleCorkboardClose = useCallback(() => {
+    setCorkboardOpen(false);
+    // Same resume path a dialogue uses — clears the scene dim + unpauses
+    eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+  }, []);
 
   // ── Sync completion state to running Phaser scene ─────────────
   useEffect(() => {
@@ -1710,6 +1743,17 @@ export default function UnifiedGamePage() {
             foundKeys={gameState.state.identifiersFound}
             recentKey={recentIdentifierKey}
             onClose={handleCloseCodex}
+          />
+        )}
+
+        {/* Break-room corkboard minigame */}
+        {corkboardOpen && (
+          <CorkboardOverlay
+            alreadyCleaned={gameState.state.completedZones.includes('staff_corkboard')}
+            identifiersFound={gameState.state.identifiersFound}
+            onIdentifierFound={handleIdentifierFound}
+            onComplete={handleCorkboardComplete}
+            onClose={handleCorkboardClose}
           />
         )}
 

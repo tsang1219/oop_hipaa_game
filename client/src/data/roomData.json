@@ -2430,6 +2430,14 @@
           "y": 7,
           "sceneId": "phone_security",
           "spriteType": "computer"
+        },
+        {
+          "id": "staff_corkboard",
+          "name": "Staff Corkboard",
+          "x": 11,
+          "y": 2,
+          "sceneId": "minigame:corkboard",
+          "spriteType": "poster"
         }
       ],
       "educationalItems": [

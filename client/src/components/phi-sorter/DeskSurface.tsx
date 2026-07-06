@@ -1,23 +1,36 @@
 /**
  * DeskSurface — Phase 24 (SORTV2-14)
  *
- * Wood-grain CSS desk container for the Papers-Please-style PHI Sorter format.
+ * CSS desk container for the Papers-Please-style PHI Sorter format.
  * Pure presentational — no game state, no EventBridge, no timers.
+ *
+ * HIPAA-is-the-game pass: the surface re-skins per station (SorterStation
+ * colors) so Reception / Lab / Records read as three different desks —
+ * warm intake wood, cool lab steel, archival records green.
  *
  * Children (ShiftClock, OutgoingTray, DeskDocument, StampPad) compose inside
  * and are positioned by the parent overlay layout.
  */
-export function DeskSurface({ children }: { children: React.ReactNode }) {
+export function DeskSurface({
+  children,
+  base = '#6B4A2F',
+  edge = '#3d2817',
+}: {
+  children: React.ReactNode;
+  base?: string;
+  edge?: string;
+}) {
   return (
     <div
-      className="relative border-4 border-[#3d2817] overflow-visible"
+      className="relative border-4 overflow-visible"
       style={{
+        borderColor: edge,
         background: [
-          // Warm wood base
-          '#6B4A2F',
-          // Plank seams — horizontal repeating
+          // Station base material
+          base,
+          // Plank/panel seams — horizontal repeating
           'repeating-linear-gradient(90deg, rgba(0,0,0,0.12) 0 2px, transparent 2px 48px)',
-          // Subtle wood grain — vertical
+          // Subtle grain — vertical
           'repeating-linear-gradient(0deg, rgba(255,255,255,0.03) 0 3px, transparent 3px 7px)',
           // Top-edge light strip for depth
           'linear-gradient(180deg, rgba(255,255,255,0.06) 0px, transparent 12px)',

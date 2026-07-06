@@ -104,6 +104,16 @@ export function getSorterItemIcon(item: SorterItem): string {
   return '📋';
 }
 
+/** Station identity — what makes THIS sorter instance different (HIPAA-is-the-game
+ *  pass). The label + tagline sit on the desk as a placard; the desk colors
+ *  re-skin the surface so three visits read as three places, not one repeated. */
+export type SorterStation = {
+  label: string;      // "LAB MANIFEST STATION"
+  tagline: string;    // the set's one-line lesson — its reason to exist
+  deskBase: string;   // CSS color — desk surface
+  deskEdge: string;   // CSS color — desk border
+};
+
 /** A full document set for one PHI Sorter encounter instance. */
 export type SorterDocumentSet = {
   id: string;                  // 'phi-sorter-set-1', 'phi-sorter-set-2', 'phi-sorter-set-3'
@@ -111,6 +121,7 @@ export type SorterDocumentSet = {
   triggerLocation: 'reception' | 'lab' | 'medical_records';
   npcId: string;               // For NPC-attributed framing in context card
   contextCard: { title: string; body: string }; // SorterContextCard props
+  station: SorterStation;
   items: SorterItem[];
   passingAccuracy: number;     // 0.0–1.0; 0.7 default
   takeaways: [string, string]; // EncounterDebrief takeaways (1-2 short HIPAA learnings)
@@ -129,6 +140,12 @@ const SET_1: SorterDocumentSet = {
     body: 'Riley slides a stack of patient intake forms across the desk. ' +
       '"Before these go to the auditor, I need to mark which fields count as PHI — ' +
       'Protected Health Information. Can you help me sort out what stays and what\'s fine to share?"',
+  },
+  station: {
+    label: 'INTAKE DESK',
+    tagline: 'The obvious ones — identifiers live where people write them.',
+    deskBase: '#6B4A2F',
+    deskEdge: '#3d2817',
   },
   items: [
     {
@@ -332,6 +349,12 @@ const SET_2: SorterDocumentSet = {
     body: 'The lab tech looks up from the centrifuge. ' +
       '"I need a second pair of eyes on these sample labels before they go on the external manifest. ' +
       'Some of these details I\'m not sure about — PHI or not PHI? The less-obvious ones trip me up."',
+  },
+  station: {
+    label: 'LAB MANIFEST STATION',
+    tagline: 'No names here — the identifiers hide in serials, IPs, and codes.',
+    deskBase: '#3A4A5C',
+    deskEdge: '#1e2a38',
   },
   items: [
     {
@@ -562,6 +585,12 @@ const SET_3: SorterDocumentSet = {
     body: 'The records clerk pulls up a research data set awaiting approval. ' +
       '"These are trickier than they look. Some of these date and location fields — ' +
       'Safe Harbor says some are fine and some aren\'t. Help me flag anything that blocks de-identification."',
+  },
+  station: {
+    label: 'DE-ID REVIEW DESK',
+    tagline: 'Safe Harbor edge cases — the year survives, the month doesn\'t.',
+    deskBase: '#3E5244',
+    deskEdge: '#22301f',
   },
   items: [
     {

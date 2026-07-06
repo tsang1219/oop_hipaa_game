@@ -634,8 +634,28 @@ export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound,
           </span>
         </div>
 
-        {/* PHASE 24: Desk surface containing all desk components */}
-        <DeskSurface>
+        {/* PHASE 24: Desk surface containing all desk components.
+            Station colors re-skin the desk per set (HIPAA-is-the-game pass). */}
+        <DeskSurface base={docSet.station.deskBase} edge={docSet.station.deskEdge}>
+          {/* Station placard — which desk this is, and its one-line lesson */}
+          <div
+            className="absolute top-3 left-3 z-10 max-w-[45%] border-2 border-black/50 bg-black/35 px-2.5 py-1.5"
+            data-testid="sorter-station-placard"
+          >
+            <p
+              className="text-[#FFD93D]"
+              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
+            >
+              {docSet.station.label}
+            </p>
+            <p
+              className="text-white/85 mt-1"
+              style={{ fontFamily: 'var(--font-body)', fontSize: '12px', lineHeight: '1.3' }}
+            >
+              {docSet.station.tagline}
+            </p>
+          </div>
+
           {/* ShiftClock — absolute top-right of desk */}
           <div className="absolute top-3 right-3 z-10">
             <ShiftClock secondsLeft={secondsLeft} totalSeconds={docSet.shiftSeconds} />
