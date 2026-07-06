@@ -2,11 +2,24 @@ import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures } from '../sprites';
 import { objectTextureKey } from '../sprites/objectTextures';
+import { npcTextureKey } from '../sprites/npcTextures';
 import {
   ENCOUNTER_WAVES_INBOUND,
   ENCOUNTER_WAVE_BUDGETS,
   ENCOUNTER_AVAILABLE_TOWERS,
 } from '../../game/breach-defense/constants';
+import {
+  PRINTER_BEATS, PRINTER_AFTER_LINES, PRINTER_PROMPT, PRINTER_SPOTS,
+  PRINTER_COUNT_KEY, CAT_PETS_KEY, ZZ_LINE_KEY,
+  CAT_PET_LINES, CAT_MILESTONE_PETS, CAT_MILESTONE_LINE, CAT_AMBIENT_LINE, CAT_PROMPT,
+  BOWL_LINE, BOWL_PROMPT, ROTA_LINE, ROTA_PROMPT,
+  ZZ_NAME, ZZ_LINES, ZZ_LOOP_INDEXES, ZZ_PROMPT,
+  CLOSET_ROOM_ID, HIDDEN_DOOR_PROMPT, closetFound, bumpCounter,
+} from '../../data/whimsyData';
+import {
+  IDLE_LINES, AMBIENT_MIN_MS, AMBIENT_JITTER_MS, AMBIENT_DWELL_MS, AMBIENT_VOLUME,
+} from '../../data/idleLines';
+import type { WhimsyData } from '../systems/exploration/interactableFactory';
 import { findPath } from '../systems/exploration/pathfinding';
 import {
   ensurePlayerFallbackTexture,
@@ -95,6 +108,12 @@ export class ExplorationScene extends Phaser.Scene {
   lastActivityAt = 0;
   private lastIdleHintAt = 0;
   private idleHintIndex = 0;
+
+  // Ambient eavesdrop system (moments-of-pure-play pass) — every 12-20s one
+  // on-screen NPC (or the cat) mutters a small bubble. Teaches nothing.
+  private lastAmbientAt = 0;
+  private nextAmbientGap = AMBIENT_MIN_MS;
+  private lastAmbientId: string | null = null;
 
   // Idle frame index per direction (row * 3 + 0 for idle col) — from CREDITS.md layout
   // down=0, left=3, right=6, up=9
@@ -211,6 +230,11 @@ export class ExplorationScene extends Phaser.Scene {
     this.lastActivityAt = 0;
     this.lastIdleHintAt = 0;
     this.idleHintIndex = 0;
+
+    // Reset ambient eavesdrop cadence per room
+    this.lastAmbientAt = 0;
+    this.nextAmbientGap = AMBIENT_MIN_MS + Math.random() * AMBIENT_JITTER_MS;
+    this.lastAmbientId = null;
   }
 
   create() {
@@ -278,6 +302,10 @@ export class ExplorationScene extends Phaser.Scene {
     if (room.id === 'it_office') {
       this.spawnDefenseConsole();
     }
+
+    // Whimsy layer (moments-of-pure-play pass): GERALD the printer fleet,
+    // and Supply Closet B's residents. Teaches nothing. That's the point.
+    this.spawnWhimsy(room);
 
     // Pulse first NPC if this room hasn't been pulsed yet
     // (stays in the scene per the refactor proposal — writes npcPulseTween/npcPulseTarget)
@@ -368,9 +396,13 @@ export class ExplorationScene extends Phaser.Scene {
       {
         fontFamily: '"Press Start 2P"',
         fontSize: '8px',
-        color: '#4A90E2',
+        color: '#7FB8FF',
         stroke: '#000000',
-        strokeThickness: 2,
+        strokeThickness: 4,
+        // Same opaque plate as NPC name tags so it reads cleanly and never
+        // garbles against an adjacent label (e.g. the boss "BOSS" tag).
+        backgroundColor: '#0b0b16ee',
+        padding: { x: 4, y: 3 },
       },
     ).setOrigin(0.5, 1).setDepth(31);
 
@@ -681,6 +713,9 @@ export class ExplorationScene extends Phaser.Scene {
     // Proximity check
     this.checkProximity();
 
+    // Reveal NPC name plates only near the player (declutter — Stardew-style)
+    this.updateNPCLabels();
+
     // Update interaction radius indicator
     if (this.interactionIndicator) {
       if (this.nearbyInteractable) {
@@ -716,6 +751,18 @@ export class ExplorationScene extends Phaser.Scene {
           { npcs: this.completedNPCs, zones: this.completedZones, items: this.collectedItems },
           this.idleHintIndex,
         );
+      }
+    }
+
+    // Ambient eavesdrop (moments-of-pure-play): every 12-20s, someone on
+    // screen mutters a line. Skipped while a bubble is already up.
+    if (!this.paused && !this.transitioning) {
+      const now = this.time.now;
+      if (this.lastAmbientAt === 0) this.lastAmbientAt = now; // entry grace
+      if (now - this.lastAmbientAt > this.nextAmbientGap && !this.npcSpeechBubble) {
+        this.lastAmbientAt = now;
+        this.nextAmbientGap = AMBIENT_MIN_MS + Math.random() * AMBIENT_JITTER_MS;
+        this.emitAmbientLine();
       }
     }
 
@@ -1201,6 +1248,364 @@ export class ExplorationScene extends Phaser.Scene {
     });
   }
 
+  // ── Whimsy layer (moments-of-pure-play pass) ─────────────────────
+  // GERALD the printer fleet + Supply Closet B. Nothing in here scores,
+  // teaches, or completes anything. See whimsyData.ts for the writing.
+
+  /** Register an invisible interactable anchor for a whimsy object. */
+  private addWhimsy(id: string, data: WhimsyData): Phaser.GameObjects.Sprite {
+    const anchor = this.add.sprite(
+      data.x * TILE + TILE / 2, data.y * TILE + TILE / 2, objectTextureKey('computer'),
+    ).setAlpha(0.01).setDepth(5 + data.y);
+    this.interactables.push({ type: 'whimsy', id, data: data as any, sprite: anchor });
+    return anchor;
+  }
+
+  private spawnWhimsy(room: Room): void {
+    // ── GERALD (one per haunted floor; they are all Gerald) ────────
+    const spot = PRINTER_SPOTS[room.id];
+    if (spot) {
+      const cx = spot.x * TILE + TILE / 2;
+      const cy = spot.y * TILE + TILE / 2;
+      // Label-maker tape: GERALD
+      const tape = this.add.text(cx, cy - 20, 'GERALD', {
+        fontFamily: '"Press Start 2P"',
+        fontSize: '6px',
+        color: '#2a2418',
+        backgroundColor: '#e8dcc0',
+        padding: { x: 2, y: 1 },
+      }).setOrigin(0.5).setDepth(6 + spot.y).setAngle(-2);
+      tape.setAlpha(0.95);
+      // Status LED — restless amber before the payoff, steady green after
+      const printed = (() => {
+        try { return (parseInt(localStorage.getItem(PRINTER_COUNT_KEY) ?? '0', 10) || 0) >= PRINTER_BEATS.length; }
+        catch { return false; }
+      })();
+      const led = this.add.rectangle(cx + 12, cy - 10, 3, 3, printed ? 0x2ecc71 : 0xf5a623, 1)
+        .setDepth(6 + spot.y);
+      if (!printed) {
+        this.tweens.add({
+          targets: led,
+          alpha: { from: 1, to: 0.15 },
+          duration: 340,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+      }
+      this.addWhimsy(`printer_${room.id}`, {
+        x: spot.x, y: spot.y, kind: 'printer', prompt: PRINTER_PROMPT,
+      });
+    }
+
+    // ── Supply Closet B ────────────────────────────────────────────
+    if (room.id !== CLOSET_ROOM_ID) return;
+
+    // Warm lamp glow over the cat corner — the reason the seam spills light
+    if (this.textures.exists('glow_radial')) {
+      const lamp = this.add.image(7 * TILE + TILE / 2, 4 * TILE, 'glow_radial')
+        .setTint(0xffc878)
+        .setBlendMode(Phaser.BlendModes.ADD)
+        .setAlpha(0.35)
+        .setScale(2.2)
+        .setDepth(3);
+      this.tweens.add({
+        targets: lamp,
+        alpha: { from: 0.35, to: 0.5 },
+        duration: 2600,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+    }
+
+    // Blanket nest
+    const nestX = 7 * TILE + TILE / 2;
+    const nestY = 4 * TILE + TILE / 2 + 6;
+    this.add.ellipse(nestX, nestY + 2, 34, 16, 0x4a5a78, 1).setDepth(8);
+    this.add.ellipse(nestX, nestY, 30, 13, 0x6a7a98, 1).setDepth(8);
+    this.add.ellipse(nestX, nestY, 22, 9, 0x3a4a68, 0.55).setDepth(8);
+
+    // Mr. Whiskers — pixel loaf, generated once
+    if (!this.textures.exists('_cat_loaf')) {
+      const g = this.add.graphics();
+      const fur = 0x9a938c, dark = 0x6e6862, cream = 0xd8cfc4;
+      // Loaf body
+      g.fillStyle(fur, 1);
+      g.fillRoundedRect(2, 5, 18, 9, 4);
+      // Stripes
+      g.fillStyle(dark, 1);
+      g.fillRect(6, 5, 2, 6);
+      g.fillRect(10, 5, 2, 7);
+      g.fillRect(14, 5, 2, 6);
+      // Head
+      g.fillStyle(fur, 1);
+      g.fillRoundedRect(14, 2, 9, 8, 3);
+      // Ears
+      g.fillTriangle(15, 3, 17, 3, 16, 0);
+      g.fillTriangle(20, 3, 22, 3, 21, 0);
+      g.fillStyle(dark, 1);
+      // Closed eyes — content arcs
+      g.fillRect(16, 6, 2, 1);
+      g.fillRect(20, 6, 2, 1);
+      // Nose
+      g.fillStyle(0xc98a8a, 1);
+      g.fillRect(18, 8, 1, 1);
+      // Chest patch
+      g.fillStyle(cream, 1);
+      g.fillRect(14, 10, 3, 3);
+      // Tail curled around the front
+      g.fillStyle(dark, 1);
+      g.fillRoundedRect(1, 11, 12, 3, 1);
+      g.generateTexture('_cat_loaf', 24, 15);
+      g.destroy();
+    }
+    const cat = this.add.sprite(nestX, nestY - 4, '_cat_loaf').setDepth(9);
+    this.tweens.add({
+      targets: cat,
+      scaleY: { from: 1, to: 1.05 },
+      duration: 1400,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+    const catIa = this.addWhimsy('whimsy_cat', {
+      x: 7, y: 4, kind: 'cat', prompt: CAT_PROMPT, ambient: CAT_AMBIENT_LINE,
+    });
+    // Make the cat itself the bubble/heart anchor, not the invisible box
+    catIa.setPosition(nestX, nestY - 4);
+
+    // Heart particle texture (for petting)
+    if (!this.textures.exists('_heart_px')) {
+      const g = this.add.graphics();
+      g.fillStyle(0xff7a9a, 1);
+      g.fillCircle(2, 2, 2);
+      g.fillCircle(6, 2, 2);
+      g.fillTriangle(0, 3, 8, 3, 4, 8);
+      g.generateTexture('_heart_px', 9, 9);
+      g.destroy();
+    }
+
+    // Food bowl
+    const bowlX = 6 * TILE + TILE / 2;
+    const bowlY = 5 * TILE + TILE / 2;
+    this.add.ellipse(bowlX, bowlY + 2, 16, 7, 0x8a5a30, 1).setDepth(8);
+    this.add.ellipse(bowlX, bowlY, 14, 6, 0xa87040, 1).setDepth(8);
+    this.add.ellipse(bowlX, bowlY, 9, 4, 0x5a3a1a, 1).setDepth(8);
+    this.add.circle(bowlX - 2, bowlY, 1, 0xd8b890, 1).setDepth(9);
+    this.add.circle(bowlX + 2, bowlY - 1, 1, 0xd8b890, 1).setDepth(9);
+    this.addWhimsy('whimsy_bowl', { x: 6, y: 5, kind: 'flavor', prompt: BOWL_PROMPT, line: BOWL_LINE });
+
+    // Feeding rota — paper pinned to the shelf front
+    const rotaX = 2 * TILE + TILE / 2;
+    const rotaY = 1 * TILE + TILE / 2 + 10;
+    this.add.rectangle(rotaX + 1, rotaY + 1, 14, 16, 0x000000, 0.25).setDepth(8);
+    this.add.rectangle(rotaX, rotaY, 14, 16, 0xf0e6cc, 1).setDepth(8).setAngle(2);
+    const rotaG = this.add.graphics().setDepth(9);
+    rotaG.fillStyle(0x8a8070, 0.9);
+    for (let i = 0; i < 4; i++) rotaG.fillRect(rotaX - 5, rotaY - 5 + i * 4, 10, 1);
+    this.add.circle(rotaX, rotaY - 8, 1.5, 0xcc4444, 1).setDepth(9);
+    this.addWhimsy('whimsy_rota', { x: 2, y: 2, kind: 'flavor', prompt: ROTA_PROMPT, line: ROTA_LINE });
+
+    // Zz Test — the patient who isn't real, on a crate he isn't using up
+    const zzX = 2 * TILE + TILE / 2;
+    const zzY = 5 * TILE + TILE / 2;
+    this.add.rectangle(zzX, zzY + 12, 26, 12, 0x6a4a2a, 1).setDepth(8);
+    this.add.rectangle(zzX, zzY + 8, 26, 3, 0x7e5a36, 1).setDepth(8);
+    const zz = this.add.sprite(zzX, zzY - 2, npcTextureKey('nervous_patient'), 0)
+      .setDepth(9)
+      .setTint(0xc2cede)
+      .setAlpha(0.92);
+    this.tweens.add({
+      targets: zz,
+      scaleY: { from: 1, to: 1.02 },
+      duration: 2100,
+      yoyo: true,
+      repeat: -1,
+      ease: 'Sine.easeInOut',
+    });
+    const zzLabel = this.add.text(zzX, zzY + 20, ZZ_NAME, {
+      fontFamily: '"Press Start 2P"',
+      fontSize: '8px',
+      color: '#c2cede',
+      stroke: '#000000',
+      strokeThickness: 3,
+      backgroundColor: '#00000066',
+      padding: { x: 2, y: 1 },
+    }).setOrigin(0.5, 0).setDepth(10);
+    zzLabel.setAlpha(0.9);
+    const zzIa = this.addWhimsy('whimsy_zz', { x: 2, y: 5, kind: 'zz', prompt: ZZ_PROMPT });
+    zzIa.setPosition(zzX, zzY - 2);
+
+    // Drifting dust motes in the lamp light — the room breathes
+    this.time.addEvent({
+      delay: 2400,
+      loop: true,
+      callback: () => {
+        const mote = this.add.circle(
+          nestX - 30 + Math.random() * 60, TILE + 6, 1, 0xfff2cc, 0.6,
+        ).setDepth(20);
+        this.tweens.add({
+          targets: mote,
+          y: mote.y + 4 * TILE,
+          alpha: 0,
+          duration: 5600,
+          ease: 'Sine.easeOut',
+          onComplete: () => mote.destroy(),
+        });
+      },
+    });
+  }
+
+  /** Whimsy interactions — no pause, no dim, no scoring. Bubble + feel only. */
+  private handleWhimsyInteraction(ia: InteractableData): void {
+    const d = ia.data as unknown as WhimsyData;
+
+    if (d.kind === 'printer') {
+      const n = bumpCounter(PRINTER_COUNT_KEY);
+      if (n < PRINTER_BEATS.length) {
+        const beat = PRINTER_BEATS[n];
+        if (beat.fx === 'paper') {
+          try { this.sound.play('sfx_sorter_paper', { volume: 0.5 }); } catch (_) {}
+          this.spitPage(ia.sprite.x, ia.sprite.y);
+          this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 3400 });
+        } else if (beat.fx === 'grind') {
+          try { this.sound.play('sfx_breach_alert', { volume: 0.08, rate: 0.55 }); } catch (_) {}
+          this.tweens.add({ targets: ia.sprite, x: ia.sprite.x + 1, duration: 40, yoyo: true, repeat: 5 });
+          this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 3400 });
+        } else if (beat.fx === 'payoff') {
+          // Commandment 2: it whirs first. Then, at last, it prints.
+          try { this.sound.play('sfx_breach_alert', { volume: 0.06, rate: 0.5 }); } catch (_) {}
+          this.time.delayedCall(650, () => {
+            try { this.sound.play('sfx_fanfare', { volume: 0.5 }); } catch (_) {}
+            this.cameras.main.flash(250, 255, 240, 200, false);
+            this.spitPage(ia.sprite.x, ia.sprite.y);
+            if (this.textures.exists('particle_circle')) {
+              const burst = this.add.particles(ia.sprite.x, ia.sprite.y - 8, 'particle_circle', {
+                speed: { min: 50, max: 130 },
+                angle: { min: 200, max: 340 },
+                scale: { start: 0.7, end: 0 },
+                alpha: { start: 1, end: 0 },
+                tint: [0xffd700, 0xfff2c8, 0x9ad9ff],
+                lifespan: 800,
+                quantity: 18,
+                emitting: false,
+              } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(99);
+              burst.explode(18);
+              this.time.delayedCall(900, () => burst.destroy());
+            }
+            this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 4600 });
+          });
+        } else {
+          try { this.sound.play('sfx_interact', { volume: 0.15, rate: 0.7 }); } catch (_) {}
+          this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 3400 });
+        }
+      } else {
+        const line = PRINTER_AFTER_LINES[(n - PRINTER_BEATS.length) % PRINTER_AFTER_LINES.length];
+        try { this.sound.play('sfx_interact', { volume: 0.12, rate: 0.55 }); } catch (_) {}
+        this.showNpcSpeechBubble(ia, line, { volume: 0, dwellMs: 3000 });
+      }
+      return;
+    }
+
+    if (d.kind === 'cat') {
+      const pets = bumpCounter(CAT_PETS_KEY) + 1;
+      try { this.sound.play('sfx_interact', { volume: 0.16, rate: 0.55 }); } catch (_) {}
+      // Squish of acknowledgement
+      this.tweens.add({
+        targets: ia.sprite,
+        scaleX: { from: 1, to: 1.12 },
+        scaleY: { from: 1, to: 0.9 },
+        duration: 110,
+        yoyo: true,
+        ease: 'Sine.easeOut',
+      });
+      const milestone = pets === CAT_MILESTONE_PETS;
+      if (this.textures.exists('_heart_px')) {
+        const hearts = this.add.particles(ia.sprite.x, ia.sprite.y - 10, '_heart_px', {
+          speedY: { min: -40, max: -18 },
+          speedX: { min: -12, max: 12 },
+          scale: { start: 1, end: 0.2 },
+          alpha: { start: 1, end: 0 },
+          lifespan: 900,
+          quantity: milestone ? 10 : 3,
+          emitting: false,
+        } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig).setDepth(99);
+        hearts.explode(milestone ? 10 : 3);
+        this.time.delayedCall(1000, () => hearts.destroy());
+      }
+      if (milestone) {
+        try { this.sound.play('sfx_fanfare', { volume: 0.3 }); } catch (_) {}
+        this.showNpcSpeechBubble(ia, CAT_MILESTONE_LINE, { volume: 0, dwellMs: 3200 });
+      } else {
+        this.showNpcSpeechBubble(ia, CAT_PET_LINES[(pets - 1) % CAT_PET_LINES.length], { volume: 0, dwellMs: 2200 });
+      }
+      return;
+    }
+
+    if (d.kind === 'zz') {
+      const n = bumpCounter(ZZ_LINE_KEY);
+      const idx = n < ZZ_LINES.length
+        ? n
+        : ZZ_LOOP_INDEXES[(n - ZZ_LINES.length) % ZZ_LOOP_INDEXES.length];
+      try { this.sound.play('sfx_interact', { volume: 0.2, rate: 0.9 }); } catch (_) {}
+      this.showNpcSpeechBubble(ia, ZZ_LINES[idx], { volume: 0, dwellMs: 4800 });
+      return;
+    }
+
+    // 'flavor' — a thing you look at, a line you get
+    try { this.sound.play('sfx_interact', { volume: 0.18, rate: 1.2 }); } catch (_) {}
+    this.showNpcSpeechBubble(ia, d.line ?? '...', { volume: 0, dwellMs: 3600 });
+  }
+
+  /** A page slides out of a printer tray and settles. */
+  private spitPage(x: number, y: number): void {
+    const page = this.add.rectangle(x, y + 6, 10, 2, 0xffffff, 1).setDepth(9);
+    this.tweens.add({
+      targets: page,
+      y: y + 14,
+      scaleY: 4,
+      duration: 340,
+      ease: 'Sine.easeOut',
+      onComplete: () => {
+        this.tweens.add({
+          targets: page,
+          alpha: 0,
+          delay: 2400,
+          duration: 500,
+          onComplete: () => page.destroy(),
+        });
+      },
+    });
+  }
+
+  /** Ambient eavesdrop tick — one small mutter from someone on screen. */
+  private emitAmbientLine(): void {
+    const candidates: { ia: InteractableData; lines: string[] }[] = [];
+    for (const ia of this.interactables) {
+      if (ia.type === 'npc') {
+        const lines = IDLE_LINES[ia.id];
+        if (lines?.length) candidates.push({ ia, lines });
+      } else if (ia.type === 'whimsy') {
+        const d = ia.data as unknown as WhimsyData;
+        if (d.ambient) candidates.push({ ia, lines: [d.ambient] });
+      }
+    }
+    if (candidates.length === 0) return;
+    // Don't let the same person mutter twice in a row (unless they're alone)
+    const pool = candidates.length > 1
+      ? candidates.filter((c) => c.ia.id !== this.lastAmbientId)
+      : candidates;
+    const pick = pool[Math.floor(Math.random() * pool.length)];
+    // Don't talk over the player's current focus target
+    if (this.nearbyInteractable?.id === pick.ia.id) return;
+    this.lastAmbientId = pick.ia.id;
+    const line = pick.lines[Math.floor(Math.random() * pick.lines.length)];
+    this.showNpcSpeechBubble(pick.ia, line, { volume: AMBIENT_VOLUME, dwellMs: AMBIENT_DWELL_MS });
+    // QA breadcrumb — bubbles are canvas objects, so tests assert on this instead
+    try { (window as any).__QA__ && ((window as any).__QA__.lastAmbient = { id: pick.ia.id, line }); } catch (_) { /* ignore */ }
+  }
+
   // triggerPHISorterEncounter removed 2026-05-08 — replaced by NPC-driven trigger
   // (npc.encounterTrigger handler in triggerInteraction emits ENCOUNTER_REQUEST,
   // React shows EncounterRequestModal, accept transitions phase to 'phi-sorter'
@@ -1402,6 +1807,22 @@ export class ExplorationScene extends Phaser.Scene {
     step();
   }
 
+  // ── NPC name-plate reveal ──────────────────────────────────────
+  /** Names only show for NPCs the player is near, fading in/out smoothly, so a
+   *  roomful of plates no longer clutters the view (Stardew-style). */
+  private updateNPCLabels() {
+    const REVEAL = 3; // tiles (Manhattan) at which a name is fully shown
+    for (const ia of this.interactables) {
+      if (ia.type !== 'npc' || !ia.label) continue;
+      const d = ia.data as { x: number; y: number };
+      const dist = Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y);
+      const ceiling = (ia.label.getData('baseAlpha') as number) ?? 1;
+      const target = dist <= REVEAL ? ceiling : 0;
+      const cur = ia.label.alpha;
+      ia.label.setAlpha(cur + (target - cur) * 0.2); // ease toward target
+    }
+  }
+
   // ── Proximity ──────────────────────────────────────────────────
   private checkProximity() {
     let closest: InteractableData | null = null;
@@ -1426,6 +1847,8 @@ export class ExplorationScene extends Phaser.Scene {
         ? (this.registry.get('encounterResult_td-it-office')
             ? '[SPACE] Re-run threat simulation'
             : '[SPACE] Check the threat console')
+        : closest.type === 'whimsy'
+        ? `[SPACE] ${(closest.data as unknown as WhimsyData).prompt}`
         : `[SPACE] Read ${(closest.data as EducationalItem).title}`;
       this.promptText.setText(label);
       this.promptText.setVisible(true);
@@ -1435,15 +1858,26 @@ export class ExplorationScene extends Phaser.Scene {
       const nearDoor = this.doors.nearDoor;
       if (nearDoor) {
         const doorLabel = nearDoor.label || nearDoor.targetRoomId.replace(/_/g, ' ');
+        const isHiddenUnfound = (nearDoor as { hidden?: boolean }).hidden && !closetFound();
         // F-12 fix (Run 07): a locked door used to show the same inviting
         // "[SPACE] Enter" prompt, then honk on the attempt. Tell the truth
         // up front — the attempt feedback (red flash + alert) stays.
         if (this.doors.states[nearDoor.id] === 'locked') {
-          this.promptText.setText(`[LOCKED] ${doorLabel} — finish this area first`);
+          // A hidden door that's ALSO locked (demo mode) stays a wall
+          if (isHiddenUnfound) {
+            this.promptText.setVisible(false);
+          } else {
+            this.promptText.setText(`[LOCKED] ${doorLabel} — finish this area first`);
+            this.promptText.setVisible(true);
+          }
+        } else if (isHiddenUnfound) {
+          // Whimsy pass: the seam doesn't say where it goes
+          this.promptText.setText(`[SPACE] ${HIDDEN_DOOR_PROMPT}`);
+          this.promptText.setVisible(true);
         } else {
           this.promptText.setText(`[SPACE] Enter ${doorLabel}`);
+          this.promptText.setVisible(true);
         }
-        this.promptText.setVisible(true);
       } else {
         this.promptText.setVisible(false);
       }
@@ -1453,6 +1887,14 @@ export class ExplorationScene extends Phaser.Scene {
   // ── Interaction ────────────────────────────────────────────────
   private triggerInteraction(ia: InteractableData) {
     this.lastActivityAt = this.time.now; // Reset idle-hint grace period on interaction
+
+    // Whimsy objects never pause, dim, or open UI — a bubble and a feeling,
+    // then you keep walking (moments-of-pure-play pass)
+    if (ia.type === 'whimsy') {
+      this.handleWhimsyInteraction(ia);
+      return;
+    }
+
     this.sound.play('sfx_interact', { volume: 0.55 });
     this.stopNpcPulse(ia);
     this.paused = true;
@@ -1467,7 +1909,9 @@ export class ExplorationScene extends Phaser.Scene {
 
     this.tweens.add({
       targets: dimOverlay,
-      fillAlpha: 0.25,
+      // 0.45 (was 0.25): the world — including the always-on name plates —
+      // recedes so focus lands on the speaker.
+      fillAlpha: 0.45,
       duration: 200,
       ease: 'Sine.easeIn'
     });
@@ -1728,7 +2172,11 @@ export class ExplorationScene extends Phaser.Scene {
   /** Brief floating one-liner above an NPC — for post-encounter "talk again"
    *  moments that don't warrant the full dialogue overlay. Auto-fades. */
   private npcSpeechBubble?: Phaser.GameObjects.Container;
-  private showNpcSpeechBubble(ia: InteractableData, line: string): void {
+  private showNpcSpeechBubble(
+    ia: InteractableData,
+    line: string,
+    opts?: { volume?: number; dwellMs?: number },
+  ): void {
     // Replace any bubble already showing (rapid re-presses shouldn't stack)
     if (this.npcSpeechBubble) {
       this.tweens.killTweensOf(this.npcSpeechBubble);
@@ -1746,13 +2194,19 @@ export class ExplorationScene extends Phaser.Scene {
     const bg = this.add.rectangle(
       0, pad, text.width + pad * 2, text.height + pad * 2, 0xfffbe8, 0.95,
     ).setStrokeStyle(2, 0x222222).setOrigin(0.5, 1);
-    const bubble = this.add.container(ia.sprite.x, ia.sprite.y - TILE * 1.1, [bg, text])
+    // Clamp inside the room so speakers near walls (GERALD one tile under the
+    // top wall, Zz against the closet's left wall) don't clip off-canvas
+    const halfW = bg.width / 2 + 4;
+    const roomPxW = this.room.width * TILE;
+    const bx = Phaser.Math.Clamp(ia.sprite.x, halfW, Math.max(halfW, roomPxW - halfW));
+    const by = Math.max(ia.sprite.y - TILE * 1.1, bg.height + 10);
+    const bubble = this.add.container(bx, by, [bg, text])
       .setDepth(95)
       .setAlpha(0);
     this.npcSpeechBubble = bubble;
-    try { this.sound.play('sfx_interact', { volume: 0.3 }); } catch (_) {}
+    try { this.sound.play('sfx_interact', { volume: opts?.volume ?? 0.3 }); } catch (_) {}
     this.tweens.add({ targets: bubble, alpha: 1, y: bubble.y - 4, duration: 180, ease: 'Sine.easeOut' });
-    this.time.delayedCall(2400, () => {
+    this.time.delayedCall(opts?.dwellMs ?? 2400, () => {
       if (this.npcSpeechBubble !== bubble) return;
       this.tweens.add({
         targets: bubble,

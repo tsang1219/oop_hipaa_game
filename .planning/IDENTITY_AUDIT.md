@@ -57,6 +57,7 @@ In rough order:
 2. **Editorial voice / hot takes pass.** A codex or NPC channel where HIPAA gets talked *about* with a POV. Real hot takes: *"The Privacy Rule is 40% common sense and 60% lawsuit avoidance"* / *"Fax machines are considered secure because Congress hadn't heard of email in 1996"* / *"Most breaches aren't hackers — they're a nurse leaving a laptop on the bus."* This is what makes it feel like a smart small game, not a training product.
 
 3. **Moments of pure play.** Scenes that earn nothing. A break room conversation about Real Housewives. A printer-jamming gag that recurs across the game. A hidden room. An easter-egg NPC who breaks the fourth wall. Idle NPCs you can eavesdrop on.
+   _SHIPPED 2026-07-06 (whimsy pass):_ GERALD the printer fleet (8-beat gag across Reception/Records/IT, pays off, finds peace); Supply Closet B (hidden seam door off the break↔lab hallway) housing Mr. Whiskers (pettable, of emergency-contact fame) and Zz Test (the EHR test patient — carries the game's one fourth-wall line); ambient eavesdrop lines for the whole cast (`idleLines.ts`), including Riley's vending feud and the lab tech's pour-over doctrine. Content in `whimsyData.ts` / `idleLines.ts`.
 
 4. **Reframe the completion artifact.** Sponsor certificate stays, but the surrounding tone becomes "thank you for playing our little game" not "congratulations on completing your training." A credits roll. A "made by a small team, funded by [sponsor]" moment.
 

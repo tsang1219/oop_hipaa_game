@@ -2,16 +2,53 @@ import Phaser from 'phaser';
 import { npcTextureKey } from '../../sprites/npcTextures';
 import { objectTextureKey } from '../../sprites/objectTextures';
 import { getHallwayBoard } from '../../../data/hallwayContent';
+import { getNPCColor } from '@/data/spriteAssetPaths';
 import { isDemoActive } from '@/lib/demoSession';
 import type { Room, NPC, InteractionZone, EducationalItem } from '@shared/schema';
 
 const TILE = 32;
 
+/**
+ * Unified "interact here" cue. Every interactable — NPC, zone, item — gets the
+ * SAME soft pulsing gold outline ring, so the affordance reads consistently
+ * (previously: gold aura on items, blue ring on zones, nothing under NPCs).
+ */
+function addInteractCue(
+  scene: Phaser.Scene, x: number, y: number, depth: number, radius = 17,
+): { ring: Phaser.GameObjects.Arc; tween: Phaser.Tweens.Tween } {
+  const ring = scene.add.circle(x, y, radius, 0xffcf5a, 0)
+    .setStrokeStyle(2, 0xffcf5a, 0.55)
+    .setDepth(depth);
+  const tween = scene.tweens.add({
+    targets: ring,
+    scale: { from: 0.82, to: 1.2 },
+    strokeAlpha: { from: 0.55, to: 0 },
+    duration: 1300,
+    repeat: -1,
+    ease: 'Sine.easeInOut',
+  });
+  return { ring, tween };
+}
+
 export interface InteractableData {
-  type: 'npc' | 'zone' | 'item' | 'hallwayBoard' | 'console';
+  type: 'npc' | 'zone' | 'item' | 'hallwayBoard' | 'console' | 'whimsy';
   id: string;
   data: NPC | InteractionZone | EducationalItem | { x: number; y: number; title: string; content: string };
   sprite: Phaser.GameObjects.Sprite;
+  /** NPC name plate — the scene reveals it on proximity so names don't clutter. */
+  label?: Phaser.GameObjects.Text;
+}
+
+/** Whimsy interactable payload (moments-of-pure-play pass) — carried in `data`
+ *  for type: 'whimsy'. `kind` routes the scene's handler; `prompt` feeds the
+ *  [SPACE] hint; `ambient` (optional) joins the eavesdrop rotation. */
+export interface WhimsyData {
+  x: number;
+  y: number;
+  kind: 'printer' | 'cat' | 'zz' | 'flavor';
+  prompt: string;
+  line?: string;      // static line for kind: 'flavor'
+  ambient?: string;   // ambient bubble line, if this object mutters
 }
 
 /** Read-only scene state + scene-owned callbacks the spawn loops need.
@@ -70,39 +107,8 @@ export function spawnInteractables(
         ease: 'Sine.easeInOut',
       });
 
-      // Filled glow aura: additive gold pulsing behind the item sprite
-      // The aura stays anchored; the bob moves the sprite above it — glow reads as floor-glow
-      // glow_radial has soft alpha falloff so the gold tint stays gold (no white blob)
-      if (scene.textures.exists('glow_radial')) {
-        // Deep amber + restrained alpha: additive gold clips to white over pale
-        // floors, so go darker on the tint and let the pulse carry the motion
-        const aura = scene.add.image(sprite.x, sprite.y + 2, 'glow_radial')
-          .setTint(0xffa000)
-          .setBlendMode(Phaser.BlendModes.ADD)
-          .setAlpha(0.45)
-          .setDepth(sprite.depth - 1);
-        scene.tweens.add({
-          targets: aura,
-          alpha: { from: 0.45, to: 0.75 },
-          scale: { from: 0.85, to: 1.1 },
-          duration: 1100,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-      } else {
-        // Fallback: filled circle alpha pulse (never stroke-only)
-        const auraFallback = scene.add.circle(sprite.x, sprite.y + 2, 20, 0xffd700, 0.12)
-          .setDepth(sprite.depth - 1);
-        scene.tweens.add({
-          targets: auraFallback,
-          alpha: { from: 0.12, to: 0.28 },
-          duration: 1100,
-          yoyo: true,
-          repeat: -1,
-          ease: 'Sine.easeInOut',
-        });
-      }
+      // Unified interaction cue — same gold ring as zones + NPCs
+      addInteractCue(scene, sprite.x, sprite.y + 2, sprite.depth - 1);
 
       // Periodic sparkle — the Zelda "this thing matters" twinkle (Commandment 9)
       if (scene.textures.exists('particle_circle')) {
@@ -199,24 +205,10 @@ export function spawnInteractables(
       repeat: -1,
       ease: 'Sine.easeInOut',
     });
-    // Interaction zone glow ring — pulsing blue aura for incomplete zones
+    // Interaction zone cue — same unified gold ring as items + NPCs.
     // Ring + tween stored in zoneGlows map so live completion can kill it (Phase 27 VIS-08)
     if (!ctx.completedZones.has(zone.id)) {
-      const zoneGlow = scene.add.circle(
-        sprite.x, sprite.y, 20, 0x00aaff, 0
-      ).setStrokeStyle(1.5, 0x00aaff, 0).setDepth(sprite.depth - 1);
-
-      const glowTween = scene.tweens.add({
-        targets: zoneGlow,
-        strokeAlpha: { from: 0, to: 0.4 },
-        scale: { from: 0.8, to: 1.2 },
-        duration: 1200,
-        yoyo: true,
-        repeat: -1,
-        ease: 'Sine.easeInOut'
-      });
-
-      zoneGlows.set(zone.id, { ring: zoneGlow, tween: glowTween });
+      zoneGlows.set(zone.id, addInteractCue(scene, sprite.x, sprite.y, sprite.depth - 1));
     }
 
     // Completed zone checkmark (at-render time, no pop — pop is for live completion)
@@ -228,6 +220,9 @@ export function spawnInteractables(
   }
 
   // ── NPCs ─────────────────────────────────────────────────────
+  // Collected name plates → a post-loop de-collision pass stacks any that overlap
+  // (adjacent NPCs used to garble, e.g. "Marcus" + "Lab Technician" → "Marcushnician").
+  const npcLabels: Phaser.GameObjects.Text[] = [];
   for (const npc of room.npcs) {
     // Phase 17 (2026-06-10): Act-gated and demo-excluded NPCs.
     // If the NPC's encounterTrigger.minAct is set, skip spawning when the
@@ -255,9 +250,13 @@ export function spawnInteractables(
     npcShadow.setDepth(npcDepth - 1);
     if (completed) {
       sprite.setAlpha(0.7);
+    } else {
+      // Unified interaction cue — same gold ring as zones + items, at the NPC's feet
+      addInteractCue(scene, sprite.x, sprite.y + TILE / 2 - 3, npcDepth - 1);
     }
 
-    // Name label below sprite with dark background for readability
+    // Name plate — reads in the NPC's signature color. Lighter tag than before,
+    // and the scene only reveals it when the player is near (declutter).
     const labelX = npc.x * TILE + TILE / 2;
     const labelY = npc.y * TILE + TILE + 2;
     const nameLabel = scene.add.text(
@@ -265,16 +264,15 @@ export function spawnInteractables(
       npc.name,
       {
         fontFamily: '"Press Start 2P"',
-        fontSize: '9px',
-        color: '#ffffff',
+        fontSize: '8px',
+        color: getNPCColor(npc.id),
         stroke: '#000000',
         strokeThickness: 3,
-        backgroundColor: '#00000066',
-        padding: { x: 2, y: 1 },
+        backgroundColor: '#0b0b16bb',
+        padding: { x: 3, y: 2 },
       },
-    ).setOrigin(0.5, 0).setDepth(npcDepth + 1);
+    ).setOrigin(0.5, 0).setDepth(95);  // above furniture, below dialogue dim (100)
     // Clamp label horizontally so it never overflows the room/canvas bounds.
-    // With origin (0.5, 0), the label extends labelHalf in each direction from labelX.
     const labelPad = 2;
     const labelHalf = nameLabel.width / 2;
     const roomPxWidth = room.width * TILE;
@@ -283,7 +281,10 @@ export function spawnInteractables(
     if (maxX >= minX) {
       nameLabel.x = Phaser.Math.Clamp(labelX, minX, maxX);
     }
-    if (completed) nameLabel.setAlpha(0.4);
+    // Proximity-revealed: start hidden; the scene fades it in near the player.
+    nameLabel.setData('baseAlpha', completed ? 0.45 : 1);
+    nameLabel.setAlpha(0);
+    npcLabels.push(nameLabel);
 
     // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
     scene.tweens.add({
@@ -303,9 +304,14 @@ export function spawnInteractables(
 
     // Boss indicator
     if (npc.isFinalBoss && !completed) {
-      const bossText = scene.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 10, 'BOSS', {
-        fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#e74c3c',
-      }).setOrigin(0.5).setDepth(npcDepth + 3);
+      const bossText = scene.add.text(npc.x * TILE + TILE / 2, npc.y * TILE - 14, 'BOSS', {
+        fontFamily: '"Press Start 2P"', fontSize: '9px', color: '#ff6b5c',
+        stroke: '#000000', strokeThickness: 4,
+        backgroundColor: '#0b0b16ee', padding: { x: 4, y: 3 },
+      }).setOrigin(0.5).setDepth(96);
+      // Join the de-collision pass so the boss tag can't garble against an
+      // adjacent NPC's name plate (records: BOSS vs "Records Clerk").
+      npcLabels.push(bossText);
       scene.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
 
       // Boss glow ring — pulsing aura that draws the player's attention
@@ -360,7 +366,26 @@ export function spawnInteractables(
       ctx.npcBubbles.set(npc.id, bubble);
     }
 
-    interactables.push({ type: 'npc', id: npc.id, data: npc, sprite });
+    interactables.push({ type: 'npc', id: npc.id, data: npc, sprite, label: nameLabel });
+  }
+
+  // ── Name-plate de-collision ──────────────────────────────────
+  // Greedily place labels top-to-bottom; if one overlaps an already-placed
+  // plate, push it down a line until it clears. Turns garbled adjacent labels
+  // ("Marcushnician") into a clean vertical stack.
+  const placed: Phaser.Geom.Rectangle[] = [];
+  const overlaps = (a: Phaser.Geom.Rectangle, b: Phaser.Geom.Rectangle) =>
+    a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+  const sorted = [...npcLabels].sort((a, b) => (a.y - b.y) || (a.x - b.x));
+  const lineH = 15;
+  for (const lbl of sorted) {
+    let rect = lbl.getBounds();
+    let guard = 0;
+    while (guard++ < 8 && placed.some((p) => overlaps(rect, p))) {
+      lbl.y += lineH;
+      rect = lbl.getBounds();
+    }
+    placed.push(rect);
   }
 
   return { interactables, zoneGlows };

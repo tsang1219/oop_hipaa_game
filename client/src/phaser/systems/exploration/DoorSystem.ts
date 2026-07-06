@@ -2,12 +2,18 @@ import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../../EventBridge';
 import type { Room } from '@shared/schema';
 import type { MusicController } from './MusicController';
+import { closetFound, markClosetFound } from '../../../data/whimsyData';
 
 const TILE = 32;
 
 export type DoorState = 'locked' | 'available' | 'completed' | 'next';
 
-export type Door = { id: string; targetRoomId: string; x: number; y: number; side: string; label: string };
+export type Door = {
+  id: string; targetRoomId: string; x: number; y: number; side: string; label: string;
+  /** Whimsy pass: hidden doors render as a wall seam (+ paw prints) until
+   *  first entered — no frame, no state ring, no label. Pure discovery. */
+  hidden?: boolean;
+};
 
 /**
  * The scene fields DoorSystem reads/writes through the scene reference.
@@ -69,6 +75,11 @@ export class DoorSystem {
   enter(door: Door): void {
     if (this.scene.transitioning) return;
     this.scene.lastActivityAt = this.scene.time.now; // Reset idle-hint grace period on door entry
+    // First time through a hidden door: it's found forever (renders as a real
+    // little door from now on)
+    if (door.hidden && !closetFound()) {
+      markClosetFound();
+    }
     this.scene.transitioning = true;
     this.scene.sound.play('sfx_footstep', { volume: 0.35, rate: 0.8 });
     // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
@@ -96,6 +107,42 @@ export class DoorSystem {
       const doorPixelX = door.x * TILE + TILE / 2;
       const doorPixelY = door.y * TILE + TILE / 2;
       const state = this.doorStates[door.id] ?? 'available';
+
+      // Hidden, not-yet-found door (whimsy pass): no frame, no ring, no label.
+      // Just a seam in the wall, a sliver of warm light at the floor, and a
+      // few paw prints for anyone paying attention.
+      if ((door as Door).hidden && !closetFound()) {
+        const seamG = this.scene.add.graphics().setDepth(2);
+        // Vertical crack down the wall tile
+        seamG.fillStyle(0x0d0d16, 0.9);
+        seamG.fillRect(door.x * TILE + 14, door.y * TILE + 4, 2, TILE - 6);
+        seamG.fillStyle(0x000000, 0.5);
+        seamG.fillRect(door.x * TILE + 16, door.y * TILE + 6, 1, TILE - 8);
+        // Warm light spilling under the seam
+        const spill = this.scene.add.rectangle(
+          doorPixelX, door.y * TILE + TILE - 1, 12, 2, 0xffd9a0, 0.5,
+        ).setDepth(2);
+        this.scene.tweens.add({
+          targets: spill,
+          alpha: { from: 0.5, to: 0.15 },
+          duration: 2200,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+        // Paw prints wandering toward the seam (below the wall, on the floor)
+        seamG.fillStyle(0x6a5a48, 0.5);
+        const paws: [number, number][] = [[-3, 40], [6, 48], [-1, 57], [8, 65]];
+        for (const [pxOff, pyOff] of paws) {
+          const px = doorPixelX + pxOff;
+          const py = door.y * TILE + pyOff;
+          seamG.fillRect(px, py, 2, 2);
+          seamG.fillRect(px + 3, py + 1, 2, 2);
+          seamG.fillRect(px + 1, py + 3, 3, 2);
+        }
+        this.doorVisuals.push(seamG, spill);
+        continue; // no frame, no state visuals, no label
+      }
 
       // Door frame — prominent wood frame with highlight and shadow
       const frameG = this.scene.add.graphics().setDepth(1);
