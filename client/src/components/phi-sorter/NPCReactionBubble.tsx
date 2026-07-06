@@ -22,6 +22,11 @@ export type NPCReactionBubbleProps = {
    */
   spriteUrl?: string;
   /**
+   * Optional dedicated generated bust portrait URL (full image, not a sheet
+   * crop). Tried first; on 404 the component falls back to spriteUrl's crop.
+   */
+  portraitUrl?: string;
+  /**
    * Run 08 cast identity — the NPC's signature color (name header, portrait
    * border, bubble tail, neutral-variant border). HOLD IT gold and the
    * enthusiastic/thoughtful variant tints still win over it. Defaults to the
@@ -50,7 +55,10 @@ export type NPCReactionBubbleProps = {
  *
  * Positioned absolute/fixed at top-center by the parent overlay layout.
  */
-export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral', holdIt, spriteUrl, color = '#4FB3D9' }: NPCReactionBubbleProps) {
+export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral', holdIt, spriteUrl, portraitUrl, color = '#4FB3D9' }: NPCReactionBubbleProps) {
+  // Prefer a dedicated generated bust portrait; fall back to the sheet crop on 404.
+  const [portraitFailed, setPortraitFailed] = useState(false);
+  const useFullPortrait = !!portraitUrl && !portraitFailed;
   // Track which text version is currently visible — drives fade-in on change
   const [visibleText, setVisibleText] = useState(text);
   const [opacity, setOpacity] = useState(text ? 1 : 0);
@@ -189,21 +197,35 @@ export function NPCReactionBubble({ npcName, npcRole, text, variant = 'neutral',
         <div className="flex flex-col items-center">
           {/* 64px pixelated portrait — Phase 21 CertificateOverlay pattern.
               Border carries the NPC's signature color (gold during HOLD IT). */}
-          <div
-            className="border-4"
-            style={{
-              width: '64px',
-              height: '64px',
-              borderColor: identityColor,
-              backgroundImage: `url(${spriteUrl})`,
-              backgroundSize: '192px 256px',
-              backgroundPosition: '0 0',
-              backgroundRepeat: 'no-repeat',
-              imageRendering: 'pixelated',
-              backgroundColor: '#1a1a2e',
-            }}
-            data-testid="sorter-npc-portrait"
-          />
+          {useFullPortrait ? (
+            <img
+              src={portraitUrl}
+              alt={npcName}
+              onError={() => setPortraitFailed(true)}
+              className="border-4"
+              style={{
+                width: '64px', height: '64px', borderColor: identityColor,
+                objectFit: 'cover', imageRendering: 'pixelated', backgroundColor: '#1a1a2e',
+              }}
+              data-testid="sorter-npc-portrait"
+            />
+          ) : (
+            <div
+              className="border-4"
+              style={{
+                width: '64px',
+                height: '64px',
+                borderColor: identityColor,
+                backgroundImage: `url(${spriteUrl})`,
+                backgroundSize: '192px 256px',
+                backgroundPosition: '0 0',
+                backgroundRepeat: 'no-repeat',
+                imageRendering: 'pixelated',
+                backgroundColor: '#1a1a2e',
+              }}
+              data-testid="sorter-npc-portrait"
+            />
+          )}
           {/* Name plate — signature color (Run 08; was gold) */}
           <div
             className="mt-1 text-center"

@@ -3,7 +3,7 @@ import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { getSorterDocumentSet } from '@/data/sorterData';
 import { getPhi18Entry, phi18Count, type Phi18Entry } from '@/data/phi18';
 import { IdentifierGetBanner } from '@/components/IdentifierGetBanner';
-import { getSponsorSpritePath, getNPCColor } from '@/data/spriteAssetPaths';
+import { getSponsorSpritePath, getNPCColor, getNPCPortraitImage } from '@/data/spriteAssetPaths';
 import { DeskSurface } from './DeskSurface';
 import { ShiftClock } from './ShiftClock';
 import { OutgoingTray } from './OutgoingTray';
@@ -603,6 +603,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound,
         variant={currentReactionVariant}
         holdIt={holdItReveal ?? undefined}
         spriteUrl={npcSpriteUrl}
+        portraitUrl={npcDisplay.roomNpcId ? getNPCPortraitImage(npcDisplay.roomNpcId).fullUrl : undefined}
         color={getNPCColor(npcDisplay.roomNpcId)}
       />
 

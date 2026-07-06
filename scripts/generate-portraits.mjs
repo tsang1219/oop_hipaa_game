@@ -1,0 +1,140 @@
+#!/usr/bin/env node
+/**
+ * Bulk-generate 8-bit dialogue portraits for every PrivacyQuest character via
+ * the Gemini image API ("nano banana"). Zero dependencies — raw fetch on Node 18+.
+ *
+ * USAGE
+ *   export GEMINI_API_KEY=your_key_here          # aistudio.google.com/apikey
+ *   node scripts/generate-portraits.mjs          # generates all missing portraits
+ *   node scripts/generate-portraits.mjs --force  # regenerate even if the PNG exists
+ *   node scripts/generate-portraits.mjs aiyana_intake marcus_lab_aide   # just these
+ *
+ * Options via env:
+ *   MODEL=gemini-2.5-flash-image   (default; try gemini-2.5-flash-image-preview if 404)
+ *   USE_REFERENCE=1                pass each character's walk sprite as an image
+ *                                  reference (keeps hair/skin/clothing on-model)
+ *
+ * Output → client/public/attached_assets/generated_images/privacyquest/portraits/<id>.png
+ * The game picks them up automatically (getNPCPortraitImage + onError fallback).
+ */
+import { readFileSync, writeFileSync, existsSync, mkdirSync } from 'node:fs';
+import { fileURLToPath } from 'node:url';
+import { dirname, join } from 'node:path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(__dirname, '..');
+const OUT_DIR = join(ROOT, 'client/public/attached_assets/generated_images/privacyquest/portraits');
+const CHAR_DIR = join(ROOT, 'client/public/attached_assets/generated_images/privacyquest/characters');
+
+const KEY = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+const MODEL = process.env.MODEL || 'gemini-2.5-flash-image';
+const USE_REFERENCE = process.env.USE_REFERENCE === '1';
+
+if (!KEY) {
+  console.error('✗ Set GEMINI_API_KEY (get one free at https://aistudio.google.com/apikey), then re-run.');
+  process.exit(1);
+}
+
+// Shared style — prepended to every character so the whole cast matches.
+const SHARED_STYLE =
+  '16-bit SNES-era pixel-art portrait, head-and-shoulders bust, chunky visible pixels, ' +
+  'limited palette with clean dithering, bold 1px dark outline, soft top-left key light. ' +
+  'Friendly, readable, Chrono Trigger / EarthBound / Stardew Valley character-portrait energy. ' +
+  'Character centered, facing forward with a slight 3/4 turn, eyes in the upper third. ' +
+  'Solid dark navy #1a1a2e background. Square 1:1. No text, no logo, no border, no watermark. ' +
+  'Subject: ';
+
+// id = output filename (matches roomData npcId). type = walk-sheet ref (npc_<type>.png).
+const CHARACTERS = [
+  ['riley_entrance',        'receptionist', 'warm, upbeat hospital front-desk receptionist on their first day, bright welcoming smile, coral-red scrub top, tidy hair'],
+  ['riley',                 'receptionist', 'friendly composed front-desk coordinator, helpful expression, coral-red top'],
+  ['aiyana_intake',         'officer',      'calm precise young intake volunteer, steady focused eyes, sky-teal volunteer vest, lanyard badge'],
+  ['marcus_lab_aide',       'staff',        'deadpan-warm lab aide with a faint smirk, amber-orange tee under a white lab coat, safety goggles pushed up on forehead'],
+  ['dr_tovar',              'officer',      'cool exact compliance scholar, calm confident expression, mint-teal collared shirt, thin glasses'],
+  ['priya_privacy_officer', 'officer',      'privacy officer with urgency worn calmly, alert but composed, rose-pink blazer, ID badge'],
+  ['dr_martinez',           'doctor',       'harried ER physician mid-rush, slightly sweaty and focused, green scrubs, stethoscope, white coat'],
+  ['nervous_patient',       'patient',      'anxious middle-aged man in a hospital waiting room, worried furrowed brow, periwinkle-blue shirt'],
+  ['chatty_visitor',        'visitor',      'chatty hospital administrator caught mid-sentence, over-friendly grin, lime-green polo, visitor badge'],
+  ['officer',               'officer',      'by-the-book city police officer, neutral firm expression, navy uniform, gold badge'],
+  ['frantic_family',        'visitor',      'frantic worried family member, wide anxious eyes, peach sweater'],
+  ['nurse_nina',            'nurse',        'caring night-shift ICU nurse with tired-kind eyes, teal scrubs, hair tied back'],
+  ['lab_tech',              'it_tech',      'focused lab technician, cyan-accented lab coat, nitrile gloves, safety glasses'],
+  ['researcher',            'doctor',       'inquisitive faculty researcher with bright curious eyes, spearmint cardigan under a lab coat'],
+  ['courier',               'visitor',      'cheerful reference-lab courier in motion, lime delivery polo, cap, cooler-bag strap'],
+  ['records_clerk',         'receptionist', 'helpful medical-records clerk with a kind patient smile, salmon blouse, reading glasses on a chain'],
+  ['patient_request',       'patient',      'ordinary patient politely requesting their records, periwinkle gown-shirt'],
+  ['attorney',              'boss',         'sharp cool-confident attorney, slate-gray suit and tie, holding a folded document'],
+  ['compliance_officer',    'officer',      'stern authoritative chief compliance officer, azure-blue suit, badge'],
+  ['security_analyst',      'it_tech',      'sharp IT security analyst, hoodie over a collared shirt, cyan screen-glow on the face'],
+  ['vendor',                'visitor',      'smooth persuasive sales vendor with a grin, lime polo and company lanyard, holding a tablet'],
+  ['workaround_employee',   'staff',        'harried employee in a hurry with a pleading look, apricot scrub top'],
+  ['gossiping_coworker',    'nurse',        'gossipy coworker leaning in conspiratorially, raised eyebrow, pink scrubs'],
+  ['friend_fishing',        'staff',        'overly-friendly coworker fishing for information, too-wide smile, deep-apricot cardigan'],
+  ['tired_employee',        'patient',      'utterly exhausted employee with heavy eye-bags and half-lidded eyes, wrinkled periwinkle scrubs, holding a coffee cup'],
+  ['hr_director',           'boss',         'polished HR director holding a coffee, orchid-purple dress shirt, corporate smile'],
+  ['selfie_coworker',       'visitor',      'coworker holding a phone up for a selfie, cheesy grin, lime tee'],
+];
+
+const ENDPOINT = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+async function generateOne(id, type, subject) {
+  const parts = [{ text: SHARED_STYLE + subject }];
+  if (USE_REFERENCE) {
+    const ref = join(CHAR_DIR, `npc_${type}.png`);
+    if (existsSync(ref)) {
+      parts.push({ text: 'Use this reference only for hair color, skin tone, and clothing colors; redraw as a proper bust portrait.' });
+      parts.push({ inlineData: { mimeType: 'image/png', data: readFileSync(ref).toString('base64') } });
+    }
+  }
+  const body = { contents: [{ parts }], generationConfig: { responseModalities: ['IMAGE'] } };
+
+  for (let attempt = 1; attempt <= 4; attempt++) {
+    let res;
+    try {
+      res = await fetch(ENDPOINT, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-goog-api-key': KEY },
+        body: JSON.stringify(body),
+      });
+    } catch (e) {
+      if (attempt === 4) throw e;
+      await sleep(1500 * attempt); continue;
+    }
+    if (res.status === 429 || res.status >= 500) {           // throttled / transient
+      if (attempt === 4) throw new Error(`HTTP ${res.status} after retries`);
+      await sleep(2500 * attempt); continue;
+    }
+    const json = await res.json();
+    if (json.error) throw new Error(json.error.message || JSON.stringify(json.error));
+    const imgPart = json.candidates?.[0]?.content?.parts?.find((p) => p.inlineData?.data);
+    if (!imgPart) {
+      const txt = json.candidates?.[0]?.content?.parts?.map((p) => p.text).filter(Boolean).join(' ');
+      throw new Error(`no image returned${txt ? ` — model said: ${txt.slice(0, 160)}` : ''}`);
+    }
+    writeFileSync(join(OUT_DIR, `${id}.png`), Buffer.from(imgPart.inlineData.data, 'base64'));
+    return;
+  }
+}
+
+async function main() {
+  mkdirSync(OUT_DIR, { recursive: true });
+  const args = process.argv.slice(2);
+  const force = args.includes('--force');
+  const only = args.filter((a) => !a.startsWith('--'));
+  const todo = CHARACTERS.filter(([id]) => (only.length ? only.includes(id) : true))
+                         .filter(([id]) => force || !existsSync(join(OUT_DIR, `${id}.png`)));
+
+  console.log(`Model: ${MODEL}  ·  reference: ${USE_REFERENCE ? 'on' : 'off'}  ·  ${todo.length} to generate\n`);
+  let ok = 0, fail = 0;
+  for (const [id, type, subject] of todo) {
+    process.stdout.write(`  ${id.padEnd(24)} … `);
+    try { await generateOne(id, type, subject); console.log('✓'); ok++; }
+    catch (e) { console.log(`✗ ${e.message}`); fail++; }
+    await sleep(1200); // gentle pacing
+  }
+  console.log(`\nDone. ${ok} generated, ${fail} failed. → ${OUT_DIR.replace(ROOT + '/', '')}`);
+  if (fail) console.log('Re-run to retry the failures (existing files are skipped unless --force).');
+}
+
+main().catch((e) => { console.error(e); process.exit(1); });

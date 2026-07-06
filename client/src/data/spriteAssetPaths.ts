@@ -146,6 +146,24 @@ export function getSponsorSpritePath(spriteKey: string): string {
   return SPONSOR_SPRITE_PATHS[spriteKey] ?? SPONSOR_SPRITE_PATHS.npc_staff_sheet;
 }
 
+// ── Dedicated dialogue portraits (drop-in) ───────────────────────────────────
+//
+// A character's dialogue portrait defaults to a crop of their tiny walk sheet
+// (frame 0) — small and generic. To give a character a proper generated 8-bit
+// BUST portrait, drop a PNG here (no code change needed):
+//
+//   client/public/attached_assets/generated_images/privacyquest/portraits/<npcId>.png
+//
+// getNPCPortraitImage() returns that URL by convention; the portrait components
+// try it first and fall back to the sheet crop if the file 404s. Bulk-generate
+// all of them with scripts/generate-portraits.mjs. See .planning/PORTRAIT_GENERATION.md.
+const PORTRAIT_DIR = `${base}attached_assets/generated_images/privacyquest/portraits/`;
+
+/** Full generated-portrait URL (by convention) + the sheet-crop fallback URL. */
+export function getNPCPortraitImage(npcId: string): { fullUrl: string; sheetUrl: string } {
+  return { fullUrl: `${PORTRAIT_DIR}${npcId}.png`, sheetUrl: getNPCPortraitPath(npcId) };
+}
+
 // ── Cast identity colors (Run 08 initial pass) ──────────────────────────────
 //
 // Every named NPC gets a signature color used wherever they speak: dialogue

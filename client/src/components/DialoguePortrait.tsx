@@ -1,4 +1,5 @@
-import { getNPCPortraitPath, hasNPCPortrait, getNPCColor, DEFAULT_SPEAKER_COLOR } from '@/data/spriteAssetPaths';
+import { useState } from 'react';
+import { getNPCPortraitImage, hasNPCPortrait, getNPCColor, DEFAULT_SPEAKER_COLOR } from '@/data/spriteAssetPaths';
 
 interface DialoguePortraitProps {
   npcId: string;
@@ -23,7 +24,12 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
   // character mapping — they're things, not people. Render a document plate
   // instead of borrowing a random staff member's face.
   const isCharacter = hasNPCPortrait(npcId);
-  const spriteUrl = isCharacter ? getNPCPortraitPath(npcId) : null;
+  const { fullUrl, sheetUrl } = getNPCPortraitImage(npcId);
+  // Prefer a dedicated generated bust portrait; fall back to the sheet crop if
+  // it isn't present (404). Tracking the failed URL auto-resets when the speaker
+  // — and thus fullUrl — changes.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const useFull = isCharacter && failedUrl !== fullUrl;
 
   // Run 08 cast identity: characters speak in their signature color — frame,
   // glow, and name plate. Things (zones/items) keep the neutral UI pink.
@@ -49,12 +55,28 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
       >
         {/* 96px pixelated crop — frame 0 (idle-down) at 3x.
             F-13: unmapped ids (zones/items) get a document glyph plate. */}
-        {isCharacter ? (
+        {useFull ? (
+          // Dedicated generated bust portrait — full image, pixelated.
+          <img
+            src={fullUrl}
+            alt={npcName}
+            onError={() => setFailedUrl(fullUrl)}
+            style={{
+              width: '96px',
+              height: '96px',
+              objectFit: 'cover',
+              imageRendering: 'pixelated',
+              backgroundColor: '#1a1a2e',
+              animation: 'portrait-breathe 2.4s ease-in-out infinite',
+            }}
+          />
+        ) : isCharacter ? (
+          // Fallback: crop of the walk sheet (frame 0, idle-down) at 3×.
           <div
             style={{
               width: '96px',
               height: '96px',
-              backgroundImage: `url(${spriteUrl})`,
+              backgroundImage: `url(${sheetUrl})`,
               backgroundSize: '288px 384px',
               backgroundPosition: '0 0',
               backgroundRepeat: 'no-repeat',
