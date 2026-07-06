@@ -44,8 +44,10 @@ const USE_REFERENCE = process.env.USE_REFERENCE === '1';
 // run again with STYLE_ANCHOR set (the anchor file is skipped as "already done").
 const STYLE_ANCHOR = process.env.STYLE_ANCHOR;
 
-if (!KEY) {
-  console.error('✗ Set GEMINI_API_KEY (get one free at https://aistudio.google.com/apikey), then re-run.');
+const PASTE_SHEET = process.argv.includes('--paste-sheet');
+if (!KEY && !PASTE_SHEET) {
+  console.error('✗ Set GEMINI_API_KEY (needs a billing-enabled Google project for image gen),\n' +
+    '  or run `node scripts/generate-portraits.mjs --paste-sheet` for the free web/paste route.');
   process.exit(1);
 }
 
@@ -147,7 +149,38 @@ async function generateOne(id, type, subject) {
   }
 }
 
+/** Emit a copy-paste sheet for the free AI-Studio web route (no API/billing). */
+function writePasteSheet() {
+  const hero = STYLE_ANCHOR || 'aiyana_intake';
+  const ordered = [...CHARACTERS].sort((a, b) => (a[0] === hero ? -1 : b[0] === hero ? 1 : 0));
+  const lines = [
+    '# Portrait Paste Sheet — free web route (no API key / billing)',
+    '',
+    'Open **aistudio.google.com**, pick the image model ("Nano Banana" / Gemini 2.5',
+    'Flash Image). Do the **HERO first**; once you like it, keep going **in the SAME',
+    'chat** so the style holds. Download each and save with the exact filename shown',
+    'into `client/public/attached_assets/generated_images/privacyquest/portraits/`.',
+    '', '---', '',
+    `## 1 · HERO → \`${hero}.png\``,
+    '', '```',
+    SHARED_STYLE + CHARACTERS.find((c) => c[0] === hero)[2],
+    '```', '',
+    '_After you love the hero, paste each of these in the same chat:_', '',
+  ];
+  let n = 2;
+  for (const [id, , subject] of ordered) {
+    if (id === hero) continue;
+    lines.push(`## ${n++} · \`${id}.png\``, '', '```',
+      `Same exact art style, palette, framing, and background as the image above — now draw: ${subject}.`,
+      '```', '');
+  }
+  const out = join(ROOT, '.planning/PORTRAIT_PASTE_SHEET.md');
+  writeFileSync(out, lines.join('\n'));
+  console.log(`Wrote ${CHARACTERS.length}-portrait paste sheet → ${out.replace(ROOT + '/', '')}`);
+}
+
 async function main() {
+  if (PASTE_SHEET) { writePasteSheet(); return; }
   mkdirSync(OUT_DIR, { recursive: true });
   const args = process.argv.slice(2);
   const force = args.includes('--force');
