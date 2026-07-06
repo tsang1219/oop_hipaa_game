@@ -77,8 +77,12 @@ for (const set of allSets) {
     assert(typeof item.label === 'string' && item.label.length > 0, `${set.id} item ${item.id}: label non-empty`);
     assert(item.category === 'phi' || item.category === 'not_phi', `${set.id} item ${item.id}: category valid`);
     assert(typeof item.explanation === 'string' && item.explanation.length > 20, `${set.id} item ${item.id}: explanation > 20 chars`);
-    if (item.category === 'phi') {
-      assert(typeof item.identifierType === 'string' && item.identifierType.length > 0, `${set.id} item ${item.id}: PHI has identifierType`);
+    // identifierType is OPTIONAL for PHI: some PHI (e.g. employer, #11) is
+    // identifiable without being one of the 18 Safe Harbor types — those items
+    // intentionally omit it (teaches PHI is broader than the checklist). When
+    // present, it must be a non-empty string.
+    if (item.category === 'phi' && item.identifierType !== undefined) {
+      assert(typeof item.identifierType === 'string' && item.identifierType.length > 0, `${set.id} item ${item.id}: PHI identifierType (when set) is non-empty`);
     }
   }
 }
@@ -100,7 +104,9 @@ const validIdentifierTypes = new Set([
   'device_serial', 'url', 'ip_address', 'biometric', 'photo', 'other',
 ]);
 for (const set of allSets) {
-  for (const item of set.items.filter(i => i.category === 'phi')) {
+  // Only PHI items that declare an identifierType are checked — omitting it is a
+  // valid, intentional state (identifiable-but-not-on-the-18-list PHI).
+  for (const item of set.items.filter(i => i.category === 'phi' && i.identifierType !== undefined)) {
     assert(
       validIdentifierTypes.has(item.identifierType as string),
       `${set.id} item ${item.id}: identifierType '${item.identifierType}' is a valid Safe Harbor type`,
