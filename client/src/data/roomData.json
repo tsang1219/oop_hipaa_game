@@ -1552,7 +1552,7 @@
           "type": "manual",
           "x": 2,
           "y": 8,
-          "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. PHI = The Big 18 Identifiers + Health Info. Think: names, addresses, SSNs, medical records, dates of birth, phone numbers, photos, basically anything that could identify a patient AND their health status. The Golden Rule: If you can connect health data to a specific person, congrats\u2014it's PHI. Treat it like it's your own embarrassing medical history."
+          "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. Safe Harbor lists exactly 18 identifier types\u2014names, full ZIP codes, SSNs, device serials, even full-face photos. Strip all 18 and health data stops being PHI. Your codex (press I) logs every identifier you catch in the wild\u2014sort the paperwork, fill the wall, all eighteen. The Golden Rule stands: if you can connect health data to a specific person, congrats\u2014it's PHI. Treat it like your own embarrassing medical history."
         }
       ],
       "spawnPoint": {

@@ -594,3 +594,29 @@
   0%, 100% { transform: scale(1); }
   50%       { transform: scale(1.12); }
 }
+
+/* Breach Triage rule ticker entrance (HIPAA-is-the-game pass) */
+@keyframes ticker-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* The Eighteen — identifier-logged banner entrance + codex slot unlock pop */
+@keyframes identifier-banner-in {
+  0%   { opacity: 0; transform: translate(-50%, -14px) scale(0.9); }
+  60%  { opacity: 1; transform: translate(-50%, 2px) scale(1.04); }
+  100% { opacity: 1; transform: translate(-50%, 0) scale(1); }
+}
+
+@keyframes codex-slot-pop {
+  0%   { transform: scale(0.6); opacity: 0; }
+  60%  { transform: scale(1.15); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+/* Corkboard note pull-down */
+@keyframes note-pull {
+  0%   { transform: rotate(var(--note-tilt, 0deg)) scale(1); opacity: 1; }
+  40%  { transform: rotate(var(--note-tilt, 0deg)) scale(1.06) translateY(2px); opacity: 1; }
+  100% { transform: rotate(18deg) scale(0.7) translateY(90px); opacity: 0; }
+}

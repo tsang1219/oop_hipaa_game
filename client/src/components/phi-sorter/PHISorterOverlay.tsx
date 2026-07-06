@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { getSorterDocumentSet } from '@/data/sorterData';
+import { getPhi18Entry, phi18Count, type Phi18Entry } from '@/data/phi18';
+import { IdentifierGetBanner } from '@/components/IdentifierGetBanner';
 import { getSponsorSpritePath, getNPCColor } from '@/data/spriteAssetPaths';
 import { DeskSurface } from './DeskSurface';
 import { ShiftClock } from './ShiftClock';
@@ -29,6 +31,11 @@ type SorterPhase = 'sorting' | 'completing' | 'celebrating';
 export type PHISorterOverlayProps = {
   documentSetId: string;     // Lookup key into SORTER_DOCUMENT_SETS
   encounterId: string;       // Round-trips back to onComplete and Plan 04
+  /** The Eighteen codex — identifier keys already logged (HIPAA-is-the-game pass).
+   *  Correctly redacting a PHI item with a not-yet-logged identifierType fires
+   *  onIdentifierFound + the in-sorter item-get banner. */
+  identifiersFound?: string[];
+  onIdentifierFound?: (key: string) => void;
   onComplete: (result: {
     encounterId: string;
     correctCount: number;
@@ -99,7 +106,7 @@ const SHIFT_OVER_LINES: Record<NPCSorterId, string> = {
  *   - Persistent NPC portrait hosting all reactions (SORTV2-15)
  *   - Keyboard-only completion: ←/→ focus stamp, Enter/Space commit, Esc abort (SORTV2-15)
  */
-export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbort }: PHISorterOverlayProps) {
+export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound, onIdentifierFound, onComplete, onAbort }: PHISorterOverlayProps) {
   const docSet = useMemo(() => getSorterDocumentSet(documentSetId), [documentSetId]);
 
   // Error fallback — graceful exit on bad documentSetId (does NOT crash)
@@ -201,6 +208,15 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   // eslint-disable-next-line react-hooks/rules-of-hooks
   const [isShaking, setIsShaking] = useState(false);
 
+  // ── The Eighteen codex (HIPAA-is-the-game pass) ──────────────────────────────
+  // Item-get banner for a newly logged identifier. Session ref guards repeats
+  // before the parent's save state round-trips back down as a prop.
+  // eslint-disable-next-line react-hooks/rules-of-hooks
+  const [identifierBanner, setIdentifierBanner] = useState<{ entry: Phi18Entry; count: number; nonce: number } | null>(null);
+  const sessionFoundRef = useRef<string[]>([]);
+  const bannerNonceRef = useRef(0);
+  const bannerTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
   // PHASE 23: Tracks the accuracy band as of the previous drop for transition detection.
   // Initialized to 'good' (opener band) — matches the seed reaction on mount.
   // eslint-disable-next-line react-hooks/rules-of-hooks
@@ -241,6 +257,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
   useEffect(() => {
     return () => {
       cascadeTimersRef.current.forEach(clearTimeout);
+      if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
     };
   }, []);
 
@@ -321,6 +338,30 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
       if (isCorrect) {
         setCorrectCount((c) => c + 1);
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_correct', volume: 0.7 });
+
+        // The Eighteen: first-ever correct redaction of this identifier type →
+        // log it + item-get banner. Non-blocking; the desk keeps moving.
+        if (item.category === 'phi' && item.identifierType && onIdentifierFound) {
+          const entry = getPhi18Entry(item.identifierType);
+          const known = [...(identifiersFound ?? []), ...sessionFoundRef.current];
+          if (entry && !known.includes(entry.key)) {
+            sessionFoundRef.current.push(entry.key);
+            onIdentifierFound(entry.key);
+            const newCount = phi18Count([...known, entry.key]);
+            const complete = newCount >= 18;
+            const nonce = ++bannerNonceRef.current;
+            setIdentifierBanner({ entry, count: newCount, nonce });
+            eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX,
+              complete
+                ? { key: 'sfx_fanfare', volume: 0.6 }
+                : { key: 'sfx_interact', volume: 0.5, rate: 1.5 });
+            if (bannerTimerRef.current) clearTimeout(bannerTimerRef.current);
+            bannerTimerRef.current = setTimeout(
+              () => setIdentifierBanner((b) => (b?.nonce === nonce ? null : b)),
+              complete ? 3600 : 2200,
+            );
+          }
+        }
       } else {
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_wrong', volume: 0.7 });
         // Educational feedback panel — teach the rule for ≥3s before fading
@@ -407,7 +448,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
         cascadeTimersRef.current.push(t2);
       }
     },
-    [phase, docAnimState, shiftOver, docSet.items, currentDocIndex, correctCount, totalDropsSoFar, totalCount, npcDisplay.id],
+    [phase, docAnimState, shiftOver, docSet.items, currentDocIndex, correctCount, totalDropsSoFar, totalCount, npcDisplay.id, identifiersFound, onIdentifierFound],
   );
 
   /**
@@ -664,6 +705,16 @@ export function PHISorterOverlay({ documentSetId, encounterId, onComplete, onAbo
             {wrongFeedback.explanation}
           </div>
         </div>
+      )}
+
+      {/* The Eighteen item-get banner — non-blocking, top-center, ~2.2s.
+          Kept outside shake surface (anchored overlay). */}
+      {identifierBanner && (
+        <IdentifierGetBanner
+          key={identifierBanner.nonce}
+          entry={identifierBanner.entry}
+          count={identifierBanner.count}
+        />
       )}
 
       {/* PHASE 23: Celebration overlay — shown during 'celebrating' phase for ~1.2s (SORTV2-09).

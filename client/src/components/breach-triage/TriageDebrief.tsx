@@ -25,6 +25,11 @@ export type TriageDebriefProps = {
   scoreContribution: number;    // 0..12
   takeaways: string[];
   locationLabel?: string;       // drives close button text, e.g. "THE ER"
+  points?: number;              // arcade points (HIPAA-is-the-game pass)
+  bestStreak?: number;          // longest correct chain
+  isNewRecord?: boolean;        // beat the local personal best
+  /** Per-incident rule results, queue order — renders the "report card". */
+  ruleOutcomes?: { tag: string; short: string; ok: boolean }[];
   onDismiss: () => void;
 };
 
@@ -35,6 +40,10 @@ export function TriageDebrief({
   scoreContribution,
   takeaways,
   locationLabel,
+  points,
+  bestStreak,
+  isNewRecord,
+  ruleOutcomes,
   onDismiss,
 }: TriageDebriefProps) {
   const [visible, setVisible] = useState(false);
@@ -93,7 +102,7 @@ export function TriageDebrief({
         </div>
 
         {/* Body */}
-        <div className="p-5 space-y-4">
+        <div className="p-5 space-y-4 max-h-[480px] overflow-y-auto">
           {/* Triage accuracy bar */}
           <div>
             <p
@@ -117,21 +126,37 @@ export function TriageDebrief({
             </p>
           </div>
 
-          {/* Triage-specific stat: avg response time */}
-          <div className="flex items-center justify-between border border-gray-700 bg-[#1a1a2e]/60 px-3 py-2">
-            <p
-              className="text-gray-400"
-              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
-            >
-              AVG RESPONSE
-            </p>
-            <p
-              className="text-white"
-              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px' }}
-              data-testid="triage-debrief-avg-response"
-            >
-              {avgResponseMs > 0 ? `${avgResponseSec}s` : 'N/A'}
-            </p>
+          {/* Arcade stat row: PTS / BEST STREAK / AVG RESPONSE */}
+          <div className="grid grid-cols-3 gap-2">
+            <div className="border border-gray-700 bg-[#1a1a2e]/60 px-2 py-2 text-center">
+              <p className="text-gray-400 mb-1" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px' }}>
+                POINTS
+              </p>
+              <p className="text-[#FFD93D]" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }} data-testid="triage-debrief-points">
+                {(points ?? 0).toLocaleString()}
+              </p>
+              {isNewRecord && (
+                <p className="text-[#FFD93D] mt-1 animate-pulse" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '6px' }} data-testid="triage-debrief-record">
+                  ★ NEW RECORD
+                </p>
+              )}
+            </div>
+            <div className="border border-gray-700 bg-[#1a1a2e]/60 px-2 py-2 text-center">
+              <p className="text-gray-400 mb-1" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px' }}>
+                BEST STREAK
+              </p>
+              <p className="text-white" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }} data-testid="triage-debrief-streak">
+                {bestStreak ?? 0}
+              </p>
+            </div>
+            <div className="border border-gray-700 bg-[#1a1a2e]/60 px-2 py-2 text-center">
+              <p className="text-gray-400 mb-1" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px' }}>
+                AVG RESPONSE
+              </p>
+              <p className="text-white" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }} data-testid="triage-debrief-avg-response">
+                {avgResponseMs > 0 ? `${avgResponseSec}s` : 'N/A'}
+              </p>
+            </div>
           </div>
 
           {/* Score contribution */}
@@ -143,6 +168,44 @@ export function TriageDebrief({
             >
               + {scoreContribution} COMPLIANCE SCORE
             </p>
+          )}
+
+          {/* Rule report card — the point of the whole exercise: which rules
+              does the player now own, and which ones bit them. */}
+          {ruleOutcomes && ruleOutcomes.length > 0 && (
+            <div data-testid="triage-debrief-rules">
+              <p
+                className="text-gray-400 mb-2"
+                style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
+              >
+                THE RULES YOU CALLED
+              </p>
+              <div className="flex flex-wrap gap-1.5 mb-2">
+                {ruleOutcomes.filter((r) => r.ok).map((r, i) => (
+                  <span
+                    key={i}
+                    className="border border-[#7FE5C0]/60 bg-[#12291f] text-[#7FE5C0] px-2 py-1"
+                    style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px' }}
+                  >
+                    ✓ {r.tag}
+                  </span>
+                ))}
+              </div>
+              {ruleOutcomes.some((r) => !r.ok) && (
+                <ul className="space-y-2">
+                  {ruleOutcomes.filter((r) => !r.ok).map((r, i) => (
+                    <li key={i} className="border border-[#FF9D7F]/50 bg-[#2a1512] px-2 py-2">
+                      <p className="text-[#FF9D7F] mb-1" style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px' }}>
+                        ✗ {r.tag}
+                      </p>
+                      <p className="text-gray-300" style={{ fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '1.4' }}>
+                        {r.short}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
           )}
 
           {/* Takeaways */}
@@ -159,7 +222,7 @@ export function TriageDebrief({
                   <li
                     key={i}
                     className="text-gray-300 flex gap-2"
-                    style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.7' }}
+                    style={{ fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '1.45' }}
                   >
                     <span className="text-[#7FE5C0] flex-shrink-0">&bull;</span>
                     <span>{takeaway}</span>

@@ -53,6 +53,8 @@ import { getSorterDocumentSet } from '@/data/sorterData';
 import { getNPCColor } from '@/data/spriteAssetPaths';
 import { BreachTriageOverlay } from '@/components/breach-triage/BreachTriageOverlay';
 import { TriageDebrief } from '@/components/breach-triage/TriageDebrief';
+import { Phi18Codex } from '@/components/Phi18Codex';
+import { phi18Count, PHI18_TOTAL, phi18Complete } from '@/data/phi18';
 import { getTriageIncidentSet } from '@/data/triageData';
 import { computeDoorStates, type RoomWithDoors } from '@/lib/doorGraph';
 import { StandaloneTDView, type TDStandaloneResult } from '../components/breach-defense/StandaloneTDView';
@@ -215,6 +217,10 @@ export default function UnifiedGamePage() {
     totalCount?: number;         // sorter + triage: feeds accuracy bar
     avgResponseMs?: number;      // triage-only: feeds AVG RESPONSE stat in TriageDebrief
     kind?: 'triage';             // triage-only discriminator — sorter leaves this absent
+    points?: number;             // triage arcade points (HIPAA-is-the-game pass)
+    bestStreak?: number;         // triage best correct chain
+    isNewRecord?: boolean;       // triage: beat the stored personal best
+    ruleOutcomes?: { tag: string; short: string; ok: boolean }[]; // triage rule report card
   } | null>(null);
 
   // ── Encounter request modal state (NPC-driven trigger, 2026-05-08) ──
@@ -229,6 +235,11 @@ export default function UnifiedGamePage() {
     documentSetId: string;
     encounterType?: 'phi-sorter' | 'breach-triage';  // Phase 17: discriminates which overlay to launch
   } | null>(null);
+  // ── The Eighteen codex (HIPAA-is-the-game pass) ────────────────
+  const [showCodex, setShowCodex] = useState(false);
+  const [recentIdentifierKey, setRecentIdentifierKey] = useState<string | null>(null);
+  const [codexChipPulse, setCodexChipPulse] = useState(0);
+
   // Gate state per room
   const [resolvedGates, setResolvedGates] = useState<Set<string>>(new Set());
   const [unlockedNpcs, setUnlockedNpcs] = useState<Set<string>>(new Set());
@@ -1146,11 +1157,25 @@ export default function UnifiedGamePage() {
     scoreContribution: number;
     avgResponseMs: number;
     takeaways: [string, string];
+    points?: number;
+    bestStreak?: number;
+    ruleOutcomes?: { tag: string; short: string; ok: boolean }[];
   }) => {
     const incidentSet = getTriageIncidentSet(narrativeCardData?.triageConfig?.incidentSetId ?? '');
     const accuracy = result.totalCount > 0 ? result.correctCount / result.totalCount : 0;
     const passingAccuracy = incidentSet?.passingAccuracy ?? 0.7;
     const outcome: 'victory' | 'defeat' = accuracy >= passingAccuracy ? 'victory' : 'defeat';
+
+    // Local personal best for arcade points — replay incentive, never synced
+    let isNewRecord = false;
+    try {
+      const bestKey = `pq:triage:best:${result.encounterId}`;
+      const prevBest = parseInt(localStorage.getItem(bestKey) ?? '0', 10) || 0;
+      if ((result.points ?? 0) > prevBest) {
+        isNewRecord = prevBest > 0; // first run isn't a "record", it's a baseline
+        localStorage.setItem(bestKey, String(result.points ?? 0));
+      }
+    } catch { /* localStorage unavailable — skip records */ }
 
     setEncounterResult({
       encounterId: result.encounterId,
@@ -1162,6 +1187,10 @@ export default function UnifiedGamePage() {
       totalCount: result.totalCount,
       avgResponseMs: result.avgResponseMs,
       kind: 'triage',
+      points: result.points,
+      bestStreak: result.bestStreak,
+      isNewRecord,
+      ruleOutcomes: result.ruleOutcomes,
     });
     setEncounterPhase('debrief');
 
@@ -1219,6 +1248,45 @@ export default function UnifiedGamePage() {
       gameState.completeNPC(ENCOUNTER_NPC_BY_ID[result.encounterId]);
     }
   }, [narrativeCardData, gameState]);
+
+  // ── The Eighteen codex handlers (HIPAA-is-the-game pass) ──────
+  // An identifier was correctly caught for the first time (sorter / corkboard).
+  const handleIdentifierFound = useCallback((key: string) => {
+    const before = gameState.state.identifiersFound;
+    if (before.includes(key)) return;
+    gameState.collectIdentifier(key);
+    setRecentIdentifierKey(key);
+    setCodexChipPulse((n) => n + 1);
+    if (phi18Complete([...before, key])) {
+      // Completion payoff: compliance bonus + toast. The in-encounter banner
+      // carries the gold moment; this makes it count.
+      gameState.addScore(10);
+      notify('All 18 identifiers logged — Safe Harbor certified', { label: 'THE EIGHTEEN', type: 'success' });
+    }
+  }, [gameState, notify]);
+
+  const handleOpenCodex = useCallback(() => {
+    setShowCodex(true);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
+  }, []);
+
+  const handleCloseCodex = useCallback(() => {
+    setShowCodex(false);
+    setRecentIdentifierKey(null);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION);
+  }, []);
+
+  // [I] opens the codex during idle exploration (codex handles its own close)
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'i' && e.key !== 'I') return;
+      if (showCodex || pageMode !== 'exploration' || encounterPhase !== 'idle') return;
+      e.preventDefault();
+      handleOpenCodex();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [pageMode, encounterPhase, showCodex, handleOpenCodex]);
 
   // ── Sync completion state to running Phaser scene ─────────────
   useEffect(() => {
@@ -1603,6 +1671,38 @@ export default function UnifiedGamePage() {
           />
         )}
 
+        {/* The Eighteen codex chip — bottom-left during idle exploration */}
+        {encounterPhase === 'idle' && pageMode === 'exploration' && currentRoom && !showCodex && (
+          <button
+            onClick={handleOpenCodex}
+            className={`absolute bottom-2 left-2 z-30 border-2 bg-black/80 px-2.5 py-2 transition-colors hover:bg-black/95 ${
+              phi18Complete(gameState.state.identifiersFound)
+                ? 'border-[#FFD93D] text-[#FFD93D]'
+                : 'border-[#4FB3D9]/70 text-white'
+            }`}
+            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
+            data-testid="phi18-chip"
+            aria-label="Open The Eighteen codex"
+          >
+            <span
+              key={codexChipPulse}
+              className="inline-block animate-[sorter-score-pulse_0.4s_ease-out]"
+            >
+              📇 THE 18 · {phi18Count(gameState.state.identifiersFound)}/{PHI18_TOTAL}
+            </span>
+            <span className="text-white/40 ml-1.5">[I]</span>
+          </button>
+        )}
+
+        {/* The Eighteen codex overlay */}
+        {showCodex && (
+          <Phi18Codex
+            foundKeys={gameState.state.identifiersFound}
+            recentKey={recentIdentifierKey}
+            onClose={handleCloseCodex}
+          />
+        )}
+
         {/* Encounter overlays (Phase 13) */}
         {encounterPhase === 'narrative-card' && narrativeCardData && (
           narrativeCardData.type === 'phi-sorter' && narrativeCardData.sorterConfig
@@ -1638,6 +1738,8 @@ export default function UnifiedGamePage() {
           <PHISorterOverlay
             documentSetId={narrativeCardData.sorterConfig.documentSetId}
             encounterId={narrativeCardData.encounterId}
+            identifiersFound={gameState.state.identifiersFound}
+            onIdentifierFound={handleIdentifierFound}
             onComplete={handleSorterComplete}
             onAbort={handleSorterAbort}
           />
@@ -1678,6 +1780,10 @@ export default function UnifiedGamePage() {
               avgResponseMs={encounterResult.avgResponseMs ?? 0}
               takeaways={encounterResult.takeaways as [string, string] ?? ['', '']}
               locationLabel={SORTER_LOCATION_LABELS[encounterResult.encounterId]}
+              points={encounterResult.points}
+              bestStreak={encounterResult.bestStreak}
+              isNewRecord={encounterResult.isNewRecord}
+              ruleOutcomes={encounterResult.ruleOutcomes}
               onDismiss={handleDismissDebrief}
             />
           ) : encounterResult.takeaways && encounterResult.takeaways.length > 0 ? (

@@ -1,16 +1,19 @@
 /**
  * TriageIncidentCard — Single incident slot card.
  *
- * Displays an incident ticket with:
- *   - Slot number badge
- *   - Headline in alarm-amber, detail text below
+ * Redesigned for at-a-glance decisions ("HIPAA is the game" pass):
+ *   - Headline in alarm-amber
+ *   - FACT CHIPS: 3 scannable decision facts (icon + ≤4 words) — the primary read surface.
+ *     The player decides off the chips; the flavor line below is texture, not homework.
+ *   - Flavor detail in body font (readable at speed, deliberately secondary)
  *   - Timer bar across the bottom (green > 50%, yellow 25-50%, red + pulse < 25%)
  *   - Gold focus ring when keyboard-focused
  *   - [R] REPORTABLE and [N] NOT REPORTABLE action buttons
- *   - Feedback overlay: correct (green pulse), wrong (red shake), expired ("TOO SLOW" stamp)
+ *   - Feedback overlays: correct (green pulse + ✓ stamp), wrong (red shake),
+ *     expired ("TOO SLOW" stamp)
  *
- * Visual language: Press Start 2P font, 4px borders, dark panel backgrounds (#1a1a2e / #2a2a3e),
- * matching the sorter family (CLAUDE.md Nintendo Test — every action needs a response).
+ * Visual language: Press Start 2P for chrome/chips, var(--font-body) for prose,
+ * 4px borders, dark panel backgrounds (#1a1a2e / #2a2a3e) — sorter family.
  */
 
 import type { TriageIncident } from '@/data/triageData';
@@ -46,7 +49,8 @@ export function TriageIncidentCard({
       ? 'bg-[#fbbf24]'
       : 'bg-[#ef4444]';
 
-  const timerPulse = pct <= 0.25 ? 'animate-pulse' : '';
+  const isCritical = pct <= 0.25 && feedback === null;
+  const timerPulse = isCritical ? 'animate-pulse' : '';
 
   // Feedback overlay classes
   const feedbackOverlay =
@@ -56,12 +60,14 @@ export function TriageIncidentCard({
       ? 'animate-[shake-red_0.5s_ease-out]'
       : null;
 
-  // Card border: gold when focused, red when expired, default dark-blue
+  // Card border: gold when focused, red when expired or critical-time, default dark-blue
   const borderClass =
     focused
       ? 'border-[#fbbf24] ring-4 ring-yellow-400'
       : feedback === 'expired'
       ? 'border-[#ef4444]'
+      : isCritical
+      ? 'border-[#ef4444]/80'
       : 'border-[#3a3a5e]';
 
   // Card background dims slightly on expiry
@@ -72,9 +78,9 @@ export function TriageIncidentCard({
       className={`relative flex flex-col border-4 ${borderClass} ${bgClass} ${feedbackOverlay ?? ''} cursor-pointer select-none transition-colors duration-150`}
       onClick={onSelect}
       data-testid={`triage-card-slot-${slotNumber}`}
-      style={{ minHeight: '180px' }}
+      style={{ minHeight: '200px' }}
     >
-      {/* Slot badge + difficulty indicator */}
+      {/* Slot badge + difficulty pips */}
       <div className="flex items-center justify-between px-3 pt-2 pb-1">
         <span
           className="text-[#fbbf24] bg-[#3a2a00] border-2 border-[#fbbf24] px-2 py-0.5"
@@ -83,29 +89,45 @@ export function TriageIncidentCard({
           [{slotNumber}]
         </span>
         <span
-          className="text-white/40"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px' }}
+          className="text-[#fbbf24]/60"
+          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', letterSpacing: '2px' }}
+          title={`Difficulty ${incident.difficulty} of 3`}
         >
-          LVL {incident.difficulty}
+          {'◆'.repeat(incident.difficulty)}
+          <span className="text-white/15">{'◆'.repeat(3 - incident.difficulty)}</span>
         </span>
       </div>
 
       {/* Incident headline — alarm amber */}
-      <div className="px-3 pb-1">
+      <div className="px-3 pb-2">
         <p
           className="text-[#fbbf24] leading-snug"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.6' }}
+          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', lineHeight: '1.5' }}
           data-testid={`card-headline-${slotNumber}`}
         >
           {incident.headline}
         </p>
       </div>
 
-      {/* Incident detail — smaller white text */}
+      {/* FACT CHIPS — the decision surface. Read these, make the call. */}
+      <div className="px-3 pb-2 flex flex-wrap gap-1.5" data-testid={`card-facts-${slotNumber}`}>
+        {incident.facts.map((f, i) => (
+          <span
+            key={i}
+            className="inline-flex items-center gap-1 bg-[#0d0d20] border-2 border-[#4a4a7e] px-1.5 py-1 text-white"
+            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1' }}
+          >
+            <span style={{ fontSize: '10px', lineHeight: '1' }}>{f.icon}</span>
+            {f.text}
+          </span>
+        ))}
+      </div>
+
+      {/* Incident detail — flavor line, readable body font, deliberately secondary */}
       <div className="px-3 pb-2 flex-1">
         <p
-          className="text-white/80 leading-relaxed"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', lineHeight: '1.7' }}
+          className="text-white/65"
+          style={{ fontFamily: 'var(--font-body)', fontSize: '13px', lineHeight: '1.35' }}
         >
           {incident.detail}
         </p>
@@ -155,9 +177,17 @@ export function TriageIncidentCard({
         </div>
       )}
 
-      {/* Correct flash overlay */}
+      {/* Correct stamp overlay — the rule ticker (overlay-level) carries the words;
+          the card gets the thunk: green flash + rule-tag stamp */}
       {feedback === 'correct' && (
-        <div className="absolute inset-0 bg-[#22c55e]/20 pointer-events-none animate-[flash-green_0.4s_ease-out]" />
+        <div className="absolute inset-0 flex items-center justify-center bg-[#22c55e]/15 pointer-events-none animate-[flash-green_0.4s_ease-out]">
+          <span
+            className="text-[#22c55e] border-4 border-[#22c55e] px-3 py-1 rotate-[-6deg] bg-black/70"
+            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', letterSpacing: '1px' }}
+          >
+            ✓ {incident.rule.tag}
+          </span>
+        </div>
       )}
     </div>
   );

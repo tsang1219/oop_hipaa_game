@@ -29,6 +29,8 @@ export interface UnifiedGameState {
   completedZones: string[];
   collectedItems: string[];
   collectedStories: string[];
+  /** The Eighteen codex — Safe Harbor identifier keys found so far (phi18.ts). */
+  identifiersFound: string[];
   privacyScore: number;
   currentRoomId: string | null;
   currentAct: 1 | 2 | 3;
@@ -130,6 +132,7 @@ export function useGameState() {
       completedZones: s.completedZones,
       collectedItems: s.collectedItems,
       collectedStories: s.collectedStories,
+      identifiersFound: extended.identifiersFound ?? [],
       privacyScore: s.privacyScore,
       currentRoomId: extended.currentRoomId ?? null,
       currentAct: extended.currentAct ?? 1,
@@ -168,6 +171,7 @@ export function useGameState() {
       decisions: state.decisions,
       encounterResults: state.encounterResults,
       unifiedScore: state.unifiedScore,
+      identifiersFound: state.identifiersFound,
     };
     writeSave(merged as SaveDataV2);
   }, [state]);
@@ -206,6 +210,14 @@ export function useGameState() {
     setState(prev => {
       if (prev.collectedStories.includes(storyId)) return prev;
       return { ...prev, collectedStories: [...prev.collectedStories, storyId] };
+    });
+  }, []);
+
+  /** Log a Safe Harbor identifier to The Eighteen codex (idempotent). */
+  const collectIdentifier = useCallback((key: string) => {
+    setState(prev => {
+      if (prev.identifiersFound.includes(key)) return prev;
+      return { ...prev, identifiersFound: [...prev.identifiersFound, key] };
     });
   }, []);
 
@@ -315,6 +327,7 @@ export function useGameState() {
     completeZone,
     collectItem,
     collectStory,
+    collectIdentifier,
     addScore,
     setCurrentRoom,
     setActFlag,

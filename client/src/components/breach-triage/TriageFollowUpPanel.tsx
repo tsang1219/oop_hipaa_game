@@ -59,14 +59,26 @@ export function TriageFollowUpPanel({ incident, step, wrongPick, onPick }: Triag
           </p>
         </div>
 
-        {/* Incident headline for context */}
+        {/* Incident headline + fact chips for context — the decision facts stay visible */}
         <div className="px-4 pt-3 pb-2">
           <p
-            className="text-[#fbbf24]/80"
+            className="text-[#fbbf24]/80 mb-2"
             style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px' }}
           >
             RE: {incident.headline}
           </p>
+          <div className="flex flex-wrap gap-1.5">
+            {incident.facts.map((f, i) => (
+              <span
+                key={i}
+                className="inline-flex items-center gap-1 bg-[#0d0d20] border border-[#4a4a7e] px-1.5 py-0.5 text-white/80"
+                style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', lineHeight: '1' }}
+              >
+                <span style={{ fontSize: '9px', lineHeight: '1' }}>{f.icon}</span>
+                {f.text}
+              </span>
+            ))}
+          </div>
         </div>
 
         {/* Prompt */}
@@ -109,7 +121,7 @@ export function TriageFollowUpPanel({ incident, step, wrongPick, onPick }: Triag
           })}
         </div>
 
-        {/* Wrong-pick explanation — §164.404-410 lesson moment */}
+        {/* Wrong-pick explanation — §164.404-410 lesson moment (readable prose) */}
         {wrongPick && (
           <div
             className="mx-4 mb-4 border-2 border-[#fbbf24] bg-[#2a1a00] p-3"
@@ -122,8 +134,8 @@ export function TriageFollowUpPanel({ incident, step, wrongPick, onPick }: Triag
               NOT QUITE
             </p>
             <p
-              className="text-white/90"
-              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', lineHeight: '1.8' }}
+              className="text-white/95"
+              style={{ fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '1.4', letterSpacing: '0.01em' }}
             >
               {wrongPick.explanation}
             </p>

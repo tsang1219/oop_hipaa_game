@@ -12,8 +12,13 @@
  * Phoenix-Wright-style reveal. Humor tone: deadpan Daria/Veep, never surreal, never punching down.
  *
  * Recurring patients (documented for content consistency):
- *   - Mrs. Henderson: s1-patient-name (intake form, Reception) + s3-fax-number (fax release, Records)
- *   - Mr. Okonkwo: s2-diagnosis-with-mrn (lab manifest) + s3-account-number (billing records)
+ *   - Mrs. Henderson: s1-patient-name (intake form, Reception) + s3-zip5/s3-fax-number (Records)
+ *   - Mr. Okonkwo: s2-biometric + s2-diagnosis-with-mrn + s2-portal-url (MRN #4821 token) + s3-account-number
+ *
+ * The Eighteen codex (HIPAA-is-the-game pass): identifierType is the grant channel for
+ * the collection mechanic (phi18.ts). Sorter sets cover 17 of 18; #17 (full-face photos)
+ * is granted by the break-room corkboard. Coverage: S1 → 1,2,3,4,6,7 · S2 → 8,9,12,13,14,15,16
+ * · S3 → 2,3,5,10,11,18.
  *
  * Per CLAUDE.md: All game data lives in TypeScript constants files — not hardcoded in scenes.
  */
@@ -65,7 +70,10 @@ export type SorterItem = {
   id: string;
   label: string;               // BACKWARD-COMPAT — preserved for grep/search; UI reads from `chart` now
   category: 'phi' | 'not_phi';
-  identifierType?: SorterIdentifierType; // Required when category === 'phi'
+  identifierType?: SorterIdentifierType; // Set when a phi item maps to one of the 18 Safe Harbor
+                               // identifiers — this is The Eighteen codex grant channel (phi18.ts).
+                               // OMIT for PHI that's identifiable without being on the 18 list
+                               // (e.g., employer details) — those teach that PHI > the checklist.
   explanation: string;         // Shown on incorrect drop — explains the rule
   // PHASE 22 ADDITIONS:
   chart: SorterChart;          // REQUIRED on every item
@@ -220,12 +228,15 @@ const SET_1: SorterDocumentSet = {
       },
     },
     {
+      // Deliberately NO identifierType: employer is NOT one of the 18 — this item
+      // teaches that the Safe Harbor list is the de-ID checklist, not the PHI definition.
       id: 's1-employer-name',
       label: 'Employer: Riverside Unified School District',
       category: 'phi',
-      identifierType: 'other',
-      explanation: 'Employer name and address are one of the 18 Safe Harbor identifiers (#11) ' +
-        'under 45 CFR §164.514(b)(2). Employer information on a patient record links to their health-care context — PHI.',
+      icon: '🏢',
+      explanation: 'Sneaky one: employer isn\'t on the Safe Harbor 18 at all. But PHI is broader than the checklist — ' +
+        'any individually identifiable information on a patient record counts, and an employer narrows one patient down fast. ' +
+        'Redact it. (45 CFR §160.103 — the definition, not the de-ID list)',
       chart: {
         patientName: 'Park, Ji-Woo',
         age: 33,
@@ -443,6 +454,24 @@ const SET_2: SorterDocumentSet = {
       },
     },
     {
+      // Recurring patient: Okonkwo's MRN #4821 (s2-diagnosis-with-mrn) is the token in this URL
+      id: 's2-portal-url',
+      label: 'Portal URL: results.mercygeneral.org/r/4821-OKO',
+      category: 'phi',
+      identifierType: 'url',
+      explanation: 'Web URLs are identifier #14 under §164.514(b)(2) when they can be linked to an individual. ' +
+        'A results link carrying a patient record token (4821 — that\'s Mr. Okonkwo\'s MRN) opens one person\'s chart. ' +
+        'The hospital homepage is fine; this link is PHI.',
+      chart: {
+        patientName: 'Okonkwo, Chidi',
+        age: 41,
+        miscField: {
+          label: 'Manifest note',
+          value: 'Results link pasted in "for convenience." Convenience noted. Redact it anyway.',
+        },
+      },
+    },
+    {
       id: 's2-lab-test-type',
       label: 'Lab Test Type: Complete Blood Count',
       category: 'not_phi',
@@ -512,7 +541,7 @@ const SET_2: SorterDocumentSet = {
     },
   ],
   passingAccuracy: 0.7,
-  shiftSeconds: 82,
+  shiftSeconds: 88, // 13 items post-Eighteen additions — was 82 at 12 items
   takeaways: [
     'Device serials, IP addresses, and biometric identifiers are all PHI under §164.514(b)(2) — ' +
       'even when a patient\'s name doesn\'t appear on the document.',
@@ -576,9 +605,9 @@ const SET_3: SorterDocumentSet = {
       id: 's3-age-90-plus',
       label: 'Age: 91 years',
       category: 'phi',
-      identifierType: 'other',
-      explanation: 'Ages 90 and above are explicitly listed as PHI under §164.514(b)(2) because ' +
-        'the small population of nonagenarians and centenarians makes individuals re-identifiable. ' +
+      identifierType: 'date',
+      explanation: 'Ages 90 and above are explicitly PHI under §164.514(b)(2) — they live inside the dates element (#3) ' +
+        'because so few people reach 90+ that age alone re-identifies them. ' +
         'Ages below 90 may be retained; ages 90+ must be grouped as "90 or older."',
       chart: {
         patientName: 'Goldberg, Bernard',
@@ -645,6 +674,24 @@ const SET_3: SorterDocumentSet = {
       },
     },
     {
+      id: 's3-cdl-number',
+      label: 'CDL #: D8802-44519 (DOT physical on file)',
+      category: 'phi',
+      identifierType: 'license',
+      explanation: 'Certificate and license numbers are identifier #11 under §164.514(b)(2). ' +
+        'A commercial driver\'s license number on a DOT physical ties the exam record to exactly one driver — PHI.',
+      chart: {
+        patientName: 'Delgado, Ruben',
+        age: 54,
+        role: 'Long-haul driver',
+        doctorNote: 'DOT physical: passed. Asked for a note saying he passed "with distinction." There is no such note.',
+        miscField: {
+          label: 'License field',
+          value: 'CDL D8802-44519 — copied from the card, per DOT exam protocol',
+        },
+      },
+    },
+    {
       id: 's3-year-only',
       label: 'Year Only: 2024',
       category: 'not_phi',
@@ -672,6 +719,24 @@ const SET_3: SorterDocumentSet = {
           value: '@webmail.com — domain-only fragment from anonymization process; username removed',
         },
         doctorNote: 'The anonymization script stripped usernames but left domains. Legal confirmed: domains alone are fine.',
+      },
+    },
+    {
+      id: 's3-study-code',
+      label: 'Study Code: PX-077 (roster crosswalk exists)',
+      category: 'phi',
+      identifierType: 'other',
+      explanation: 'Identifier #18 is the catch-all: any other unique identifying number, characteristic, or code. ' +
+        'A study code is only safe once it can\'t be mapped back to a person — PX-077 still crosswalks to the ' +
+        'participant roster on the shared drive, so it re-identifies. (45 CFR §164.514(b)(2), §164.514(c))',
+      chart: {
+        patientName: 'Vasquez, Lena',
+        age: 36,
+        role: 'Study participant #077',
+        miscField: {
+          label: 'Research file',
+          value: 'PX-077 — the de-ID plan says "destroy crosswalk." The crosswalk has not been destroyed.',
+        },
       },
     },
     {
@@ -730,7 +795,7 @@ const SET_3: SorterDocumentSet = {
     },
   ],
   passingAccuracy: 0.7,
-  shiftSeconds: 68,
+  shiftSeconds: 80, // 14 items post-Eighteen additions — was 68 at 12 items
   takeaways: [
     'Safe Harbor lets you keep the year and 3-digit ZIP prefixes (in populous areas). ' +
       'Full dates, full ZIP codes, and ages 90 and above must be removed.',

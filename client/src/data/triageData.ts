@@ -34,10 +34,27 @@ export type TriageFollowUp = {
   timelineOptions: TriageOption[]; // exactly 3, one correct
 };
 
+/** At-a-glance decision fact — the card renders these as scannable chips so the
+ *  reportable-or-not call is readable in ~2 seconds, not a paragraph parse. */
+export type TriageFact = {
+  icon: string;   // emoji glyph
+  text: string;   // ≤ 4 words, ALL CAPS — e.g. "1,200 RECORDS"
+};
+
+/** The named rule an incident tests. Stamped on the card on every resolution
+ *  (correct AND wrong) and listed in the debrief — the player leaves knowing
+ *  which §164.4xx rule decided each call. */
+export type TriageRule = {
+  tag: string;    // short rule name, e.g. "ENCRYPTION SAFE HARBOR"
+  short: string;  // one plain sentence of the rule itself
+};
+
 export type TriageIncident = {
   id: string;
   headline: string;       // terse incident-ticket title, e.g. "LAPTOP MISSING — ONCOLOGY"
   detail: string;         // 1-2 sentences, incident-report deadpan with personality
+  facts: TriageFact[];    // 3 decision-relevant chips, rendered above the detail
+  rule: TriageRule;       // the rule this incident tests
   reportable: boolean;
   classificationExplanation: string; // shown on wrong classification; ends with CFR cite
   followUp?: TriageFollowUp;         // REQUIRED iff reportable === true
@@ -50,6 +67,10 @@ export type TriageIncidentSet = {
   npcName: string;                     // 'Priya'
   npcRole: string;                     // 'Privacy Officer'
   contextCard: { title: string; body: string };
+  /** Priya's cheat sheet — the actual §164.402 rule structure, pinned on screen
+   *  during play (Papers Please rulebook move). Line 1: the presumption + its
+   *  exceptions. Line 2: what reporting looks like once something IS a breach. */
+  ruleStrip: [string, string];
   incidents: TriageIncident[];
   passingAccuracy: number;             // 0.7
   takeaways: [string, string];
@@ -64,6 +85,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'MISDIRECTED FAX — DISCHARGE SUMMARY',
     detail: 'A patient discharge summary was faxed to Gino\'s Pizzeria instead of the patient\'s PCP. ' +
       'Gino called the front desk, confused and mildly concerned.',
+    facts: [
+      { icon: '📠', text: 'SENT TO PIZZERIA' },
+      { icon: '📄', text: 'DISCHARGE SUMMARY' },
+      { icon: '👤', text: '1 PATIENT' },
+    ],
+    rule: {
+      tag: 'PRESUMED BREACH',
+      short: 'PHI to the wrong recipient is presumed a breach — intent doesn\'t matter.',
+    },
     reportable: true,
     classificationExplanation: 'This is an impermissible disclosure of unsecured PHI. ' +
       'It\'s presumed a breach unless a documented risk assessment shows low probability of compromise — ' +
@@ -127,6 +157,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'LAPTOP STOLEN — STAFF PARKING LOT',
     detail: 'An unencrypted laptop containing 1,200 patient records was stolen from a staff member\'s car. ' +
       'The car was locked. The laptop was not.',
+    facts: [
+      { icon: '🔓', text: 'NOT ENCRYPTED' },
+      { icon: '👥', text: '1,200 RECORDS' },
+      { icon: '🚗', text: 'STOLEN FROM CAR' },
+    ],
+    rule: {
+      tag: 'UNSECURED = UNPROTECTED',
+      short: 'No encryption means unsecured PHI — no safe harbor, and 1,200 crosses the 500 line.',
+    },
     reportable: true,
     classificationExplanation: 'Unsecured PHI (unencrypted) that was impermissibly disclosed is a reportable breach. ' +
       'The lack of encryption means the safe harbor does not apply. ' +
@@ -194,6 +233,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'LAPTOP LEFT IN RIDESHARE — ENCRYPTED',
     detail: 'A laptop was left in a rideshare. Full-disk AES-256 encryption, encryption key not compromised, ' +
       'device wiped remotely within two hours.',
+    facts: [
+      { icon: '🔐', text: 'AES-256 ENCRYPTED' },
+      { icon: '🔑', text: 'KEY NOT COMPROMISED' },
+      { icon: '⏱️', text: 'WIPED IN 2 HRS' },
+    ],
+    rule: {
+      tag: 'ENCRYPTION SAFE HARBOR',
+      short: 'Encrypted PHI with an uncompromised key isn\'t "unsecured" — no notification.',
+    },
     reportable: false,
     classificationExplanation: 'The encryption safe harbor applies. Encrypted PHI is not "unsecured PHI" under §164.402, ' +
       'so no breach notification is required — provided the encryption key was not compromised. ' +
@@ -207,6 +255,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'UNAUTHORIZED ACCESS — HR REP, BEHAVIORAL HEALTH RECORDS',
     detail: 'An HR rep accessed a coworker\'s behavioral-health visit notes the week before a promotion decision. ' +
       'No treatment, payment, or operations justification. The HR rep says they were "just curious."',
+    facts: [
+      { icon: '👀', text: '"JUST CURIOUS"' },
+      { icon: '🧠', text: 'BEHAVIORAL HEALTH NOTES' },
+      { icon: '🏥', text: 'STAYED IN-HOUSE' },
+    ],
+    rule: {
+      tag: 'NO SNOOPING EXCEPTION',
+      short: 'Intentional access with no work reason is a breach — even inside the building.',
+    },
     reportable: true,
     classificationExplanation: 'Intentional unauthorized access with no job-related purpose is a breach, not an exception. ' +
       '"Staying in-house" doesn\'t protect it — the affected employee-patient must be notified. ' +
@@ -271,6 +328,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'WRONG CHART OPENED — FLOAT NURSE, SELF-REPORTED',
     detail: 'A float nurse opened the wrong J. Ramirez chart, realized within seconds, closed it, and self-reported immediately. ' +
       'No further use or disclosure. No job-related need for the record was violated — it was a genuine mix-up.',
+    facts: [
+      { icon: '😳', text: 'HONEST MIX-UP' },
+      { icon: '🙋', text: 'SELF-REPORTED FAST' },
+      { icon: '🚫', text: 'NO FURTHER USE' },
+    ],
+    rule: {
+      tag: 'GOOD-FAITH EXCEPTION',
+      short: 'An accidental glance by staff, no re-use, promptly reported — not a breach.',
+    },
     reportable: false,
     classificationExplanation: 'This falls under the good-faith exception at §164.402(1)(i): unintentional acquisition ' +
       'by a workforce member acting within authority, with no further use or disclosure. ' +
@@ -284,6 +350,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'BUSINESS ASSOCIATE BREACH — 3,400 RECORDS EXFILTRATED',
     detail: 'The billing vendor (a business associate) reports that attackers exfiltrated 3,400 patient records ' +
       'three weeks ago. The vendor "sat on it" while investigating. Now they\'re telling us.',
+    facts: [
+      { icon: '🏢', text: 'VENDOR (BA) BREACH' },
+      { icon: '👥', text: '3,400 EXFILTRATED' },
+      { icon: '🗓️', text: 'TOLD US 3 WKS LATE' },
+    ],
+    rule: {
+      tag: 'BA CLOCK RULE',
+      short: 'A vendor breach is your breach — and the 60-day clock started at THEIR discovery.',
+    },
     reportable: true,
     classificationExplanation: 'The BA must notify the covered entity without unreasonable delay and no later than 60 days from the BA\'s discovery (§164.410). ' +
       'The covered entity then owns individual, OCR, and media notification — 3,400 records crosses the 500 threshold. (45 CFR §164.404, §164.406, §164.408, §164.410)',
@@ -348,6 +423,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'UNAUTHORIZED EXPORT — REGISTRATION CLERK, PATIENT CONTACT LIST',
     detail: 'A registration clerk exported a patient contact list and used it to advertise her personal wellness business. ' +
       'She says the email was "very tasteful." The affected patients disagree.',
+    facts: [
+      { icon: '📤', text: 'EXPORTED PATIENT LIST' },
+      { icon: '💸', text: 'HER SIDE BUSINESS' },
+      { icon: '🙅', text: 'NO AUTHORIZATION' },
+    ],
+    rule: {
+      tag: 'IMPERMISSIBLE USE',
+      short: 'Using PHI for personal gain is a breach — "harmless" and "tasteful" don\'t enter into it.',
+    },
     reportable: true,
     classificationExplanation: 'An impermissible use of PHI for personal financial gain is a breach. ' +
       '"Tasteful" marketing is still unauthorized disclosure. Affected patients must be notified; ' +
@@ -411,6 +495,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'HISTORICAL RECORDS RELEASED — PATIENT DECEASED 1962',
     detail: 'A historical society requested and received medical records for a patient who died in 1962. ' +
       'The records were released without a valid authorization form on file.',
+    facts: [
+      { icon: '🪦', text: 'DIED 1962' },
+      { icon: '📜', text: '60+ YEARS DECEASED' },
+      { icon: '❔', text: 'NO AUTH ON FILE' },
+    ],
+    rule: {
+      tag: '50-YEAR LIMIT',
+      short: 'HIPAA protection ends 50 years after death — these records aren\'t PHI anymore.',
+    },
     reportable: false,
     classificationExplanation: 'HIPAA PHI protections apply for 50 years after an individual\'s death (§164.502(f)). ' +
       'A patient who died in 1962 is more than 60 years deceased — these records are no longer PHI under HIPAA, ' +
@@ -424,6 +517,15 @@ const INCIDENTS: TriageIncident[] = [
     headline: 'RANSOMWARE — FILE SERVER ENCRYPTED, 2,800 RECORDS AT RISK',
     detail: 'Ransomware encrypted the file server holding unsecured PHI for 2,800 patients. ' +
       'No exfiltration proof either way — attackers left no calling card.',
+    facts: [
+      { icon: '🦠', text: 'RANSOMWARE HIT' },
+      { icon: '👥', text: '2,800 RECORDS' },
+      { icon: '🕵️', text: 'NO EXFIL PROOF' },
+    ],
+    rule: {
+      tag: 'RANSOMWARE PRESUMPTION',
+      short: 'Ransomware on unsecured PHI IS a breach until you prove otherwise — not the reverse.',
+    },
     reportable: true,
     classificationExplanation: 'Per OCR guidance, ransomware encryption of unsecured PHI is PRESUMED a breach ' +
       'unless a documented risk assessment demonstrates low probability of compromise. ' +
@@ -496,10 +598,14 @@ const BREACH_TRIAGE_SET_1: TriageIncidentSet = {
   contextCard: {
     title: 'Priya\'s Triage Queue',
     body: 'Priya slides a tablet across the counter without looking up. ' +
-      '"Third queue today. I need someone to classify these as reportable breaches or not — ' +
-      'and for the reportable ones, who we notify and when. HIPAA is very specific. Be more specific." ' +
+      '"Third queue today. Reportable breach or not — that\'s the call. For the reportable ones: who we notify, and by when. ' +
+      'I taped the cheat sheet to the top of the screen. The exceptions ARE the game. Fast and right — in that order. No wait. Reverse that." ' +
       'She goes back to typing. Fast.',
   },
+  ruleStrip: [
+    'PRESUMED BREACH — unless 🔐 ENCRYPTED (key safe) · 🤝 GOOD-FAITH slip, no re-use · 🪦 50+ YRS DECEASED',
+    'IF REPORTABLE: notify patients ≤60 DAYS · 500+ records → + MEDIA + OCR NOW (under 500: OCR annual log)',
+  ],
   incidents: INCIDENTS,
   passingAccuracy: 0.7,
   takeaways: [
