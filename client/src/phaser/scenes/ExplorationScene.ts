@@ -2131,30 +2131,34 @@ export class ExplorationScene extends Phaser.Scene {
    *  until they walked to another room). */
   private clearDialogueDim = (): void => {
     if (!this.dialogueDimOverlay) return;
+    const overlay = this.dialogueDimOverlay;
+    this.dialogueDimOverlay = undefined;
+    // If the scene is momentarily inactive, a tween won't run — destroy outright.
+    if (!this.scene.isActive()) { overlay.destroy(); return; }
     this.tweens.add({
-      targets: this.dialogueDimOverlay,
+      targets: overlay,
       fillAlpha: 0,
       duration: 300,
       ease: 'Sine.easeOut',
-      onComplete: () => {
-        this.dialogueDimOverlay?.destroy();
-        this.dialogueDimOverlay = undefined;
-      },
+      onComplete: () => overlay.destroy(),
     });
   };
 
   private onDialogueComplete = () => {
-    if (!this.scene.isActive()) return;
+    // Unpause + clear the dim UNCONDITIONALLY, before the isActive guard. These
+    // must land even if the scene is momentarily inactive — e.g. the intro modal
+    // dismissed while the scene is still finishing create(). The old early-return
+    // could swallow the unpause and leave the player stuck-paused until a manual
+    // refresh (the "can't move on New Game" bug).
     this.paused = false;
+    this.clearDialogueDim();
+    if (!this.scene.isActive()) return;
     this.lastActivityAt = this.time.now; // Restart idle-hint grace after dialogue closes
 
     // Zoom back from boss encounter
     if (this.cameras.main.zoom !== 1) {
       this.cameras.main.zoomTo(1, 300, 'Sine.easeInOut');
     }
-
-    // Fade out dialogue dim overlay
-    this.clearDialogueDim();
 
     // Re-focus the canvas so keyboard input works after React overlays stole focus.
     // tabIndex ensures the canvas is focusable; double-attempt covers slow React unmounts.

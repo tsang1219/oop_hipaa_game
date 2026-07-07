@@ -1474,7 +1474,14 @@ export default function UnifiedGamePage() {
   const handleDismissIntroModal = useCallback(() => {
     setShowIntroModal(false);
     eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
-    eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+    // Unpause the scene, retried a couple times: on a fresh New Game the intro is
+    // dismissed while the Exploration scene may still be finishing create(), so a
+    // single emit can arrive before the scene registers its listener — leaving the
+    // player paused-and-stuck until a refresh. The retries land once it's ready.
+    const unpause = () => eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
+    unpause();
+    setTimeout(unpause, 250);
+    setTimeout(unpause, 750);
   }, []);
 
   const handleShowHelpModal = useCallback(() => {
