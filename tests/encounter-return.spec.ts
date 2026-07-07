@@ -19,8 +19,15 @@ test('Return to hospital after encounter victory does not crash', async ({ page 
   );
   await page.waitForTimeout(1000);
 
-  // ── Step 2: Trigger encounter ────────────────────────────────
-  await page.evaluate(() => window.__QA__!.commands.teleportTo(9, 6));
+  // ── Step 2: Trigger encounter via the Threat Console ─────────
+  // The hidden walk-on trigger was replaced by the defense console at (11,11);
+  // stand below it and press SPACE to raise the alert.
+  await page.evaluate(() => window.__QA__!.commands.teleportTo(11, 12));
+  await page.waitForFunction(
+    () => (window as any).__QA__?.nearbyInteractable?.id === 'defense_console',
+    { timeout: 5_000 },
+  );
+  await page.evaluate(() => window.__QA__!.commands.pressSpace());
   await page.waitForTimeout(1500);
 
   // Click DEFEND THE NETWORK

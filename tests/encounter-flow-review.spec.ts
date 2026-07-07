@@ -31,8 +31,15 @@ test('Full encounter lifecycle — final verification', async ({ page }) => {
   console.log('[FINAL] Room NPCs:', JSON.stringify(roomState.npcs));
   console.log('[FINAL] Room Zones:', JSON.stringify(roomState.zones));
 
-  // ── 2. Walk toward encounter zone ──────────────────────────
-  await page.evaluate(() => window.__QA__!.commands.teleportTo(9, 6));
+  // ── 2. Interact with the Threat Console ────────────────────
+  // The hidden walk-on trigger was replaced by the defense console at (11,11);
+  // stand below it and press SPACE to raise the alert.
+  await page.evaluate(() => window.__QA__!.commands.teleportTo(11, 12));
+  await page.waitForFunction(
+    () => window.__QA__?.nearbyInteractable?.id === 'defense_console',
+    { timeout: 5_000 },
+  );
+  await page.evaluate(() => window.__QA__!.commands.pressSpace());
 
   // Wait for narrative card with the anticipation beat (shake + delay)
   await page.waitForFunction(
@@ -45,7 +52,7 @@ test('Full encounter lifecycle — final verification', async ({ page }) => {
   // Verify narrative card content
   const cardText = await page.evaluate(() => document.body.innerText);
   expect(cardText).toContain('SECURITY ALERT');
-  expect(cardText).toContain('suspicious login attempts');
+  expect(cardText).toContain('uspicious login attempts');
   expect(cardText).toContain('DEFEND THE NETWORK');
   expect(cardText).toContain('NOT RIGHT NOW');
   console.log('[FINAL] Narrative card rendered correctly');

@@ -30,8 +30,10 @@ test('Encounter return-to-hospital flow', async ({ page }) => {
   await page.waitForTimeout(1000);
   console.log('Step 1: IT Office loaded');
 
-  // Trigger encounter
-  await page.evaluate(() => window.__QA__!.commands.teleportTo(9, 6));
+  // Trigger encounter via the Threat Console at (11,11)
+  await page.evaluate(() => window.__QA__!.commands.teleportTo(11, 12));
+  await page.waitForTimeout(800);
+  await page.evaluate(() => window.__QA__!.commands.pressSpace());
   await page.waitForTimeout(1500);
 
   // Click DEFEND THE NETWORK

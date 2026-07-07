@@ -78,10 +78,12 @@ test('IT Office encounter flow diagnostic', async ({ page }) => {
   await page.screenshot({ path: 'test-results/encounter-02-near-analyst.png' });
   console.log('Step 2: Teleported near Security Analyst');
 
-  // Move closer to trigger encounter zone (9,6)
+  // Interact with the Threat Console at (11,11) — the walk-on trigger is gone
   await page.evaluate(() => {
-    window.__QA__!.commands.teleportTo(9, 6);
+    window.__QA__!.commands.teleportTo(11, 12);
   });
+  await page.waitForTimeout(800);
+  await page.evaluate(() => window.__QA__!.commands.pressSpace());
   await page.waitForTimeout(1500);
 
   await page.screenshot({ path: 'test-results/encounter-03-trigger-zone.png' });
