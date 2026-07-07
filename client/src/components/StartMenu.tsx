@@ -13,6 +13,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
 import { PixelComputerLogo } from './PixelComputerLogo';
+import { SPONSOR_CONFIG } from '../data/sponsorConfig';
 
 export interface StartMenuProps {
   onDemo: () => void;
@@ -409,6 +410,12 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
         </p>
         <p className="text-[7px] text-gray-500 tracking-[0.3em]">
           BY ANDREW TSANG &bull; A HEALTH IS OTHER PEOPLE GAME
+        </p>
+        <p
+          className="text-[7px] text-[#FFD23F]/70 tracking-[0.3em]"
+          data-testid="sponsor-presented-by"
+        >
+          PRESENTED BY {SPONSOR_CONFIG.name.toUpperCase()}
         </p>
       </div>
 

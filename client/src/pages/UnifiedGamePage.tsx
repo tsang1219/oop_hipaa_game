@@ -511,7 +511,10 @@ export default function UnifiedGamePage() {
         doorStates,
       });
 
-      if (showIntroModal) {
+      // Demo guard: showIntroModal is computed at mount — before startDemo()
+      // flips isDemoActive() — so a fresh browser entering DEMO would pause
+      // here for a TutorialModal that demo mode never renders (soft-lock).
+      if (showIntroModal && !isDemoActive()) {
         eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
       }
     };
@@ -660,7 +663,10 @@ export default function UnifiedGamePage() {
       }
 
       // Door navigation payload
-      const { targetRoomId, fromDoorId } = payload;
+      // targetRoomId is a let: demo mode reroutes door exits along the curated
+      // tour order (see the demo block below).
+      let { targetRoomId } = payload;
+      const { fromDoorId } = payload;
 
       // Check if current room is complete on exit
       if (currentRoomId) {
@@ -698,6 +704,19 @@ export default function UnifiedGamePage() {
         if (currentRoomId === 'records_room' && allDemoRoomsDone) {
           setPageMode('demo-complete');
           return; // skip REACT_LOAD_ROOM — capstone takes over
+        }
+        // Curated routing: the demo order (reception → er → break_room →
+        // records_room) is deliberately non-physical — on the real map, ER and
+        // Records sit behind the demo-locked lab / IT office, so walking the
+        // curated tour is impossible. Any door out of a demo room therefore
+        // leads to the next demo room still on the tour, not to the hallway
+        // the door nominally points at. (Incomplete rooms stay on the list, so
+        // skipping ahead circles back before the capstone can fire.)
+        const nextDemoRoom = DEMO_ROOM_ORDER.find(
+          id => id !== currentRoomId && !completedDemo.includes(id),
+        );
+        if (nextDemoRoom) {
+          targetRoomId = nextDemoRoom;
         }
       }
 
@@ -1485,6 +1504,9 @@ export default function UnifiedGamePage() {
   const handleCharacterConfirmed = useCallback(() => {
     if (postSelectIntent === 'demo') {
       startDemo();
+      // showIntroModal was initialized before the demo existed (mount time);
+      // clear it so nothing downstream pauses for the never-rendered modal.
+      setShowIntroModal(false);
     }
     setPostSelectIntent(null);
     setPageMode('exploration');

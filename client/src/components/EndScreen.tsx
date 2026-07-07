@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Trophy, XCircle } from 'lucide-react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
+import { SPONSOR_CONFIG } from '@/data/sponsorConfig';
 
 interface EndScreenProps {
   isWin: boolean;
@@ -161,8 +162,8 @@ export default function EndScreen({
 
             {isWin && (
               <p className="text-[8px] text-muted-foreground italic leading-relaxed">
-                "Remember: HIPAA isn't about memorizing rules. It's about making
-                privacy-first decisions every single day. Stay vigilant!"
+                "The audit's Monday morning. For the first time all year,
+                I'm going home on time."
                 <br />
                 — Chief Compliance Officer
               </p>
@@ -170,11 +171,29 @@ export default function EndScreen({
 
             {!isWin && (
               <p className="text-[8px] text-muted-foreground italic leading-relaxed">
-                "Every HIPAA violation you make in this game would be a career-ending
-                mistake in real life. Learn from these errors!"
+                "Rough shift. Shake it off and run it back —
+                the audit's still coming."
                 <br />
                 — Chief Compliance Officer
               </p>
+            )}
+
+            {isWin && (
+              <div className="pt-4 border-t-2 border-primary/20 space-y-2">
+                <p
+                  className="text-[9px] text-primary tracking-[0.3em]"
+                  data-testid="thanks-for-playing"
+                >
+                  THANKS FOR PLAYING
+                </p>
+                <p
+                  className="text-[7px] text-muted-foreground tracking-[0.2em]"
+                  data-testid="sponsor-credit"
+                >
+                  A HEALTH IS OTHER PEOPLE GAME &bull; PRESENTED BY{' '}
+                  {SPONSOR_CONFIG.name.toUpperCase()}
+                </p>
+              </div>
             )}
           </div>
         </div>

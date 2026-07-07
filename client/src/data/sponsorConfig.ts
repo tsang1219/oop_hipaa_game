@@ -1,13 +1,18 @@
 /**
- * sponsorConfig.ts — Pluggable sponsor identity for the v2.2 Sponsor Demo.
+ * sponsorConfig.ts — Pluggable sponsor identity.
  *
  * CERT-04: Editing this single file changes the sponsor identity (name, end-NPC
  * sprite, two end-of-demo dialogue lines, redemption code) with no source-code
- * changes elsewhere. Phase 21 populates these fields per-sponsor; Phase 18
- * establishes the shape and sensible placeholder defaults so consumers can
- * import and type-check today.
+ * changes elsewhere.
  *
- * Consumed by Phase 21's completion sequence (certificate + end NPC).
+ * Consumed by:
+ *   - CertificateOverlay (demo capstone: certificate + end-NPC handoff)
+ *   - StartMenu (footer "presented by" credit)
+ *   - EndScreen (full-game win: thanks-for-playing credit)
+ *
+ * Current identity: Out-of-Pocket. When a different sponsor signs, swap the
+ * four fields below — keep the dialogue lines in a character's voice (the end
+ * NPC is Riley from the front desk), never in ad copy.
  */
 
 export interface SponsorConfig {
@@ -25,11 +30,13 @@ export interface SponsorConfig {
 }
 
 export const SPONSOR_CONFIG: SponsorConfig = {
-  name: 'Sponsor TBD',
-  character_sprite: 'npc_staff_sheet',
+  name: 'Out-of-Pocket',
+  // Riley bookends the demo: first face you meet at the entrance, last face
+  // handing you the certificate.
+  character_sprite: 'npc_receptionist_sheet',
   two_dialogue_lines: [
-    'Nice work today.',
-    'Tell them I sent you.',
+    'Four rooms. Zero leaks. The break room is already talking about you — no names, obviously.',
+    "This one's from our friends at Out-of-Pocket. Don't spend it all in one waiting room.",
   ],
-  code: 'DEMO-CODE-PLACEHOLDER',
+  code: 'MINIMUM-NECESSARY',
 };
