@@ -70,7 +70,7 @@ export default function EndScreen({
               transform: showMessage ? 'translateY(0)' : 'translateY(20px)',
               transition: 'all 500ms ease-out'
             }}>
-              <p className="text-[10px] leading-relaxed text-foreground">
+              <p className="font-body text-[16px] leading-snug text-foreground">
                 You've honored the trust patients placed in this organization.
                 Every room cleared represents lives quietly protected—patients who
                 will never know your name, but whose trust you kept.
@@ -102,7 +102,7 @@ export default function EndScreen({
               transform: showMessage ? 'translateY(0)' : 'translateY(20px)',
               transition: 'all 500ms ease-out'
             }}>
-              <p className="text-[10px] leading-relaxed text-foreground">
+              <p className="font-body text-[16px] leading-snug text-foreground">
                 Community Trust has been destroyed. Patients are hiding symptoms,
                 skipping treatment, suffering alone. In the real world, this means
                 lives lost—not just regulatory fines. Time to rebuild that trust.
@@ -161,7 +161,7 @@ export default function EndScreen({
             </Button>
 
             {isWin && (
-              <p className="text-[8px] text-muted-foreground italic leading-relaxed">
+              <p className="font-body text-[14px] text-muted-foreground italic leading-snug">
                 "The audit's Monday morning. For the first time all year,
                 I'm going home on time."
                 <br />
@@ -170,7 +170,7 @@ export default function EndScreen({
             )}
 
             {!isWin && (
-              <p className="text-[8px] text-muted-foreground italic leading-relaxed">
+              <p className="font-body text-[14px] text-muted-foreground italic leading-snug">
                 "Rough shift. Shake it off and run it back —
                 the audit's still coming."
                 <br />

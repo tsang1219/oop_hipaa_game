@@ -42,8 +42,8 @@ export const NarrativeContextCard: React.FC<NarrativeContextCardProps> = ({
         {/* Body */}
         <div className="p-5 space-y-4">
           <p
-            className="text-white leading-relaxed"
-            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', lineHeight: '1.8' }}
+            className="text-white"
+            style={{ fontFamily: 'var(--font-body)', fontSize: '17px', lineHeight: '1.45' }}
           >
             {narrativeText}
           </p>

@@ -92,7 +92,7 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
           {!isVictory && (
             <p
               className="text-red-300"
-              style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.7' }}
+              style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.4' }}
             >
               The attackers got through this time. Walk back to the workstation
               cluster when you're ready to run the defense again.
@@ -107,12 +107,12 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
             >
               WHAT YOU LEARNED
             </p>
-            <ul className="space-y-3">
+            <ul className="space-y-2.5">
               {HIPAA_TAKEAWAYS.map((takeaway, i) => (
                 <li
                   key={i}
-                  className="text-gray-300 flex gap-2"
-                  style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.7' }}
+                  className="text-gray-200 flex gap-2"
+                  style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.4' }}
                 >
                   <span className="text-green-400 flex-shrink-0">&bull;</span>
                   <span>{takeaway}</span>

@@ -122,12 +122,12 @@ export function SorterDebrief({
               >
                 KEY LEARNINGS
               </p>
-              <ul className="space-y-3">
+              <ul className="space-y-2.5">
                 {takeaways.map((takeaway, i) => (
                   <li
                     key={i}
-                    className="text-gray-300 flex gap-2"
-                    style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.7' }}
+                    className="text-gray-200 flex gap-2"
+                    style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.4' }}
                   >
                     <span className="text-[#7FE5C0] flex-shrink-0">&bull;</span>
                     <span>{takeaway}</span>

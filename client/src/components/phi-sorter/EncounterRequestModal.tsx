@@ -87,11 +87,12 @@ export function EncounterRequestModal({
           )}
         </div>
 
-        {/* Request text */}
+        {/* Request text — NPC speech, so it reads in the dialogue body font
+            (multi-sentence asks were a wall at 9px Press Start). */}
         <div className="px-5 py-5">
           <p
             className="text-white"
-            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', lineHeight: '1.8' }}
+            style={{ fontFamily: 'var(--font-body)', fontSize: '17px', lineHeight: '1.45' }}
             data-testid="encounter-request-text"
           >
             {requestText}
