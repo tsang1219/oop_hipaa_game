@@ -49,8 +49,10 @@ export type SorterIdentifierType =
 /** Patient chart fields rendered in the sortable card. Humor lives in optional free-text fields. */
 export type SorterChart = {
   patientName?: string;         // "Henderson, Margaret" — deadpan, recurring-when-intentional.
-                                // OPTIONAL: clearly-institutional docs (supply orders, menus)
-                                // carry NO patient name — that's the whole point of a KEEP.
+                                // Rendered as INITIALS only (DeskDocument.toInitials): a full
+                                // name is Safe Harbor identifier #1, so it must never sit legibly
+                                // on a card whose correct answer is KEEP. Clearly-institutional
+                                // docs (supply orders, menus, aggregate reports) carry NO name.
   age?: number;                 // numeric; for Set 3 age-90+ edge case, store as 91/92
   role?: string;                // "Retired postal inspector" — humor surface
   emergencyContact?: string;    // "Mr. Whiskers (cat) — no phone, lives in same house" — humor surface
@@ -265,10 +267,11 @@ const SET_1: SorterDocumentSet = {
       id: 's1-hospital-address',
       label: 'Hospital Address: 800 Valley Blvd',
       category: 'not_phi',
+      icon: '🏥',
+      docKind: 'Facility Form',
       explanation: 'This is an organizational address — it identifies the hospital, not a patient. ' +
         'Institutional details without a patient identifier are not PHI under §164.514(b)(2).',
       chart: {
-        patientName: 'Reyes-Smith, Daniela',
         miscField: {
           label: 'Document field',
           value: 'Facility address — printed on all forms',
@@ -279,10 +282,11 @@ const SET_1: SorterDocumentSet = {
       id: 's1-room-temp',
       label: 'Room Temperature: 68°F',
       category: 'not_phi',
+      icon: '🌡️',
+      docKind: 'Facilities Log',
       explanation: 'Environmental measurements have no connection to a specific patient\'s ' +
         'health, condition, or payment. No identifier + no health link = not PHI.',
       chart: {
-        patientName: 'Hashimoto, Kenji',
         miscField: {
           label: 'Logged by',
           value: 'Facilities. Thermostat has been "broken" since 2019 per facilities dept.',
@@ -297,7 +301,6 @@ const SET_1: SorterDocumentSet = {
         'Without a patient identifier attached, this demographic detail alone does not constitute PHI.',
       chart: {
         patientName: 'Mendez, Roberto',
-        age: 51,
         doctorNote: 'Patient asked if this field was legally required. Reasonable question, honestly.',
       },
     },
@@ -466,10 +469,11 @@ const SET_2: SorterDocumentSet = {
       id: 's2-diagnosis-only',
       label: 'ICD-10 Code: F33.1',
       category: 'not_phi',
+      icon: '📊',
+      docKind: 'Aggregate Report',
       explanation: 'A diagnosis code by itself is not PHI. PHI requires an identifier PLUS a health connection. ' +
         'F33.1 alone identifies a condition, not a person. Pair it with a patient record number and it becomes PHI.',
       chart: {
-        patientName: 'Rivera, Sofia',
         miscField: {
           label: 'Code only',
           value: 'F33.1 — appears on aggregate stats report, no patient ID attached',
@@ -498,10 +502,11 @@ const SET_2: SorterDocumentSet = {
       id: 's2-lab-test-type',
       label: 'Lab Test Type: Complete Blood Count',
       category: 'not_phi',
+      icon: '🧪',
+      docKind: 'Lab Reference',
       explanation: 'A procedure category describes what kind of test was run — it doesn\'t identify any specific patient. ' +
         'Without an attached identifier, "complete blood count" is not PHI under §164.514(b)(2).',
       chart: {
-        patientName: 'Goldberg, Aaron',
         miscField: {
           label: 'Test category',
           value: 'CBC — listed on supply order form, no patient identifier in this field',
@@ -512,10 +517,11 @@ const SET_2: SorterDocumentSet = {
       id: 's2-sample-volume',
       label: 'Sample Volume: 5mL',
       category: 'not_phi',
+      icon: '🧪',
+      docKind: 'Lab Protocol',
       explanation: 'A measurement without any patient identifier is not PHI. ' +
         '"5mL" doesn\'t connect to any individual\'s health care or payment information.',
       chart: {
-        patientName: 'Hashimoto, Yuki',
         miscField: {
           label: 'Volume logged',
           value: '5mL — lab protocol field, no patient ID in this column',
@@ -527,10 +533,11 @@ const SET_2: SorterDocumentSet = {
       id: 's2-specimen-type',
       label: 'Specimen Type: Venous Blood',
       category: 'not_phi',
+      icon: '🧫',
+      docKind: 'Manifest Header',
       explanation: 'A specimen type categorizes the kind of biological sample collected. ' +
         'Without a patient identifier, "venous blood" describes a category, not a person — not PHI under §164.514(b)(2).',
       chart: {
-        patientName: 'Mendez, Carmen',
         miscField: {
           label: 'Specimen category',
           value: 'Venous blood — appears in manifest header, shared across multiple samples',
@@ -772,10 +779,11 @@ const SET_3: SorterDocumentSet = {
       id: 's3-url-no-identifiers',
       label: 'URL: https://healthinfo.gov/article/472',
       category: 'not_phi',
+      icon: '🔗',
+      docKind: 'Reference',
       explanation: 'URLs are identifier #14 under §164.514(b)(2) only when they can be linked to a specific individual. ' +
         'A public health information article URL with no patient parameters or session tokens is not PHI.',
       chart: {
-        patientName: 'Tovar, Santiago',
         miscField: {
           label: 'Reference URL',
           value: 'https://healthinfo.gov/article/472 — public resource, no patient-specific parameters',

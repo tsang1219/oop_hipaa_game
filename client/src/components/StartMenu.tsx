@@ -16,9 +16,14 @@ import { PixelComputerLogo } from './PixelComputerLogo';
 import { SPONSOR_CONFIG } from '../data/sponsorConfig';
 
 export interface StartMenuProps {
+  /** A resumable full-game save exists — show CONTINUE and reframe FULL GAME as NEW GAME. */
+  hasSave: boolean;
   onDemo: () => void;
   onTowerDefense: () => void;
-  onFullGame: () => void;
+  /** Start a fresh full game (clears any existing save on the way to character select). */
+  onNewGame: () => void;
+  /** Resume the in-progress full-game save. Only invoked when hasSave is true. */
+  onResume: () => void;
 }
 
 type SectionId = 'main-rpg' | 'mini-games';
@@ -68,7 +73,7 @@ function ModeIcon({ icon, color }: { icon: MenuItem['icon']; color: string }) {
   );
 }
 
-export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps): JSX.Element {
+export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume }: StartMenuProps): JSX.Element {
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showLogo, setShowLogo] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
@@ -76,14 +81,27 @@ export function StartMenu({ onDemo, onTowerDefense, onFullGame }: StartMenuProps
   const [showFooter, setShowFooter] = useState(false);
   const lastSelectedRef = useRef(0);
 
+  // Resume + New Game live directly on the main menu (no intermediate title
+  // screen). CONTINUE only appears when a save exists, and is the default
+  // selection so returning players just press Enter.
   const menuItems: MenuItem[] = [
+    ...(hasSave
+      ? [{
+          label: 'CONTINUE',
+          description: 'BACK TO YOUR SHIFT',
+          accent: '#FFD23F',
+          icon: 'cross' as const,
+          section: 'main-rpg' as const,
+          action: onResume,
+        }]
+      : []),
     {
-      label: 'FULL GAME',
-      description: 'PROTECT THE HOSPITAL',
-      accent: '#FFD23F',
+      label: hasSave ? 'NEW GAME' : 'FULL GAME',
+      description: hasSave ? 'START OVER FROM DAY ONE' : 'PROTECT THE HOSPITAL',
+      accent: hasSave ? '#FF9EC4' : '#FFD23F',
       icon: 'cross',
       section: 'main-rpg',
-      action: onFullGame,
+      action: onNewGame,
     },
     {
       label: 'DEMO',

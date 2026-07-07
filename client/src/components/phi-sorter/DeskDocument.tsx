@@ -45,6 +45,24 @@ function getInkRot(id: string): number {
   return ((id.length * 7) % 13) - 6;
 }
 
+/**
+ * Render a stored "Last, First" name as bare initials ("Henderson, Margaret" →
+ * "M.H."). A full patient name is itself Safe Harbor identifier #1, so printing
+ * it on a card whose correct answer is KEEP is self-contradictory. Initials are
+ * not one of the 18 identifiers — showing only initials keeps every card honest
+ * (the thing being judged is the field below, not the person) without an
+ * awkward redaction bar.
+ */
+function toInitials(name: string): string {
+  const parts = name.split(',').map((s) => s.trim()).filter(Boolean);
+  if (parts.length >= 2) {
+    const [last, first] = parts;
+    return `${first[0]}.${last[0]}.`.toUpperCase();
+  }
+  const bare = name.trim();
+  return bare ? `${bare[0].toUpperCase()}.` : '';
+}
+
 /** ChartLine — restyled for cream paper (dark text, warm label color).
  *  Feel pass: legible body font, larger — the player shouldn't decode pixels. */
 function ChartLine({ label, value }: { label: string; value: string }) {
@@ -139,13 +157,15 @@ export function DeskDocument({ item, animState, stampedKind, wasCorrect }: DeskD
         </span>
       </div>
 
-      {/* Patient name + age — only for actual patient records */}
+      {/* Patient name — shown as initials only (see toInitials). Institutional
+          docs carry no name at all and skip this block. */}
       {chart.patientName && (
         <div
           className="mb-2"
           style={{ fontFamily: 'var(--font-body)', fontSize: '19px', fontWeight: 600, color: '#1a1a2e' }}
+          data-testid="sorter-patient-initials"
         >
-          {chart.patientName}
+          {toInitials(chart.patientName)}
           {chart.age !== undefined ? `, ${chart.age}` : ''}
         </div>
       )}

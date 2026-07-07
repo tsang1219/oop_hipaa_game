@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures } from '../sprites';
 import { objectTextureKey } from '../sprites/objectTextures';
-import { npcTextureKey } from '../sprites/npcTextures';
+import { npcSpriteTextureKey } from '../sprites/npcTextures';
 import {
   ENCOUNTER_WAVES_INBOUND,
   ENCOUNTER_WAVE_BUDGETS,
@@ -1412,7 +1412,7 @@ export class ExplorationScene extends Phaser.Scene {
     const zzY = 5 * TILE + TILE / 2;
     this.add.rectangle(zzX, zzY + 12, 26, 12, 0x6a4a2a, 1).setDepth(8);
     this.add.rectangle(zzX, zzY + 8, 26, 3, 0x7e5a36, 1).setDepth(8);
-    const zz = this.add.sprite(zzX, zzY - 2, npcTextureKey('nervous_patient'), 0)
+    const zz = this.add.sprite(zzX, zzY - 2, npcSpriteTextureKey(this, 'nervous_patient', 'patient'), 0)
       .setDepth(9)
       .setTint(0xc2cede)
       .setAlpha(0.92);
@@ -1647,6 +1647,11 @@ export class ExplorationScene extends Phaser.Scene {
     // the encounter remains replayable when the player walks back over the trigger tile.
     if (data?.encounterId || data?.aborted) {
       this.paused = false;
+      // Pure-React encounters (sorter/triage) leave the SPACE-trigger dim overlay
+      // up — it was created before ENCOUNTER_REQUEST fired and only the dialogue
+      // path ever cleared it. Escape / decline / completion all route here, so
+      // clear it here too or the room stays dimmed until the player leaves.
+      this.clearDialogueDim();
       if (data.encounterId) {
         this.encounterTriggered = false;
         this.registry.set(`encounterResult_${data.encounterId}`, true);
@@ -2119,6 +2124,25 @@ export class ExplorationScene extends Phaser.Scene {
   };
 
   // ── Resume after dialogue ──────────────────────────────────────
+  /** Fade out + destroy the anticipation dim overlay, if one is up. Idempotent —
+   *  a no-op when no overlay exists. Shared by every path that closes a dialogue
+   *  or encounter so the dim can't outlive the interaction (a SPACE-triggered
+   *  encounter that the player Escapes / declines used to leave the room dimmed
+   *  until they walked to another room). */
+  private clearDialogueDim = (): void => {
+    if (!this.dialogueDimOverlay) return;
+    this.tweens.add({
+      targets: this.dialogueDimOverlay,
+      fillAlpha: 0,
+      duration: 300,
+      ease: 'Sine.easeOut',
+      onComplete: () => {
+        this.dialogueDimOverlay?.destroy();
+        this.dialogueDimOverlay = undefined;
+      },
+    });
+  };
+
   private onDialogueComplete = () => {
     if (!this.scene.isActive()) return;
     this.paused = false;
@@ -2130,18 +2154,7 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // Fade out dialogue dim overlay
-    if (this.dialogueDimOverlay) {
-      this.tweens.add({
-        targets: this.dialogueDimOverlay,
-        fillAlpha: 0,
-        duration: 300,
-        ease: 'Sine.easeOut',
-        onComplete: () => {
-          this.dialogueDimOverlay?.destroy();
-          this.dialogueDimOverlay = undefined;
-        }
-      });
-    }
+    this.clearDialogueDim();
 
     // Re-focus the canvas so keyboard input works after React overlays stole focus.
     // tabIndex ensures the canvas is focusable; double-attempt covers slow React unmounts.
@@ -2163,6 +2176,9 @@ export class ExplorationScene extends Phaser.Scene {
    *  Instead mark the decline; the update() loop re-arms once they leave the radius. */
   private onResumeFromDecline = () => {
     this.paused = false;
+    // Same reason as onReturnFromEncounter: a declined narrative card leaves the
+    // dim overlay up otherwise.
+    this.clearDialogueDim();
     if (this.encounterTriggered) {
       this.encounterDeclined = true;
     }

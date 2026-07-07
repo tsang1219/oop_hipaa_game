@@ -29,7 +29,6 @@ import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
 import { migrateV1toV2, loadSave, writeSave, hasSaveData } from '@/lib/saveData';
-import { TitleScreen } from '../components/TitleScreen';
 import { StartMenu } from '../components/StartMenu';
 import { CharacterSelectScreen } from '../components/CharacterSelectScreen';
 import {
@@ -153,8 +152,8 @@ export default function UnifiedGamePage() {
       sessionStorage.removeItem('pq:skip-title');
       return 'exploration';
     }
-    // Phase 18: cold-boot players land on the StartMenu (3-button mode selector).
-    // FULL GAME button transitions to 'title' (then existing TitleScreen → exploration path).
+    // Phase 18: cold-boot players land on the StartMenu, which now hosts
+    // Continue / New Game directly (the separate TitleScreen was folded in).
     return 'start-menu';
   });
   // Tracks which post-character-select flow to run on confirm. 'demo' fires
@@ -583,6 +582,24 @@ export default function UnifiedGamePage() {
     [gameState.state.completedNPCs, gameState.state.completedZones, gameState.state.collectedItems],
   );
 
+  // True while ANY foreground overlay is up. The room-cleared banner (and the
+  // patient-story reveal it chains into) must wait until the player has
+  // dismissed whatever they're currently looking at — otherwise it lands on top
+  // of the open item modal / dialogue / gate and blocks its inputs. Extends the
+  // original encounter-only guard (R7-05) to every blocking overlay.
+  const celebrationBlocked =
+    encounterPhase !== 'idle' ||
+    pageMode !== 'exploration' ||
+    selectedItem !== null ||
+    showStoryModal ||
+    activeObservationGate !== null ||
+    activeChoiceGate !== null ||
+    showRoomIntro ||
+    showIntroModal ||
+    corkboardOpen ||
+    showCodex ||
+    encounterRequest !== null;
+
   // ── Auto-complete current room + refresh door visuals ─────────
   // When the player satisfies all requirements mid-exploration, mark the room complete
   // and push fresh door states to Phaser so doors update in place (no stale red X).
@@ -612,13 +629,13 @@ export default function UnifiedGamePage() {
         ? reqs.requiredNpcs.length + reqs.requiredZones.length + reqs.requiredItems.length > 0
         : currentRoom.npcs.length > 0;
       if (earnedCompletion) {
-        if (encounterPhase === 'idle') {
+        if (!celebrationBlocked) {
           eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: currentRoomId });
           setRoomClearedBanner({ roomName: currentRoom.name });
         } else {
-          // R7-05: an encounter overlay (sorter/triage/TD) is open — landing the
-          // banner + patient story on top of it blocks its inputs. Defer the
-          // celebration until the encounter closes.
+          // A foreground overlay (item modal, dialogue, gate, encounter…) is
+          // open — landing the banner + patient story on top of it blocks its
+          // inputs. Defer the celebration until the overlay closes.
           setPendingCelebration({ roomId: currentRoomId, roomName: currentRoom.name });
         }
       }
@@ -633,17 +650,17 @@ export default function UnifiedGamePage() {
     gameState.state.completedZones,
     gameState.state.collectedItems,
     checkRoomCompletion,
-    encounterPhase,
+    celebrationBlocked,
   ]);
 
-  // R7-05: fire a deferred room celebration once the encounter overlay closes.
+  // Fire a deferred room celebration once every blocking overlay has closed.
   useEffect(() => {
-    if (encounterPhase === 'idle' && pendingCelebration) {
+    if (!celebrationBlocked && pendingCelebration) {
       eventBridge.emit(BRIDGE_EVENTS.REACT_ROOM_COMPLETE_FANFARE, { roomId: pendingCelebration.roomId });
       setRoomClearedBanner({ roomName: pendingCelebration.roomName });
       setPendingCelebration(null);
     }
-  }, [encounterPhase, pendingCelebration]);
+  }, [celebrationBlocked, pendingCelebration]);
 
   // ── Door navigation handler (EXPLORATION_EXIT_ROOM) ───────────
   const handleExitRoom = useCallback(
@@ -1479,16 +1496,18 @@ export default function UnifiedGamePage() {
   }, []);
 
   // ── Start menu (Phase 18) ──────────────────────────────────────
-  // FULL GAME: if a save exists, route to TitleScreen (Resume / New Game prompt).
-  // Otherwise route through character-select on the way to a fresh exploration.
-  const handleSelectFullGame = useCallback(() => {
+  // NEW GAME / FULL GAME: Resume + New Game now live directly on the StartMenu
+  // (no intermediate TitleScreen). Starting a new full game when a save exists
+  // clears it first (handleNewGame → reload → character-select); a cold start
+  // routes straight through character-select.
+  const handleStartNewFullGame = useCallback(() => {
     if (hasSaveData()) {
-      setPageMode('title');
+      handleNewGame();
     } else {
       setPostSelectIntent('full-game');
       setPageMode('character-select');
     }
-  }, []);
+  }, [handleNewGame]);
 
   // DEMO: route through character-select first, then start the demo session
   // on confirm. We deliberately delay startDemo() until after selection so the
@@ -1578,18 +1597,21 @@ export default function UnifiedGamePage() {
   };
 
   // ── Start menu (Phase 18 — DEMO-01) ──────────────────────────
-  // First screen the player sees on `/`. Three buttons route to:
+  // First screen the player sees on `/`. Routes:
+  //   CONTINUE      → resume the in-progress save (only shown when one exists)
+  //   NEW GAME/FULL GAME → fresh full game via character select (handleStartNewFullGame)
   //   DEMO          → curated 4-room sponsor pitch (handleSelectDemo)
-  //   TOWER DEFENSE → standalone TD scene (Phase 19 will wire)
-  //   FULL GAME     → existing TitleScreen / exploration flow (unchanged)
+  //   TOWER DEFENSE → standalone TD scene
   // Phaser is NOT mounted while in this mode — the canvas div renders only in
   // the main game view branch below. QA bypass paths still skip this screen.
   if (pageMode === 'start-menu') {
     return (
       <StartMenu
+        hasSave={hasSaveData()}
         onDemo={handleSelectDemo}
         onTowerDefense={handleSelectTowerDefense}
-        onFullGame={handleSelectFullGame}
+        onNewGame={handleStartNewFullGame}
+        onResume={handleResume}
       />
     );
   }
@@ -1623,17 +1645,6 @@ export default function UnifiedGamePage() {
         onPlayAgain={handleTdPlayAgain}
         onBackToMenu={handleTdBackToMenu}
         onDismissHelper={() => setTdHelperVisible(false)}
-      />
-    );
-  }
-
-  // ── Title screen ──────────────────────────────────────────────
-  if (pageMode === 'title') {
-    return (
-      <TitleScreen
-        hasSave={hasSaveData()}
-        onNewGame={handleNewGame}
-        onResume={handleResume}
       />
     );
   }

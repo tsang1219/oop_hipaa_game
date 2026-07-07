@@ -1,6 +1,6 @@
 import Phaser from 'phaser';
 import { furnitureTextureKey } from '../../sprites/furniture';
-import { npcTextureKey } from '../../sprites/npcTextures';
+import { npcSpriteTextureKey } from '../../sprites/npcTextures';
 import { objectTextureKey } from '../../sprites/objectTextures';
 import type { Room } from '@shared/schema';
 import type { InteractableData } from './interactableFactory';
@@ -42,7 +42,7 @@ export function addRoomAmbience(
     const nurseStartX = 8 * TILE + TILE / 2;
     const nurseEndX = 11 * TILE + TILE / 2;
     scene.add.ellipse(nurseStartX, nurseY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
-    const nurseSprite = scene.add.sprite(nurseStartX, nurseY, npcTextureKey('nurse_chen')).setDepth(5 + 4);
+    const nurseSprite = scene.add.sprite(nurseStartX, nurseY, npcSpriteTextureKey(scene, 'nurse_chen'), 0).setDepth(5 + 4);
     scene.tweens.add({ targets: nurseSprite, x: nurseEndX, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => nurseSprite.setFlipX(true), onRepeat: () => nurseSprite.setFlipX(false) });
     scene.tweens.add({ targets: nurseSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 360, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
 

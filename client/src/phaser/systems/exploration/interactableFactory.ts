@@ -1,5 +1,5 @@
 import Phaser from 'phaser';
-import { npcTextureKey } from '../../sprites/npcTextures';
+import { npcSpriteTextureKey } from '../../sprites/npcTextures';
 import { objectTextureKey } from '../../sprites/objectTextures';
 import { getHallwayBoard } from '../../../data/hallwayContent';
 import { getNPCColor } from '@/data/spriteAssetPaths';
@@ -233,7 +233,10 @@ export function spawnInteractables(
       if (isDemoActive() || ctx.getCurrentAct() < minAct) continue;
     }
 
-    const texKey = npcTextureKey(npc.id);
+    // Prefer the PNG spritesheet (frame 0 = idle-down) keyed off the roomData
+    // `sprite` field — the same source the dialogue portrait resolves through —
+    // so the in-room sprite and the portrait always match.
+    const texKey = npcSpriteTextureKey(scene, npc.id, (npc as { sprite?: string }).sprite);
     const completed = ctx.completedNPCs.has(npc.id);
 
     // Drop shadow at feet level (behind the sprite)

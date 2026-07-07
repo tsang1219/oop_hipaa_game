@@ -277,6 +277,33 @@ export function npcTextureKey(npcId: string): string {
 }
 
 /**
+ * Resolve the on-canvas texture key for a room NPC, preferring the loaded PNG
+ * spritesheet (npc_TYPE_sheet, frame 0 = idle-down) over the legacy programmatic
+ * chibi texture drawn by generateNPCTextures().
+ *
+ * `spriteType` is the roomData `npc.sprite` field — the SAME single source of
+ * truth the dialogue portrait uses (spriteAssetPaths.NPC_SPRITE_TYPE_BY_ID), so
+ * the in-room sprite and the dialogue portrait can never disagree. Falls back to
+ * the hardcoded npcTextureKey() map for NPCs that carry no sprite field (e.g.
+ * the ambience-only nurse_chen), then to the programmatic texture if the sheet
+ * failed to load.
+ *
+ * Fixes the "portrait doesn't match the sprite" + "sprite looks blocky / two
+ * legs and a head" bugs: room NPCs used to render the old programmatic chibi
+ * (npcTextureKey → 'npc_boss') while the player and portraits used the new PNG
+ * sheets ('npc_boss_sheet').
+ */
+export function npcSpriteTextureKey(
+  scene: Phaser.Scene,
+  npcId: string,
+  spriteType?: string,
+): string {
+  const base = spriteType ? `npc_${spriteType}` : npcTextureKey(npcId);
+  const sheetKey = `${base}_sheet`;
+  return scene.textures.exists(sheetKey) ? sheetKey : base;
+}
+
+/**
  * Map an NPC id to the NPC type string used in animation keys (e.g. 'npc_TYPE_walk_DIR').
  */
 export function npcTypeFromId(npcId: string): string {
