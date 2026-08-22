@@ -1,0 +1,224 @@
+{
+ "roomId": "reception",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.reception",
+ "wallStyle": "cream",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "desk",
+   "x": 7,
+   "y": 2,
+   "w": 6,
+   "h": 2,
+   "frame": "prop.counter.reception.wood",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "notice_board",
+   "x": 13,
+   "y": 1,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.noticeboard",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "filing_cabinet",
+   "x": 4,
+   "y": 2,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.cabinet.gray.2",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "filing_cabinet",
+   "x": 15,
+   "y": 2,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.cabinet.pink.2",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 1,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.orange.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 18,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.white.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "privacy_screen",
+   "x": 6,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.stanchion.plain",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "privacy_screen",
+   "x": 13,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.stanchion.plain",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 2,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.yellow",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 16,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.green",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 2,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.yellow",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 16,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.green",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "tissue_box",
+   "x": 5,
+   "y": 11,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.table.round.white",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "magazine_rack",
+   "x": 2,
+   "y": 12,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.bookshelf.wood",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "printer_station",
+   "x": 3,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.copier",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "water_dispenser",
+   "x": 17,
+   "y": 12,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.machine.white",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "trash_can",
+   "x": 6,
+   "y": 3,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.trash.blue",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "wheelchair",
+   "x": 1,
+   "y": 11,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.wheelchair.side.blue",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "toy_chest",
+   "x": 18,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.toychest.red",
+   "depth": 18,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 1,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.fern.m",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "iv_stand",
+   "x": 18,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.ivpole.a",
+   "depth": 9,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 15,
+ "missing": [],
+ "imageRequests": 27
+}
