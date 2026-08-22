@@ -53,6 +53,7 @@ import { getNPCColor } from '@/data/spriteAssetPaths';
 import { BreachTriageOverlay } from '@/components/breach-triage/BreachTriageOverlay';
 import { TriageDebrief } from '@/components/breach-triage/TriageDebrief';
 import { Phi18Codex } from '@/components/Phi18Codex';
+import { FeedbackModal } from '@/components/FeedbackModal';
 import { phi18Count, PHI18_TOTAL, phi18Complete } from '@/data/phi18';
 import { CorkboardOverlay } from '@/components/CorkboardOverlay';
 import { CORKBOARD_SCORE } from '@/data/corkboardData';
@@ -245,6 +246,7 @@ export default function UnifiedGamePage() {
 
   // ── The Eighteen codex (HIPAA-is-the-game pass) ────────────────
   const [showCodex, setShowCodex] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
   const [recentIdentifierKey, setRecentIdentifierKey] = useState<string | null>(null);
   const [codexChipPulse, setCodexChipPulse] = useState(0);
 
@@ -486,44 +488,53 @@ export default function UnifiedGamePage() {
   }, []);
 
   // ── Boot → Start ExplorationScene with hospital_entrance ──────
+  // Latest-state Exploration starter. Stored in a ref and reassigned every
+  // render so both the once-registered SCENE_READY listener and the watchdog
+  // below read CURRENT gameState / showIntroModal — the old version was frozen
+  // in a []-deps closure (stale currentRoomId / intro flag).
+  const bootReadyRef = useRef(false);
+  const startExplorationRef = useRef<() => void>(() => {});
+  startExplorationRef.current = () => {
+    if (!gameRef.current || sceneStartedRef.current) return;
+    if (pageModeRef.current === 'tower-defense-standalone') return;
+    sceneStartedRef.current = true;
+    // Phase 18 (DEMO-04): demo sessions always boot the player into Reception
+    // (the first curated demo room) regardless of any persisted currentRoomId.
+    // Full-game flow is unchanged — resume room or hospital_entrance fallback.
+    const resumeRoomId = isDemoActive()
+      ? 'reception'
+      : (gameState.state.currentRoomId ?? 'hospital_entrance');
+    const startRoom = rooms.find(r => r.id === resumeRoomId)
+      ?? rooms.find(r => r.id === 'hospital_entrance')!;
+    const doorStates = computeDoorStates(startRoom, gameState.state.completedRooms);
+
+    gameState.setCurrentRoom(startRoom.id);
+
+    gameRef.current.scene.start('Exploration', {
+      room: startRoom,
+      completedNPCs: gameState.state.completedNPCs,
+      completedZones: gameState.state.completedZones,
+      collectedItems: gameState.state.collectedItems,
+      doorStates,
+    });
+
+    // Demo guard: showIntroModal is computed at mount — before startDemo()
+    // flips isDemoActive() — so a fresh browser entering DEMO would pause
+    // here for a TutorialModal that demo mode never renders (soft-lock).
+    if (showIntroModal && !isDemoActive()) {
+      eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
+    }
+  };
+
+  // SCENE_READY listener — fast path for starting Exploration / BreachDefense.
   useEffect(() => {
-    const startExploration = () => {
-      if (!gameRef.current || sceneStartedRef.current) return;
-      sceneStartedRef.current = true;
-      // Phase 18 (DEMO-04): demo sessions always boot the player into Reception
-      // (the first curated demo room) regardless of any persisted currentRoomId.
-      // Full-game flow is unchanged — resume room or hospital_entrance fallback.
-      const resumeRoomId = isDemoActive()
-        ? 'reception'
-        : (gameState.state.currentRoomId ?? 'hospital_entrance');
-      const startRoom = rooms.find(r => r.id === resumeRoomId)
-        ?? rooms.find(r => r.id === 'hospital_entrance')!;
-      const doorStates = computeDoorStates(startRoom, gameState.state.completedRooms);
-
-      gameState.setCurrentRoom(startRoom.id);
-
-      gameRef.current.scene.start('Exploration', {
-        room: startRoom,
-        completedNPCs: gameState.state.completedNPCs,
-        completedZones: gameState.state.completedZones,
-        collectedItems: gameState.state.collectedItems,
-        doorStates,
-      });
-
-      // Demo guard: showIntroModal is computed at mount — before startDemo()
-      // flips isDemoActive() — so a fresh browser entering DEMO would pause
-      // here for a TutorialModal that demo mode never renders (soft-lock).
-      if (showIntroModal && !isDemoActive()) {
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
-      }
-    };
-
     const handleSceneReady = (sceneKey: string) => {
       if (sceneKey === 'Boot') {
+        bootReadyRef.current = true; // assets preloaded — safe to start Exploration
         // Don't auto-start Exploration if the player picked TOWER DEFENSE
         // standalone — that path starts BreachDefense directly.
         if (pageModeRef.current === 'tower-defense-standalone') return;
-        startExploration();
+        startExplorationRef.current?.();
       }
       if (sceneKey === 'BreachDefense') {
         // BreachDefense scene is ready — tell it to start the game
@@ -531,37 +542,32 @@ export default function UnifiedGamePage() {
       }
     };
     eventBridge.on(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
+    return () => { eventBridge.off(BRIDGE_EVENTS.SCENE_READY, handleSceneReady); };
+  }, []);
 
-    // If Boot already fired before this effect registered (race condition),
-    // poll briefly for the game ref to become available.
-    // F-10 fix (Run 07): the poll used to start Exploration ~50ms after mount —
-    // long before BootScene's preload finished downloading the music tracks —
-    // so every cold boot logged "music_hub not ready, skipping BGM" and the
-    // first room of every session was silent. Now the poll only fires once the
-    // qa-bridge has seen Boot's SCENE_READY (assets loaded); the SCENE_READY
-    // listener above covers the normal path.
-    // F-17 fix (Run 07): same pageModeRef guard as handleSceneReady — the poll
-    // used to boot Exploration underneath the standalone Tower Defense.
-    const bootPoll = setInterval(() => {
+  // Watchdog — GUARANTEE the Exploration scene actually starts whenever we're in
+  // exploration mode. Replaces the old bootPoll+5s-timeout, which could give up
+  // before the scene ever started: SCENE_READY('Boot') can fire before gameRef
+  // is populated (React hasn't committed the imperative handle), or the player
+  // lingers on the menu / character-select past the 5s window. Either left the
+  // game booted into NO playable scene until a manual refresh — the reported
+  // "can't move on New Game." This keeps retrying (no premature timeout) until
+  // the scene is up, then stops. Cheap: a guard check every 120ms.
+  useEffect(() => {
+    if (pageMode !== 'exploration') return;
+    if (sceneStartedRef.current) return;
+    let stopped = false;
+    const tick = () => {
+      if (stopped) return;
+      if (sceneStartedRef.current) { stopped = true; clearInterval(iv); return; }
       if (pageModeRef.current === 'tower-defense-standalone') return;
-      if (
-        gameRef.current &&
-        !sceneStartedRef.current &&
-        window.__QA__?.scenesVisited?.includes('Boot')
-      ) {
-        clearInterval(bootPoll);
-        startExploration();
-      }
-    }, 50);
-    // Stop polling after 5 seconds as safety valve
-    const bootTimeout = setTimeout(() => clearInterval(bootPoll), 5000);
-
-    return () => {
-      eventBridge.off(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
-      clearInterval(bootPoll);
-      clearTimeout(bootTimeout);
+      if (!gameRef.current || !bootReadyRef.current) return; // wait for game + Boot preload
+      startExplorationRef.current?.();
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+    const iv = setInterval(tick, 120);
+    tick();
+    return () => { stopped = true; clearInterval(iv); };
+  }, [pageMode]);
 
   // ── Room completion check ─────────────────────────────────────
   const checkRoomCompletion = useCallback(
@@ -598,6 +604,7 @@ export default function UnifiedGamePage() {
     showIntroModal ||
     corkboardOpen ||
     showCodex ||
+    showFeedback ||
     encounterRequest !== null;
 
   // ── Auto-complete current room + refresh door visuals ─────────
@@ -1334,6 +1341,17 @@ export default function UnifiedGamePage() {
     eventBridge.emit(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION);
   }, []);
 
+  // ── Feedback channel handlers (pause/resume mirror the codex contract) ──
+  const handleOpenFeedback = useCallback(() => {
+    setShowFeedback(true);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
+  }, []);
+
+  const handleCloseFeedback = useCallback(() => {
+    setShowFeedback(false);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION);
+  }, []);
+
   // [I] opens the codex during idle exploration (codex handles its own close)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -1786,6 +1804,15 @@ export default function UnifiedGamePage() {
           />
         )}
 
+        {/* In-game feedback channel (bug / idea / confusing / loved it) */}
+        {showFeedback && (
+          <FeedbackModal
+            gameRef={gameRef}
+            gameState={gameState.state}
+            onClose={handleCloseFeedback}
+          />
+        )}
+
         {/* Break-room corkboard minigame */}
         {corkboardOpen && (
           <CorkboardOverlay
@@ -2056,6 +2083,15 @@ export default function UnifiedGamePage() {
           title="Show controls"
         >
           ?
+        </button>
+        <button
+          onClick={handleOpenFeedback}
+          className="text-[8px] text-gray-400 hover:text-white border border-gray-600 hover:border-gray-400 px-2 py-1 transition-colors"
+          style={{ fontFamily: '"Press Start 2P"' }}
+          title="Send feedback"
+          data-testid="feedback-button"
+        >
+          💬
         </button>
         <button
           onClick={() => setMuted(m => !m)}

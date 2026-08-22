@@ -17,6 +17,7 @@ const NPC_STYLES: Record<string, NpcStyle> = {
   npc_patient:      { shirt: 0x95a5a6, hair: 0xd4a574, pants: 0x95a5a6, shoes: 0xbdc3c7 },
   npc_visitor:      { shirt: 0xf39c12, hair: 0x7f3c10, pants: 0x333333, shoes: 0x5d4037 },
   npc_officer:      { shirt: 0x2c3e50, hair: 0x1a1a1a, pants: 0x1a1a1a, shoes: 0x111111 },
+  npc_lawyer:       { shirt: 0x27406b, hair: 0x8a6733, pants: 0x1b2d4d, shoes: 0x141414, tie: 0xe8c33a },
 };
 
 export function generateNPCTextures(scene: Phaser.Scene) {
@@ -252,7 +253,7 @@ export function npcTextureKey(npcId: string): string {
     // Records Room
     records_clerk: 'npc_receptionist',
     patient_request: 'npc_patient',
-    attorney: 'npc_boss',
+    attorney: 'npc_lawyer',
     compliance_officer: 'npc_officer',
     // IT Office
     security_analyst: 'npc_it_tech',

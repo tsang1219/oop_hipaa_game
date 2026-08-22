@@ -56,6 +56,7 @@ HAIR = {
     'white':      rgb('F0F0F0'),
     'red':        rgb('A0230A'),
     'dark_brown': rgb('3B1F0C'),
+    'sandy':      rgb('8A6733'),  # light-brown/dark-blond; darker than peach skin so the hairline reads
 }
 
 # Shared colors
@@ -95,11 +96,33 @@ def outline_rect(draw, x, y, w, h, fill, edge=OUTLINE):
     vline(draw, x+w-1, y, h, edge)       # right
 
 
+def draw_suit_front(draw, tie, dress):
+    """
+    Business-suit overlay for the FRONT-facing frames: a white shirt collar
+    band under the chin plus a tie knot and blade down the sternum.
+
+    Only front views get it — from the side or the back a chibi at this scale
+    reads as "person in a jacket" anyway, and the tie is the whole point.
+    Torso occupies x=11..20, y=14..20; the neck skin block is x=15..16, y=14..15.
+    """
+    if not (tie and dress):
+        return
+    # Shirt collar — a white band framing the base of the neck
+    hline(draw, 14, 15, 4, dress)
+    px(draw, 14, 15, darken(dress, 30))
+    px(draw, 17, 15, darken(dress, 30))
+    # Tie: knot at the collar, blade hanging to the waistline
+    rect(draw, 15, 16, 2, 4, tie)
+    vline(draw, 15, 16, 4, darken(tie, 35))   # left-edge shading
+    px(draw, 16, 16, lighten(tie, 45))        # knot highlight
+
+
 # ────────────────────────────────────────────────────────────────────────────
 #  FACING DOWN (front view)
 # ────────────────────────────────────────────────────────────────────────────
 def draw_down(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-              badge=False, stet=False, coat=False, coat_c=None):
+              badge=False, stet=False, coat=False, coat_c=None,
+              tie=None, dress=None):
     """
     Chibi front view. walk=0 idle, 1 left step, 2 right step.
     Width: head 12px (x=10..21), body 10px (x=11..20)
@@ -142,6 +165,9 @@ def draw_down(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 
     # Collar / neck
     rect(draw, 15, 14, 2, 2, skin)
+
+    # Shirt collar + tie (suit characters)
+    draw_suit_front(draw, tie, dress)
 
     # Stethoscope
     if stet:
@@ -207,7 +233,8 @@ def draw_down(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 
 
 def draw_down_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-                   badge=False, stet=False, coat=False, coat_c=None, step=1):
+                   badge=False, stet=False, coat=False, coat_c=None,
+                   tie=None, dress=None, step=1):
     """Walk frame: step=1 left foot forward, step=2 right foot forward."""
     # Shadow
     hline(draw, 13, 30, 6, rgba('000000', 60))
@@ -241,6 +268,7 @@ def draw_down_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
         rect(draw, 11, 14, 3, 6, coat_c)
         rect(draw, 18, 14, 3, 6, coat_c)
     rect(draw, 15, 14, 2, 2, skin)
+    draw_suit_front(draw, tie, dress)
     if stet:
         px(draw, 13, 17, STET_SILVER); px(draw, 15, 17, STET_SILVER)
         px(draw, 14, 17, STET_SILVER); px(draw, 14, 18, STET_SILVER)
@@ -271,7 +299,8 @@ def draw_down_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 #  FACING UP (back view)
 # ────────────────────────────────────────────────────────────────────────────
 def draw_up(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-            badge=False, stet=False, coat=False, coat_c=None):
+            badge=False, stet=False, coat=False, coat_c=None,
+            tie=None, dress=None):
     # Shadow
     hline(draw, 13, 30, 6, rgba('000000', 60))
 
@@ -321,7 +350,8 @@ def draw_up(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 
 
 def draw_up_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-                 badge=False, stet=False, coat=False, coat_c=None, step=1):
+                 badge=False, stet=False, coat=False, coat_c=None,
+                   tie=None, dress=None, step=1):
     hline(draw, 13, 30, 6, rgba('000000', 60))
     if step == 1:
         rect(draw, 11, 20, 5, 6, pant); rect(draw, 17, 22, 5, 4, pant)
@@ -351,7 +381,8 @@ def draw_up_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 #  FACING LEFT (side view)
 # ────────────────────────────────────────────────────────────────────────────
 def draw_left(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-              badge=False, stet=False, coat=False, coat_c=None):
+              badge=False, stet=False, coat=False, coat_c=None,
+              tie=None, dress=None):
     hline(draw, 13, 30, 6, rgba('000000', 60))
 
     # Back foot
@@ -425,7 +456,8 @@ def draw_left(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 
 
 def draw_left_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-                   badge=False, stet=False, coat=False, coat_c=None, step=1):
+                   badge=False, stet=False, coat=False, coat_c=None,
+                   tie=None, dress=None, step=1):
     hline(draw, 13, 30, 6, rgba('000000', 60))
 
     if step == 1:   # back leg back, front leg forward
@@ -473,7 +505,8 @@ def draw_left_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 #  FACING RIGHT (side view mirror)
 # ────────────────────────────────────────────────────────────────────────────
 def draw_right(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-               badge=False, stet=False, coat=False, coat_c=None):
+               badge=False, stet=False, coat=False, coat_c=None,
+              tie=None, dress=None):
     hline(draw, 13, 30, 6, rgba('000000', 60))
 
     # Back foot
@@ -530,7 +563,8 @@ def draw_right(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 
 
 def draw_right_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
-                    badge=False, stet=False, coat=False, coat_c=None, step=1):
+                    badge=False, stet=False, coat=False, coat_c=None,
+                   tie=None, dress=None, step=1):
     hline(draw, 13, 30, 6, rgba('000000', 60))
 
     if step == 1:
@@ -570,11 +604,13 @@ def draw_right_walk(draw, skin, hair, shirt, pant, shoe=SHOE_MED,
 
 # ── frame dispatcher ─────────────────────────────────────────────────────────
 def make_frame(direction: str, walk: int, skin, hair, shirt, pant,
-               shoe=SHOE_MED, badge=False, stet=False, coat=False, coat_c=None):
+               shoe=SHOE_MED, badge=False, stet=False, coat=False, coat_c=None,
+               tie=None, dress=None):
     frame = Image.new('RGBA', (32, 32), (0, 0, 0, 0))
     d = ImageDraw.Draw(frame)
     kw = dict(skin=skin, hair=hair, shirt=shirt, pant=pant,
-              shoe=shoe, badge=badge, stet=stet, coat=coat, coat_c=coat_c)
+              shoe=shoe, badge=badge, stet=stet, coat=coat, coat_c=coat_c,
+              tie=tie, dress=dress)
 
     if direction == 'down':
         if walk == 0:   draw_down(d, **kw)
@@ -602,13 +638,14 @@ FRAME_W = 32; FRAME_H = 32; COLS = 3; ROWS = 4
 
 def make_spritesheet(name: str, skin, hair, shirt, pant,
                      shoe=SHOE_MED, badge=False, stet=False,
-                     coat=False, coat_c=None):
+                     coat=False, coat_c=None, tie=None, dress=None):
     sheet = Image.new('RGBA', (FRAME_W*COLS, FRAME_H*ROWS), (0, 0, 0, 0))
     for row_i, direction in enumerate(DIRECTIONS):
         for col_i in range(COLS):
             frame = make_frame(direction, col_i, skin, hair, shirt, pant,
                                shoe=shoe, badge=badge, stet=stet,
-                               coat=coat, coat_c=coat_c)
+                               coat=coat, coat_c=coat_c,
+                               tie=tie, dress=dress)
             sheet.paste(frame, (col_i*FRAME_W, row_i*FRAME_H))
     out = os.path.join(OUT, f'{name}.png')
     sheet.save(out, 'PNG')
@@ -683,7 +720,16 @@ def make_all():
         shirt=rgb('D4AC0D'), pant=rgb('6B5535'),
         shoe=rgb('5C4220'))
 
-    print('\nDone! 10 spritesheets generated.')
+    # Lawyer (Records room): navy suit, white shirt, gold tie, sandy hair.
+    # Likeness-based — the real-person cast (see characters.ts) reads by
+    # silhouette, so the suit-and-gold-tie combo is his identifying mark.
+    make_spritesheet('npc_lawyer',
+        skin=SKIN['peach'], hair=HAIR['sandy'],
+        shirt=rgb('27406B'), pant=rgb('1B2D4D'),
+        shoe=rgb('141414'),
+        dress=rgb('F2F4F8'), tie=rgb('E8C33A'))
+
+    print('\nDone! 11 spritesheets generated.')
     print('Format: 96×128px  |  3 cols × 4 rows  |  32×32 frames')
     print('Row order: 0=down, 1=left, 2=right, 3=up')
     print('Col order: 0=idle, 1=walk-a, 2=walk-b')

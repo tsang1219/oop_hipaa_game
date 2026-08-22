@@ -40,14 +40,21 @@ will merge-conflict if run in parallel. Only parallelize runs that DON'T write g
 `01` (read-only), `02` (docs), `04`-proposal (docs). Everything else = separate branch,
 integrated one at a time.
 
-## Tonight's launch (2 parallel + 1 loop)
-- **Chat A** (unattended): `02-planning-reconciliation` → branch `fable/reconciliation`
-- **Chat B** (unattended): `04-refactor-proposal` (proposal only) → branch `fable/refactor-proposal`
-- **Chat C** (the loop): `07-find-fix-verify-loop` → branch `fable/fix-loop`
+## Tonight's launch (the polish push — 2026-08-22)
+Driven by `.planning/POLISH_SPEC.md` + `.planning/ASSET_PLAN.md`, which consolidate everything below
+into one requirements list. Read those two first; they supersede the polish half of `POLISH_STANDARD.md`
+and the FEEL/SPRITE backlog in `DEBUG_LOG.md` (half of which is already closed).
 
-All three are collision-free (A and B are docs; C writes code on its own branch). In the
-morning: read the three reports, approve/adjust the refactor plan, triage what the loop flagged.
-Then queue `05` / `06` as daytime sessions when you have taste to spend.
+- **Night 1** (unattended): `11-art-substrate` → branch `fable/art-substrate`. The biggest lever in
+  the project — a real tileset, walls with height, shadows, density, light. Nothing else changes the
+  screenshot.
+- **Night 2** (unattended): `12-living-world` → branch `fable/living-world`. Blinking, walking NPCs,
+  and the 219 sound files we own and never wired. Run after 11 (they share `BootScene.ts`).
+- **Daytime, with me**: `13-hipaa-trivia-and-hot-takes` → branch `fable/trivia`, and the still-open
+  cast work in `08-cast-identity-pass`. Both are voice work — they need my taste each cycle.
+
+Earlier launch (2026-07, complete): `02-planning-reconciliation`, `04-refactor-proposal`,
+`07-find-fix-verify-loop` — reports are in this folder.
 
 ## Shared guardrails (apply to EVERY run)
 1. **Own branch or worktree. Never commit to `main`.** One run = one branch.

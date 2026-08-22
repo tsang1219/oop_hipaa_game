@@ -1844,8 +1844,8 @@
         },
         {
           "id": "attorney",
-          "name": "Attorney with Subpoena",
-          "sprite": "boss",
+          "name": "Nate the Lawyer",
+          "sprite": "lawyer",
           "x": 15,
           "y": 8,
           "sceneId": "legal_request"

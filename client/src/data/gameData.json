@@ -819,7 +819,7 @@
     },
     {
       "id": "legal_request",
-      "character": "Attorney with Subpoena",
+      "character": "Nate the Lawyer",
       "dialogue": "I have a subpoena for patient records in a malpractice case. I need these records TODAY. My client is depending on this. Don't make me get a judge involved.",
       "choices": [
         {

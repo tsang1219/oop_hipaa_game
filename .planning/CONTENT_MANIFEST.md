@@ -62,7 +62,7 @@ Each scene has: `id`, `character`, `dialogue`, `choices[]` (with `text`, `score`
 |----|-----------|-------------|------|---------|
 | `records_access` | Records Clerk | Patient Access Timeline (30 days) | Records | Quiz: how long to fulfill access request? |
 | `patient_access_rights` | Patient Requesting File | Right to Access Own Records | Records | Patient requesting 2 years of records |
-| `legal_request` | Attorney with Subpoena | Subpoena Handling / Legal Disclosure | Records | Aggressive attorney demanding same-day records |
+| `legal_request` | Nate the Lawyer | Subpoena Handling / Legal Disclosure | Records | Aggressive attorney demanding same-day records |
 | `unlocked_files` | Observation | Physical Safeguards / File Security | Records | Unlocked cabinet with medical records, door propped open |
 | `proper_disposal` | Observation | PHI Disposal / Shredding | Records | Patient documents in regular trash |
 | `access_audit` | Observation | Audit Logs / Suspicious Access | Records | Coworker accessed chart 15 times without reason |

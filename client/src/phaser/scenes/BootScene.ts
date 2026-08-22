@@ -65,6 +65,7 @@ export class BootScene extends Phaser.Scene {
     this.load.spritesheet('npc_staff_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_staff.png`, CHAR_FRAME);
     this.load.spritesheet('npc_patient_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_patient.png`, CHAR_FRAME);
     this.load.spritesheet('npc_visitor_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_visitor.png`, CHAR_FRAME);
+    this.load.spritesheet('npc_lawyer_sheet', `${base}attached_assets/generated_images/privacyquest/characters/npc_lawyer.png`, CHAR_FRAME);
 
     // Load BreachDefense tower sprites
     this.load.image('tower_MFA', `${base}attached_assets/generated_images/mfa_tower_pixel_sprite.png`);
@@ -144,10 +145,10 @@ export class BootScene extends Phaser.Scene {
       });
     }
 
-    // Register NPC walk animations for all 9 NPC types (4 directions x 9 types = 36 anims)
+    // Register NPC walk animations for all 10 NPC types (4 directions x 10 types = 40 anims)
     const NPC_TYPES = [
       'receptionist', 'nurse', 'doctor', 'it_tech',
-      'officer', 'boss', 'staff', 'patient', 'visitor',
+      'officer', 'boss', 'staff', 'patient', 'visitor', 'lawyer',
     ] as const;
     for (const type of NPC_TYPES) {
       const sheetKey = `npc_${type}_sheet`;
@@ -176,6 +177,7 @@ export class BootScene extends Phaser.Scene {
       'player_down', 'player_up', 'player_left', 'player_right',
       'npc_receptionist', 'npc_nurse', 'npc_doctor', 'npc_it_tech',
       'npc_boss', 'npc_staff', 'npc_patient', 'npc_visitor', 'npc_officer',
+      'npc_lawyer',
     ];
     for (const key of criticalTextures) {
       if (!this.textures.exists(key)) {

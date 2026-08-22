@@ -35,6 +35,7 @@ export const SPONSOR_SPRITE_PATHS: Record<string, string> = {
   npc_staff_sheet:        `${base}attached_assets/generated_images/privacyquest/characters/npc_staff.png`,
   npc_patient_sheet:      `${base}attached_assets/generated_images/privacyquest/characters/npc_patient.png`,
   npc_visitor_sheet:      `${base}attached_assets/generated_images/privacyquest/characters/npc_visitor.png`,
+  npc_lawyer_sheet:       `${base}attached_assets/generated_images/privacyquest/characters/npc_lawyer.png`,
 };
 
 /**
@@ -190,6 +191,7 @@ export const NPC_TYPE_COLORS: Record<string, string> = {
   staff:        '#FFA94D', // hi-vis apricot
   patient:      '#9FB4FF', // gown periwinkle
   visitor:      '#B4E33D', // visitor-badge lime
+  lawyer:       '#E8C33A', // the gold tie, worn as a signature
 };
 
 const NPC_COLOR_BY_ID: Record<string, string> = {
@@ -218,7 +220,7 @@ const NPC_COLOR_BY_ID: Record<string, string> = {
   // ── Records ──
   records_clerk:         '#F4978E', // dusty salmon — reception family, not Riley's coral
   patient_request:       '#9FB4FF', // gown periwinkle
-  attorney:              '#94A3B8', // courtroom slate
+  attorney:              '#E8C33A', // the gold tie — matches his sprite, reads apart from the room's blues
   compliance_officer:    '#5B8DEF', // by-the-book azure
 
   // ── IT Office ──
