@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { npcSpriteTextureKey } from '../../sprites/npcTextures';
-import { objectTextureKey } from '../../sprites/objectTextures';
+import { objectTexture } from './art/objectFrames';
+import { resolveInteractableArt } from './art/artCatalog';
+import { ATLAS_KEY } from './art/atlasFrames.generated';
 import { getHallwayBoard } from '../../../data/hallwayContent';
 import { getNPCColor } from '@/data/spriteAssetPaths';
 import { isDemoActive } from '@/lib/demoSession';
@@ -92,8 +94,12 @@ export function spawnInteractables(
   // ── Educational items ────────────────────────────────────────
   for (const item of room.educationalItems) {
     const collected = ctx.collectedItems.has(item.id);
-    const texKey = objectTextureKey(item.type);
-    const sprite = scene.add.sprite(item.x * TILE + TILE / 2, item.y * TILE + TILE / 2, texKey);
+    const tex = objectTexture(item.type);
+    const art = resolveInteractableArt(room.id, item.id);
+    const sprite = scene.add.sprite(
+      item.x * TILE + TILE / 2 + (art?.dx ?? 0), item.y * TILE + TILE / 2 + (art?.dy ?? 0),
+      art?.frame ? ATLAS_KEY : tex.key, art?.frame ?? tex.frame,
+    );
     sprite.setAlpha(collected ? 0.4 : 1);
     if (collected) {
       sprite.setTint(0x888888);
@@ -181,7 +187,8 @@ export function spawnInteractables(
       }).setOrigin(0.5).setDepth(7);
 
       // Invisible interactive sprite overlapping the board
-      const boardSprite = scene.add.sprite(boardX, boardY, objectTextureKey('poster'))
+      const boardTex = objectTexture('poster');
+      const boardSprite = scene.add.sprite(boardX, boardY, boardTex.key, boardTex.frame)
         .setAlpha(0.01) // nearly invisible; visual is the rectangle above
         .setDepth(8)
         .setInteractive({ cursor: 'pointer' });
@@ -197,8 +204,12 @@ export function spawnInteractables(
 
   // ── Interaction zones ────────────────────────────────────────
   for (const zone of room.interactionZones) {
-    const texKey = objectTextureKey(zone.spriteType || 'computer');
-    const sprite = scene.add.sprite(zone.x * TILE + TILE / 2, zone.y * TILE + TILE / 2, texKey);
+    const tex = objectTexture(zone.spriteType || 'computer');
+    const zoneArt = resolveInteractableArt(room.id, zone.id);
+    const sprite = scene.add.sprite(
+      zone.x * TILE + TILE / 2 + (zoneArt?.dx ?? 0), zone.y * TILE + TILE / 2 + (zoneArt?.dy ?? 0),
+      zoneArt?.frame ? ATLAS_KEY : tex.key, zoneArt?.frame ?? tex.frame,
+    );
     sprite.setDepth(20);
     scene.tweens.add({
       targets: sprite,

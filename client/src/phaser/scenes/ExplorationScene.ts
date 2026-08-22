@@ -1,7 +1,9 @@
 import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures } from '../sprites';
-import { objectTextureKey } from '../sprites/objectTextures';
+import { objectTexture } from '../systems/exploration/art/objectFrames';
+import { getArtHandle } from '../systems/exploration/art/artRenderer';
+import { isArtRoom } from '../systems/exploration/art/artCatalog';
 import { npcSpriteTextureKey } from '../sprites/npcTextures';
 import {
   ENCOUNTER_WAVES_INBOUND,
@@ -678,6 +680,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
     eventBridge.on(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     eventBridge.on(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
+    eventBridge.on(BRIDGE_EVENTS.QA_SET_LIGHTING, this.onQASetLighting, this);
 
     // ── Type-driven furniture idle animations (Phase 26-02) ──────
     // (Round 4 → systems/exploration/roomAmbience)
@@ -992,6 +995,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.QA_PRESS_SPACE, this.onQAPressSpace, this);
     eventBridge.off(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     eventBridge.off(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
+    eventBridge.off(BRIDGE_EVENTS.QA_SET_LIGHTING, this.onQASetLighting, this);
   }
 
   /** F-25 (Run 07): now actually invoked — wired in create() via
@@ -1122,6 +1126,11 @@ export class ExplorationScene extends Phaser.Scene {
       return false;
     }
   }
+
+  /** Run 11 proof hook: show/hide the atlas renderer's lighting layer. */
+  private onQASetLighting = (data: { on: boolean }) => {
+    getArtHandle(this)?.setLighting(!!data?.on);
+  };
 
   private onQATeleportTo = (data: { tileX: number; tileY: number }) => {
     if (!this.isSceneAlive()) return;
@@ -1450,7 +1459,8 @@ export class ExplorationScene extends Phaser.Scene {
     }
 
     // Interactable anchor — invisible sprite; visuals above carry the look
-    const anchor = this.add.sprite(cx, cy, objectTextureKey('computer'))
+    const consoleTex = objectTexture('computer');
+    const anchor = this.add.sprite(cx, cy, consoleTex.key, consoleTex.frame)
       .setAlpha(0.01)
       .setDepth(depth);
     this.interactables.push({
@@ -1467,8 +1477,9 @@ export class ExplorationScene extends Phaser.Scene {
 
   /** Register an invisible interactable anchor for a whimsy object. */
   private addWhimsy(id: string, data: WhimsyData): Phaser.GameObjects.Sprite {
+    const whimsyTex = objectTexture('computer');
     const anchor = this.add.sprite(
-      data.x * TILE + TILE / 2, data.y * TILE + TILE / 2, objectTextureKey('computer'),
+      data.x * TILE + TILE / 2, data.y * TILE + TILE / 2, whimsyTex.key, whimsyTex.frame,
     ).setAlpha(0.01).setDepth(5 + data.y);
     this.interactables.push({ type: 'whimsy', id, data: data as any, sprite: anchor });
     return anchor;
@@ -1480,8 +1491,11 @@ export class ExplorationScene extends Phaser.Scene {
     if (spot) {
       const cx = spot.x * TILE + TILE / 2;
       const cy = spot.y * TILE + TILE / 2;
+      // Run 11: in atlas-rendered rooms GERALD is a real 1×2 copier, so the tape
+      // and LED ride on its upper half instead of floating over the tile centre.
+      const tall = isArtRoom(room.id);
       // Label-maker tape: GERALD
-      const tape = this.add.text(cx, cy - 20, 'GERALD', {
+      const tape = this.add.text(cx, cy - (tall ? 44 : 20), 'GERALD', {
         fontFamily: '"Press Start 2P"',
         fontSize: '6px',
         color: '#2a2418',
@@ -1494,7 +1508,7 @@ export class ExplorationScene extends Phaser.Scene {
         try { return (parseInt(localStorage.getItem(PRINTER_COUNT_KEY) ?? '0', 10) || 0) >= PRINTER_BEATS.length; }
         catch { return false; }
       })();
-      const led = this.add.rectangle(cx + 12, cy - 10, 3, 3, printed ? 0x2ecc71 : 0xf5a623, 1)
+      const led = this.add.rectangle(cx + (tall ? 9 : 12), cy - (tall ? 28 : 10), 3, 3, printed ? 0x2ecc71 : 0xf5a623, 1)
         .setDepth(6 + spot.y);
       if (!printed) {
         this.tweens.add({

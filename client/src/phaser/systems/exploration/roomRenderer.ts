@@ -2,6 +2,50 @@ import Phaser from 'phaser';
 import { furnitureTextureKey } from '../../sprites/furniture';
 import { drawCompositeFurniture, hasComposite } from './compositeFurniture';
 import type { Room } from '@shared/schema';
+import { getRoomArt } from './art/artCatalog';
+import { renderRoomArt, getArtHandle } from './art/artRenderer';
+
+/**
+ * Run 11 (art-substrate): invisible static bodies for every obstacle. Walls are
+ * built per tile so door tiles (and one tile of clearance) stay open. Shared by
+ * the atlas renderer and the legacy procedural path below — the walkable layer is
+ * identical whichever one draws the room.
+ */
+export function buildWallColliders(
+  scene: Phaser.Scene,
+  room: Room,
+  doors: Array<{ x: number; y: number }>,
+  walls: Phaser.Physics.Arcade.StaticGroup,
+): void {
+  for (const obs of room.obstacles) {
+    const ox = obs.x * TILE;
+    const oy = obs.y * TILE;
+    const ow = obs.width * TILE;
+    const oh = obs.height * TILE;
+    const obsType = (obs as any).type as string | undefined;
+    if (obsType === 'wall' && doors.length > 0) {
+      for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
+        for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
+          const isDoorTile = doors.some((d: any) => {
+            if (d.x === wx && d.y === wy) return true;
+            if (d.x === wx && Math.abs(d.y - wy) <= 1) return true;
+            if (d.y === wy && Math.abs(d.x - wx) <= 1) return true;
+            return false;
+          });
+          if (!isDoorTile) {
+            const wr = scene.add.rectangle(wx * TILE + TILE / 2, wy * TILE + TILE / 2, TILE, TILE);
+            wr.setVisible(false);
+            walls.add(wr);
+          }
+        }
+      }
+    } else {
+      const wallRect = scene.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh);
+      wallRect.setVisible(false);
+      walls.add(wallRect);
+    }
+  }
+}
 
 const TILE = 32;
 
@@ -175,6 +219,16 @@ export function ensurePlayerFallbackTexture(scene: Phaser.Scene): void {
 }
 
 export function renderRoom(scene: Phaser.Scene, room: Room): { walls: Phaser.Physics.Arcade.StaticGroup } {
+  // Run 11: rooms with an art style render from the LimeZu atlas. Everything
+  // below this block is the legacy procedural path for rooms not yet converted.
+  const artStyle = getRoomArt(room.id);
+  if (artStyle) {
+    renderRoomArt(scene, room, artStyle);
+    const walls = scene.physics.add.staticGroup();
+    buildWallColliders(scene, room, ((room as any).doors || []) as Array<{ x: number; y: number }>, walls);
+    return { walls };
+  }
+
   const w = room.width * TILE;
   const h = room.height * TILE;
 
@@ -679,38 +733,16 @@ export function renderRoom(scene: Phaser.Scene, room: Room): { walls: Phaser.Phy
       }
     }
 
-    // Physics collision body (invisible) — skip tiles occupied by doors
-    // (doors already declared above at floor render time — reuse same array)
-    if (obsType === 'wall' && doors.length > 0) {
-      // Build collision per-tile, skipping door tiles (and 1 tile adjacent inward)
-      for (let wy = obs.y; wy < obs.y + obs.height; wy++) {
-        for (let wx = obs.x; wx < obs.x + obs.width; wx++) {
-          const isDoorTile = doors.some((d: any) => {
-            // Skip the door tile itself and one tile of clearance
-            if (d.x === wx && d.y === wy) return true;
-            if (d.x === wx && Math.abs(d.y - wy) <= 1) return true;
-            if (d.y === wy && Math.abs(d.x - wx) <= 1) return true;
-            return false;
-          });
-          if (!isDoorTile) {
-            const wr = scene.add.rectangle(wx * TILE + TILE / 2, wy * TILE + TILE / 2, TILE, TILE);
-            wr.setVisible(false);
-            walls.add(wr);
-          }
-        }
-      }
-    } else {
-      const wallRect = scene.add.rectangle(ox + ow / 2, oy + oh / 2, ow, oh);
-      wallRect.setVisible(false);
-      walls.add(wallRect);
-    }
   }
 
+  buildWallColliders(scene, room, doors, walls);
   return { walls };
 }
 
 // ── Vignette overlay — subtle edge darkening to draw eye to center ──
 export function renderVignette(scene: Phaser.Scene): void {
+  // Atlas-rendered rooms carry their own radial vignette in the lighting layer.
+  if (getArtHandle(scene)) return;
   const camW = scene.cameras.main.width;
   const camH = scene.cameras.main.height;
   const vignette = scene.add.graphics();

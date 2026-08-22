@@ -1,7 +1,8 @@
 import Phaser from 'phaser';
 import { furnitureTextureKey } from '../../sprites/furniture';
 import { npcSpriteTextureKey } from '../../sprites/npcTextures';
-import { objectTextureKey } from '../../sprites/objectTextures';
+import { objectTexture } from './art/objectFrames';
+import { getArtHandle } from './art/artRenderer';
 import { playBusSfx } from './audioMixer';
 import type { Room } from '@shared/schema';
 import type { InteractableData } from './interactableFactory';
@@ -61,21 +62,8 @@ export function addRoomAmbience(
 
   // ── Reception life pass (DESIGN-005) ────────────────────────
   if (room.id === 'reception') {
-    // Busy desk props — clipboard, coffee mug, papers stack riding on the desk surface
-    const deskSurfaceY = 2 * TILE + TILE / 2 - 6;
-    const clipboard = scene.add.sprite(8 * TILE + TILE / 2, deskSurfaceY, objectTextureKey('manual')).setScale(0.55).setDepth(5).setAngle(-8);
-    const mug = scene.add.sprite(9 * TILE + TILE / 2 + 6, deskSurfaceY + 2, furnitureTextureKey('coffee_mug')).setScale(0.6).setDepth(5);
-    const papers = scene.add.sprite(11 * TILE + TILE / 2, deskSurfaceY, furnitureTextureKey('inbox_tray')).setScale(0.55).setDepth(5);
-    scene.tweens.add({ targets: mug, y: mug.y - 1, duration: 1800, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    void clipboard; void papers;
-
-    // Vary chair groupings — add a conversation pair facing each other (decorative, no collision)
-    const pairY = 11 * TILE + TILE / 2;
-    const chairA = scene.add.sprite(10 * TILE + TILE / 2, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(15);
-    const chairB = scene.add.sprite(11 * TILE + TILE / 2 + 4, pairY, furnitureTextureKey('chair')).setDepth(3).setAngle(-15).setFlipX(true);
-    // Angled corner chair near the right cluster, suggesting someone sat askew
-    const chairC = scene.add.sprite(14 * TILE + TILE / 2, 8 * TILE + TILE / 2, furnitureTextureKey('chair')).setDepth(3).setAngle(-25);
-    void chairA; void chairB; void chairC;
+    // Run 11: the busy-desk clutter (clipboard, mug, papers) and the extra chairs
+    // are LimeZu frames placed by art/artCatalog.ts ROOM_DECOR now.
 
     // Interactable pulse — subtle scale yoyo on items + zones to signpost interactivity
     for (const ia of interactables) {
@@ -186,7 +174,8 @@ export function addRoomAmbience(
     // (3) Subpoena envelope prop next to Attorney — small obj_manual sprite, signals "official document"
     const attorney = interactables.find(i => i.type === 'npc' && i.id === 'attorney');
     if (attorney) {
-      const env = scene.add.sprite(attorney.sprite.x + 14, attorney.sprite.y + 4, objectTextureKey('manual')).setScale(0.5).setDepth(attorney.sprite.depth - 1).setAngle(12);
+      const envTex = objectTexture('manual');
+      const env = scene.add.sprite(attorney.sprite.x + 14, attorney.sprite.y + 4, envTex.key, envTex.frame).setScale(0.5).setDepth(attorney.sprite.depth - 1).setAngle(12);
       scene.tweens.add({ targets: env, y: env.y - 1, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
     // (4) Decorative document cart drifting slowly down the central aisle (separate from the static cart at (6,5))
@@ -316,9 +305,28 @@ export function addRoomAmbience(
 // Positions computed from obstacle tile coords so no sprite references needed.
 // All tweens/timers use scene.tweens.add / scene.time.addEvent — Phaser cleans them on scene shutdown.
 export function addFurnitureIdleAnimations(scene: Phaser.Scene, room: any): void {
+  // Run 11: in atlas-rendered rooms the props are real sprites, so plants sway
+  // themselves (pivoting at the pot) and nothing paints ellipses over the art.
+  const art = getArtHandle(scene);
   for (const obs of room.obstacles) {
     const obsType = (obs as any).type as string | undefined;
     if (!obsType) continue;
+
+    if (art) {
+      const sprite = art.props.get(`${obsType}@${obs.x},${obs.y}`);
+      if (obsType === 'plant' && sprite) {
+        scene.tweens.add({
+          targets: sprite,
+          angle: { from: -1.6, to: 1.6 },
+          duration: 2100 + Math.random() * 500,
+          yoyo: true,
+          repeat: -1,
+          ease: 'Sine.easeInOut',
+        });
+        continue;
+      }
+      if (obsType === 'plant' || obsType === 'privacy_screen') continue;
+    }
 
     // ── curtain_partition / privacy_screen — cloth sway (ANIM-07) ────────
     if (obsType === 'curtain_partition' || obsType === 'privacy_screen') {

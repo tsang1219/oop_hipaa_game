@@ -49,6 +49,14 @@ export class BootScene extends Phaser.Scene {
     // Load background images
     this.load.image('hospital_bg', `${base}attached_assets/generated_images/Hospital_corridor_pixel_background_72c96c5f.png`);
 
+    // Run 11 (ART-01/ART-11) — the interior tileset: ONE atlas sliced from LimeZu
+    // Modern Interiors by scripts/art/slice-atlas.mjs (see attached_assets/CREDITS.md).
+    this.load.atlas(
+      'interiors',
+      `${base}attached_assets/generated_images/privacyquest/atlas/interiors.png`,
+      `${base}attached_assets/generated_images/privacyquest/atlas/interiors.json`,
+    );
+
     // Load character spritesheets — 32x32 frames, 3 cols x 4 rows
     // Row order: down(0), left(1), right(2), up(3) — 3 frames per direction
     const CHAR_FRAME = { frameWidth: 32, frameHeight: 32 };

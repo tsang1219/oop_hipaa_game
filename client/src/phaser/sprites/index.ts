@@ -1,7 +1,6 @@
 import Phaser from 'phaser';
 
 import { generateNPCTextures } from './npcTextures';
-import { generateObjectTextures } from './objectTextures';
 import { generateFurnitureTextures } from './furniture';
 
 /**
@@ -10,6 +9,7 @@ import { generateFurnitureTextures } from './furniture';
  */
 export function generateAllTextures(scene: Phaser.Scene) {
   generateNPCTextures(scene);
-  generateObjectTextures(scene);
+  // Run 11: object sprites (poster / manual / computer / whiteboard) now come from
+  // the LimeZu atlas — see systems/exploration/art/objectFrames.ts.
   generateFurnitureTextures(scene);
 }

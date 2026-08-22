@@ -1,5 +1,6 @@
 import { eventBridge, BRIDGE_EVENTS } from './EventBridge';
 import { loadSave } from '../lib/saveData';
+import type { ArtSnapshot } from './systems/exploration/art/artRenderer';
 
 /**
  * QA Bridge — exposes rich game state to window for Playwright testing.
@@ -72,6 +73,8 @@ export interface QABridge {
     pressSpace(): void;
     navigateToDoor(doorId: string): void;
     teleportTo(tileX: number, tileY: number): void;
+    /** Run 11: toggle the atlas renderer's lighting layer (ART-06 proof shots). */
+    setLighting(on: boolean): void;
   };
 
   // Promise-based waiters for Playwright
@@ -97,6 +100,8 @@ export interface QABridge {
   ambience?: { roomId: string | null; running: boolean; layers: string[] };
   /** Last ambient eavesdrop line (existing breadcrumb, typed here). */
   lastAmbient?: { id: string; line: string };
+  /** Run 11 (art-substrate): what the atlas renderer drew for the current room. */
+  art?: ArtSnapshot;
 }
 
 declare global {
@@ -174,6 +179,9 @@ export function initQABridge() {
       },
       teleportTo(tileX: number, tileY: number): void {
         eventBridge.emit(BRIDGE_EVENTS.QA_TELEPORT_TO, { tileX, tileY });
+      },
+      setLighting(on: boolean): void {
+        eventBridge.emit(BRIDGE_EVENTS.QA_SET_LIGHTING, { on });
       },
     },
 

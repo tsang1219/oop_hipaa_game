@@ -75,7 +75,7 @@ export const PRINTER_PROMPT = 'Check on GERALD';
 /** Where each Gerald lives: roomId → tile. (IT Office anchors to the existing
  *  printer_station obstacle; the other two get their own small stations.) */
 export const PRINTER_SPOTS: Record<string, { x: number; y: number }> = {
-  reception: { x: 3, y: 1 },
+  reception: { x: 3, y: 2 }, // Run 11: wall-flush props dropped a row when the back wall grew to 2 rows
   records_room: { x: 12, y: 11 },
   it_office: { x: 16, y: 10 }, // center of the 3x2 printer_station — (15,10) tied with the fax zone's approach tile for proximity
 };

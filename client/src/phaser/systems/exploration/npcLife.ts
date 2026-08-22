@@ -2,7 +2,7 @@ import Phaser from 'phaser';
 import { tileBlocked } from './pathfinding';
 import { blinkTextureKey, ensureBlinkTexture } from './blinkFrames';
 import { playSfx } from './audioMixer';
-import { objectTextureKey } from '../../sprites/objectTextures';
+import { objectTexture } from './art/objectFrames';
 import { furnitureTextureKey } from '../../sprites/furniture';
 import type { Room, NPC, Position } from '@shared/schema';
 import type { InteractableData } from './interactableFactory';
@@ -617,7 +617,7 @@ export class NpcLifeController {
         break;
       }
       case 'chart': {
-        this.floatIcon(e, objectTextureKey('manual'), 0.5, -12, -22, 900);
+        this.floatIcon(e, objectTexture('manual'), 0.5, -12, -22, 900);
         // a little "reading" nod, paper rustle under it
         scene.tweens.add({ targets: s, scaleY: 0.95, duration: 140, yoyo: true, delay: 220, ease: 'Sine.easeInOut', onComplete: () => { s.scaleY = 1; } });
         playSfx(scene, 'sfx_fidget_paper', { bus: 'sfx', volume: 0.08, rate: 1.1 + Math.random() * 0.2, cooldownKey: 'fidget_paper', cooldownMs: 900 });
@@ -671,10 +671,12 @@ export class NpcLifeController {
   }
 
   /** A small prop rises beside the head, holds, and fades. Returns the sprite. */
-  private floatIcon(e: LifeEntry, tex: string, scale: number, dx: number, dy: number, holdMs: number): Phaser.GameObjects.Sprite | null {
-    if (!this.scene.textures.exists(tex)) return null;
+  private floatIcon(e: LifeEntry, tex: string | { key: string; frame: string }, scale: number, dx: number, dy: number, holdMs: number): Phaser.GameObjects.Sprite | null {
+    const key = typeof tex === 'string' ? tex : tex.key;
+    const frame = typeof tex === 'string' ? undefined : tex.frame;
+    if (!this.scene.textures.exists(key)) return null;
     const s = e.sprite;
-    const icon = this.scene.add.sprite(s.x + dx, s.y + dy + 6, tex).setScale(scale).setAlpha(0).setDepth(s.depth + 2);
+    const icon = this.scene.add.sprite(s.x + dx, s.y + dy + 6, key, frame).setScale(scale).setAlpha(0).setDepth(s.depth + 2);
     this.scene.tweens.add({
       targets: icon, alpha: 0.95, y: s.y + dy, duration: 220, ease: 'Sine.easeOut',
       onComplete: () => {
