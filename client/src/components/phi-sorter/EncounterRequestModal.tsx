@@ -12,6 +12,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type EncounterRequestModalProps = {
   npcName: string;
@@ -36,6 +37,7 @@ export function EncounterRequestModal({
   onAccept,
   onDecline,
 }: EncounterRequestModalProps) {
+  useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

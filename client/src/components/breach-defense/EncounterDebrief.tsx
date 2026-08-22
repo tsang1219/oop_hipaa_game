@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 interface EncounterDebriefProps {
   encounterId: string;
@@ -19,6 +20,7 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
   scoreContribution,
   onDismiss,
 }) => {
+  useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

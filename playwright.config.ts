@@ -11,6 +11,9 @@ export default defineConfig({
   retries: 1,
   workers: 1,
   use: {
+    // Run 12: PW_CHANNEL=chrome runs the suite in the installed Google Chrome
+    // when the bundled Chromium isn't downloaded (undefined = Playwright default).
+    channel: process.env.PW_CHANNEL || undefined,
     baseURL: 'http://localhost:8080',
     viewport: { width: 1280, height: 960 },
     actionTimeout: 30_000,

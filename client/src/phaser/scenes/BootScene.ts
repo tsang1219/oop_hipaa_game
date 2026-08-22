@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures } from '../sprites';
 import { getSelectedCharacter } from '@/data/characters';
+import { ensureBlinkTexture } from '../systems/exploration/blinkFrames';
 
 const TILE_SIZE = 32;
 
@@ -98,14 +99,61 @@ export class BootScene extends Phaser.Scene {
     this.load.audio('sfx_sorter_stamp',   `${base}attached_assets/audio/kenney_impact-sounds/Audio/impactPlank_medium_000.ogg`);
     this.load.audio('sfx_sorter_paper',   `${base}attached_assets/audio/kenney_interface-sounds/Audio/scroll_002.ogg`);
 
+    // ── Run 12 (living-world) — AUD-02/03/04/06/07: mining the other 219 Kenney
+    // files that were sitting unused in attached_assets/audio. See CREDITS.md
+    // and RUN_REPORT-12.md's audio map for the full key -> call-site table.
+    const IMPACT = `${base}attached_assets/audio/kenney_impact-sounds/Audio`;
+    const UI = `${base}attached_assets/audio/kenney_interface-sounds/Audio`;
+
+    // AUD-03 — footsteps by floor material, 5 round-robin variants each
+    // (walk and run share the set; footsteps.ts varies rate/volume instead).
+    const FOOTSTEP_MATERIALS: Record<string, string> = { wood: 'wood', concrete: 'concrete', carpet: 'carpet' };
+    for (const mat of Object.keys(FOOTSTEP_MATERIALS)) {
+      for (let i = 0; i < 5; i++) {
+        const n = String(i).padStart(3, '0');
+        this.load.audio(`sfx_step_${mat}_${i}`, `${IMPACT}/footstep_${mat}_${n}.ogg`);
+      }
+    }
+
+    // AUD-07 — stinger set (discovery / item-get / act-change / secret-found;
+    // correct/wrong/room-clear reuse the existing sorter + fanfare keys above)
+    this.load.audio('sfx_stinger_discovery', `${UI}/confirmation_002.ogg`);
+    this.load.audio('sfx_stinger_itemget',   `${UI}/select_004.ogg`);
+    this.load.audio('sfx_stinger_actchange', `${UI}/bong_001.ogg`);
+    this.load.audio('sfx_stinger_secret',    `${UI}/question_002.ogg`);
+
+    // ANIM-07 — door open swing, round-robin so repeated door use varies
+    this.load.audio('sfx_door_open_0', `${UI}/open_001.ogg`);
+    this.load.audio('sfx_door_open_1', `${UI}/open_002.ogg`);
+    this.load.audio('sfx_door_open_2', `${UI}/open_003.ogg`);
+    this.load.audio('sfx_room_enter',  `${UI}/minimize_006.ogg`);
+
+    // AUD-02 — the UI grammar every screen uses from the first click
+    this.load.audio('sfx_ui_tick',      `${UI}/tick_001.ogg`);
+    this.load.audio('sfx_ui_hover',     `${UI}/tick_004.ogg`);
+    for (let i = 0; i < 4; i++) this.load.audio(`sfx_ui_click_${i}`, `${UI}/click_00${i + 1}.ogg`);
+    this.load.audio('sfx_ui_open_0',    `${UI}/maximize_001.ogg`);
+    this.load.audio('sfx_ui_open_1',    `${UI}/maximize_004.ogg`);
+    this.load.audio('sfx_ui_close_0',   `${UI}/minimize_001.ogg`);
+    this.load.audio('sfx_ui_close_1',   `${UI}/minimize_004.ogg`);
+    for (let i = 0; i < 3; i++) this.load.audio(`sfx_ui_select_${i}`, `${UI}/select_00${i + 1}.ogg`);
+
+    // Everything rarer (tower defense, sorter/triage/corkboard one-shots,
+    // ambient accents, the sample-mode voice blips) loads in DeferredAudioScene,
+    // launched right after boot so it never holds the LOADING bar.
+
     // Load background music — loaded once here, available to all scenes globally
     this.load.audio('music_hub',         `${base}attached_assets/audio/music_hub.ogg`);
     this.load.audio('music_exploration', `${base}attached_assets/audio/music_exploration.ogg`);
     this.load.audio('music_breach',      `${base}attached_assets/audio/music_breach.ogg`);
     // Demo-mode per-room music
     this.load.audio('music_demo_er',           `${base}attached_assets/audio/music_demo_er.ogg`);
-    this.load.audio('music_demo_break_room',   `${base}attached_assets/audio/music_demo_break_room.ogg`);
     this.load.audio('music_demo_records_room', `${base}attached_assets/audio/music_demo_records_room.ogg`);
+    // AUD-01: music_demo_break_room.ogg was byte-identical to music_exploration.ogg
+    // (same md5) — a fake "unique" track. Deleted from disk; break_room's
+    // musicTrack override was removed from roomData.json so it now falls back
+    // to the Act default (music_exploration), which is what it was silently
+    // playing anyway. No load call for it any more.
   }
 
   create() {
@@ -172,6 +220,17 @@ export class BootScene extends Phaser.Scene {
     // Generate particle texture for BreachDefense VFX
     this.generateParticleTexture();
 
+    // Run 12 (ANIM-01) — closed-eye variants of every character sheet, built
+    // from the sheet's own pixels. See systems/exploration/blinkFrames.ts.
+    const blinkable = ['player_sheet', ...NPC_TYPES.map(t => `npc_${t}_sheet`)];
+    const blinkBuilt: string[] = [];
+    for (const sheet of blinkable) {
+      if (ensureBlinkTexture(this, sheet)) blinkBuilt.push(sheet);
+    }
+    if (import.meta.env.DEV && blinkBuilt.length < blinkable.length) {
+      console.info(`[BootScene] blink frames: ${blinkBuilt.length}/${blinkable.length} sheets`);
+    }
+
     // Verify critical programmatic textures were generated successfully
     const criticalTextures = [
       'player_down', 'player_up', 'player_left', 'player_right',
@@ -184,6 +243,10 @@ export class BootScene extends Phaser.Scene {
         console.error(`[BootScene] Texture '${key}' failed to generate`);
       }
     }
+
+    // Run 12: second-pass audio (see DeferredAudioScene) runs alongside the
+    // first room instead of in front of it.
+    this.scene.launch('DeferredAudio');
 
     // Signal React that boot is complete — React starts the appropriate scene
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Boot');

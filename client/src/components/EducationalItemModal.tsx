@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 interface EducationalItemModalProps {
   title: string;
@@ -21,7 +22,7 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
   useEffect(() => {
     requestAnimationFrame(() => {
       setIsVisible(true);
-      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+      uiSfx('open');
     });
   }, []);
 
@@ -31,7 +32,7 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
         isVisible ? 'bg-black/70' : 'bg-black/0'
       }`}
       onClick={() => {
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+        uiSfx('close');
         onClose();
       }}
       role="dialog"
@@ -75,7 +76,7 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
         <div className="flex justify-center">
           <button
             onClick={() => {
-              eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+              uiSfx('close');
               onClose();
             }}
             className="font-['Press_Start_2P'] text-xs bg-[#FF6B9D] hover:bg-[#FF5A8A] text-white px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer"

@@ -15,6 +15,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { PHI18_ENTRIES, PHI18_TOTAL, phi18Count, type Phi18Entry } from '@/data/phi18';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type Phi18CodexProps = {
   foundKeys: string[];
@@ -24,6 +25,7 @@ export type Phi18CodexProps = {
 };
 
 export function Phi18Codex({ foundKeys, recentKey, onClose }: Phi18CodexProps) {
+  useOverlaySfx(null, 'close');
   const found = useMemo(() => new Set(foundKeys), [foundKeys]);
   const count = phi18Count(foundKeys);
   const complete = count >= PHI18_TOTAL;
@@ -36,7 +38,7 @@ export function Phi18Codex({ foundKeys, recentKey, onClose }: Phi18CodexProps) {
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4, rate: 1.1 });
+    uiSfx('open');
   }, []);
 
   useEffect(() => {

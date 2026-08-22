@@ -83,6 +83,20 @@ export interface QABridge {
 
   // Direct EventBridge access for testing
   emit(event: string, data?: any): void;
+
+  // ── Run 12 (living world) — proof surfaces, written by the game ──
+  /** Per-NPC life state: tile, facing, blink/fidget/walk counters (ExplorationScene → NpcLifeController.snapshot). */
+  living?: Array<{
+    id: string; tile: { x: number; y: number }; home: { x: number; y: number };
+    facing: 'down' | 'left' | 'right' | 'up'; state: 'idle' | 'walking' | 'talking';
+    canWander: boolean; blinks: number; fidgets: number; legs: number; turns: number;
+  }>;
+  /** Ring buffer of the last ~120 sound plays (audioMixer.logAudio). */
+  audioLog?: Array<{ t: number; key: string; bus: string; volume: number; rate?: number }>;
+  /** The running synthesized room bed, if any (ambienceBeds). */
+  ambience?: { roomId: string | null; running: boolean; layers: string[] };
+  /** Last ambient eavesdrop line (existing breadcrumb, typed here). */
+  lastAmbient?: { id: string; line: string };
 }
 
 declare global {

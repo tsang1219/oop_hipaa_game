@@ -1,9 +1,13 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { getNPCPortraitImage, hasNPCPortrait, getNPCColor, DEFAULT_SPEAKER_COLOR } from '@/data/spriteAssetPaths';
+import { getBlinkSheetDataUrl } from '@/phaser/systems/exploration/blinkFrames';
 
 interface DialoguePortraitProps {
   npcId: string;
   npcName: string;
+  /** ANIM-08 — while the dialogue text is typing, the portrait bobs faster
+   *  (a mouth-flap stand-in with no new art); stops dead on the last glyph. */
+  talking?: boolean;
 }
 
 /**
@@ -19,7 +23,7 @@ interface DialoguePortraitProps {
  * Used in BattleEncounterScreen dialogue header (Phase 25 Plan 02).
  * data-testid="npc-battle-sprite" preserved for QA bridge / visual tests.
  */
-export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitProps) {
+export default function DialoguePortrait({ npcId, npcName, talking = false }: DialoguePortraitProps) {
   // F-13 (Run 07): zone/item dialogues (sign-in sheet, shredder, …) have no
   // character mapping — they're things, not people. Render a document plate
   // instead of borrowing a random staff member's face.
@@ -31,9 +35,36 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   const useFull = isCharacter && failedUrl !== fullUrl;
 
+  // ANIM-01 — the portrait blinks too. BootScene builds a closed-eye copy of
+  // every walk sheet (blinkFrames.ts); when the portrait is the sheet crop,
+  // swap to that copy for ~110ms every few seconds. Bust portraits (when
+  // they exist) don't blink — no closed-eye art for them.
+  const sheetType = (npcId && /^npc_/.test(sheetUrl)) ? null : null; // (kept for clarity; url below is authoritative)
+  void sheetType;
+  const blinkUrl = isCharacter ? getBlinkSheetDataUrl(sheetKeyFromUrl(sheetUrl)) : undefined;
+  const [blinking, setBlinking] = useState(false);
+  useEffect(() => {
+    if (!blinkUrl) return;
+    let openTimer: ReturnType<typeof setTimeout> | undefined;
+    let closeTimer: ReturnType<typeof setTimeout> | undefined;
+    const schedule = () => {
+      openTimer = setTimeout(() => {
+        setBlinking(true);
+        closeTimer = setTimeout(() => { setBlinking(false); schedule(); }, 110);
+      }, 2200 + Math.random() * 3600);
+    };
+    schedule();
+    return () => { clearTimeout(openTimer); clearTimeout(closeTimer); };
+  }, [blinkUrl, npcId]);
+
   // Run 08 cast identity: characters speak in their signature color — frame,
   // glow, and name plate. Things (zones/items) keep the neutral UI pink.
   const speakerColor = isCharacter ? getNPCColor(npcId) : DEFAULT_SPEAKER_COLOR;
+  // ANIM-08 — talk-bob replaces the slow idle breathe while text is typing;
+  // stops dead (no animation) the instant the last glyph lands.
+  const portraitAnim = talking
+    ? 'portrait-talk 0.24s steps(2) infinite'
+    : 'portrait-breathe 2.4s ease-in-out infinite';
 
   return (
     <>
@@ -41,6 +72,10 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
         @keyframes portrait-breathe {
           0%, 100% { transform: translateY(0); }
           50%       { transform: translateY(-2px); }
+        }
+        @keyframes portrait-talk {
+          0%, 100% { transform: translateY(0) scaleY(1); }
+          50%       { transform: translateY(-1px) scaleY(0.97); }
         }
       `}</style>
 
@@ -67,7 +102,7 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
               objectFit: 'cover',
               imageRendering: 'pixelated',
               backgroundColor: '#1a1a2e',
-              animation: 'portrait-breathe 2.4s ease-in-out infinite',
+              animation: portraitAnim,
             }}
           />
         ) : isCharacter ? (
@@ -76,13 +111,13 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
             style={{
               width: '96px',
               height: '96px',
-              backgroundImage: `url(${sheetUrl})`,
+              backgroundImage: `url(${blinking && blinkUrl ? blinkUrl : sheetUrl})`,
               backgroundSize: '288px 384px',
               backgroundPosition: '0 0',
               backgroundRepeat: 'no-repeat',
               imageRendering: 'pixelated',
               backgroundColor: '#1a1a2e',
-              animation: 'portrait-breathe 2.4s ease-in-out infinite',
+              animation: portraitAnim,
             }}
           />
         ) : (
@@ -95,7 +130,7 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
               alignItems: 'center',
               justifyContent: 'center',
               fontSize: '40px',
-              animation: 'portrait-breathe 2.4s ease-in-out infinite',
+              animation: portraitAnim,
             }}
             aria-label="Object of interest"
           >
@@ -121,4 +156,11 @@ export default function DialoguePortrait({ npcId, npcName }: DialoguePortraitPro
       </div>
     </>
   );
+}
+
+/** '/attached_assets/.../characters/npc_nurse.png' → 'npc_nurse_sheet' (the BootScene texture key). */
+function sheetKeyFromUrl(url: string): string {
+  const m = /\/characters\/([a-z_]+)\.png/i.exec(url);
+  if (!m) return '';
+  return m[1] === 'player' || m[1].startsWith('player_') ? 'player_sheet' : `${m[1]}_sheet`;
 }

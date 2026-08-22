@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import type { Gate } from '@shared/schema';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 interface ChoicePromptProps {
   gate: Gate;
@@ -18,7 +19,7 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
   useEffect(() => {
     const showTimer = setTimeout(() => {
       setVisible(true);
-      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+      uiSfx('open');
     }, 100);
     const optionsTimer = setTimeout(() => setShowOptions(true), 500);
     return () => {
@@ -38,16 +39,16 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
       } else if (e.key === ' ' || e.key === 'Enter') {
         e.preventDefault();
         if (options[selectedIndex]) {
-          eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
+          uiSfx('select');
           onChoice(options[selectedIndex].unlocksId);
         }
       } else if (e.key === '1' && options[0]) {
         e.preventDefault();
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
+        uiSfx('select');
         onChoice(options[0].unlocksId);
       } else if (e.key === '2' && options[1]) {
         e.preventDefault();
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
+        uiSfx('select');
         onChoice(options[1].unlocksId);
       }
     };
@@ -92,7 +93,7 @@ export default function ChoicePrompt({ gate, onChoice }: ChoicePromptProps) {
                 transition: `all 300ms ease-out ${index * 100}ms`,
               }}
               onClick={() => {
-                eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55 });
+                uiSfx('select');
                 onChoice(option.unlocksId);
               }}
               data-testid={`button-choice-${index}`}

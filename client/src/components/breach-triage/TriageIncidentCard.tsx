@@ -17,6 +17,7 @@
  */
 
 import type { TriageIncident } from '@/data/triageData';
+import { uiSfx } from '@/lib/uiSfx';
 
 export type TriageIncidentCardProps = {
   slotNumber: 1 | 2 | 3;
@@ -76,7 +77,7 @@ export function TriageIncidentCard({
   return (
     <div
       className={`relative flex flex-col border-4 ${borderClass} ${bgClass} ${feedbackOverlay ?? ''} cursor-pointer select-none transition-colors duration-150`}
-      onClick={onSelect}
+      onClick={() => { uiSfx('cardFlip'); onSelect(); }}
       data-testid={`triage-card-slot-${slotNumber}`}
       style={{ minHeight: '200px' }}
     >

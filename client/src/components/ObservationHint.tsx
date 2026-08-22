@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import type { Gate } from '@shared/schema';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 interface ObservationHintProps {
   gate: Gate;
@@ -13,7 +14,7 @@ export default function ObservationHint({ gate, onAcknowledge }: ObservationHint
   useEffect(() => {
     const showTimer = setTimeout(() => {
       setVisible(true);
-      eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.35 });
+      uiSfx('open');
     }, 100);
     return () => clearTimeout(showTimer);
   }, []);

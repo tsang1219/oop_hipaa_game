@@ -17,6 +17,7 @@ import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { CORKBOARD_NOTES, CORKBOARD_VIOLATION_COUNT, type CorkboardNote } from '@/data/corkboardData';
 import { getPhi18Entry, phi18Count, type Phi18Entry } from '@/data/phi18';
 import { IdentifierGetBanner } from '@/components/IdentifierGetBanner';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type CorkboardOverlayProps = {
   /** Zone already completed — render the cleaned board, no re-scoring. */
@@ -37,6 +38,7 @@ export function CorkboardOverlay({
   onComplete,
   onClose,
 }: CorkboardOverlayProps) {
+  useOverlaySfx(null, 'close');
   const [visible, setVisible] = useState(false);
   const [pulled, setPulled] = useState<Set<string>>(
     () => new Set(alreadyCleaned ? CORKBOARD_NOTES.filter((n) => n.kind === 'violation').map((n) => n.id) : []),
@@ -52,7 +54,7 @@ export function CorkboardOverlay({
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+    uiSfx('open');
   }, []);
 
   const violationsPulled = useMemo(
@@ -66,6 +68,7 @@ export function CorkboardOverlay({
 
   const handleNote = (note: CorkboardNote) => {
     if (done || pulled.has(note.id)) return;
+    uiSfx('pin');
 
     if (note.kind === 'violation') {
       setPulled((prev) => new Set(prev).add(note.id));

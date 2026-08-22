@@ -1,0 +1,232 @@
+{
+  "roomId": "reception",
+  "seconds": 10,
+  "frames": 40,
+  "avgClusters": 8.56,
+  "minClusters": 4,
+  "framesWithMotion": 39,
+  "distinctMovingCells": 879,
+  "perFrame": [
+    {
+      "frame": 1,
+      "clusters": 11,
+      "changedCells": 764
+    },
+    {
+      "frame": 2,
+      "clusters": 10,
+      "changedCells": 143
+    },
+    {
+      "frame": 3,
+      "clusters": 8,
+      "changedCells": 82
+    },
+    {
+      "frame": 4,
+      "clusters": 7,
+      "changedCells": 64
+    },
+    {
+      "frame": 5,
+      "clusters": 9,
+      "changedCells": 64
+    },
+    {
+      "frame": 6,
+      "clusters": 10,
+      "changedCells": 81
+    },
+    {
+      "frame": 7,
+      "clusters": 7,
+      "changedCells": 88
+    },
+    {
+      "frame": 8,
+      "clusters": 8,
+      "changedCells": 89
+    },
+    {
+      "frame": 9,
+      "clusters": 11,
+      "changedCells": 69
+    },
+    {
+      "frame": 10,
+      "clusters": 7,
+      "changedCells": 40
+    },
+    {
+      "frame": 11,
+      "clusters": 9,
+      "changedCells": 59
+    },
+    {
+      "frame": 12,
+      "clusters": 9,
+      "changedCells": 81
+    },
+    {
+      "frame": 13,
+      "clusters": 9,
+      "changedCells": 79
+    },
+    {
+      "frame": 14,
+      "clusters": 8,
+      "changedCells": 50
+    },
+    {
+      "frame": 15,
+      "clusters": 8,
+      "changedCells": 50
+    },
+    {
+      "frame": 16,
+      "clusters": 5,
+      "changedCells": 36
+    },
+    {
+      "frame": 17,
+      "clusters": 11,
+      "changedCells": 77
+    },
+    {
+      "frame": 18,
+      "clusters": 9,
+      "changedCells": 77
+    },
+    {
+      "frame": 19,
+      "clusters": 11,
+      "changedCells": 67
+    },
+    {
+      "frame": 20,
+      "clusters": 7,
+      "changedCells": 37
+    },
+    {
+      "frame": 21,
+      "clusters": 7,
+      "changedCells": 52
+    },
+    {
+      "frame": 22,
+      "clusters": 7,
+      "changedCells": 70
+    },
+    {
+      "frame": 23,
+      "clusters": 11,
+      "changedCells": 85
+    },
+    {
+      "frame": 24,
+      "clusters": 10,
+      "changedCells": 86
+    },
+    {
+      "frame": 25,
+      "clusters": 9,
+      "changedCells": 52
+    },
+    {
+      "frame": 26,
+      "clusters": 4,
+      "changedCells": 19
+    },
+    {
+      "frame": 27,
+      "clusters": 8,
+      "changedCells": 76
+    },
+    {
+      "frame": 28,
+      "clusters": 8,
+      "changedCells": 91
+    },
+    {
+      "frame": 29,
+      "clusters": 10,
+      "changedCells": 96
+    },
+    {
+      "frame": 30,
+      "clusters": 9,
+      "changedCells": 68
+    },
+    {
+      "frame": 31,
+      "clusters": 8,
+      "changedCells": 64
+    },
+    {
+      "frame": 32,
+      "clusters": 8,
+      "changedCells": 85
+    },
+    {
+      "frame": 33,
+      "clusters": 8,
+      "changedCells": 76
+    },
+    {
+      "frame": 34,
+      "clusters": 7,
+      "changedCells": 70
+    },
+    {
+      "frame": 35,
+      "clusters": 11,
+      "changedCells": 75
+    },
+    {
+      "frame": 36,
+      "clusters": 11,
+      "changedCells": 67
+    },
+    {
+      "frame": 37,
+      "clusters": 8,
+      "changedCells": 91
+    },
+    {
+      "frame": 38,
+      "clusters": 8,
+      "changedCells": 78
+    },
+    {
+      "frame": 39,
+      "clusters": 8,
+      "changedCells": 72
+    }
+  ],
+  "npcs": [
+    {
+      "id": "riley",
+      "blinks": 3,
+      "fidgets": 1,
+      "legs": 0,
+      "canWander": false,
+      "movedFromHome": false
+    },
+    {
+      "id": "nervous_patient",
+      "blinks": 1,
+      "fidgets": 0,
+      "legs": 2,
+      "canWander": true,
+      "movedFromHome": true
+    },
+    {
+      "id": "chatty_visitor",
+      "blinks": 2,
+      "fidgets": 1,
+      "legs": 1,
+      "canWander": true,
+      "movedFromHome": true
+    }
+  ]
+}

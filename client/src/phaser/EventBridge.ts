@@ -74,6 +74,9 @@ export const BRIDGE_EVENTS = {
   REACT_RESTART_BREACH: 'react:restart-breach',
   REACT_SET_MUSIC_VOLUME: 'react:set-music-volume',
   REACT_PLAY_SFX: 'react:play-sfx',
+  // Run 12 (AUD-04): React dialogue typewriter → one per-character voice
+  // syllable. Payload: { color: string (signature hex), seed?: number }
+  REACT_VOICE_BLIP: 'react:voice-blip',
   REACT_ANSWER_FEEDBACK: 'react:answer-feedback',
   REACT_LAUNCH_ENCOUNTER: 'react:launch-encounter',           // React: user confirmed narrative card
   /**

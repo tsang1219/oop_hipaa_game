@@ -2,6 +2,7 @@ import { useEffect, useRef, useState, forwardRef, useImperativeHandle } from 're
 import Phaser from 'phaser';
 import { createGameConfig } from './config';
 import { eventBridge, BRIDGE_EVENTS } from './EventBridge';
+import { playSfx, playVoiceBlip, type Bus } from './systems/exploration/audioMixer';
 
 interface PhaserGameProps {
   width?: number;
@@ -43,7 +44,31 @@ export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
 
       eventBridge.on(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
 
+      // Run 12 (AUD-02/04/05): React's sounds play through the Game's sound
+      // manager, not a scene — so menus, overlays and the standalone tower
+      // defense all get UI sound, and every play goes through the mixer.
+      const onPlaySfx = (data: { key: string; volume?: number; rate?: number; bus?: Bus; cooldownKey?: string; cooldownMs?: number }) => {
+        const game = gameRef.current;
+        if (!game || !data?.key) return;
+        playSfx(game, data.key, {
+          bus: data.bus ?? 'sfx',
+          volume: data.volume ?? 0.5,
+          rate: data.rate ?? 1,
+          cooldownKey: data.cooldownKey,
+          cooldownMs: data.cooldownMs,
+        });
+      };
+      const onVoiceBlip = (data: { color: string; seed?: number; volume?: number }) => {
+        const game = gameRef.current;
+        if (!game || !data?.color) return;
+        playVoiceBlip(game, { color: data.color, seed: data.seed, volume: data.volume });
+      };
+      eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, onPlaySfx);
+      eventBridge.on(BRIDGE_EVENTS.REACT_VOICE_BLIP, onVoiceBlip);
+
       return () => {
+        eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, onPlaySfx);
+        eventBridge.off(BRIDGE_EVENTS.REACT_VOICE_BLIP, onVoiceBlip);
         eventBridge.off(BRIDGE_EVENTS.SCENE_READY, handleSceneReady);
         gameRef.current?.destroy(true);
         gameRef.current = null;

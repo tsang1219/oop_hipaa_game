@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type OnboardingStep = 'WELCOME' | 'SELECT_TOWER' | 'PLACE_TOWER' | 'TOWER_PLACED' | 'PREP' | null;
 
@@ -46,7 +47,7 @@ function WelcomeStep({ onAdvance }: { onAdvance: () => void }) {
   );
 
   useEffect(() => {
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4 });
+    uiSfx('confirm');
   }, []);
 
   // Auto-advance 1.5s after typing completes
@@ -142,7 +143,7 @@ function TowerPlacedStep({ onAdvance }: { onAdvance: () => void }) {
   );
 
   useEffect(() => {
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
+    uiSfx('confirm');
   }, []);
 
   // Auto-advance after typing + 2s

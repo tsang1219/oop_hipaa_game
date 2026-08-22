@@ -26,6 +26,7 @@ import {
   collectFeedbackSnapshot,
   captureScreenshot,
 } from '@/lib/feedback';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type FeedbackModalProps = {
   gameRef: React.RefObject<Phaser.Game | null>;
@@ -38,6 +39,7 @@ type Status = 'idle' | 'sending' | 'sent' | 'failed';
 const ACCENT = '#4FB3D9';
 
 export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProps) {
+  useOverlaySfx(null, 'close');
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState<FeedbackType>('bug');
   const [message, setMessage] = useState('');
@@ -47,7 +49,7 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.4, rate: 1.1 });
+    uiSfx('open');
     // Focus the box on the next tick so the transition doesn't eat the focus.
     const t = setTimeout(() => textareaRef.current?.focus(), 60);
     return () => clearTimeout(t);

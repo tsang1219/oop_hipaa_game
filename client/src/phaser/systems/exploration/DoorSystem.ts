@@ -3,6 +3,7 @@ import { eventBridge, BRIDGE_EVENTS } from '../../EventBridge';
 import type { Room } from '@shared/schema';
 import type { MusicController } from './MusicController';
 import { closetFound, markClosetFound } from '../../../data/whimsyData';
+import { playRoundRobin, playSfx, playStinger } from './audioMixer';
 
 const TILE = 32;
 
@@ -26,6 +27,13 @@ export interface DoorHostScene extends Phaser.Scene {
   lastActivityAt: number;
 }
 
+interface DoorLeaf {
+  leaf: Phaser.GameObjects.Container;
+  /** 1 = closed, 0 = fully open (scaleX toward the hinge) */
+  openness: number;
+  state: DoorState;
+}
+
 /**
  * DoorSystem — door navigation state + visuals for ExplorationScene (Round 6).
  * Owns `doorStates`, `doorVisuals`, `nearDoor`; moved verbatim from the scene:
@@ -33,11 +41,17 @@ export interface DoorHostScene extends Phaser.Scene {
  * renderDoorStates → render() (the 4-state locked/next/available/completed visuals).
  * The scene keeps the onLoadRoom/onUpdateDoorStates/onDoorLocked eventBridge
  * handlers and delegates. A fresh instance is created per room in init().
+ *
+ * Run 12 (ANIM-07): every visible door has a real leaf. It cracks ajar with a
+ * creak as you approach, closes again if you walk away, and swings fully
+ * open — before the fade — when you go through.
  */
 export class DoorSystem {
   private doorStates: Record<string, DoorState> = {};
   private doorVisuals: Phaser.GameObjects.GameObject[] = [];
   private _nearDoor: Door | null = null;
+  private leaves = new Map<string, DoorLeaf>();
+  private ajarDoorId: string | null = null;
 
   constructor(
     private scene: DoorHostScene,
@@ -61,15 +75,26 @@ export class DoorSystem {
   checkProximity(px: number, py: number): void {
     const doors = (this.room as any).doors;
     if (!doors || doors.length === 0) return;
+    let found: Door | null = null;
     for (const door of doors) {
       const dx = Math.abs(px - (door.x * TILE + TILE / 2));
       const dy = Math.abs(py - (door.y * TILE + TILE / 2));
       if (dx < TILE * 1.5 && dy < TILE * 1.5) {
-        this._nearDoor = door;
-        return;
+        found = door;
+        break;
       }
     }
-    this._nearDoor = null;
+    this._nearDoor = found;
+    // ANIM-07 — doors open before you go through them: crack ajar on approach.
+    const wantAjar = found && this.doorStates[found.id] !== 'locked' && this.leaves.has(found.id) ? found.id : null;
+    if (wantAjar !== this.ajarDoorId) {
+      if (this.ajarDoorId) this.setLeaf(this.ajarDoorId, 1, 260, 'Sine.easeIn');
+      if (wantAjar) {
+        this.setLeaf(wantAjar, 0.72, 220, 'Sine.easeOut');
+        playSfx(this.scene, 'sfx_door_creak', { volume: 0.16, rate: 0.9 + Math.random() * 0.2, cooldownKey: 'door_creak', cooldownMs: 700 });
+      }
+      this.ajarDoorId = wantAjar;
+    }
   }
 
   enter(door: Door): void {
@@ -79,18 +104,77 @@ export class DoorSystem {
     // little door from now on)
     if (door.hidden && !closetFound()) {
       markClosetFound();
+      playStinger(this.scene, 'secretFound', 0.55); // AUD-07
     }
     this.scene.transitioning = true;
-    this.scene.sound.play('sfx_footstep', { volume: 0.35, rate: 0.8 });
+
+    // ANIM-07 — the door visibly swings open before the fade takes the screen.
+    const hasLeaf = this.leaves.has(door.id);
+    if (hasLeaf) {
+      this.setLeaf(door.id, 0.06, 230, 'Sine.easeIn');
+      playRoundRobin(this.scene, 'door_open', ['sfx_door_open_0', 'sfx_door_open_1', 'sfx_door_open_2'], {
+        volume: 0.42, rate: 0.95 + Math.random() * 0.1, cooldownMs: 0,
+      });
+    }
+
     // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
     this.music.fadeOutForDoor();
-    this.scene.cameras.main.fadeOut(300, 0, 0, 0);
-    this.scene.time.delayedCall(300, () => {
-      eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
-        targetRoomId: door.targetRoomId,
-        fromDoorId: door.id,
+    // A short lead so the swing reads before the screen dims (skipped for
+    // still-hidden doors — no leaf to swing, so no reason to add the delay).
+    this.scene.time.delayedCall(hasLeaf ? 150 : 0, () => {
+      this.scene.cameras.main.fadeOut(300, 0, 0, 0);
+      this.scene.time.delayedCall(300, () => {
+        eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
+          targetRoomId: door.targetRoomId,
+          fromDoorId: door.id,
+        });
       });
     });
+  }
+
+  /** Tween a door leaf's openness (1 closed → 0 open) about its hinge. */
+  private setLeaf(doorId: string, openness: number, ms: number, ease: string): void {
+    const entry = this.leaves.get(doorId);
+    if (!entry || !entry.leaf.active) return;
+    entry.openness = openness;
+    this.scene.tweens.killTweensOf(entry.leaf);
+    this.scene.tweens.add({ targets: entry.leaf, scaleX: openness, duration: ms, ease });
+  }
+
+  /** Build the leaf for a door: a wooden slab with a panel line and a knob,
+   *  hinged on the side away from the room's interior. */
+  private buildLeaf(door: Door, state: DoorState): Phaser.GameObjects.Container {
+    const fx = door.x * TILE;
+    const fy = door.y * TILE - TILE / 2;
+    const openingW = TILE - 4;
+    const openingH = TILE + TILE / 2 - 6;
+    const hingeOnRight = door.side === 'right';
+    const hingeX = hingeOnRight ? fx + TILE - 2 : fx + 2;
+    const leaf = this.scene.add.container(hingeX, fy + 5).setDepth(2);
+    const g = this.scene.add.graphics();
+    const x0 = hingeOnRight ? -openingW : 0;
+    const wood = state === 'locked' ? 0x5a4230 : 0x8a6440;
+    const woodDark = state === 'locked' ? 0x3e2c20 : 0x6a4a2e;
+    const woodLight = state === 'locked' ? 0x6c5040 : 0xa8805a;
+    g.fillStyle(wood, 1);
+    g.fillRect(x0, 0, openingW, openingH);
+    // panel inset
+    g.fillStyle(woodDark, 1);
+    g.fillRect(x0 + 4, 5, openingW - 8, openingH - 10);
+    g.fillStyle(wood, 1);
+    g.fillRect(x0 + 6, 7, openingW - 12, openingH - 14);
+    // edge highlight along the hinge side
+    g.fillStyle(woodLight, 0.9);
+    g.fillRect(hingeOnRight ? -1 : 0, 0, 1, openingH);
+    // knob on the far side from the hinge
+    g.fillStyle(0xe8c860, 1);
+    const knobX = hingeOnRight ? x0 + 5 : x0 + openingW - 6;
+    g.fillRect(knobX, Math.floor(openingH / 2) - 1, 2, 2);
+    // floor shadow under the leaf
+    g.fillStyle(0x000000, 0.25);
+    g.fillRect(x0, openingH, openingW, 2);
+    leaf.add(g);
+    return leaf;
   }
 
   render(): void {
@@ -102,6 +186,8 @@ export class DoorSystem {
       v.destroy();
     }
     this.doorVisuals = [];
+    this.leaves.clear();
+    this.ajarDoorId = null;
 
     for (const door of doors) {
       const doorPixelX = door.x * TILE + TILE / 2;
@@ -149,6 +235,11 @@ export class DoorSystem {
       this.doorVisuals.push(frameG);
       const fx = door.x * TILE;
       const fy = door.y * TILE - TILE / 2;
+      // Dark opening behind the leaf (what you see when it swings open)
+      frameG.fillStyle(0x0b0b14, 1);
+      frameG.fillRect(fx + 2, fy + 5, TILE - 4, TILE + TILE / 2 - 6);
+      frameG.fillStyle(0x2a2438, 0.6);
+      frameG.fillRect(fx + 4, fy + 7, TILE - 8, TILE / 2);
       // Frame posts (solid wood)
       frameG.fillStyle(0xa0845a, 1);
       frameG.fillRect(fx - 3, fy, 5, TILE + TILE / 2);
@@ -164,6 +255,11 @@ export class DoorSystem {
       // Shadow (outer edge)
       frameG.fillStyle(0x5a4430, 0.7);
       frameG.fillRect(fx - 3, fy + TILE + TILE / 2 - 1, TILE + 6, 2);
+
+      // ANIM-07 — the leaf itself (closed), hinged away from the room
+      const leaf = this.buildLeaf(door, state);
+      this.doorVisuals.push(leaf);
+      this.leaves.set(door.id, { leaf, openness: 1, state });
 
       if (state === 'locked') {
         // Dark overlay + lock icon
@@ -250,7 +346,7 @@ export class DoorSystem {
         const badge = this.scene.add.circle(doorPixelX, doorPixelY - TILE, 9, 0x2a6a2a, 1)
           .setDepth(3);
         this.doorVisuals.push(badge);
-        const check = this.scene.add.text(doorPixelX, doorPixelY - TILE, '\u2713', {
+        const check = this.scene.add.text(doorPixelX, doorPixelY - TILE, '✓', {
           fontFamily: '"Press Start 2P"',
           fontSize: '9px',
           color: '#ffd700',

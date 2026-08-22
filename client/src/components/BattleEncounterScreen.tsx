@@ -1,9 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import DialoguePortrait from './DialoguePortrait';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { getNPCColor, hasNPCPortrait, DEFAULT_SPEAKER_COLOR } from '@/data/spriteAssetPaths';
+// FEEL-21 — punctuation gets a longer beat than a plain letter, so the
+// typewriter reads at a human cadence instead of a metronome. ~60 glyphs/s
+// base (fast enough that nobody waits, slow enough to be a voice), with
+// real pauses on commas, full stops and dashes. A SPACE press mid-line
+// reveals the whole line — it never skips it (see handleKeyPress below).
+const PUNCTUATION_PAUSE_MS: Record<string, number> = {
+  ',': 110, ';': 120, ':': 120,
+  '.': 240, '!': 240, '?': 240, '…': 300,
+  '—': 180, '-': 50, // em dash / hyphen
+};
+const BASE_TYPE_MS = 16;
+// AUD-04 — a voice syllable every Nth letter; the mixer's own 58ms cooldown
+// caps the rate so it can never machine-gun regardless of typing speed.
+const BLIP_EVERY_N_LETTERS = 2;
 
 interface BattleEncounterScreenProps {
   npcId: string;
@@ -43,6 +57,10 @@ export default function BattleEncounterScreen({
   const [displayedText, setDisplayedText] = useState('');
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isTyping, setIsTyping] = useState(true);
+  // AUD-04 — one voice syllable per couple of letters, pitched + timbred
+  // from the speaker's signature colour (things/narration speak in UI pink).
+  const blipCounterRef = useRef(0);
+  const speakerColor = hasNPCPortrait(npcId) ? getNPCColor(npcId) : DEFAULT_SPEAKER_COLOR;
 
   useEffect(() => {
     setDisplayedText('');
@@ -52,16 +70,29 @@ export default function BattleEncounterScreen({
 
   useEffect(() => {
     if (currentIndex < dialogue.length) {
+      const justTypedChar = dialogue[currentIndex];
+      // FEEL-21 — punctuation gets a longer beat than a plain letter.
+      const delay = BASE_TYPE_MS + (PUNCTUATION_PAUSE_MS[justTypedChar] ?? 0);
       const timer = setTimeout(() => {
         setDisplayedText(dialogue.slice(0, currentIndex + 1));
         setCurrentIndex(currentIndex + 1);
-      }, 7); // snappy RPG crawl; press/hold SPACE to skip to full
+        // AUD-04 — voice syllable per few letters; silent through whitespace
+        // and punctuation so the pause beats stay pauses.
+        if (/[A-Za-z0-9\u00C0-\u024F]/.test(justTypedChar)) {
+          blipCounterRef.current++;
+          if (blipCounterRef.current % BLIP_EVERY_N_LETTERS === 0) {
+            // deterministic per-position seed → the same line always sings the same way
+            const seed = ((currentIndex * 9301 + 49297) % 233280) / 233280;
+            eventBridge.emit(BRIDGE_EVENTS.REACT_VOICE_BLIP, { color: speakerColor, seed });
+          }
+        }
+      }, delay);
       return () => clearTimeout(timer);
     } else if (isTyping) {
       setIsTyping(false);
       onDialogueComplete?.();
     }
-  }, [currentIndex, dialogue, isTyping, onDialogueComplete]);
+  }, [currentIndex, dialogue, isTyping, onDialogueComplete, speakerColor]);
 
   useEffect(() => {
     if (phase === 'choices') {
@@ -194,7 +225,7 @@ export default function BattleEncounterScreen({
         {/* Header: NPC portrait + optional privacy meter */}
         <div className="flex items-start gap-3 px-4 pt-4 pb-2">
           {/* NPC portrait plate (96px crop + name plate inside frame) */}
-          <DialoguePortrait npcId={npcId} npcName={npcName} />
+          <DialoguePortrait npcId={npcId} npcName={npcName} talking={phase === 'dialogue' && isTyping} />
 
           <div className="flex-1 min-w-0" />
 
@@ -238,7 +269,7 @@ export default function BattleEncounterScreen({
             <div className="mt-3 text-right">
               {isTyping ? (
                 <span className="font-['Press_Start_2P'] text-[#FF6B9D]/70 text-[8px]">
-                  ▸ SPACE to skip
+                  ▸ SPACE shows the whole line
                 </span>
               ) : (
                 <span className="font-['Press_Start_2P'] text-[#FF6B9D] text-[9px] animate-pulse">

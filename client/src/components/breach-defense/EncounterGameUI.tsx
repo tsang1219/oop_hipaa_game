@@ -4,6 +4,7 @@ import { eventBridge, BRIDGE_EVENTS } from '../../phaser/EventBridge';
 import { OnboardingOverlay, type OnboardingStep } from './OnboardingOverlay';
 import { WaveIntroBanner } from './WaveIntroBanner';
 import { ThreatStrip } from './ThreatStrip';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 type TowerType = keyof typeof TOWERS;
 
@@ -98,7 +99,7 @@ export function EncounterGameUI({ availableTowerIds, onExit }: EncounterGameUIPr
     const newType = selectedTower === type ? null : type;
     setSelectedTower(newType);
     eventBridge.emit(BRIDGE_EVENTS.REACT_SELECT_TOWER_TYPE, { type: newType });
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
+    uiSfx('select');
   }, [selectedTower]);
 
   // ── Onboarding advancement ─────────────────────────────────────

@@ -37,6 +37,12 @@ import {
 } from '../systems/exploration/idleHints';
 import { MusicController } from '../systems/exploration/MusicController';
 import { DoorSystem } from '../systems/exploration/DoorSystem';
+import { NpcLifeController } from '../systems/exploration/npcLife';
+import { floorMaterialForRoom, playFootstep } from '../systems/exploration/footsteps';
+import { playSfx, playRoundRobin, duckMusic, unduckMusic, playStinger } from '../systems/exploration/audioMixer';
+import { hitStopSquash, InputBuffer, anticipationBeat, type SquashStyle } from '../systems/exploration/feel';
+import { AmbienceBeds } from '../systems/exploration/ambienceBeds';
+import { blinkTextureKey, ensureBlinkTexture } from '../systems/exploration/blinkFrames';
 import type { BreachDefenseInitData } from './BreachDefenseScene';
 import type { Room, NPC, InteractionZone, EducationalItem, Position } from '@shared/schema';
 
@@ -102,6 +108,41 @@ export class ExplorationScene extends Phaser.Scene {
 
   // Footstep throttle — minimum interval between plays (ms)
   private lastFootstepTime = 0;
+
+  // Run 12 (living world) — NPC blink/wander/facing/fidgets
+  private npcLife!: NpcLifeController;
+
+  // Run 12 — player blink (ANIM-01: "every character blinks"): texture swap
+  // to the closed-eye sheet built at boot (blinkFrames.ts)
+  private playerBlinkKey: string | null = null;
+  private playerBlinkUntil = 0;
+  private playerNextBlinkAt = 0;
+  private playerDoubleBlink = false;
+
+  // Run 12 — AUD-06 synthesized room beds under the music
+  private beds!: AmbienceBeds;
+
+  // Run 12 — FEEL-23 grace radius: the last in-range target stays hittable
+  // for a beat after you step out of range
+  private lastNearby: InteractableData | null = null;
+  private nearbyGraceUntil = 0;
+
+  // Run 12 — wall-bump feedback: the velocity we asked for last frame and the
+  // blocked flags we saw, so the collider callback can tell a fresh bump
+  // from sliding along a wall
+  private prevVelocity = new Phaser.Math.Vector2();
+  private blockedPrev = { left: false, right: false, up: false, down: false };
+  private lastWallBumpAt = 0;
+
+  // Run 12 — ANIM-06 player movement weight: 0..1 accel/decel scale applied
+  // to the target walk speed, plus turn-around-frame state.
+  private moveAccel = 0;
+  private lastMoveDirX = 0;
+  private lastMoveDirY = 0;
+  private pivotUntil = 0;
+
+  // Run 12 — FEEL-23 input buffering on the interact key
+  private interactBuffer = new InputBuffer(120);
 
   // Idle-hint sparkle system (Phase 27 VIS-07)
   // lastActivityAt is public: DoorSystem.enter() resets it on door entry (Round 6)
@@ -180,6 +221,8 @@ export class ExplorationScene extends Phaser.Scene {
     this.collectedItems = new Set(data.collectedItems || []);
     this.interactables = [];
     this.nearbyInteractable = null;
+    this.lastNearby = null;
+    this.nearbyGraceUntil = 0;
     this.movePath = [];
     this.moveTimer = null;
     this.pendingInteraction = null;
@@ -297,6 +340,15 @@ export class ExplorationScene extends Phaser.Scene {
     this.interactables = spawned.interactables;
     this.zoneGlows = spawned.zoneGlows;
 
+    // Run 12 (living world) — ANIM-01/02/03/04: blink, wander, face-the-player,
+    // role idle fidgets for every NPC just spawned above.
+    this.npcLife = new NpcLifeController(this, room, {
+      isPaused: () => this.paused || this.transitioning,
+      playerPos: () => ({ x: this.player?.x ?? -9999, y: this.player?.y ?? -9999 }),
+      getBubble: (id) => this.npcBubbles.get(id),
+    });
+    this.npcLife.build(this.interactables);
+
     // Threat Console — the visible, interactable BreachDefense launcher
     // (HIPAA-is-the-game pass; replaces the old hidden proximity trigger)
     if (room.id === 'it_office') {
@@ -370,6 +422,31 @@ export class ExplorationScene extends Phaser.Scene {
     body.setOffset(4, 4);
     body.setCollideWorldBounds(true);
 
+    // ANIM-01 — "every character blinks," including the player: swap to the
+    // closed-eye copy of the sheet for ~100ms (same frame index), then back.
+    this.playerBlinkKey = playerTex === 'player_sheet' && ensureBlinkTexture(this, 'player_sheet')
+      ? blinkTextureKey('player_sheet')
+      : null;
+    this.playerBlinkUntil = 0;
+    this.playerNextBlinkAt = this.time.now + 900 + Math.random() * 3200;
+
+    // ANIM-06 / AUD-03 — footstep audio synced to the walk-cycle contact
+    // frame (index 1 of the 3-frame cycle) instead of a flat timer, with
+    // floor material + walk/run variation. Click-to-move keeps its own
+    // timer-based footstep (guarded off here via movePath.length) — see the
+    // startPathMovement loop below.
+    this.player.on(Phaser.Animations.Events.ANIMATION_UPDATE, (anim: Phaser.Animations.Animation, frame: Phaser.Animations.AnimationFrame) => {
+      if (!anim.key.startsWith('walk_')) return;
+      // Frames are 1-based: 1 = the standing pose, 2/3 = the two foot plants.
+      if (frame.index !== 2 && frame.index !== 3) return;
+      if (this.paused || this.movePath.length > 0) return;
+      const now = this.time.now;
+      if (now - this.lastFootstepTime < 90) return;
+      this.lastFootstepTime = now;
+      playFootstep(this, floorMaterialForRoom(this.room.id), this.runKey.isDown);
+      this.spawnFootstepDust();
+    });
+
     // Player drop shadow at feet level
     this.playerShadow = this.add.ellipse(
       this.player.x, this.player.y + TILE / 2 - 2,
@@ -411,7 +488,7 @@ export class ExplorationScene extends Phaser.Scene {
       .setStrokeStyle(1, 0xffd700, 0)
       .setDepth(2);
 
-    this.physics.add.collider(this.player, this.walls);
+    this.physics.add.collider(this.player, this.walls, () => this.onWallBump());
 
     // Camera follow in rooms larger than viewport
     if (w > 640 || h > 480) {
@@ -554,7 +631,6 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION, this.onResumeFromDecline, this);
     eventBridge.on(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
-    eventBridge.on(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     eventBridge.on(BRIDGE_EVENTS.ACT_ADVANCE, this.onActAdvance, this);
 
     // Listen for correct/incorrect answer feedback from React
@@ -583,12 +659,19 @@ export class ExplorationScene extends Phaser.Scene {
     // room-entry fade preserved via parameter — wake-restore uses 800ms.)
     this.music.startRoomMusic(this.room, this.getCurrentAct(), 1800);
 
-    // Room entrance — fade in from black
+    // AUD-06 — the room's ambient bed, under the music
+    this.beds = new AmbienceBeds(this);
+    this.beds.start(this.room.id);
+
+    // Room entrance — fade in from black (+ a soft air-whoosh, Commandment 1)
     this.cameras.main.fadeIn(500, 0, 0, 0);
+    playSfx(this, 'sfx_room_enter', { volume: 0.14, rate: 1.15, cooldownKey: 'room_enter', cooldownMs: 800 });
 
     showRoomBanner(this, this.room);
 
     eventBridge.emit(BRIDGE_EVENTS.SCENE_READY, 'Exploration');
+    // Dev-only: the live scene for DevTools/Playwright inspection (Run 12 proofs).
+    if (import.meta.env.DEV) (window as unknown as { __QA_SCENE__?: unknown }).__QA_SCENE__ = this;
 
     // QA command listeners — Playwright drives the game via these
     eventBridge.on(BRIDGE_EVENTS.QA_MOVE_PLAYER_TO, this.onQAMoveTo, this);
@@ -609,11 +692,16 @@ export class ExplorationScene extends Phaser.Scene {
     // Idle frame indices per direction: down=0, left=3, right=6, up=9 (row*3+0)
     const IDLE_DOWN = 0; const IDLE_LEFT = 3; const IDLE_RIGHT = 6; const IDLE_UP = 9;
 
+    // Blinks keep going while a dialogue is open — a frozen face is worse.
+    this.updatePlayerBlink();
+    if (this.npcLife) this.npcLife.update();
+
     if (this.paused) {
       const pauseBody = this.player.body as Phaser.Physics.Arcade.Body;
       pauseBody.setVelocity(0);
       this.player.anims.stop();
       this.player.setFrame(this.lastFacingFrame);
+      this.publishLiving(); // QA surface stays truthful while a dialogue is open
       return;
     }
 
@@ -625,74 +713,84 @@ export class ExplorationScene extends Phaser.Scene {
     // If following a path, don't accept keyboard movement
     if (this.movePath.length > 0) this.lastActivityAt = this.time.now;
     if (this.movePath.length === 0) {
-      body.setVelocity(0);
-
       const left = this.cursors.left.isDown || this.wasd.A.isDown;
       const right = this.cursors.right.isDown || this.wasd.D.isDown;
       const up = this.cursors.up.isDown || this.wasd.W.isDown;
       const down = this.cursors.down.isDown || this.wasd.S.isDown;
+      const isMoving = left || right || up || down;
 
       // Hold SHIFT to run. Rooms are large, so running is the natural pace —
       // the default walk is already brisk, this is the extra gear.
       const running = this.runKey.isDown;
       const speed = running ? MOVE_SPEED * RUN_MULT : MOVE_SPEED;
 
+      // ANIM-06 — turn-around frame: reversing the held direction plants a
+      // brief idle beat before the new walk anim resumes, so direction
+      // changes read as a turn instead of an instant slide.
+      const dirX = left ? -1 : right ? 1 : 0;
+      const dirY = up ? -1 : down ? 1 : 0;
+      const now = this.time.now;
+      if (
+        (dirX !== 0 && this.lastMoveDirX !== 0 && dirX !== this.lastMoveDirX) ||
+        (dirY !== 0 && this.lastMoveDirY !== 0 && dirY !== this.lastMoveDirY)
+      ) {
+        this.pivotUntil = now + 70;
+      }
+      if (dirX !== 0) this.lastMoveDirX = dirX;
+      if (dirY !== 0) this.lastMoveDirY = dirY;
+      if (!isMoving) { this.lastMoveDirX = 0; this.lastMoveDirY = 0; }
+      const pivoting = now < this.pivotUntil;
+
+      // ANIM-06 — accel ramp / decel slide: the effective speed eases toward
+      // its target over a few frames instead of snapping, so tapping a
+      // direction produces a step (weight) rather than an instant slide.
+      const targetAccel = (isMoving && !pivoting) ? 1 : 0;
+      this.moveAccel = Phaser.Math.Linear(this.moveAccel, targetAccel, isMoving ? 0.45 : 0.35);
+      if (this.moveAccel < 0.015) this.moveAccel = 0;
+      const effSpeed = speed * this.moveAccel;
+
+      body.setVelocity(0);
       if (left) {
-        body.setVelocityX(-speed);
-        this.player.anims.play('walk_left', true);
+        body.setVelocityX(-effSpeed);
+        if (!pivoting) this.player.anims.play('walk_left', true);
         this.lastFacingFrame = IDLE_LEFT;
       } else if (right) {
-        body.setVelocityX(speed);
-        this.player.anims.play('walk_right', true);
+        body.setVelocityX(effSpeed);
+        if (!pivoting) this.player.anims.play('walk_right', true);
         this.lastFacingFrame = IDLE_RIGHT;
       }
 
       if (up) {
-        body.setVelocityY(-speed);
-        if (!left && !right) {
+        body.setVelocityY(-effSpeed);
+        if (!left && !right && !pivoting) {
           this.player.anims.play('walk_up', true);
           this.lastFacingFrame = IDLE_UP;
         }
       } else if (down) {
-        body.setVelocityY(speed);
-        if (!left && !right) {
+        body.setVelocityY(effSpeed);
+        if (!left && !right && !pivoting) {
           this.player.anims.play('walk_down', true);
           this.lastFacingFrame = IDLE_DOWN;
         }
       }
 
       if ((left || right) && (up || down)) {
-        body.velocity.normalize().scale(speed);
+        body.velocity.normalize().scale(effSpeed);
       }
 
-      const isMoving = left || right || up || down;
+      if (pivoting) {
+        // Hold the plant frame — the walk anim resumes on its own once
+        // pivotUntil elapses and the branches above start playing it again.
+        this.player.anims.stop();
+        this.player.setFrame(this.lastFacingFrame);
+      }
+
       // Legs churn faster while running — sells the speed without new art.
       if (isMoving) this.player.anims.timeScale = running ? 1.5 : 1;
       if (isMoving) this.lastActivityAt = this.time.now;
-      const footstepGap = running ? 240 : 350;
-      if (isMoving && !this.paused && this.time.now - this.lastFootstepTime > footstepGap) {
-        this.sound.play('sfx_footstep', { volume: 0.25 });
-        this.lastFootstepTime = this.time.now;
-
-        // Footstep dust puff
-        if (this.textures.exists('particle_circle')) {
-          const dustEmitter = this.add.particles(
-            this.player.x, this.player.y + 12, 'particle_circle', {
-            speed: { min: 5, max: 15 },
-            angle: { min: 220, max: 320 },
-            scale: { start: 0.3, end: 0 },
-            alpha: { start: 0.25, end: 0 },
-            lifespan: 300,
-            tint: 0xccbb99,
-            frequency: -1,
-          });
-          dustEmitter.setDepth(1);
-          dustEmitter.explode(2);
-          this.time.delayedCall(400, () => {
-            if (dustEmitter && dustEmitter.active) dustEmitter.destroy();
-          });
-        }
-      }
+      // Footstep audio + dust are now fired from the walk anim's contact
+      // frame (see the ANIMATION_UPDATE listener registered in create()),
+      // not a flat timer — this block used to poll a timestamp gap here.
 
       if (!left && !right && !up && !down) {
         this.player.anims.stop();
@@ -709,6 +807,12 @@ export class ExplorationScene extends Phaser.Scene {
     this.playerShadow.setDepth(this.player.depth - 1);
     this.playerLabel.setPosition(this.player.x, this.player.y - TILE / 2 - 4);
     this.playerLabel.setDepth(this.player.depth + 1);
+    // Remember what we asked for this frame — the wall collider callback
+    // runs during next frame's physics step, after separation zeroed it.
+    this.prevVelocity.set(body.velocity.x, body.velocity.y);
+    const bl = body.blocked;
+    this.blockedPrev.left = bl.left; this.blockedPrev.right = bl.right;
+    this.blockedPrev.up = bl.up; this.blockedPrev.down = bl.down;
 
     // Proximity check
     this.checkProximity();
@@ -728,7 +832,14 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Interact key — sample once, use for NPC/item/door
     const interactPressed = Phaser.Input.Keyboard.JustDown(this.interactKey);
-    if (interactPressed) this.lastActivityAt = this.time.now; // any key press resets idle hint
+    if (interactPressed) {
+      this.lastActivityAt = this.time.now; // any key press resets idle hint
+      // FEEL-23 — buffer the press for ~120ms. If nothing is in range this
+      // exact frame (e.g. SPACE mashed a beat before reaching the NPC), the
+      // buffered-catch-up check further down still fires it once a target
+      // appears, instead of the input being silently dropped.
+      this.interactBuffer.press(this.time.now);
+    }
 
     if (interactPressed && this.nearbyInteractable) {
       this.triggerInteraction(this.nearbyInteractable);
@@ -782,17 +893,31 @@ export class ExplorationScene extends Phaser.Scene {
       if (nearDoor && interactPressed && !this.nearbyInteractable) {
         this.doors.enter(nearDoor);
       }
+
+      // FEEL-23 — buffered catch-up: only relevant on frames where SPACE was
+      // NOT just pressed (those are handled by the two immediate checks
+      // above/below). Only consumes the buffer once an actual target exists
+      // — consume() is skipped entirely on target-less frames so the press
+      // survives until something comes into range or the window lapses.
+      if (!interactPressed && (this.nearbyInteractable || nearDoor) && this.interactBuffer.consume(this.time.now)) {
+        if (this.nearbyInteractable) {
+          this.triggerInteraction(this.nearbyInteractable);
+        } else if (nearDoor) {
+          this.doors.enter(nearDoor);
+        }
+      }
     }
 
     // Escape to exit room (legacy — only active when no doors[] present)
     if (!(this.room as any).doors?.length && Phaser.Input.Keyboard.JustDown(this.escKey)) {
-      this.sound.play('sfx_interact', { volume: 0.4 });
+      playSfx(this, 'sfx_interact', { volume: 0.4 });
       eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, this.room.id);
     }
 
     // QA state broadcast (throttled to 200ms)
     if (this.time.now - this.lastStateBroadcastTime > 200) {
       this.lastStateBroadcastTime = this.time.now;
+      this.publishLiving();
       // F-19 fix (Run 07): the payload now matches the shape qa-bridge actually
       // consumes (playerPosition / roomNPCs / roomZones / roomItems / roomDoors).
       // The old fields (playerTileX/interactables/doors) had drifted from the
@@ -851,7 +976,6 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION, this.onPauseFromModal, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION, this.onResumeFromDecline, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_SET_MUSIC_VOLUME, this.onMusicVolume, this);
-    eventBridge.off(BRIDGE_EVENTS.REACT_PLAY_SFX, this.onPlaySfx, this);
     eventBridge.off(BRIDGE_EVENTS.REACT_ANSWER_FEEDBACK, this.onAnswerFeedback, this);
     eventBridge.off(BRIDGE_EVENTS.ACT_ADVANCE, this.onActAdvance, this);
     // Fanfare listener (Phase 15)
@@ -879,6 +1003,7 @@ export class ExplorationScene extends Phaser.Scene {
     // or crossfadeTo will clean it up if the act changed. release() drops the
     // bgMusic ref and clears the sound 'unlocked' listener (Round 6).
     this.music.release();
+    try { this.beds?.stop(0); } catch (_) { /* already gone */ }
     // Clean up EventBridge listeners
     this.removeBridgeListeners();
     try { this.events.off(Phaser.Scenes.Events.WAKE, this.handleWakeFromEncounter, this); } catch (_) {}
@@ -892,6 +1017,95 @@ export class ExplorationScene extends Phaser.Scene {
       try { this.npcPulseTween.stop(); } catch (_) {}
       this.npcPulseTween = null;
     }
+  }
+
+  // ── ANIM-06: footstep dust puff, fired from the walk-cycle contact frame ──
+  private spawnFootstepDust(): void {
+    if (!this.textures.exists('particle_circle')) return;
+    const dustEmitter = this.add.particles(
+      this.player.x, this.player.y + 12, 'particle_circle', {
+      speed: { min: 5, max: 15 },
+      angle: { min: 220, max: 320 },
+      scale: { start: 0.3, end: 0 },
+      alpha: { start: 0.25, end: 0 },
+      lifespan: 300,
+      tint: 0xccbb99,
+      frequency: -1,
+    });
+    dustEmitter.setDepth(1);
+    dustEmitter.explode(2);
+    this.time.delayedCall(400, () => {
+      if (dustEmitter && dustEmitter.active) dustEmitter.destroy();
+    });
+  }
+
+  /** Run 12 proof surface: per-NPC life state on window.__QA__ (throttled to ~5Hz). */
+  private lastLivingPublishAt = 0;
+  private publishLiving(): void {
+    if (this.time.now - this.lastLivingPublishAt < 200) return;
+    this.lastLivingPublishAt = this.time.now;
+    try {
+      const qa = (window as unknown as { __QA__?: Record<string, unknown> }).__QA__;
+      if (qa && this.npcLife) qa.living = this.npcLife.snapshot();
+    } catch (_) { /* QA bridge absent */ }
+  }
+
+  // ── ANIM-01: player blink — texture swap to the closed-eye sheet ──
+  private updatePlayerBlink(): void {
+    if (!this.playerBlinkKey || !this.player?.active) return;
+    const now = this.time.now;
+    const moving = this.player.anims.isPlaying;
+    if (this.playerBlinkUntil) {
+      if (now >= this.playerBlinkUntil || moving) {
+        this.playerBlinkUntil = 0;
+        if (this.player.texture.key === this.playerBlinkKey) {
+          this.player.setTexture('player_sheet', this.lastFacingFrame);
+        }
+        this.playerNextBlinkAt = this.playerDoubleBlink ? now + 170 : now + 2600 + Math.random() * 3600;
+        this.playerDoubleBlink = false;
+      }
+      return;
+    }
+    if (moving || this.lastFacingFrame === 9 /* facing up: no eyes to close */) return;
+    if (now >= this.playerNextBlinkAt) {
+      this.player.setTexture(this.playerBlinkKey, this.lastFacingFrame);
+      this.playerBlinkUntil = now + 105;
+      this.playerDoubleBlink = Math.random() < 0.12;
+    }
+  }
+
+  // ── AUD-02 / FEEL: walking into a wall at speed makes a soft thud + 1px recoil ──
+  private onWallBump(): void {
+    const now = this.time.now;
+    if (now - this.lastWallBumpAt < 420 || this.paused) return;
+    const body = this.player.body as Phaser.Physics.Arcade.Body;
+    const b = body.blocked;
+    const v = this.prevVelocity;
+    const thr = MOVE_SPEED * 0.7;
+    // Only a FRESH contact counts — sliding along a wall stays silent.
+    const newHit =
+      (b.left && !this.blockedPrev.left && v.x < -thr) ||
+      (b.right && !this.blockedPrev.right && v.x > thr) ||
+      (b.up && !this.blockedPrev.up && v.y < -thr) ||
+      (b.down && !this.blockedPrev.down && v.y > thr);
+    if (!newHit) return;
+    this.lastWallBumpAt = now;
+    this.blockedPrev.left = b.left; this.blockedPrev.right = b.right; this.blockedPrev.up = b.up; this.blockedPrev.down = b.down;
+    const running = v.length() > MOVE_SPEED * 1.3;
+    playRoundRobin(this, 'wall_bump', ['sfx_wall_bump_0', 'sfx_wall_bump_1', 'sfx_wall_bump_2'], {
+      volume: running ? 0.22 : 0.12, rate: 0.9 + Math.random() * 0.2, cooldownMs: 400,
+    });
+    const dx = b.left ? 2 : b.right ? -2 : 0;
+    const dy = b.up ? 2 : b.down ? -2 : 0;
+    this.tweens.add({ targets: this.player, x: this.player.x + dx, y: this.player.y + dy, duration: 45, yoyo: true, ease: 'Sine.easeOut' });
+  }
+
+  /** The player leans 2px into whatever they just touched, then settles. */
+  private nudgePlayerToward(x: number, y: number): void {
+    const dx = Math.sign(x - this.player.x) * 2;
+    const dy = Math.sign(y - this.player.y) * 2;
+    if (dx === 0 && dy === 0) return;
+    this.tweens.add({ targets: this.player, x: this.player.x + dx, y: this.player.y + dy, duration: 60, yoyo: true, ease: 'Sine.easeOut' });
   }
 
   // ── QA Testing Commands ──────────────────────────────────────────
@@ -1018,19 +1232,18 @@ export class ExplorationScene extends Phaser.Scene {
 
   private onActAdvance = (data: { newAct: number; track: string; baseVolume?: number }) => {
     this.music.crossfadeTo(data.track, data.baseVolume);
-  };
-
-  private onPlaySfx = (data: { key: string; volume?: number; rate?: number }) => {
-    if (!this.scene.isActive()) return;
-    try {
-      if (this.sound && this.sound.get(data.key)) {
-        this.sound.play(data.key, { volume: data.volume ?? 0.5, rate: data.rate ?? 1 });
-      }
-    } catch (e) {
-      // Sound manager may be in a bad state (e.g. sounds array null after
-      // WebAudio context destruction). Safe to swallow here.
+    // FEEL-24 / AUD-07 — act-change is one of the four named "big reveal"
+    // beats; a quiet dim-and-stinger under the music crossfade already
+    // starting above marks the moment without competing with it.
+    if (this.scene.isActive()) {
+      anticipationBeat(this, () => playStinger(this, 'actChange', 0.5), { dimAlpha: 0.3, holdMs: 260 });
     }
   };
+
+  // REACT_PLAY_SFX: handled once, game-wide, in PhaserGame.tsx (Run 12) so
+  // menus and the standalone tower defense get UI sound too — not just
+  // rooms. (The old per-scene handler also gated on `this.sound.get(key)`,
+  // which silently dropped the first play of any key.)
 
   // ── Department completion fanfare (Phase 15) ─────────────────────
 
@@ -1041,31 +1254,31 @@ export class ExplorationScene extends Phaser.Scene {
     const playerX = data.playerX ?? this.player?.x ?? this.cameras.main.centerX;
     const playerY = data.playerY ?? this.player?.y ?? this.cameras.main.centerY;
 
-    // Beat 1: Camera flash — gold-white
-    this.cameras.main.flash(350, 255, 220, 50, false);
+    // FEEL-24 — anticipation beat: dim -> brief silence -> payoff. Room-clear
+    // is one of the four "big reveal" moments the brief calls out by name.
+    anticipationBeat(this, () => {
+      // Beat 1: Camera flash — gold-white
+      this.cameras.main.flash(350, 255, 220, 50, false);
 
-    // Beat 2: Particle burst — larger and more colorful than standard
-    if (this.textures.exists('particle_circle')) {
-      const emitter = this.add.particles(playerX, playerY, 'particle_circle', {
-        speed: { min: 80, max: 200 },
-        angle: { min: 0, max: 360 },
-        scale: { start: 0.8, end: 0 },
-        alpha: { start: 1, end: 0 },
-        tint: [0xffd700, 0x44ff44, 0x4ae2ff, 0xff6b9d],
-        lifespan: 900,
-        quantity: 30,
-        emitting: false,
-      } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
-      emitter.explode(30, playerX, playerY);
-      this.time.delayedCall(1000, () => { if (emitter.active) emitter.destroy(); });
-    }
-
-    // Beat 3: Fanfare chime
-    try {
-      if (this.cache.audio.has('sfx_fanfare')) {
-        this.sound.play('sfx_fanfare', { volume: 0.9 });
+      // Beat 2: Particle burst — larger and more colorful than standard
+      if (this.textures.exists('particle_circle')) {
+        const emitter = this.add.particles(playerX, playerY, 'particle_circle', {
+          speed: { min: 80, max: 200 },
+          angle: { min: 0, max: 360 },
+          scale: { start: 0.8, end: 0 },
+          alpha: { start: 1, end: 0 },
+          tint: [0xffd700, 0x44ff44, 0x4ae2ff, 0xff6b9d],
+          lifespan: 900,
+          quantity: 30,
+          emitting: false,
+        } as Phaser.Types.GameObjects.Particles.ParticleEmitterConfig);
+        emitter.explode(30, playerX, playerY);
+        this.time.delayedCall(1000, () => { if (emitter.active) emitter.destroy(); });
       }
-    } catch (_e) { /* ignore if sound unavailable */ }
+
+      // Beat 3: Fanfare chime (AUD-07 stinger: roomClear)
+      playStinger(this, 'roomClear', 0.9);
+    });
   };
 
   // ── Act state helper (Phase 15) ──────────────────────────────────
@@ -1113,7 +1326,7 @@ export class ExplorationScene extends Phaser.Scene {
     // FIX-03 (Phase 20): drop volume from 0.6 → 0.35 — the alert was a jarring honk
     // when the player simply walked near the IT Office workstation cluster. The shake
     // already conveys urgency; the SFX should be a soft cue, not a horn (Commandment 8).
-    try { this.sound.play('sfx_breach_alert', { volume: opts?.replay ? 0.2 : 0.35 }); } catch (_) {}
+    playSfx(this, 'sfx_breach_alert', { volume: opts?.replay ? 0.2 : 0.35 });
 
     const narrativeText = opts?.replay
       ? 'The console boots into simulation mode. Same threat patterns, fresh network — ' +
@@ -1466,18 +1679,18 @@ export class ExplorationScene extends Phaser.Scene {
       if (n < PRINTER_BEATS.length) {
         const beat = PRINTER_BEATS[n];
         if (beat.fx === 'paper') {
-          try { this.sound.play('sfx_sorter_paper', { volume: 0.5 }); } catch (_) {}
+          playSfx(this, 'sfx_sorter_paper', { volume: 0.5 });
           this.spitPage(ia.sprite.x, ia.sprite.y);
           this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 3400 });
         } else if (beat.fx === 'grind') {
-          try { this.sound.play('sfx_breach_alert', { volume: 0.08, rate: 0.55 }); } catch (_) {}
+          playSfx(this, 'sfx_scratch', { volume: 0.35, rate: 0.8 });
           this.tweens.add({ targets: ia.sprite, x: ia.sprite.x + 1, duration: 40, yoyo: true, repeat: 5 });
           this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 3400 });
         } else if (beat.fx === 'payoff') {
           // Commandment 2: it whirs first. Then, at last, it prints.
-          try { this.sound.play('sfx_breach_alert', { volume: 0.06, rate: 0.5 }); } catch (_) {}
+          playSfx(this, 'sfx_breach_alert', { volume: 0.06, rate: 0.5 });
           this.time.delayedCall(650, () => {
-            try { this.sound.play('sfx_fanfare', { volume: 0.5 }); } catch (_) {}
+            playSfx(this, 'sfx_fanfare', { volume: 0.5 });
             this.cameras.main.flash(250, 255, 240, 200, false);
             this.spitPage(ia.sprite.x, ia.sprite.y);
             if (this.textures.exists('particle_circle')) {
@@ -1497,12 +1710,12 @@ export class ExplorationScene extends Phaser.Scene {
             this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 4600 });
           });
         } else {
-          try { this.sound.play('sfx_interact', { volume: 0.15, rate: 0.7 }); } catch (_) {}
+          playSfx(this, 'sfx_interact', { volume: 0.15, rate: 0.7 });
           this.showNpcSpeechBubble(ia, beat.line, { volume: 0, dwellMs: 3400 });
         }
       } else {
         const line = PRINTER_AFTER_LINES[(n - PRINTER_BEATS.length) % PRINTER_AFTER_LINES.length];
-        try { this.sound.play('sfx_interact', { volume: 0.12, rate: 0.55 }); } catch (_) {}
+        playSfx(this, 'sfx_interact', { volume: 0.12, rate: 0.55 });
         this.showNpcSpeechBubble(ia, line, { volume: 0, dwellMs: 3000 });
       }
       return;
@@ -1510,7 +1723,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     if (d.kind === 'cat') {
       const pets = bumpCounter(CAT_PETS_KEY) + 1;
-      try { this.sound.play('sfx_interact', { volume: 0.16, rate: 0.55 }); } catch (_) {}
+      playSfx(this, 'sfx_interact', { volume: 0.16, rate: 0.55 });
       // Squish of acknowledgement
       this.tweens.add({
         targets: ia.sprite,
@@ -1535,7 +1748,7 @@ export class ExplorationScene extends Phaser.Scene {
         this.time.delayedCall(1000, () => hearts.destroy());
       }
       if (milestone) {
-        try { this.sound.play('sfx_fanfare', { volume: 0.3 }); } catch (_) {}
+        playSfx(this, 'sfx_fanfare', { volume: 0.3 });
         this.showNpcSpeechBubble(ia, CAT_MILESTONE_LINE, { volume: 0, dwellMs: 3200 });
       } else {
         this.showNpcSpeechBubble(ia, CAT_PET_LINES[(pets - 1) % CAT_PET_LINES.length], { volume: 0, dwellMs: 2200 });
@@ -1548,13 +1761,13 @@ export class ExplorationScene extends Phaser.Scene {
       const idx = n < ZZ_LINES.length
         ? n
         : ZZ_LOOP_INDEXES[(n - ZZ_LINES.length) % ZZ_LOOP_INDEXES.length];
-      try { this.sound.play('sfx_interact', { volume: 0.2, rate: 0.9 }); } catch (_) {}
+      playSfx(this, 'sfx_interact', { volume: 0.2, rate: 0.9 });
       this.showNpcSpeechBubble(ia, ZZ_LINES[idx], { volume: 0, dwellMs: 4800 });
       return;
     }
 
     // 'flavor' — a thing you look at, a line you get
-    try { this.sound.play('sfx_interact', { volume: 0.18, rate: 1.2 }); } catch (_) {}
+    playSfx(this, 'sfx_interact', { volume: 0.18, rate: 1.2 });
     this.showNpcSpeechBubble(ia, d.line ?? '...', { volume: 0, dwellMs: 3600 });
   }
 
@@ -1620,6 +1833,7 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Kill any active music tweens before destroying to avoid null volume errors
     this.music.killForEncounter();
+    if (this.beds) this.beds.stop(150);
 
     // Launch directly — camera fade callbacks silently fail with scene.launch
     this.scene.setVisible(false);
@@ -1647,6 +1861,12 @@ export class ExplorationScene extends Phaser.Scene {
     // the encounter remains replayable when the player walks back over the trigger tile.
     if (data?.encounterId || data?.aborted) {
       this.paused = false;
+      // Run 12: the SPACE press that opened the request modal ducked the mix;
+      // sorter/triage encounters never pass through onDialogueComplete, so
+      // restore it here or the music stays at 45% until the next room.
+      unduckMusic(this.music);
+      if (this.beds) this.beds.duck(1);
+      if (this.npcLife) this.npcLife.onInteractEnd();
       // Pure-React encounters (sorter/triage) leave the SPACE-trigger dim overlay
       // up — it was created before ENCOUNTER_REQUEST fired and only the dialogue
       // path ever cleared it. Escape / decline / completion all route here, so
@@ -1678,6 +1898,8 @@ export class ExplorationScene extends Phaser.Scene {
     // (Round 6 → MusicController.startRoomMusic; 800ms wake fade preserved via
     // parameter — room-entry create() uses 1800ms.)
     this.music.startRoomMusic(this.room, this.getCurrentAct(), 800);
+    if (this.beds) this.beds.start(this.room.id);
+    if (this.npcLife) this.npcLife.onInteractEnd();
   };
 
   // ── Door navigation (Phase 12) ──────────────────────────────────
@@ -1717,11 +1939,8 @@ export class ExplorationScene extends Phaser.Scene {
     // FIX-03 (Phase 20): drop from 0.4 → 0.25 — even at 0.4 the breach alert read
     // as a jarring honk when bumping a locked door during exploration. The red
     // camera flash carries the rejection feedback; SFX is just a soft accent.
-    try {
-      this.sound.play('sfx_breach_alert', { volume: 0.25 });
-    } catch (_e) {
-      // Ignore if sound not available
-    }
+    // Run 12: a proper "locked" error blip instead of the breach-alert horn
+    playSfx(this, 'sfx_door_locked', { volume: 0.4, cooldownKey: 'door_locked', cooldownMs: 400 });
   };
 
   private startPathMovement(path: Position[], pending: InteractableData | null) {
@@ -1755,27 +1974,12 @@ export class ExplorationScene extends Phaser.Scene {
       const dx = next.x - this.tileX;
       const dy = next.y - this.tileY;
 
-      this.sound.play('sfx_footstep', { volume: 0.25 });
+      // AUD-03 — floor-material footstep (click-to-move path); keeps its own
+      // per-step timing (one play per tile step), unlike the keyboard path's
+      // anim-contact-frame sync above.
+      playFootstep(this, floorMaterialForRoom(this.room.id), this.runKey.isDown);
       this.lastFootstepTime = this.time.now;
-
-      // Footstep dust puff
-      if (this.textures.exists('particle_circle')) {
-        const dustEmitter = this.add.particles(
-          this.player.x, this.player.y + 12, 'particle_circle', {
-          speed: { min: 5, max: 15 },
-          angle: { min: 220, max: 320 },
-          scale: { start: 0.3, end: 0 },
-          alpha: { start: 0.25, end: 0 },
-          lifespan: 300,
-          tint: 0xccbb99,
-          frequency: -1,
-        });
-        dustEmitter.setDepth(1);
-        dustEmitter.explode(2);
-        this.time.delayedCall(400, () => {
-          if (dustEmitter && dustEmitter.active) dustEmitter.destroy();
-        });
-      }
+      this.spawnFootstepDust();
 
       if (dx < 0) {
         this.player.anims.play('walk_left', true);
@@ -1835,11 +2039,27 @@ export class ExplorationScene extends Phaser.Scene {
 
     for (const ia of this.interactables) {
       const d = ia.data as { x: number; y: number };
-      const dist = Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y);
+      let dist = Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y);
+      // Run 12: a walking NPC is reachable where it actually stands, too.
+      if (ia.type === 'npc' && this.npcLife) {
+        const cur = this.npcLife.currentTile(ia.id);
+        if (cur) dist = Math.min(dist, Math.abs(this.tileX - cur.x) + Math.abs(this.tileY - cur.y));
+      }
       if (dist <= 1 && dist < closestDist) {
         closestDist = dist;
         closest = ia;
       }
+    }
+
+    // FEEL-23 grace radius: stepping one tile out of range keeps the last
+    // target live for a beat, so SPACE on the way past still lands.
+    const graceNow = this.time.now;
+    if (closest) {
+      this.lastNearby = closest;
+      this.nearbyGraceUntil = graceNow + 160;
+    } else if (this.lastNearby && graceNow < this.nearbyGraceUntil && !this.transitioning) {
+      const d = this.lastNearby.data as { x: number; y: number };
+      if (Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y) <= 2) closest = this.lastNearby;
     }
 
     if (closest) {
@@ -1900,10 +2120,22 @@ export class ExplorationScene extends Phaser.Scene {
       return;
     }
 
-    this.sound.play('sfx_interact', { volume: 0.55 });
+    playSfx(this, 'sfx_interact', { volume: 0.55, cooldownKey: 'interact', cooldownMs: 150 });
+    // FEEL-20 — hit-stop + squash: three frames of world-freeze on the
+    // impact, then a physical pop styled per target so an NPC, an item and a
+    // console each read as a different kind of touch.
+    if (ia.type === 'npc' && this.npcLife) this.npcLife.onInteract(ia.id);
+    const squashStyle: SquashStyle = ia.type === 'hallwayBoard' ? 'zone' : ia.type;
+    hitStopSquash(this, ia.sprite, squashStyle);
+    this.nudgePlayerToward(ia.sprite.x, ia.sprite.y);
+    if (ia.type === 'zone' || ia.type === 'hallwayBoard') playSfx(this, 'sfx_zone_examine', { volume: 0.3, rate: 1.1 });
     this.stopNpcPulse(ia);
     this.paused = true;
     this.movePath = [];
+    this.interactBuffer.clear();
+    // AUD-05 — duck the music (and the room bed) under the dialogue that's about to open.
+    duckMusic(this.music);
+    if (this.beds) this.beds.duck(0.45);
 
     // Dim screen for dialogue entrance — anticipation beat
     const dimOverlay = this.add.rectangle(
@@ -1925,6 +2157,7 @@ export class ExplorationScene extends Phaser.Scene {
     this.dialogueDimOverlay = dimOverlay;
 
     if (ia.type === 'console') {
+      playSfx(this, 'sfx_switch', { volume: 0.4, rate: 0.95 }); // the console's own switch flick
       // Threat Console → BreachDefense encounter (HIPAA-is-the-game pass).
       // triggerEncounter owns pacing (shake → alert → narrative card), so drop
       // the dialogue dim; paused stays true until the card resolves.
@@ -1958,6 +2191,8 @@ export class ExplorationScene extends Phaser.Scene {
           // Unpause, clear the dim, and give the NPC a short post-encounter line
           // (Commandment 1: no silent interactions).
           this.paused = false;
+          unduckMusic(this.music);
+          if (this.beds) this.beds.duck(1);
           if (this.dialogueDimOverlay) {
             this.tweens.killTweensOf(this.dialogueDimOverlay);
             this.dialogueDimOverlay.destroy();
@@ -1981,13 +2216,15 @@ export class ExplorationScene extends Phaser.Scene {
           documentSetId: npc.encounterTrigger.documentSetId,
           encounterType: (npc.encounterTrigger as { encounterType?: string }).encounterType,
         });
-        try { this.sound.play('sfx_interact', { volume: 0.35 }); } catch (_) {}
+        playSfx(this, 'sfx_interact', { volume: 0.35 });
         return;
       }
 
       // First-time NPC discovery sparkle — celebrate the moment
       if (!this.completedNPCs.has(npc.id)) {
         this.cameras.main.flash(150, 200, 200, 255, false);
+        playStinger(this, 'discovery', 0.4); // AUD-07
+
         if (this.textures.exists('particle_circle')) {
           const sparkle = this.add.particles(ia.sprite.x, ia.sprite.y, 'particle_circle', {
             speed: { min: 40, max: 90 },
@@ -2152,6 +2389,9 @@ export class ExplorationScene extends Phaser.Scene {
     // refresh (the "can't move on New Game" bug).
     this.paused = false;
     this.clearDialogueDim();
+    unduckMusic(this.music);
+    if (this.beds) this.beds.duck(1);
+    if (this.npcLife) this.npcLife.onInteractEnd();
     if (!this.scene.isActive()) return;
     this.lastActivityAt = this.time.now; // Restart idle-hint grace after dialogue closes
 
@@ -2183,6 +2423,8 @@ export class ExplorationScene extends Phaser.Scene {
     // Same reason as onReturnFromEncounter: a declined narrative card leaves the
     // dim overlay up otherwise.
     this.clearDialogueDim();
+    unduckMusic(this.music);
+    if (this.beds) this.beds.duck(1);
     if (this.encounterTriggered) {
       this.encounterDeclined = true;
     }
@@ -2224,7 +2466,7 @@ export class ExplorationScene extends Phaser.Scene {
       .setDepth(95)
       .setAlpha(0);
     this.npcSpeechBubble = bubble;
-    try { this.sound.play('sfx_interact', { volume: opts?.volume ?? 0.3 }); } catch (_) {}
+    playSfx(this, 'sfx_interact', { volume: opts?.volume ?? 0.3 });
     this.tweens.add({ targets: bubble, alpha: 1, y: bubble.y - 4, duration: 180, ease: 'Sine.easeOut' });
     this.time.delayedCall(opts?.dwellMs ?? 2400, () => {
       if (this.npcSpeechBubble !== bubble) return;
@@ -2311,13 +2553,14 @@ export class ExplorationScene extends Phaser.Scene {
       }
 
       // Quiet completion tick — distinct from NPC banner, softer than room fanfare (Commandment 8)
-      try { this.sound.play('sfx_sorter_correct', { volume: 0.25, rate: 1.1 }); } catch (_) {}
+      playSfx(this, 'sfx_sorter_correct', { volume: 0.25, rate: 1.1 });
     }
 
     // ── Detect newly completed NPCs ───────────────────────────────
     for (const id of Array.from(newNPCs)) {
       if (this.prevCompletedNPCs.has(id)) continue; // already known
 
+      if (this.npcLife) this.npcLife.setCompleted(id);
       const ia = this.interactables.find(i => i.type === 'npc' && i.id === id);
       if (ia) {
         // Fade-out instead of snap (Commandment 1 + parity with reload render)

@@ -37,6 +37,9 @@ export interface InteractableData {
   sprite: Phaser.GameObjects.Sprite;
   /** NPC name plate — the scene reveals it on proximity so names don't clutter. */
   label?: Phaser.GameObjects.Text;
+  /** NPC feet shadow + interact ring — Run 12: they travel with a walking NPC. */
+  shadow?: Phaser.GameObjects.Ellipse;
+  cue?: Phaser.GameObjects.Arc;
 }
 
 /** Whimsy interactable payload (moments-of-pure-play pass) — carried in `data`
@@ -251,11 +254,12 @@ export function spawnInteractables(
     const npcDepth = 5 + Math.floor(sprite.y / TILE);
     sprite.setDepth(npcDepth);
     npcShadow.setDepth(npcDepth - 1);
+    let npcCue: Phaser.GameObjects.Arc | undefined;
     if (completed) {
       sprite.setAlpha(0.7);
     } else {
       // Unified interaction cue — same gold ring as zones + items, at the NPC's feet
-      addInteractCue(scene, sprite.x, sprite.y + TILE / 2 - 3, npcDepth - 1);
+      npcCue = addInteractCue(scene, sprite.x, sprite.y + TILE / 2 - 3, npcDepth - 1).ring;
     }
 
     // Name plate — reads in the NPC's signature color. Lighter tag than before,
@@ -369,7 +373,7 @@ export function spawnInteractables(
       ctx.npcBubbles.set(npc.id, bubble);
     }
 
-    interactables.push({ type: 'npc', id: npc.id, data: npc, sprite, label: nameLabel });
+    interactables.push({ type: 'npc', id: npc.id, data: npc, sprite, label: nameLabel, shadow: npcShadow, cue: npcCue });
   }
 
   // ── Name-plate de-collision ──────────────────────────────────

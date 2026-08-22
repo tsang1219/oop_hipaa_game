@@ -1,6 +1,8 @@
 import Phaser from 'phaser';
 import { GRID_COLS, GRID_ROWS, CELL_SIZE } from '../../../game/breach-defense/constants';
 import { spawnDeathParticles } from './battleVfx';
+import { playSfx } from '../exploration/audioMixer';
+import { anticipationBeat } from '../exploration/feel';
 
 /**
  * Celebration/game-over spectacle for BreachDefenseScene, moved verbatim
@@ -11,7 +13,7 @@ import { spawnDeathParticles } from './battleVfx';
 
 /** ── Wave complete celebration effects ── (from update() Phase 1) */
 export function playWaveClearedFx(scene: Phaser.Scene, wave: number, waveKills: number): void {
-  scene.sound.play('sfx_wave_start', { volume: 0.5, rate: 1.2 });
+  playSfx(scene, 'sfx_wave_clear', { volume: 0.6, cooldownKey: 'wave_clear', cooldownMs: 500 });
   scene.cameras.main.flash(400, 100, 255, 100, false);
   scene.cameras.main.shake(200, 0.008);
 
@@ -80,6 +82,14 @@ export function playWaveClearedFx(scene: Phaser.Scene, wave: number, waveKills: 
 
 /** ── Victory celebration effects ── (from update() Phase 1) */
 export function playVictoryFx(scene: Phaser.Scene): void {
+  // FEEL-24 — encounter victory shares the game's one anticipation rhythm:
+  // dim → a short silence → the payoff (fanfare, flash, confetti).
+  anticipationBeat(scene, () => playVictoryPayoff(scene), { dimAlpha: 0.5, holdMs: 380 });
+}
+
+function playVictoryPayoff(scene: Phaser.Scene): void {
+  if (!scene.sys || !scene.sys.isActive()) return;
+  playSfx(scene, 'sfx_fanfare', { volume: 0.85, cooldownKey: 'victory', cooldownMs: 1000 });
   scene.cameras.main.flash(800, 255, 215, 0, false);
   scene.cameras.main.shake(400, 0.012);
 
@@ -155,6 +165,7 @@ export function playVictoryFx(scene: Phaser.Scene): void {
 
 /** ── Game over effects ── (from update() Phase 3) */
 export function playGameOverFx(scene: Phaser.Scene): void {
+  playSfx(scene, 'sfx_defeat', { volume: 0.5, rate: 0.8, cooldownKey: 'defeat', cooldownMs: 1000 });
   scene.cameras.main.flash(600, 255, 50, 50, false);
   scene.cameras.main.shake(500, 0.015);
 
@@ -241,7 +252,7 @@ export function runPrepCountdown(scene: Phaser.Scene, totalSeconds: number, onDo
     });
     if (remaining <= 3) {
       countdownText.setColor('#ff6644');
-      scene.sound.play('sfx_interact', { volume: 0.2 });
+      playSfx(scene, 'sfx_ui_tick', { volume: 0.35, rate: 0.9, cooldownKey: 'prep_tick', cooldownMs: 300 });
     }
     remaining--;
     scene.time.delayedCall(1000, tick);

@@ -1,0 +1,248 @@
+{
+  "roomId": "break_room",
+  "seconds": 10,
+  "frames": 40,
+  "avgClusters": 10.08,
+  "minClusters": 5,
+  "framesWithMotion": 39,
+  "distinctMovingCells": 764,
+  "perFrame": [
+    {
+      "frame": 1,
+      "clusters": 5,
+      "changedCells": 490
+    },
+    {
+      "frame": 2,
+      "clusters": 17,
+      "changedCells": 61
+    },
+    {
+      "frame": 3,
+      "clusters": 13,
+      "changedCells": 44
+    },
+    {
+      "frame": 4,
+      "clusters": 7,
+      "changedCells": 58
+    },
+    {
+      "frame": 5,
+      "clusters": 11,
+      "changedCells": 83
+    },
+    {
+      "frame": 6,
+      "clusters": 11,
+      "changedCells": 81
+    },
+    {
+      "frame": 7,
+      "clusters": 10,
+      "changedCells": 62
+    },
+    {
+      "frame": 8,
+      "clusters": 9,
+      "changedCells": 66
+    },
+    {
+      "frame": 9,
+      "clusters": 8,
+      "changedCells": 79
+    },
+    {
+      "frame": 10,
+      "clusters": 5,
+      "changedCells": 32
+    },
+    {
+      "frame": 11,
+      "clusters": 13,
+      "changedCells": 81
+    },
+    {
+      "frame": 12,
+      "clusters": 12,
+      "changedCells": 76
+    },
+    {
+      "frame": 13,
+      "clusters": 8,
+      "changedCells": 28
+    },
+    {
+      "frame": 14,
+      "clusters": 11,
+      "changedCells": 65
+    },
+    {
+      "frame": 15,
+      "clusters": 8,
+      "changedCells": 60
+    },
+    {
+      "frame": 16,
+      "clusters": 6,
+      "changedCells": 36
+    },
+    {
+      "frame": 17,
+      "clusters": 11,
+      "changedCells": 49
+    },
+    {
+      "frame": 18,
+      "clusters": 10,
+      "changedCells": 66
+    },
+    {
+      "frame": 19,
+      "clusters": 9,
+      "changedCells": 34
+    },
+    {
+      "frame": 20,
+      "clusters": 7,
+      "changedCells": 46
+    },
+    {
+      "frame": 21,
+      "clusters": 6,
+      "changedCells": 69
+    },
+    {
+      "frame": 22,
+      "clusters": 10,
+      "changedCells": 47
+    },
+    {
+      "frame": 23,
+      "clusters": 12,
+      "changedCells": 66
+    },
+    {
+      "frame": 24,
+      "clusters": 15,
+      "changedCells": 71
+    },
+    {
+      "frame": 25,
+      "clusters": 10,
+      "changedCells": 80
+    },
+    {
+      "frame": 26,
+      "clusters": 5,
+      "changedCells": 61
+    },
+    {
+      "frame": 27,
+      "clusters": 10,
+      "changedCells": 108
+    },
+    {
+      "frame": 28,
+      "clusters": 14,
+      "changedCells": 123
+    },
+    {
+      "frame": 29,
+      "clusters": 11,
+      "changedCells": 68
+    },
+    {
+      "frame": 30,
+      "clusters": 12,
+      "changedCells": 85
+    },
+    {
+      "frame": 31,
+      "clusters": 11,
+      "changedCells": 64
+    },
+    {
+      "frame": 32,
+      "clusters": 10,
+      "changedCells": 81
+    },
+    {
+      "frame": 33,
+      "clusters": 12,
+      "changedCells": 92
+    },
+    {
+      "frame": 34,
+      "clusters": 9,
+      "changedCells": 75
+    },
+    {
+      "frame": 35,
+      "clusters": 11,
+      "changedCells": 63
+    },
+    {
+      "frame": 36,
+      "clusters": 12,
+      "changedCells": 51
+    },
+    {
+      "frame": 37,
+      "clusters": 11,
+      "changedCells": 95
+    },
+    {
+      "frame": 38,
+      "clusters": 12,
+      "changedCells": 77
+    },
+    {
+      "frame": 39,
+      "clusters": 9,
+      "changedCells": 57
+    }
+  ],
+  "npcs": [
+    {
+      "id": "gossiping_coworker",
+      "blinks": 2,
+      "fidgets": 1,
+      "legs": 1,
+      "canWander": true,
+      "movedFromHome": true
+    },
+    {
+      "id": "friend_fishing",
+      "blinks": 2,
+      "fidgets": 1,
+      "legs": 3,
+      "canWander": true,
+      "movedFromHome": true
+    },
+    {
+      "id": "tired_employee",
+      "blinks": 2,
+      "fidgets": 0,
+      "legs": 1,
+      "canWander": true,
+      "movedFromHome": true
+    },
+    {
+      "id": "hr_director",
+      "blinks": 1,
+      "fidgets": 1,
+      "legs": 1,
+      "canWander": true,
+      "movedFromHome": true
+    },
+    {
+      "id": "selfie_coworker",
+      "blinks": 2,
+      "fidgets": 1,
+      "legs": 2,
+      "canWander": true,
+      "movedFromHome": true
+    }
+  ]
+}

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { furnitureTextureKey } from '../../sprites/furniture';
 import { npcSpriteTextureKey } from '../../sprites/npcTextures';
 import { objectTextureKey } from '../../sprites/objectTextures';
+import { playBusSfx } from './audioMixer';
 import type { Room } from '@shared/schema';
 import type { InteractableData } from './interactableFactory';
 
@@ -51,9 +52,10 @@ export function addRoomAmbience(
       const ia = interactables.find(i => i.type === 'npc' && i.id === fidgetId);
       if (ia) scene.tweens.add({ targets: ia.sprite, angle: { from: -1.5, to: 1.5 }, duration: 1100 + Math.random() * 400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
-    // Ambient monitor beep — heartbeat-like cadence (DESIGN-LIFT-001)
+    // Ambient monitor beep — heartbeat-like cadence (DESIGN-LIFT-001 -> AUD-06:
+    // swapped the reused sfx_interact placeholder for a real electronic tick)
     scene.time.addEvent({ delay: 9000, loop: true, callback: () => {
-      try { scene.sound.play('sfx_interact', { volume: 0.06, rate: 0.6 }); } catch (_) {}
+      playBusSfx(scene, 'sfx_ambient_er_beep', { volume: 0.14, rate: 1.3 });
     } });
   }
 
@@ -104,13 +106,14 @@ export function addRoomAmbience(
       scene.tweens.add({ targets: riley.sprite, angle: { from: -1.2, to: 1.2 }, duration: 1700, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
     // Plant leaf-sway is now handled generically by addFurnitureIdleAnimations() — no entrance-only block needed
-    // (3) Ambient lobby chatter — single subtle blip every 9-12s, max volume 0.08
+    // (3) Ambient lobby chatter — single subtle blip every 9-12s (AUD-06:
+    // swapped the reused sfx_interact placeholder for a real chatter sample)
     scene.time.addEvent({ delay: 10500, loop: true, callback: () => {
-      try { scene.sound.play('sfx_interact', { volume: 0.06, rate: 0.55 + Math.random() * 0.2 }); } catch (_) {}
+      playBusSfx(scene, 'sfx_ambient_lobby_chatter', { volume: 0.05, rate: 0.55 + Math.random() * 0.2 });
     } });
     // Ambient sliding-door whoosh — distant entry sound every ~20s (DESIGN-LIFT-001)
     scene.time.addEvent({ delay: 19500, loop: true, callback: () => {
-      try { scene.sound.play('sfx_interact', { volume: 0.06, rate: 0.8 }); } catch (_) {}
+      playBusSfx(scene, 'sfx_door_open_1', { volume: 0.05, rate: 0.6 });
     } });
   }
 
@@ -122,12 +125,24 @@ export function addRoomAmbience(
       const led = scene.add.rectangle(obs.x * TILE + obs.width * TILE - 6, obs.y * TILE + 6, 2, 2, ledColors[0]).setDepth(20);
       let li = 0;
       scene.time.addEvent({ delay: 700, loop: true, callback: () => { li = (li + 1) % ledColors.length; led.setFillStyle(ledColors[li]); } });
+
+      // ANIM-07 — "the vending machine hums and shudders": a low compressor
+      // hum every ~14s, paired with a one-frame status-light shudder (the
+      // machine kicking its compressor on) so it reads as more than blinking.
+      const ledHomeX = led.x;
+      scene.time.addEvent({ delay: 14000 + Math.random() * 2000, loop: true, callback: () => {
+        playBusSfx(scene, 'sfx_vending_hum', { volume: 0.1, rate: 0.75 });
+        scene.tweens.add({
+          targets: led, x: ledHomeX + 1, duration: 55, yoyo: true, repeat: 3, ease: 'Linear',
+          onComplete: () => { led.x = ledHomeX; },
+        });
+      } });
     }
     const mw = room.obstacles.find((o: any) => o.type === 'microwave');
     if (mw) {
       const mx = mw.x * TILE + TILE / 2, my = mw.y * TILE + TILE / 2;
       scene.time.addEvent({ delay: 9000, loop: true, callback: () => {
-        try { scene.sound.play('sfx_interact', { volume: 0.12, rate: 1.6 }); } catch (_) {}
+        playBusSfx(scene, 'sfx_interact', { volume: 0.12, rate: 1.6 });
         const f = scene.add.rectangle(mx, my, TILE - 8, TILE - 8, 0xffeeaa, 0.5).setDepth(20);
         scene.tweens.add({ targets: f, alpha: 0, duration: 350, onComplete: () => f.destroy() });
       } });
@@ -142,9 +157,9 @@ export function addRoomAmbience(
         scene.tweens.add({ targets: b, alpha: 1, y: b.y - 4, duration: 250, yoyo: true, hold: 900, onComplete: () => b.destroy() });
       } });
     }
-    // Ambient vending dispense — soft thunk every ~16s (DESIGN-LIFT-001)
+    // Ambient break-room fridge hum — low gain under the music (AUD-06)
     scene.time.addEvent({ delay: 16000, loop: true, callback: () => {
-      try { scene.sound.play('sfx_interact', { volume: 0.05, rate: 0.5 }); } catch (_) {}
+      playBusSfx(scene, 'sfx_ambient_breakroom_hum', { volume: 0.08, rate: 0.6 });
     } });
   }
 
@@ -180,9 +195,9 @@ export function addRoomAmbience(
     scene.add.ellipse(cartStartX, cartY + 10, TILE - 6, 6, 0x000000, 0.18).setDepth(2);
     const cart = scene.add.sprite(cartStartX, cartY, furnitureTextureKey('document_cart')).setDepth(3).setScale(0.85);
     scene.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    // Ambient paper rustle / drawer slide — every ~12s (DESIGN-LIFT-001)
+    // Ambient paper rustle / drawer slide — every ~12s (AUD-06: real paper sample)
     scene.time.addEvent({ delay: 12500, loop: true, callback: () => {
-      try { scene.sound.play('sfx_interact', { volume: 0.04, rate: 0.7 }); } catch (_) {}
+      playBusSfx(scene, 'sfx_ambient_records_paper', { volume: 0.07, rate: 0.85 });
     } });
   }
 
@@ -213,7 +228,7 @@ export function addRoomAmbience(
     }
     // Ambient bubble pop — chemistry-station blip every ~10s (DESIGN-LIFT-001)
     scene.time.addEvent({ delay: 10500, loop: true, callback: () => {
-      try { scene.sound.play('sfx_interact', { volume: 0.05, rate: 1.4 }); } catch (_) {}
+      playBusSfx(scene, 'sfx_interact', { volume: 0.05, rate: 1.4 });
     } });
   }
 
@@ -245,6 +260,12 @@ export function addRoomAmbience(
     // Threat Console interactable (ExplorationScene.spawnDefenseConsole) is
     // the visible invitation now; a ring at the old (9,6) trigger tile would
     // point at nothing.
+
+    // (4) Ambient server-rack whine — low gain under the music (AUD-06).
+    // The one room in the game that had zero ambient SFX timer before Run 12.
+    scene.time.addEvent({ delay: 11000, loop: true, callback: () => {
+      playBusSfx(scene, 'sfx_ambient_it_whine', { volume: 0.06, rate: 0.5 });
+    } });
   }
 
   // ── Hallway life pass (DESIGN-HALLWAY-001 + 002) ─────────────
@@ -298,6 +319,24 @@ export function addFurnitureIdleAnimations(scene: Phaser.Scene, room: any): void
   for (const obs of room.obstacles) {
     const obsType = (obs as any).type as string | undefined;
     if (!obsType) continue;
+
+    // ── curtain_partition / privacy_screen — cloth sway (ANIM-07) ────────
+    if (obsType === 'curtain_partition' || obsType === 'privacy_screen') {
+      const cx = obs.x * TILE + (obs.width * TILE) / 2;
+      const cyTop = obs.y * TILE + 4;
+      const swayW = Math.max(6, obs.width * TILE - 10);
+      const cloth = scene.add.ellipse(cx, cyTop, swayW, 5, 0xffffff, 0.10).setDepth(4);
+      scene.tweens.add({
+        targets: cloth,
+        scaleX: { from: 0.94, to: 1.06 },
+        angle: { from: -2, to: 2 },
+        duration: 2200 + Math.random() * 500,
+        yoyo: true,
+        repeat: -1,
+        ease: 'Sine.easeInOut',
+      });
+      continue;
+    }
 
     // ── plant — leaf sway (14 instances across 9 rooms) ─────────────────
     if (obsType === 'plant') {

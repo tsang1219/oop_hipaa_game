@@ -8,6 +8,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type SorterDebriefProps = {
   encounterId: string;
@@ -27,6 +28,7 @@ export function SorterDebrief({
   locationLabel,
   onDismiss,
 }: SorterDebriefProps) {
+  useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

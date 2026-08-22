@@ -13,6 +13,7 @@ import {
 import {
   playWaveClearedFx, playVictoryFx, playGameOverFx, runPrepCountdown,
 } from '../systems/breach/celebrationVfx';
+import { playSfx, playRoundRobin } from '../systems/exploration/audioMixer';
 
 type TowerType = keyof typeof TOWERS;
 type ThreatType = keyof typeof THREATS;
@@ -403,7 +404,7 @@ export class BreachDefenseScene extends Phaser.Scene {
   private onSelectTowerType(data: { type: TowerType | null }) {
     this.selectedTowerType = data.type;
     if (data.type) {
-      this.sound.play('sfx_interact', { volume: 0.2, rate: 1.2 });
+      playSfx(this, 'sfx_tower_select', { volume: 0.35, cooldownKey: 'tower_select', cooldownMs: 80 });
     }
   }
 
@@ -535,20 +536,26 @@ export class BreachDefenseScene extends Phaser.Scene {
 
   private placeTowerAt(type: TowerType, gridX: number, gridY: number): boolean {
     const stats = TOWERS[type];
-    if (this.budget < stats.cost) return false;
+    // Run 12 (AUD-02): a refused placement is an interaction too — it gets a
+    // soft "nope" instead of silence (Commandment 1).
+    const refuse = () => {
+      playSfx(this, 'sfx_tower_invalid', { volume: 0.3, cooldownKey: 'tower_invalid', cooldownMs: 220 });
+      return false;
+    };
+    if (this.budget < stats.cost) return refuse();
 
     if (this.availableTowerFilter && !this.availableTowerFilter.has(type)) {
-      return false;  // Tower type not available in this encounter
+      return refuse();  // Tower type not available in this encounter
     }
 
     const isPath = PATHS[0].some(p => p.x === gridX && p.y === gridY);
-    if (type !== 'FIREWALL' && isPath) return false;
+    if (type !== 'FIREWALL' && isPath) return refuse();
 
     const occupied = this.towers.some(t => t.gridX === gridX && t.gridY === gridY);
-    if (occupied) return false;
+    if (occupied) return refuse();
 
     // Check wave unlock
-    if (this.wave < stats.unlockWave) return false;
+    if (this.wave < stats.unlockWave) return refuse();
 
     this.budget -= stats.cost;
 
@@ -569,7 +576,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     };
     this.towers.push(tower);
 
-    this.sound.play('sfx_tower_place', { volume: 0.5 });
+    playSfx(this, 'sfx_tower_place', { volume: 0.5, cooldownKey: 'tower_place', cooldownMs: 80 });
 
     playTowerPlacementFx(this, sprite, px, py, type, stats, this.towers, tower.id, gridX, gridY);
 
@@ -626,8 +633,8 @@ export class BreachDefenseScene extends Phaser.Scene {
       .setStrokeStyle(1, 0x555555, 0.5)
       .setDepth(16);
 
-    // Subtle spawn sound
-    this.sound.play('sfx_interact', { volume: 0.15 });
+    // Subtle spawn sound — a little digital glitch as the threat materialises
+    playRoundRobin(this, 'enemy_spawn', ['sfx_glitch_0', 'sfx_glitch_1'], { volume: 0.12, rate: 1.15, cooldownMs: 140 });
 
     // HP bars fade in after a brief delay
     hpBarBg.setAlpha(0);
@@ -754,7 +761,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     });
 
     this.waveState.active = true;
-    this.sound.play('sfx_wave_start', { volume: 0.7 });
+    playSfx(this, 'sfx_wave_start', { volume: 0.7, cooldownKey: 'wave_start', cooldownMs: 500 });
   }
 
   // ── Main game loop ─────────────────────────────────────────────
@@ -950,7 +957,8 @@ export class BreachDefenseScene extends Phaser.Scene {
 
     if (breaching.length > 0) {
       this.securityScore = Math.max(0, this.securityScore - breaching.length * 20);
-      this.sound.play('sfx_breach_alert', { volume: 0.85 });
+      playSfx(this, 'sfx_breach_alert', { volume: 0.7, cooldownKey: 'breach_alert', cooldownMs: 400 });
+      playSfx(this, 'sfx_base_damage', { volume: 0.45, rate: 0.85, cooldownKey: 'base_damage', cooldownMs: 300 });
 
       // ── Breach alert screen edge pulse ──
       playBreachBorderFlash(this);
@@ -1079,7 +1087,9 @@ export class BreachDefenseScene extends Phaser.Scene {
         });
 
         tower.lastFired = time;
-        this.sound.play('sfx_tower_place', { volume: 0.15, rate: 1.5 });
+        playRoundRobin(this, 'tower_fire', ['sfx_tower_fire_0', 'sfx_tower_fire_1', 'sfx_tower_fire_2'], {
+          volume: 0.16, rate: 1.1 + Math.random() * 0.2, cooldownMs: 70,
+        });
         playRecoilTween(this, tower.sprite);
 
         // Brief range flash on fire
@@ -1115,7 +1125,9 @@ export class BreachDefenseScene extends Phaser.Scene {
         // Hit!
         target.hp -= proj.damage;
         target.flashUntil = time + 120;
-        this.sound.play('sfx_enemy_death', { volume: 0.12, rate: 1.4 });
+        playRoundRobin(this, 'enemy_hit', ['sfx_enemy_hit_0', 'sfx_enemy_hit_1', 'sfx_enemy_hit_2'], {
+          volume: 0.14, rate: 1.2 + Math.random() * 0.2, cooldownMs: 60,
+        });
         if (proj.isStrong) {
           target.strongFlashUntil = time + 120 + 150;
           target.strongFlashColor = proj.color;
@@ -1144,7 +1156,7 @@ export class BreachDefenseScene extends Phaser.Scene {
     const deadEnemies = this.enemies.filter(e => e.hp <= 0);
     this.waveKillCount += deadEnemies.length;
     for (const e of deadEnemies) {
-      this.sound.play('sfx_enemy_death', { volume: 0.6 });
+      playSfx(this, 'sfx_enemy_death', { volume: 0.55, rate: 0.95 + Math.random() * 0.1, cooldownKey: 'enemy_death', cooldownMs: 90 });
 
       const threatName = THREATS[e.type]?.name || e.type;
       showKillLabel(this, e.sprite.x, e.sprite.y, threatName);

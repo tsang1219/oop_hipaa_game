@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 interface NarrativeContextCardProps {
   narrativeText: string;
@@ -11,6 +12,7 @@ export const NarrativeContextCard: React.FC<NarrativeContextCardProps> = ({
   onConfirm,
   onDecline,
 }) => {
+  useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

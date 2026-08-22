@@ -1,4 +1,5 @@
 import { useEffect } from 'react';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type SorterContextCardProps = {
   title: string;
@@ -16,6 +17,7 @@ export type SorterContextCardProps = {
  * The PHI Sorter is a friendly forms-handoff moment (Riley, lab tech, records clerk), not a threat alert.
  */
 export function SorterContextCard({ title, body, onConfirm }: SorterContextCardProps) {
+  useOverlaySfx('open', 'close');
   // Enter/Space confirms — keyboard-first, no mouse required
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {

@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { BootScene } from './scenes/BootScene';
 import { ExplorationScene } from './scenes/ExplorationScene';
 import { BreachDefenseScene } from './scenes/BreachDefenseScene';
+import { DeferredAudioScene } from './scenes/DeferredAudioScene';
 
 export function createGameConfig(options: {
   parent: HTMLElement;
@@ -21,7 +22,7 @@ export function createGameConfig(options: {
       autoCenter: Phaser.Scale.CENTER_BOTH,
       autoRound: true,
     },
-    scene: [BootScene, ExplorationScene, BreachDefenseScene],
+    scene: [BootScene, ExplorationScene, BreachDefenseScene, DeferredAudioScene],
     physics: {
       default: 'arcade',
       arcade: {

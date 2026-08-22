@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/button';
 import { AlertCircle, Shield, Lock } from 'lucide-react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 interface TutorialModalProps {
   title: string;
@@ -12,12 +13,13 @@ interface TutorialModalProps {
 }
 
 export function TutorialModal({ title, description, onAcknowledge, type = 'info', ctaText = "Got it! Let's go →" }: TutorialModalProps) {
+  useOverlaySfx('open', null);
   const [isVisible, setIsVisible] = useState(false);
   const Icon = type === 'threat' ? AlertCircle : type === 'tower' ? Lock : Shield;
   const iconColor = type === 'threat' ? 'text-red-500' : type === 'tower' ? 'text-[#FF6B9D]' : 'text-blue-500';
 
   useEffect(() => {
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.5 });
+    uiSfx('confirm');
   }, []);
 
   useEffect(() => {

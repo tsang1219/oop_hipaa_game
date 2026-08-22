@@ -1,0 +1,232 @@
+{
+  "roomId": "er",
+  "seconds": 10,
+  "frames": 40,
+  "avgClusters": 7.62,
+  "minClusters": 5,
+  "framesWithMotion": 39,
+  "distinctMovingCells": 920,
+  "perFrame": [
+    {
+      "frame": 1,
+      "clusters": 6,
+      "changedCells": 768
+    },
+    {
+      "frame": 2,
+      "clusters": 12,
+      "changedCells": 162
+    },
+    {
+      "frame": 3,
+      "clusters": 8,
+      "changedCells": 86
+    },
+    {
+      "frame": 4,
+      "clusters": 5,
+      "changedCells": 43
+    },
+    {
+      "frame": 5,
+      "clusters": 8,
+      "changedCells": 49
+    },
+    {
+      "frame": 6,
+      "clusters": 10,
+      "changedCells": 85
+    },
+    {
+      "frame": 7,
+      "clusters": 9,
+      "changedCells": 83
+    },
+    {
+      "frame": 8,
+      "clusters": 7,
+      "changedCells": 100
+    },
+    {
+      "frame": 9,
+      "clusters": 6,
+      "changedCells": 63
+    },
+    {
+      "frame": 10,
+      "clusters": 6,
+      "changedCells": 48
+    },
+    {
+      "frame": 11,
+      "clusters": 10,
+      "changedCells": 103
+    },
+    {
+      "frame": 12,
+      "clusters": 9,
+      "changedCells": 77
+    },
+    {
+      "frame": 13,
+      "clusters": 7,
+      "changedCells": 112
+    },
+    {
+      "frame": 14,
+      "clusters": 7,
+      "changedCells": 107
+    },
+    {
+      "frame": 15,
+      "clusters": 8,
+      "changedCells": 86
+    },
+    {
+      "frame": 16,
+      "clusters": 7,
+      "changedCells": 66
+    },
+    {
+      "frame": 17,
+      "clusters": 8,
+      "changedCells": 76
+    },
+    {
+      "frame": 18,
+      "clusters": 8,
+      "changedCells": 118
+    },
+    {
+      "frame": 19,
+      "clusters": 7,
+      "changedCells": 106
+    },
+    {
+      "frame": 20,
+      "clusters": 9,
+      "changedCells": 63
+    },
+    {
+      "frame": 21,
+      "clusters": 6,
+      "changedCells": 72
+    },
+    {
+      "frame": 22,
+      "clusters": 7,
+      "changedCells": 85
+    },
+    {
+      "frame": 23,
+      "clusters": 8,
+      "changedCells": 114
+    },
+    {
+      "frame": 24,
+      "clusters": 9,
+      "changedCells": 91
+    },
+    {
+      "frame": 25,
+      "clusters": 5,
+      "changedCells": 62
+    },
+    {
+      "frame": 26,
+      "clusters": 7,
+      "changedCells": 70
+    },
+    {
+      "frame": 27,
+      "clusters": 7,
+      "changedCells": 96
+    },
+    {
+      "frame": 28,
+      "clusters": 8,
+      "changedCells": 99
+    },
+    {
+      "frame": 29,
+      "clusters": 7,
+      "changedCells": 70
+    },
+    {
+      "frame": 30,
+      "clusters": 8,
+      "changedCells": 74
+    },
+    {
+      "frame": 31,
+      "clusters": 8,
+      "changedCells": 65
+    },
+    {
+      "frame": 32,
+      "clusters": 10,
+      "changedCells": 84
+    },
+    {
+      "frame": 33,
+      "clusters": 6,
+      "changedCells": 85
+    },
+    {
+      "frame": 34,
+      "clusters": 7,
+      "changedCells": 73
+    },
+    {
+      "frame": 35,
+      "clusters": 7,
+      "changedCells": 57
+    },
+    {
+      "frame": 36,
+      "clusters": 8,
+      "changedCells": 28
+    },
+    {
+      "frame": 37,
+      "clusters": 7,
+      "changedCells": 103
+    },
+    {
+      "frame": 38,
+      "clusters": 8,
+      "changedCells": 93
+    },
+    {
+      "frame": 39,
+      "clusters": 7,
+      "changedCells": 112
+    }
+  ],
+  "npcs": [
+    {
+      "id": "dr_martinez",
+      "blinks": 3,
+      "fidgets": 1,
+      "legs": 1,
+      "canWander": true,
+      "movedFromHome": true
+    },
+    {
+      "id": "officer",
+      "blinks": 2,
+      "fidgets": 1,
+      "legs": 1,
+      "canWander": true,
+      "movedFromHome": true
+    },
+    {
+      "id": "frantic_family",
+      "blinks": 3,
+      "fidgets": 1,
+      "legs": 2,
+      "canWander": true,
+      "movedFromHome": true
+    }
+  ]
+}

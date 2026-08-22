@@ -16,6 +16,7 @@
  */
 
 import { useEffect, useState } from 'react';
+import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
 
 export type TriageDebriefProps = {
   encounterId: string;
@@ -46,6 +47,7 @@ export function TriageDebrief({
   ruleOutcomes,
   onDismiss,
 }: TriageDebriefProps) {
+  useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
 
   useEffect(() => {

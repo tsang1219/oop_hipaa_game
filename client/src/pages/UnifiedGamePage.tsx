@@ -20,7 +20,8 @@ import EndScreen from '@/components/EndScreen';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
 import { RoomIntroOverlay } from '@/components/RoomIntroOverlay';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
-import { MusicVolumeSlider } from '../components/MusicVolumeSlider';
+import { AudioMixPanel } from '../components/AudioMixPanel';
+import { uiSfx, installGlobalUiSfx } from '@/lib/uiSfx';
 import { useNotification } from '../components/NotificationToast';
 import { GameBanner } from '../components/GameBanner';
 import { useToast } from '@/hooks/use-toast';
@@ -344,9 +345,10 @@ export default function UnifiedGamePage() {
       setScoreDelta({ value: delta, key: Date.now() });
 
       if (delta > 0) {
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3 });
+        uiSfx('scoreUp');
       } else if (delta < 0) {
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_breach_alert', volume: 0.35 });
+        // Run 12: losing trust is a wince, not an air-raid siren (FEEL-25 spirit)
+        uiSfx('scoreDown');
       }
 
       if (scoreDeltaTimer.current) clearTimeout(scoreDeltaTimer.current);
@@ -373,7 +375,7 @@ export default function UnifiedGamePage() {
           label: `${m}% PROGRESS`,
           type: m === 100 ? 'success' : 'info',
         });
-        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.7 });
+        uiSfx('bell', { volume: 0.45 });
       }
     }
   }, [gameState.state.completedNPCs, totalScenarios, notify]);
@@ -407,6 +409,10 @@ export default function UnifiedGamePage() {
       setShowRoomIntro(true);
     }
   }, [currentRoomId]);
+
+  // Run 12 (AUD-02): every button in the app clicks + hovers (delegated),
+  // every overlay opens/closes with a sound — installed once, game-wide.
+  useEffect(() => installGlobalUiSfx(), []);
 
   // Mute toggle
   useEffect(() => {
@@ -877,6 +883,8 @@ export default function UnifiedGamePage() {
       if (!gameState.state.collectedItems.includes(data.itemId)) {
         gameState.collectItem(data.itemId);
         notify(data.title, { label: 'HIPAA FACT LEARNED', type: 'discovery' });
+        // AUD-07 — item-get stinger, first collection only
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_stinger_itemget', volume: 0.5 });
       }
     };
 
@@ -1491,7 +1499,7 @@ export default function UnifiedGamePage() {
 
   const handleDismissIntroModal = useCallback(() => {
     setShowIntroModal(false);
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+    uiSfx('close');
     // Unpause the scene, retried a couple times: on a fresh New Game the intro is
     // dismissed while the Exploration scene may still be finishing create(), so a
     // single emit can arrive before the scene registers its listener — leaving the
@@ -1584,7 +1592,7 @@ export default function UnifiedGamePage() {
   const handleCloseStoryModal = () => {
     setShowStoryModal(false);
     setCurrentStoryRoom(null);
-    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+    uiSfx('close');
   };
 
   // ── Demo Esc-to-start-menu (Phase 18 — DEMO-07) ────────────────
@@ -1997,7 +2005,7 @@ export default function UnifiedGamePage() {
             introText={currentRoom.config?.introText}
             onDismiss={() => {
               setShowRoomIntro(false);
-              eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+              uiSfx('close');
             }}
           />
         )}
@@ -2026,7 +2034,7 @@ export default function UnifiedGamePage() {
           <ObservationHint
             gate={activeObservationGate}
             onAcknowledge={() => {
-              eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.2, rate: 0.9 });
+              uiSfx('close');
               resolveGate(activeObservationGate.id, activeObservationGate.targetId);
               setActiveObservationGate(null);
               eventBridge.emit(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE);
@@ -2094,6 +2102,7 @@ export default function UnifiedGamePage() {
           💬
         </button>
         <button
+          data-sfx="toggle"
           onClick={() => setMuted(m => !m)}
           className="text-[10px] text-gray-300 hover:text-white transition-colors"
           title={muted ? 'Unmute' : 'Mute'}
@@ -2101,7 +2110,7 @@ export default function UnifiedGamePage() {
         >
           {muted ? '\u{1F507}' : '\u{1F50A}'}
         </button>
-        <MusicVolumeSlider />
+        <AudioMixPanel />
       </div>
 
       <ValidationOverlay gameRef={gameRef} />
