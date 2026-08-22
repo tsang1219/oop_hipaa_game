@@ -24,7 +24,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -77,10 +77,10 @@
           "type": "info_kiosk"
         },
         {
-          "x": 17,
-          "y": 1,
-          "width": 2,
-          "height": 2,
+          "x": 18,
+          "y": 2,
+          "width": 1,
+          "height": 1,
           "type": "plant"
         },
         {
@@ -159,6 +159,34 @@
           "width": 3,
           "height": 1,
           "type": "welcome_mat"
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 14,
+          "y": 11,
+          "width": 1,
+          "height": 1,
+          "type": "trash_can"
+        },
+        {
+          "x": 18,
+          "y": 9,
+          "width": 1,
+          "height": 1,
+          "type": "wheelchair"
+        },
+        {
+          "x": 1,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "type": "magazine_rack"
         }
       ],
       "npcs": [
@@ -183,7 +211,7 @@
           "encounterTrigger": {
             "encounterId": "phi-sort-reception",
             "documentSetId": "phi-sorter-set-1",
-            "requestText": "Hey — auditor's here in twenty minutes and I'm drowning. Can you help me sort what counts as PHI on these intake forms?",
+            "requestText": "Hey \u2014 auditor's here in twenty minutes and I'm drowning. Can you help me sort what counts as PHI on these intake forms?",
             "completedText": "Front desk is quiet for once. You're my favorite person today."
           },
           "isFinalBoss": false
@@ -206,7 +234,7 @@
           "type": "document",
           "x": 16,
           "y": 5,
-          "fact": "HIPAA — the Health Insurance Portability and Accountability Act of 1996 — isn't just about privacy. It has five titles, but Title II is the one that matters to you: it sets national standards for protecting patient health information (PHI). Two key rules: the Privacy Rule (who can see PHI) and the Security Rule (how to protect electronic PHI). Every person in this hospital — from the CEO to the janitor — has a role in keeping patient data safe."
+          "fact": "HIPAA \u2014 the Health Insurance Portability and Accountability Act of 1996 \u2014 isn't just about privacy. It has five titles, but Title II is the one that matters to you: it sets national standards for protecting patient health information (PHI). Two key rules: the Privacy Rule (who can see PHI) and the Security Rule (how to protect electronic PHI). Every person in this hospital \u2014 from the CEO to the janitor \u2014 has a role in keeping patient data safe."
         }
       ],
       "completionRequirements": {
@@ -245,7 +273,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -271,7 +299,7 @@
         },
         {
           "x": 10,
-          "y": 1,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "plant"
@@ -314,7 +342,7 @@
           "type": "poster",
           "x": 8,
           "y": 1,
-          "fact": "PHI includes 18 types of identifiers: names, dates, phone numbers, email, SSN, medical record numbers, health plan IDs, account numbers, license/plate numbers, device IDs, URLs, IPs, biometrics, photos, and any other unique identifier. If it can identify a patient AND relates to their health, treatment, or payment — it's PHI."
+          "fact": "PHI includes 18 types of identifiers: names, dates, phone numbers, email, SSN, medical record numbers, health plan IDs, account numbers, license/plate numbers, device IDs, URLs, IPs, biometrics, photos, and any other unique identifier. If it can identify a patient AND relates to their health, treatment, or payment \u2014 it's PHI."
         }
       ],
       "completionRequirements": {
@@ -359,7 +387,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -371,14 +399,14 @@
         },
         {
           "x": 6,
-          "y": 1,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "plant"
         },
         {
           "x": 13,
-          "y": 1,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "plant"
@@ -428,7 +456,7 @@
           "type": "poster",
           "x": 10,
           "y": 1,
-          "fact": "Most HIPAA breaches aren't hackers — they're conversations. Discussing patients in elevators, cafeterias, or hallways where others can overhear is a violation of the Minimum Necessary standard. Rule of thumb: if you can be overheard by someone without a need to know, find a private space."
+          "fact": "Most HIPAA breaches aren't hackers \u2014 they're conversations. Discussing patients in elevators, cafeterias, or hallways where others can overhear is a violation of the Minimum Necessary standard. Rule of thumb: if you can be overheard by someone without a need to know, find a private space."
         }
       ],
       "completionRequirements": {
@@ -481,13 +509,13 @@
         "requiredItems": []
       },
       "obstacles": [
-        { "x": 0, "y": 0, "width": 10, "height": 1, "type": "wall" },
+        { "x": 0, "y": 0, "width": 10, "height": 2, "type": "wall" },
         { "x": 0, "y": 7, "width": 5, "height": 1, "type": "wall" },
         { "x": 6, "y": 7, "width": 4, "height": 1, "type": "wall" },
         { "x": 0, "y": 1, "width": 1, "height": 6, "type": "wall" },
         { "x": 9, "y": 1, "width": 1, "height": 6, "type": "wall" },
-        { "x": 1, "y": 1, "width": 3, "height": 1, "type": "shelf" },
-        { "x": 7, "y": 1, "width": 2, "height": 1, "type": "archive_box" },
+        { "x": 1, "y": 2, "width": 3, "height": 1, "type": "shelf" },
+        { "x": 7, "y": 2, "width": 2, "height": 1, "type": "archive_box" },
         { "x": 1, "y": 6, "width": 1, "height": 1, "type": "trash" },
         { "x": 8, "y": 6, "width": 1, "height": 1, "type": "plant" }
       ],
@@ -527,7 +555,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -553,7 +581,7 @@
         },
         {
           "x": 10,
-          "y": 1,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "plant"
@@ -596,7 +624,7 @@
           "type": "poster",
           "x": 8,
           "y": 1,
-          "fact": "HIPAA allows sharing health data freely if it's properly de-identified. The Safe Harbor method requires removing all 18 identifiers. The Expert Determination method uses a statistician to certify re-identification risk is 'very small.' De-identified data isn't PHI — and isn't subject to HIPAA rules."
+          "fact": "HIPAA allows sharing health data freely if it's properly de-identified. The Safe Harbor method requires removing all 18 identifiers. The Expert Determination method uses a statistician to certify re-identification risk is 'very small.' De-identified data isn't PHI \u2014 and isn't subject to HIPAA rules."
         }
       ],
       "completionRequirements": {
@@ -641,7 +669,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -653,14 +681,14 @@
         },
         {
           "x": 7,
-          "y": 1,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "plant"
         },
         {
           "x": 12,
-          "y": 1,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "plant"
@@ -710,7 +738,7 @@
           "type": "poster",
           "x": 10,
           "y": 1,
-          "fact": "When a breach of unsecured PHI affects 500+ individuals, the covered entity must notify HHS, affected individuals, AND prominent media outlets — all within 60 days of discovery. For breaches under 500, notification to HHS can wait until the annual log, but individuals must still be notified within 60 days."
+          "fact": "When a breach of unsecured PHI affects 500+ individuals, the covered entity must notify HHS, affected individuals, AND prominent media outlets \u2014 all within 60 days of discovery. For breaches under 500, notification to HHS can wait until the annual log, but individuals must still be notified within 60 days."
         }
       ],
       "completionRequirements": {
@@ -755,7 +783,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -774,7 +802,7 @@
         },
         {
           "x": 14,
-          "y": 1,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "plant"
@@ -817,7 +845,7 @@
           "type": "poster",
           "x": 10,
           "y": 1,
-          "fact": "HIPAA doesn't disappear in emergencies — but it flexes. Providers can share PHI without authorization when necessary to treat the patient, to prevent a serious threat to health or safety, or to assist in disaster relief. The key word is 'necessary.' Even in a crisis, share only what's needed for the situation at hand."
+          "fact": "HIPAA doesn't disappear in emergencies \u2014 but it flexes. Providers can share PHI without authorization when necessary to treat the patient, to prevent a serious threat to health or safety, or to assist in disaster relief. The key word is 'necessary.' Even in a crisis, share only what's needed for the situation at hand."
         }
       ],
       "completionRequirements": {
@@ -1119,7 +1147,7 @@
           "type": "computer",
           "x": 2,
           "y": 4,
-          "fact": "Under HIPAA, patients aren't just bodies in beds—they have actual power. The Big 5 Patient Rights: (1) Right to Access Their Records within 30 days, (2) Right to Request Amendments to incorrect info, (3) Right to an Accounting of Disclosures for the last 6 years, (4) Right to Request Restrictions on who sees their info, (5) Right to Confidential Communications. Bottom line: Patients own their health data. We're just the janitors managing it."
+          "fact": "Under HIPAA, patients aren't just bodies in beds\u2014they have actual power. The Big 5 Patient Rights: (1) Right to Access Their Records within 30 days, (2) Right to Request Amendments to incorrect info, (3) Right to an Accounting of Disclosures for the last 6 years, (4) Right to Request Restrictions on who sees their info, (5) Right to Confidential Communications. Bottom line: Patients own their health data. We're just the janitors managing it."
         }
       ],
       "spawnPoint": {
@@ -1194,7 +1222,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -1308,6 +1336,27 @@
           "width": 2,
           "height": 1,
           "type": "crash_cart"
+        },
+        {
+          "x": 1,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "trash_can"
+        },
+        {
+          "x": 18,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "wheelchair"
+        },
+        {
+          "x": 18,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "type": "iv_stand"
         }
       ],
       "npcs": [
@@ -1379,7 +1428,7 @@
           "type": "whiteboard",
           "x": 17,
           "y": 11,
-          "fact": "HIPAA isn't trying to STOP healthcare—it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (court orders, subpoenas, for suspect identification, crime on premises, or medical emergencies—a warrant isn't always required), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
+          "fact": "HIPAA isn't trying to STOP healthcare\u2014it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (court orders, subpoenas, for suspect identification, crime on premises, or medical emergencies\u2014a warrant isn't always required), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
         }
       ],
       "spawnPoint": {
@@ -1445,7 +1494,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -1580,6 +1629,27 @@
           "width": 1,
           "height": 1,
           "type": "chemical_shelf"
+        },
+        {
+          "x": 1,
+          "y": 4,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 1,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "trash_can"
+        },
+        {
+          "x": 18,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "box"
         }
       ],
       "npcs": [
@@ -1602,7 +1672,7 @@
           "encounterTrigger": {
             "encounterId": "phi-sort-lab",
             "documentSetId": "phi-sorter-set-2",
-            "requestText": "Need a second pair of eyes — these sample labels are headed to an external manifest and I'm not sure which fields we can include. PHI or not PHI?",
+            "requestText": "Need a second pair of eyes \u2014 these sample labels are headed to an external manifest and I'm not sure which fields we can include. PHI or not PHI?",
             "completedText": "Charts are all where they belong. I can finally breathe."
           }
         },
@@ -1648,7 +1718,7 @@
           "type": "manual",
           "x": 2,
           "y": 8,
-          "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. Safe Harbor lists exactly 18 identifier types—names, full ZIP codes, SSNs, device serials, even full-face photos. Strip all 18 and health data stops being PHI. Your codex (press I) logs every identifier you catch in the wild—sort the paperwork, fill the wall, all eighteen. The Golden Rule stands: if you can connect health data to a specific person, congrats—it's PHI. Treat it like your own embarrassing medical history."
+          "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. Safe Harbor lists exactly 18 identifier types\u2014names, full ZIP codes, SSNs, device serials, even full-face photos. Strip all 18 and health data stops being PHI. Your codex (press I) logs every identifier you catch in the wild\u2014sort the paperwork, fill the wall, all eighteen. The Golden Rule stands: if you can connect health data to a specific person, congrats\u2014it's PHI. Treat it like your own embarrassing medical history."
         }
       ],
       "spawnPoint": {
@@ -1730,7 +1800,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -1798,7 +1868,7 @@
         },
         {
           "x": 8,
-          "y": 1,
+          "y": 2,
           "width": 4,
           "height": 1,
           "type": "records_counter"
@@ -1858,6 +1928,34 @@
           "width": 1,
           "height": 1,
           "type": "document_cart"
+        },
+        {
+          "x": 1,
+          "y": 2,
+          "width": 2,
+          "height": 1,
+          "type": "bookcase"
+        },
+        {
+          "x": 17,
+          "y": 2,
+          "width": 2,
+          "height": 1,
+          "type": "bookcase"
+        },
+        {
+          "x": 1,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "box"
+        },
+        {
+          "x": 18,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "box"
         }
       ],
       "npcs": [
@@ -1952,7 +2050,7 @@
           "type": "poster",
           "x": 10,
           "y": 4,
-          "fact": "Think HIPAA violations are just a slap on the wrist? Think again. Civil Penalties (per violation): Tier 1 'Didn't Know' — $100-$50K. Tier 2 'Reasonable Cause' — $1K-$50K. Tier 3 'Willful Neglect, Corrected' — $10K-$50K. Tier 4 'Willful Neglect, Not Corrected' — $50K+, up to $2.13M per year per violation category. Criminal Penalties: Up to $50K and 1 year for knowing violations. Up to $100K and 5 years for violations under false pretenses. Up to $250K and 10 years for violations with intent to sell or use PHI. And yes, individuals can be personally prosecuted — your employer's insurance won't save you."
+          "fact": "Think HIPAA violations are just a slap on the wrist? Think again. Civil Penalties (per violation): Tier 1 'Didn't Know' \u2014 $100-$50K. Tier 2 'Reasonable Cause' \u2014 $1K-$50K. Tier 3 'Willful Neglect, Corrected' \u2014 $10K-$50K. Tier 4 'Willful Neglect, Not Corrected' \u2014 $50K+, up to $2.13M per year per violation category. Criminal Penalties: Up to $50K and 1 year for knowing violations. Up to $100K and 5 years for violations under false pretenses. Up to $250K and 10 years for violations with intent to sell or use PHI. And yes, individuals can be personally prosecuted \u2014 your employer's insurance won't save you."
         }
       ],
       "spawnPoint": {
@@ -2026,7 +2124,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -2066,28 +2164,28 @@
         },
         {
           "x": 1,
-          "y": 1,
+          "y": 2,
           "width": 3,
           "height": 2,
           "type": "server_rack"
         },
         {
           "x": 5,
-          "y": 1,
+          "y": 2,
           "width": 3,
           "height": 2,
           "type": "server_rack"
         },
         {
           "x": 12,
-          "y": 1,
+          "y": 2,
           "width": 3,
           "height": 2,
           "type": "server_rack"
         },
         {
           "x": 16,
-          "y": 1,
+          "y": 2,
           "width": 3,
           "height": 2,
           "type": "server_rack"
@@ -2203,6 +2301,27 @@
           "width": 1,
           "height": 1,
           "type": "trash"
+        },
+        {
+          "x": 1,
+          "y": 8,
+          "width": 1,
+          "height": 1,
+          "type": "chair"
+        },
+        {
+          "x": 18,
+          "y": 8,
+          "width": 1,
+          "height": 1,
+          "type": "chair"
+        },
+        {
+          "x": 18,
+          "y": 12,
+          "width": 1,
+          "height": 1,
+          "type": "box"
         }
       ],
       "npcs": [
@@ -2272,7 +2391,7 @@
           "type": "whiteboard",
           "x": 10,
           "y": 2,
-          "fact": "HIPAA's Security Rule demands three types of safeguards: Administrative (policies, training, risk assessments), Physical (locks, badge access, workstation security), and Technical (encryption, access controls, audit logs). The Three A's: Authentication (prove who you are), Authorization (prove you should have access), and Audit (prove what you did). Fun detail: encryption is technically 'addressable' under HIPAA — meaning you must implement it OR document why an equivalent alternative protects the data. In practice, nearly every organization encrypts because there's no good alternative. Strong passwords, automatic logoffs, and encryption are the walls that keep the vault secure."
+          "fact": "HIPAA's Security Rule demands three types of safeguards: Administrative (policies, training, risk assessments), Physical (locks, badge access, workstation security), and Technical (encryption, access controls, audit logs). The Three A's: Authentication (prove who you are), Authorization (prove you should have access), and Audit (prove what you did). Fun detail: encryption is technically 'addressable' under HIPAA \u2014 meaning you must implement it OR document why an equivalent alternative protects the data. In practice, nearly every organization encrypts because there's no good alternative. Strong passwords, automatic logoffs, and encryption are the walls that keep the vault secure."
         }
       ],
       "spawnPoint": {
@@ -2306,7 +2425,7 @@
       "unlockRequirement": "reception",
       "patientStory": {
         "title": "James's Story",
-        "text": "Because you changed the subject when your coworkers started gossiping, James's coworker—sitting two tables away—never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
+        "text": "Because you changed the subject when your coworkers started gossiping, James's coworker\u2014sitting two tables away\u2014never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
         "icon": "users"
       },
       "config": {
@@ -2344,7 +2463,7 @@
           "x": 0,
           "y": 0,
           "width": 20,
-          "height": 1,
+          "height": 2,
           "type": "wall"
         },
         {
@@ -2472,6 +2591,34 @@
           "width": 1,
           "height": 1,
           "type": "lost_and_found_box"
+        },
+        {
+          "x": 1,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 7,
+          "y": 8,
+          "width": 1,
+          "height": 1,
+          "type": "chair"
+        },
+        {
+          "x": 12,
+          "y": 8,
+          "width": 1,
+          "height": 1,
+          "type": "chair"
+        },
+        {
+          "x": 18,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "box"
         }
       ],
       "npcs": [

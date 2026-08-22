@@ -1,0 +1,255 @@
+{
+ "roomId": "break_room",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.parquet",
+ "wallStyle": "green",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "lunch_table",
+   "x": 8,
+   "y": 6,
+   "w": 4,
+   "h": 3,
+   "frame": "prop.conftable",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "vending_machine",
+   "x": 2,
+   "y": 2,
+   "w": 2,
+   "h": 3,
+   "frame": "prop.vending.snacks",
+   "depth": 9,
+   "anchor": "floor"
+  },
+  {
+   "type": "vending_machine",
+   "x": 5,
+   "y": 2,
+   "w": 2,
+   "h": 3,
+   "frame": "prop.vending.gray",
+   "depth": 9,
+   "anchor": "floor"
+  },
+  {
+   "type": "open_fridge",
+   "x": 8,
+   "y": 2,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.fridge.open.a",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "microwave",
+   "x": 14,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.counter.k.plain",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "microwave",
+   "x": 14,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.microwave.a",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.fridge.gray.b",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.counter.k.plain",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.counter.k.shelf",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.counter.k.drawers",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.counter.k.doors",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "anim.coffee.0",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.mug.blue",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "notice_board",
+   "x": 10,
+   "y": 1,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.noticeboard",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "coat_rack",
+   "x": 1,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lamp.floor",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "trash_bin",
+   "x": 13,
+   "y": 6,
+   "w": 1,
+   "h": 2,
+   "frame": "prop.trash.green",
+   "depth": 12,
+   "anchor": "floor"
+  },
+  {
+   "type": "tv_stand",
+   "x": 7,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "anim.tvnews.0",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "couch",
+   "x": 2,
+   "y": 10,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.couch.gray.3",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "couch",
+   "x": 15,
+   "y": 10,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.couch.orange.3l",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "lost_and_found_box",
+   "x": 5,
+   "y": 12,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.box.single",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 1,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.fern.m",
+   "depth": 18,
+   "anchor": "floor"
+  },
+  {
+   "type": "chair",
+   "x": 7,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.chair.wood.side.tan",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chair",
+   "x": 12,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.chair.wood.side.orange",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "box",
+   "x": 18,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.box.single",
+   "depth": 18,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 13,
+ "animated": 2,
+ "missing": [],
+ "imageRequests": 27
+}

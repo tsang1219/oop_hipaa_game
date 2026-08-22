@@ -13,9 +13,12 @@
   Pages). Only the sliced atlas is committed and shipped:
   `attached_assets/generated_images/privacyquest/atlas/interiors.png` + `interiors.json`,
   built by `scripts/art/slice-atlas.mjs` from `scripts/art/atlas-manifest.json`.
-- Used from the pack: 32×32 Room Builder (floors, walls, baseboards, floor shadows) and the
-  32×32 theme sheets (Hospital, Generic, Conference Hall, Living Room, Classroom/Library, …)
-  for PrivacyQuest's room substrate — floors, walls, and all furniture/props.
+- Used from the pack: 32×32 Room Builder (floors, walls, borders, floor shadows), the 32×32
+  theme sheets (Hospital, Generic, Conference Hall, Kitchen, Basement, Living Room,
+  Classroom & Library, Television & Film Studio) and eight 32×32 animated objects (server
+  rack, scrolling monitor, control-room screens, coffee, hospital news TV, patient monitor,
+  security camera, canteen fridge) for PrivacyQuest's room substrate — floors, walls, and all
+  furniture/props in all 13 rooms. 661 frames in the atlas.
 - Credit line for the in-game credits: **"Interior art: Modern Interiors by LimeZu —
   limezu.itch.io/moderninteriors"**
 

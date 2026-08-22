@@ -1,0 +1,95 @@
+{
+ "roomId": "hallway_lab_records",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.terrazzo",
+ "wallStyle": "beige",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "bench",
+   "x": 4,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.orange",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "bench",
+   "x": 15,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.tan",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 10,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.fern.s",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 5,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 14,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "filing_cart",
+   "x": 12,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.cart.wood.a",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "filing_cart",
+   "x": 12,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.cart.wood.a",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "wall_clock",
+   "x": 7,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.clock.white",
+   "depth": 2,
+   "anchor": "wall"
+  }
+ ],
+ "decor": 5,
+ "animated": 0,
+ "missing": [],
+ "imageRequests": 27
+}

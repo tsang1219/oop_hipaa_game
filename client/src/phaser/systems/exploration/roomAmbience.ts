@@ -1,7 +1,7 @@
 import Phaser from 'phaser';
-import { furnitureTextureKey } from '../../sprites/furniture';
 import { npcSpriteTextureKey } from '../../sprites/npcTextures';
 import { objectTexture } from './art/objectFrames';
+import { ATLAS_KEY } from './art/atlasFrames.generated';
 import { getArtHandle } from './art/artRenderer';
 import { playBusSfx } from './audioMixer';
 import type { Room } from '@shared/schema';
@@ -82,7 +82,7 @@ export function addRoomAmbience(
     const cartTileX = 5, cartTileY = 5;
     const cartCx = cartTileX * TILE + TILE / 2, cartCy = cartTileY * TILE + TILE / 2;
     scene.add.ellipse(cartCx, cartCy + 12, TILE - 4, 8, 0x000000, 0.18).setDepth(2);
-    scene.add.sprite(cartCx, cartCy, furnitureTextureKey('coffee_station')).setDepth(3);
+    scene.add.sprite(cartCx, cartCy - 8, ATLAS_KEY, 'prop.cart.wood.a').setDepth(3);
     // Tiny steam puff every ~2.6s above the cart
     scene.time.addEvent({ delay: 2600, loop: true, callback: () => {
       const puff = scene.add.ellipse(cartCx + (Math.random() * 4 - 2), cartCy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
@@ -182,7 +182,7 @@ export function addRoomAmbience(
     const cartY = 9 * TILE + TILE / 2;
     const cartStartX = 13 * TILE + TILE / 2, cartEndX = 16 * TILE + TILE / 2;
     scene.add.ellipse(cartStartX, cartY + 10, TILE - 6, 6, 0x000000, 0.18).setDepth(2);
-    const cart = scene.add.sprite(cartStartX, cartY, furnitureTextureKey('document_cart')).setDepth(3).setScale(0.85);
+    const cart = scene.add.sprite(cartStartX, cartY - 8, ATLAS_KEY, 'prop.cart.wood.a').setDepth(3).setScale(0.85);
     scene.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     // Ambient paper rustle / drawer slide — every ~12s (AUD-06: real paper sample)
     scene.time.addEvent({ delay: 12500, loop: true, callback: () => {

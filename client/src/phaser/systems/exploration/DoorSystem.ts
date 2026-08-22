@@ -1,4 +1,5 @@
 import Phaser from 'phaser';
+import { getArtHandle } from './art/artRenderer';
 import { eventBridge, BRIDGE_EVENTS } from '../../EventBridge';
 import type { Room } from '@shared/schema';
 import type { MusicController } from './MusicController';
@@ -132,6 +133,17 @@ export class DoorSystem {
     });
   }
 
+  /** Run 11: a door in the back wall sits inside the rendered wall face (2 rows),
+   *  so its frame's top is measured down from the face's bottom edge. */
+  private wallBottom(door: Door): number {
+    const rows = getArtHandle(this.scene)?.style.wall.rows ?? 1;
+    return door.side === 'top' ? rows * TILE : (door.y + 1) * TILE;
+  }
+
+  private frameTop(door: Door): number {
+    return door.side === 'top' ? this.wallBottom(door) - (TILE + TILE / 2) : door.y * TILE - TILE / 2;
+  }
+
   /** Tween a door leaf's openness (1 closed → 0 open) about its hinge. */
   private setLeaf(doorId: string, openness: number, ms: number, ease: string): void {
     const entry = this.leaves.get(doorId);
@@ -145,7 +157,7 @@ export class DoorSystem {
    *  hinged on the side away from the room's interior. */
   private buildLeaf(door: Door, state: DoorState): Phaser.GameObjects.Container {
     const fx = door.x * TILE;
-    const fy = door.y * TILE - TILE / 2;
+    const fy = this.frameTop(door);
     const openingW = TILE - 4;
     const openingH = TILE + TILE / 2 - 6;
     const hingeOnRight = door.side === 'right';
@@ -201,12 +213,13 @@ export class DoorSystem {
         const seamG = this.scene.add.graphics().setDepth(2);
         // Vertical crack down the wall tile
         seamG.fillStyle(0x0d0d16, 0.9);
-        seamG.fillRect(door.x * TILE + 14, door.y * TILE + 4, 2, TILE - 6);
+        const faceBottom = this.wallBottom(door);
+        seamG.fillRect(door.x * TILE + 14, door.y * TILE + 4, 2, faceBottom - door.y * TILE - 6);
         seamG.fillStyle(0x000000, 0.5);
-        seamG.fillRect(door.x * TILE + 16, door.y * TILE + 6, 1, TILE - 8);
+        seamG.fillRect(door.x * TILE + 16, door.y * TILE + 6, 1, faceBottom - door.y * TILE - 8);
         // Warm light spilling under the seam
         const spill = this.scene.add.rectangle(
-          doorPixelX, door.y * TILE + TILE - 1, 12, 2, 0xffd9a0, 0.5,
+          doorPixelX, faceBottom - 1, 12, 2, 0xffd9a0, 0.5,
         ).setDepth(2);
         this.scene.tweens.add({
           targets: spill,
@@ -221,7 +234,7 @@ export class DoorSystem {
         const paws: [number, number][] = [[-3, 40], [6, 48], [-1, 57], [8, 65]];
         for (const [pxOff, pyOff] of paws) {
           const px = doorPixelX + pxOff;
-          const py = door.y * TILE + pyOff;
+          const py = faceBottom - TILE + pyOff;
           seamG.fillRect(px, py, 2, 2);
           seamG.fillRect(px + 3, py + 1, 2, 2);
           seamG.fillRect(px + 1, py + 3, 3, 2);
@@ -234,7 +247,7 @@ export class DoorSystem {
       const frameG = this.scene.add.graphics().setDepth(1);
       this.doorVisuals.push(frameG);
       const fx = door.x * TILE;
-      const fy = door.y * TILE - TILE / 2;
+      const fy = this.frameTop(door);
       // Dark opening behind the leaf (what you see when it swings open)
       frameG.fillStyle(0x0b0b14, 1);
       frameG.fillRect(fx + 2, fy + 5, TILE - 4, TILE + TILE / 2 - 6);

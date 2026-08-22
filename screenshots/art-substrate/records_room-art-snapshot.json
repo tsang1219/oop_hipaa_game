@@ -1,0 +1,235 @@
+{
+ "roomId": "records_room",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.carpet.tan",
+ "wallStyle": "green",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "filing_cabinet",
+   "x": 3,
+   "y": 2,
+   "w": 1,
+   "h": 4,
+   "frame": "prop.drawers.column",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "filing_cabinet",
+   "x": 6,
+   "y": 2,
+   "w": 1,
+   "h": 3,
+   "frame": "prop.shelf.narrow.books",
+   "depth": 9,
+   "anchor": "floor"
+  },
+  {
+   "type": "filing_cabinet",
+   "x": 13,
+   "y": 2,
+   "w": 1,
+   "h": 3,
+   "frame": "prop.shelf.narrow.books",
+   "depth": 9,
+   "anchor": "floor"
+  },
+  {
+   "type": "filing_cabinet",
+   "x": 16,
+   "y": 2,
+   "w": 1,
+   "h": 4,
+   "frame": "prop.drawers.column",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "records_counter",
+   "x": 8,
+   "y": 2,
+   "w": 4,
+   "h": 1,
+   "frame": "prop.desk.k.wood",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "records_counter",
+   "x": 8,
+   "y": 2,
+   "w": 4,
+   "h": 1,
+   "frame": "prop.desk.k.wood",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "inbox_tray",
+   "x": 7,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.table.small.brown",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "inbox_tray",
+   "x": 7,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.papers.a",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "outbox_tray",
+   "x": 12,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.table.small.brown",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "outbox_tray",
+   "x": 12,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.papers.b",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.desk.wood.pc.3",
+   "depth": 14,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.drawers.tan",
+   "depth": 14,
+   "anchor": "floor"
+  },
+  {
+   "type": "shredder_station",
+   "x": 2,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.cabinet.gray.2",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "scanner_station",
+   "x": 16,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.desk.wood.pc",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "scanner_station",
+   "x": 16,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.fax.a",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "printer_station",
+   "x": 12,
+   "y": 11,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.copier",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "archive_box",
+   "x": 2,
+   "y": 13,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.boxes.stack",
+   "depth": 18,
+   "anchor": "floor"
+  },
+  {
+   "type": "document_cart",
+   "x": 6,
+   "y": 11,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.cart.wood.b",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "bookcase",
+   "x": 1,
+   "y": 2,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bookcase.2.a",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "bookcase",
+   "x": 17,
+   "y": 2,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bookcase.2.c",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "box",
+   "x": 1,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.box.single",
+   "depth": 18,
+   "anchor": "floor"
+  },
+  {
+   "type": "box",
+   "x": 18,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.box.single",
+   "depth": 18,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 12,
+ "animated": 1,
+ "missing": [],
+ "imageRequests": 27
+}

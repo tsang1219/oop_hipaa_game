@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "info_kiosk@16@3",
+  "playerTile": [
+   16,
+   2
+  ],
+  "rel": "behind",
+  "playerDepth": 7,
+  "propDepth": 9
+ },
+ {
+  "prop": "info_kiosk@16@3",
+  "playerTile": [
+   15,
+   4
+  ],
+  "rel": "beside",
+  "playerDepth": 9,
+  "propDepth": 9
+ },
+ {
+  "prop": "info_kiosk@16@3",
+  "playerTile": [
+   17,
+   5
+  ],
+  "rel": "front",
+  "playerDepth": 10,
+  "propDepth": 9
+ }
+]

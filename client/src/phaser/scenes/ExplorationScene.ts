@@ -26,7 +26,6 @@ import { findPath } from '../systems/exploration/pathfinding';
 import {
   ensurePlayerFallbackTexture,
   renderRoom,
-  renderVignette,
   showRoomBanner,
 } from '../systems/exploration/roomRenderer';
 import { spawnInteractables } from '../systems/exploration/interactableFactory';
@@ -626,7 +625,6 @@ export class ExplorationScene extends Phaser.Scene {
       ease: 'Sine.easeInOut'
     });
 
-    renderVignette(this);
 
     // ── Listen for React events — MUST be before music to survive any audio errors ──
     eventBridge.on(BRIDGE_EVENTS.REACT_DIALOGUE_COMPLETE, this.onDialogueComplete, this);

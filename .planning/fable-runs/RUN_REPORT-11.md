@@ -1,30 +1,27 @@
-# Run Report — 11: The art substrate — **Reception checkpoint**
+# Run Report — 11: The art substrate
 
 **Branch:** `fable/art-substrate` (off `fable/living-world` @ `fb030e2`, the branch you were on — it carries Run 12,
-so this is playable with the blinking/walking cast). `main` untouched.
-**Mode:** own branch · **Stopped at your MEDIUM checkpoint:** Reception is finished; the other 11 rooms are NOT
-touched. This report is the hand-back for that stop.
+so the blinking/walking cast lives in the new rooms). `main` untouched.
+**Mode:** own branch · **Checkpoint:** Reception was shown first (commit `96f2ecc`); you picked the two-row
+wall (variant C) and approved nudging wall-flush props down a row; the other 12 rooms followed on that rule.
 **Proof environment:** everything below was proven against the running game in Google Chrome driven by
 Playwright (`PW_CHANNEL=chrome`), through the QA deep-links and `window.__QA__`. Nothing is claimed from code.
 
 ---
 
-## The 90-second version
+## The ninety-second version
 
-Open `screenshots/art-substrate/grid-before-vs-after-vs-variantA.png`. Left is the room you had this morning;
-middle is Reception rendered from **LimeZu Modern Interiors**; right is the same room with the alternative
-wall style (the one style fork I hit — see below). Then open `reception-after.png` at full size.
+Open `screenshots/art-substrate/grid-before-vs-after.png` — thirteen rooms, left is this morning, right is now.
 
-What's there now: a floor with six scattered tile variants and worn walkways instead of a checkerboard, a real
-two-row back wall (cap, face, baseboard) with LimeZu's thin wall tops running down the sides and along the
-bottom, the tileset's own floor-contact shadows under every wall, the U-shaped reception counter with Riley's
-empty chair in the well and clutter on the back counter, waiting benches, a stanchion pair, a wheelchair
-parked by the magazine shelf, a fern, an IV stand, a toy chest in the kids' corner, GERALD as an actual copier,
-a notice board and clock and sanitizer on the wall, doormats inside both doors, and a warm lighting layer
-(ambient tint + ceiling pools + vignette) that you can switch off to see what it does. Every prop y-sorts with
-the characters — walk up behind the trash can and your legs disappear behind it.
-
-**My recommendation on the fork: ship the two-row wall (variant C, what is on the branch).** Details in §4.
+Every room in PrivacyQuest renders from **LimeZu Modern Interiors** through one 661-frame atlas: floors with
+six scattered tile variants and worn walkways, a two-row back wall with cap, face and baseboard, LimeZu's thin
+wall tops down the sides, the tileset's own contact shadows under every wall, every obstacle as a y-sorted
+atlas sprite (a few animated: server racks blink, monitors scroll, the break-room TV runs a hospital news
+report, security cameras pan, coffee steams), wall-mounted dressing, and a per-room lighting layer — warm in
+the break room, cold teal-and-blue in the ER, dim carpet-and-green in Records, dark raised floor and cyan
+monitor glow in IT. The 4,676 lines of procedural floor/wall/furniture drawing are deleted, not commented out.
+Collision, pathfinding, doors, zones, items and NPC spawns are untouched; the only geometry that moved is listed
+in §6, and every NPC, zone, item and door in every room was re-checked reachable by BFS.
 
 ---
 
@@ -40,117 +37,114 @@ Nothing else was taken. No CC-BY-SA, no GPL art.
 exactly as ASSET_PLAN §3 asks — but only `LICENSE.txt` and a restore `README.md` are tracked. The pack's
 license forbids redistribution, this repo is **public**, and `deploy.yml` publishes `attached_assets/` to
 GitHub Pages; committing the 320 MB pack would have put the whole paid tileset on a public URL. The only
-LimeZu pixels in git are the sliced atlas the game actually loads
-(`attached_assets/generated_images/privacyquest/atlas/interiors.png` + `.json`, 417 frames, 236 KB), which is
-the normal "use in your project" case. The game builds and runs without the vendor folder; it is only needed
-to re-slice (`node scripts/art/slice-atlas.mjs`). The vendor README explains how to restore it on a fresh clone.
+LimeZu pixels in git are the sliced atlas the game loads
+(`attached_assets/generated_images/privacyquest/atlas/interiors.png` + `.json`, 661 frames, 1024×2054, 410 KB),
+which is the normal "use in your project" case. The game builds and runs without the vendor folder; it is only
+needed to re-slice (`node scripts/art/slice-atlas.mjs`).
 
-## 2. Status against the targets (Reception scope)
+## 2. Status against the targets
 
-| ID | Requirement | Reception | Evidence |
+| ID | Requirement | Status | Evidence |
 |---|---|---|---|
-| ART-01 | One real 32×32 tileset as the substrate; zero `fillRect` floors | **Done for Reception.** Floor, wall face, wall tops, shadows all from atlas frames drawn into one RenderTexture; the legacy `fillRect` path still runs for the 11 unconverted rooms | `reception-after.png`, `reception-art-snapshot.json` (`floorSet: floor.reception`, `missing: []`) |
-| ART-02 | Retire procedural furniture; thin lookup prop id → frame | **Done for Reception** (`art/artCatalog.ts` is the lookup). `objectTextures.ts` deleted. `sprites/furniture/*` + `compositeFurniture.ts` (3,912 lines) are **still present** because the other 11 rooms render through them — they go when the last room converts | `git show --stat` of the substrate commit |
-| ART-03 | Wall height: back wall face with baseboard, props against it occlude correctly | **Done** — 2-row face (cap + face + baseboard); cabinets/plants/copier stand in front of it; the counter's back rises into it | `reception-after.png` top edge; `reception-variantA.png` for the 1-row alternative |
-| ART-04 | Soft drop shadows under every character and free-standing prop | **Done** — characters keep their ellipse (Run 12); LimeZu props carry their baked soft base shadow; the ground carries the tileset's wall-contact shadows | `reception-after.png` |
-| ART-05 | 3+ floor variants scattered non-uniformly + wear decals | **Done** — 6 variants, 3×2 seamless pattern with 18% random swaps, 9 worn-walkway patches along door→counter→door and spawn→counter, dropped paper + a crumpled form | `art/artCatalog.ts` `ROOM_ART.reception.floor/wear` |
-| ART-06 | Per-room ambient tint + light pools + soft vignette, toggleable | **Done** — warm `0xffe4c2` MULTIPLY ambient, four ADD light pools, radial vignette; `__QA__.commands.setLighting(false)` hides the layer; corners measure 127 → 161 luma with it off | `reception-lighting-on.png` / `-off.png`, `reception-lighting.json` |
-| ART-07 | Y-sorted depth, verified at three y-positions | **Done** — props use `depth = 5 + bottomRow`, the same rule characters already used. Six shots (behind / beside / in front of the water machine and the trash can) with the player's depth read from the live scene: 16 < 17 < 18 and 7 < 8 < 9 | `reception-depth-*.png`, `reception-depth.json` |
-| ART-08 | Density pass — no empty corners, asymmetric clutter, walkways obvious | **Done** — 24 props + 14 decor pieces vs 22 props before; every corner has something (plants, wheelchair + shelf, water machine + toy chest); the two waiting wings differ (yellow vs green benches, side table + magazine shelf left, IV stand right); the centre aisle and the counter approach stay open | `reception-after.png` |
-| ART-11 | Single texture atlas via `load.atlas` | **Done for interiors** — one `load.atlas` call, 1 image request for every floor/wall/prop. Total load-time image requests are 28: that remaining count is the 11 character sheets + 14 tower-defense sprites + 1 lobby background, which this run was told to leave alone | `reception-art-snapshot.json` (`imageRequests: 28`) |
+| ART-01 | One real 32×32 tileset as the substrate for all 12 rooms; zero `fillRect` floors | **Done — 13 rooms** (the secret closet too). `roomRenderer.ts` has no floor/wall drawing left; a room without a catalog entry throws | `*-after.png`, `*-art-snapshot.json` (`missing: []` in every room) |
+| ART-02 | Retire procedural furniture; thin lookup prop id → frame | **Done.** `sprites/furniture/*` (3,441 lines), `compositeFurniture.ts` (471), `objectTextures.ts` (210) and the legacy half of `roomRenderer.ts` are **deleted**. The lookup is `art/artCatalog.ts` | `git show --stat` of the conversion commit: −4,676 lines |
+| ART-03 | Wall height: back-wall face with baseboard; props against it occlude correctly | **Done, every room** — two-row face (cap + face + baseboard); cabinets, racks, fridges, bookcases stand in front of it and rise into it | any `*-after.png` top edge |
+| ART-04 | Soft drop shadows under every character and free-standing prop | **Done** — characters keep their ellipse (Run 12); LimeZu props carry their baked base shadow; the ground carries the tileset's wall-contact shadows | `*-after.png` |
+| ART-05 | 3+ floor variants scattered non-uniformly + wear decals | **Done** — 6 variants per floor, 3×2 seamless pattern with 18% random swaps, per-room worn-walkway patches, dropped paper / crumpled forms | `ROOM_ART.*.floor`, `.wear` |
+| ART-06 | Per-room ambient tint + light pools + vignette, toggleable | **Done** — `__QA__.commands.setLighting(false)` hides the layer; each room's edges measurably brighten | `*-lighting-on/off.png`, `*-lighting.json` |
+| ART-07 | Y-sorted depth, verified at three y-positions per room | **Done** — props use `depth = 5 + bottomRow`, the rule characters already used. Per room, the player is teleported behind / beside / in front of a tall prop and its live depth compared to the prop's | `*-depth-*.png`, `*-depth.json` |
+| ART-08 | Density pass — no empty corners, cable runs, asymmetric clutter, walkways obvious | **Done** — 146 → 167 solid props plus ~140 non-solid dressing pieces; cable ducts and light rails in IT and the IT hallway; every corner holds something; the two sides of every room differ | `*-after.png` |
+| ART-11 | Single texture atlas via `load.atlas` | **Done for interiors** — one `load.atlas`, one image request for every floor/wall/prop in the game. Load-time image requests are 28 in total: the other 27 are the 11 character sheets + 14 tower-defense sprites + 1 lobby background, which this run was told to leave alone | `*-art-snapshot.json` (`imageRequests`) |
 
-## 3. The pipeline (how the assets land, and how to do the next room)
+## 3. The pipeline (how assets land; how to add or change a room)
 
-1. **Acquire** → `attached_assets/vendor/modern-interiors/` (git-ignored, §1).
-2. **Credit** → `attached_assets/CREDITS.md`.
-3. **Pick frames** → `node scripts/art/sheet-inspector.mjs <sheet.png> <outDir>` renders any tileset as labeled
-   2× contact sheets with absolute tile coordinates; `scripts/art/tile-zoom.mjs` zooms a rect. This is how every
-   frame below was chosen (by looking, not by guessing from file names).
-4. **Slice** → `scripts/art/atlas-manifest.json` lists every frame as `{sheet, t:[tx,ty,tw,th]}` (tile units;
-   `split` explodes a floor block into variants). `node scripts/art/slice-atlas.mjs` shelf-packs them (2 px pad,
-   1 px extrude — no bleeding under the room-entry zoom) into `interiors.png/.json` and regenerates
-   `art/atlasFrames.generated.ts`, a string-literal union so a typo in a frame name fails `tsc`.
-5. **Map** → `client/src/phaser/systems/exploration/art/artCatalog.ts`: `PROP_DEFAULTS` (type → frame),
-   `ROOM_PROP_OVERRIDES` (per room or per instance `"type@x,y"`), `ROOM_DECOR` (wall art, counter clutter, mats,
-   wear — nothing with collision), `ROOM_INTERACTABLE_ART` (zone/item sprite + nudge), `ROOM_ART` (floor set,
-   wall style/height, trim, lighting).
-6. **Render** → `art/artRenderer.ts`. `roomRenderer.renderRoom` dispatches here when `ROOM_ART[room.id]`
-   exists; collision is built by the shared `buildWallColliders`, so the walkable layer is identical on both paths.
-7. **Prove** → `PW_CHANNEL=chrome node tests/art-substrate-capture.mjs after <room>`,
-   `node tests/art-substrate-probe.mjs <room>` (dumps `__QA__.art`),
-   `PW_CHANNEL=chrome npx playwright test tests/art-substrate-proof.spec.ts` (atlas / depth / lighting),
+1. **Acquire** → `attached_assets/vendor/modern-interiors/` (git-ignored, §1). **Credit** → `attached_assets/CREDITS.md`.
+2. **Pick frames by looking** → `scripts/art/sheet-inspector.mjs <sheet.png> <outDir>` renders any tileset as labeled
+   2× contact sheets with absolute tile coordinates; `scripts/art/tile-zoom.mjs` zooms a rect;
+   `scripts/art/atlas-contact.mjs --sheet living` renders the sliced frames by name (this is how I caught that the
+   sofas I had "read" off the Living Room sheet were actually on the Basement sheet).
+3. **Slice** → `scripts/art/atlas-manifest.json` lists every frame as `{sheet, t:[tx,ty,tw,th]}` (tile units; `px`
+   for pixel rects — the animated objects; `split` explodes a floor block into variants).
+   `node scripts/art/slice-atlas.mjs` shelf-packs them (2 px pad, 1 px extrude) into `interiors.png/.json` and
+   regenerates `art/atlasFrames.generated.ts`, a string-literal union so a typo in a frame name fails `tsc`.
+4. **Map** → `client/src/phaser/systems/exploration/art/artCatalog.ts`: `PROP_DEFAULTS` (type → how to draw it:
+   a frame, or `parts` for a bay = bed + table + IV pole, or `fill` for benches built from 1×1 counter tiles,
+   `layer: 'ground'` for mats and cable ducts, `anim` for the animated frames), `ROOM_PROP_OVERRIDES` (per room or
+   per instance `"type@x,y"`), `ROOM_DECOR` (wall art, counter clutter, mats, wear — nothing with collision),
+   `ROOM_INTERACTABLE_ART` (zone/item sprite + nudge), `ROOM_ART` (floor set, wall style, trim, lighting).
+5. **Render** → `art/artRenderer.ts`: one RenderTexture for void/floor/face/trims/shadows/ground props/decor/wear,
+   y-sorted sprites for everything else, a toggleable lighting container, `__QA__.art` snapshot. Collision comes
+   from the shared `buildWallColliders` — the walkable layer never depends on art.
+6. **Prove** → `node tests/art-substrate-capture.mjs after [rooms]`, `node tests/art-substrate-probe.mjs <room>`,
+   `PW_CHANNEL=chrome npx playwright test tests/art-substrate-proof.spec.ts` (39 tests: atlas / depth / lighting ×13),
    `node scripts/art/grid.mjs before after`.
 
-Converting a room is: add a `ROOM_ART` entry, map its obstacle types (most are already in `PROP_DEFAULTS`),
-dress it in `ROOM_DECOR`, move wall-flush props down a row if it takes the 2-row wall, capture, look, adjust.
+## 4. Room by room — what each one is made of
 
-## 4. The style fork — wall height (needs your call before the other 11)
-
-The room is exactly one screen (20×15 tiles = 640×480) and every room's top wall is a single data row. LimeZu's
-wall face is two tiles tall (cap + face + baseboard). Two plausible looks:
-
-| | **C — two-row wall** (on the branch, `reception-after.png`) | **A — one-row wall** (`reception-variantA.png`) |
-|---|---|---|
-| What you see | A real wall: cap, face, baseboard; furniture stands in front of it | 32 px of wall face cut off by the screen edge; furniture at row 1 rises into it, jammed against the HUD |
-| Gameplay geometry | Row 1 becomes wall. Wall-flush props drop one row (and GERALD's spot with them). The "corridor behind the reception desk" along row 1 is gone — which is the Pokémon-Center counter rule anyway | Untouched |
-| Cost for the other 11 rooms | Hallways keep their PHI-tip **items** at row 1 → those 5 items move to row 2 (`roomData.json` + `tests/helpers/qa-helpers.ts` constants); IT's four server racks, records' counter, the lobby's board/plant shift a row; `hallway_break_lab` gets a real front-facing door frame for its top door at (8,0). No NPC, zone, door or spawn is at row 1 anywhere | None |
-
-`node scripts/art/reception-variant.mjs A|C` flips Reception between them; the branch is on C.
-**I recommend C** — it is the thing you asked for ("the top of a room is a wall and not the void") and the
-geometry cost is a handful of one-row nudges, all of which I can list and test.
-
-Other calls I made alone (say the word and I'll swap any of them — all are one-line catalog edits):
-- **Floor:** LimeZu's light gray-beige large-format tile (`floor.reception`). Alternates already in the atlas:
-  `floor.cream` (warmer, with bracket motifs), `floor.lightgray` (cooler, cleaner).
-- **Wall:** cream (`wall.cream`). Also sliced: beige, pale green, blue-gray, hospital light-blue with an orange
-  baseboard, teal-with-crosses.
-- **Counter:** the wood/orange U-counter (`prop.counter.reception.wood`); beige and white versions are sliced.
-- **Waiting seats:** 2×1 padded benches (no overhang into the door path) rather than the 1×2 armchairs, which
-  would have hidden anyone walking in from the lobby door behind their backs.
-- **Privacy screens → queue stanchions.** The two 1×1 `privacy_screen` tiles flank the counter approach; a
-  post reads as "wait behind the line" and suits the sign-in-sheet scenario. The ER's curtains are a different type.
-
-## 5. What I deleted, what I didn't
-
-- **Deleted:** `client/src/phaser/sprites/objectTextures.ts` (210 lines — the four hand-drawn obj_* sprites).
-  Zones, items, the hallway board anchor, the threat-console/whimsy anchors and the NPC "reads a chart" fidget
-  all use atlas frames now, game-wide.
-- **Not yet deleted, on purpose:** `sprites/furniture/*` (3,441 lines) and `compositeFurniture.ts` (471) and the
-  legacy floor/wall code in `roomRenderer.ts`. The 11 unconverted rooms still render through them. They are
-  deleted — not commented out — in the commit that converts the last room. Converting all rooms before this
-  checkpoint would have meant doing eleven rooms' worth of frame-picking before you had seen one.
-
-## 6. Every place gameplay geometry moved (all in `client/src/data/roomData.json`, Reception only)
-
-| What | From | To | Why |
+| Room | Floor · wall · trim | Mood (light) | Signature |
 |---|---|---|---|
-| top `wall` obstacle | `(0,0) 20×1` | `(0,0) 20×2` | wall height (variant C) |
-| `plant` | (1,1) | (1,2) | stands in front of the wall, not inside it |
-| `printer_station` (GERALD) | (3,1) | (3,2) — and `PRINTER_SPOTS.reception` in `whimsyData.ts` | same; his tape + LED now ride the copier's upper half |
-| `filing_cabinet` | (4,1) | (4,2) | same |
-| `filing_cabinet` | (14,1) | (15,2) | same, plus one tile right so the notice board has free floor under it |
-| `plant` | (18,1) | (18,2) | same |
-| `notice_board` | (1,3) floor-standing | (13,1) wall-mounted (inside the wall rows, no walkability change) | a board belongs on a wall; frees the item's corner |
-| **added** `trash_can` (6,3), `wheelchair` (1,11), `toy_chest` (18,13), `plant` (1,5), `iv_stand` (18,4) | — | — | density pass; none sits on a walkway or between a door and an interactable |
+| Hospital Lobby | white tile · light blue w/ orange baseboard · white | bright, neutral | white reception counter with two intake staff out front, info stand, round white-framed benches, entrance mat, umbrella basket, wheelchair by the benches |
+| Reception | gray-beige large tile · cream · cream | warm | wood U-counter with Riley's empty chair, stanchions, yellow/green benches, wheelchair + magazine shelf, fern, IV stand, toy chest, notice board + clock + sanitizer on the wall |
+| Hallways ×5 | terrazzo · beige (1–3) / blue-gray (4–5) · cream | dim warm | fluorescent tubes on the wall, cork board, PHI-tip posters, wood benches, water cooler, drinks fridge, filing carts, a blinking server rack and cable rail in the IT hallway, exit sign + defibrillator + wheelchair before the ER |
+| Break Room | parquet · pale green · cream | warm | two vending machines, open fridge, microwave on a counter, kitchenette with steaming coffee, conference-table lunch table with food, gray and orange sofas, the TV running LimeZu's hospital news report, green rug, floor lamp |
+| Laboratory | white tile · blue-gray · white | cool, curious | double-sided white benches built from counter tiles with bottles/microscope on top, imaging station with a big monitor, CT-style centrifuge, glass fume hood, gray specimen fridge, glass bio cabinet, sink, eyewash, autoclave, bottle shelves, light rail on the wall |
+| Medical Records | tan carpet · pale green · cream | dim, amber pools | steel drawer columns and narrow book shelves as the aisles, two bookcases to the ceiling, wooden counter with trays, clerk desk + drawers, shredder cabinet, scanner desk + fax, GERALD, archive boxes, a panning security camera |
+| IT Office | dark raised-floor grid · gray · white | cold cyan | twelve blinking server racks (four 3-wide banks), an animated control-room screen wall, light rails, scrolling monitors, a blue control console as the monitoring desk, two console workstations, chalkboard "whiteboard wall", glass desk + copier (GERALD), retro terminal as the Threat Console, cable ducts on the floor, cameras |
+| Emergency Room | blue tile · teal with crosses · white | cold, a red pool at the door | two patient bays (bed + side table + IV pole / monitor stand + table + pink bed) behind vertical blinds, two-PC nurse station, white-counter triage desk with a clipboard and red phone, exam-table gurneys, crash cart with ECG, equipment carts, animated patient monitors on the wall, whiteboard |
+| Supply Closet B | tan · gray · cream | dim, one warm pool | bottle shelving + narrow bookcase, boxes, ladder on the wall, mop, basket, fern, trash — Mr. Whiskers' nest untouched |
 
-Unchanged: all three NPC spawns, both zones, the item, both doors, the spawn point, `qa-helpers.ts`.
-Net walkable-tile change: −18 (row 1) −5 (new props) + 2 (the old notice board's tiles) = −21 of 234.
+## 5. What I deleted
+
+`client/src/phaser/sprites/furniture/{index,coreFurniture,medicalLabFurniture,commonAreasFurniture,officeFurniture}.ts`
+(3,441 lines), `client/src/phaser/systems/exploration/compositeFurniture.ts` (471), `client/src/phaser/sprites/objectTextures.ts`
+(210), and the floor/wall/tint/decor/light-pool/furniture body of `roomRenderer.ts` (~560). What remains procedural:
+the NPC fallback sheets (`npcTextures.ts`), the player fallback texture, the door frames/leaves (`DoorSystem.ts`,
+Run 12's animated doors, now placed inside the two-row face for back-wall doors), and the small Run-12 ambience
+overlays (LED blinks, monitor flashes, the ER "EMERGENCY" panel) which ride on top of the atlas props.
+
+## 6. Every place gameplay geometry moved (all in `client/src/data/roomData.json`)
+
+Rule (yours, from the checkpoint): the back wall is two rows, so props that stood on row 1 drop to row 2.
+NPC spawns, zones, items, doors and spawn points are unchanged in every room; `tests/helpers/qa-helpers.ts`
+constants are unchanged. Hallway PHI-tip items stay at row 1 — they hang on the wall as posters and are
+interacted with from row 2, which the adjacency rule already allows. Every room was BFS-checked after the edit:
+every NPC, zone, item and door still reachable from the spawn point.
+
+| Room | Moved | Added (density pass) |
+|---|---|---|
+| all 13 | top `wall` obstacle 20×1 → 20×2 (10×1 → 10×2 in the closet) | — |
+| hospital_entrance | big `plant` (17,1) 2×2 → (18,2) 1×1 | plant (1,2), trash_can (14,11), wheelchair (18,9), magazine_rack (1,12) |
+| reception | plant (1,1)→(1,2); printer/GERALD (3,1)→(3,2) + `PRINTER_SPOTS`; cabinets (4,1)→(4,2), (14,1)→(15,2); plant (18,1)→(18,2); notice_board (1,3)→(13,1) wall | trash_can (6,3), wheelchair (1,11), toy_chest (18,13), plant (1,5), iv_stand (18,4) |
+| hallway_reception_break | plant (10,1)→(10,2) | — |
+| hallway_break_lab | plants (6,1)→(6,2), (13,1)→(13,2) | — |
+| hallway_lab_records | plant (10,1)→(10,2) | — |
+| hallway_records_it | plants (7,1)→(7,2), (12,1)→(12,2) | — |
+| hallway_it_er | plant (14,1)→(14,2) | — |
+| supply_closet | shelf (1,1)→(1,2); archive_box (7,1)→(7,2) | — |
+| lab | — | plant (1,4), trash_can (1,13), box (18,13) |
+| records_room | records_counter (8,1)→(8,2) | bookcase (1,2) 2×1, bookcase (17,2) 2×1, box (1,13), box (18,13) |
+| it_office | server racks (1,1),(5,1),(12,1),(16,1) → row 2 | chair (1,8), chair (18,8), box (18,12) |
+| er | — | trash_can (1,13), wheelchair (18,13), iv_stand (18,12) |
+| break_room | — | plant (1,13), chair (7,8), chair (12,8), box (18,13) |
+
+Also: the hallway bulletin board (the act-aware notice in `interactableFactory.ts`) moved from the wall centre to
+cols 11–12 so it no longer sits on top of the PHI-tip poster; its anchor tile is (11,2). `PRINTER_SPOTS.reception`
+(GERALD) moved with his copier. Nothing in `CONTENT_MANIFEST.md` changed — no content-bearing object moved.
 
 ## 7. Proof artifacts (`screenshots/art-substrate/`)
 
-- `grid-before-vs-after-vs-variantA.png` — the judge-it-in-ninety-seconds image.
-- `<room>-before.png` for all 13 rooms (captured before any code changed; the other 12 await their `-after`).
-- `reception-after.png`, `reception-variantA.png`.
-- `reception-depth-{water_dispenser,trash_can}-{behind,beside,front}.png` + `reception-depth.json` — the
-  player's live depth vs the prop's at each position.
-- `reception-lighting-on.png` / `-off.png` + `reception-lighting.json` — corner luma 126.9 → 160.9.
-- `reception-art-snapshot.json` — the full `__QA__.art` dump: 24 props with frames and depths, 14 decor
-  pieces, `missing: []`, image request list.
-- `tests/art-substrate-proof.spec.ts` — **3/3 green** (atlas + no missing frames + one atlas request + zero
-  console errors; depth ordering; lighting toggle brightens the edges).
-- `tests/progression/*.spec.ts` — **31 passed, 0 failed, 4 skipped** (the `breach-gameplay` group is skipped by
-  the suite itself; unchanged), 6.1 min, run against this branch with Reception on the atlas path — door
-  unlocks, full playthrough, NPC interaction, room completion and navigation all green, no console errors.
+- `grid-before-vs-after.png` — all 13 rooms, before | after. (`grid-before-vs-after-vs-variantA.png` is the
+  Reception checkpoint with the one-row alternative.)
+- `<room>-before.png` / `<room>-after.png` for all 13 rooms. The Records *before* shot carries the room's entry
+  prompt (the capture script learned to click through it only after the before-shots were taken).
+- `<room>-depth-<prop>-{behind,beside,front}.png` + `<room>-depth.json` — the player's live depth vs the prop's.
+- `<room>-lighting-on.png` / `-off.png` + `<room>-lighting.json` — edge luminance with the layer on and off.
+- `<room>-art-snapshot.json` — the `__QA__.art` dump: every prop's frame and depth, decor count, animated count,
+  `missing: []`, image request count.
+- `tests/art-substrate-proof.spec.ts` — **39/39 green** (13 rooms × atlas / depth / lighting), 3.7 min.
+- `tests/progression/*.spec.ts` — **31 passed, 0 failed, 4 skipped** (the `breach-gameplay` group is
+  `test.skip` in the suite itself; unchanged), 5.3 min, run against the fully converted game — door unlocks,
+  full playthrough, NPC interaction, room completion and navigation all green, zero console errors.
 - `npm run check` (tsc) clean. `npm run test:data` 26/26. `npm run test:unit` shows 14 failures in
   `saveData.test.ts` that are **pre-existing** (verified identical on the base commit in a temp worktree):
   Node 26's experimental `localStorage` global shadows jsdom's, so `localStorage.clear()` throws in
@@ -158,38 +152,35 @@ Net walkable-tile change: −18 (row 1) −5 (new props) + 2 (the old notice boa
 
 ## 8. Proud of / not proud of
 
-**Proud of:** the wall — cap, face, baseboard, thin side tops, the tileset's own AO under them; it finally
-reads as a place. The counter with the empty chair in the well. The floor: you have to look for the repeat. The
-depth rule being one line shared with characters. The pipeline: the next room is data, not drawing code.
+**Proud of:** the IT office and the ER — they read as places at a glance, and the IT office moves (racks, screen
+wall, monitors, camera) without a line of animation code in the scene. The lab benches built from counter tiles.
+The fact that a room is now a data entry: the closet took twenty minutes. The atlas contact-sheet tool, which
+turned "I think that's a sofa" into "that is a cabinet, here is the sofa".
 
-**Not proud of, or still want your eyes on:**
-- The **water dispenser** is LimeZu's white kiosk with a blue panel (`prop.machine.white`) — it reads a bit like
-  an ATM. The pack has no proper water cooler in the sheets I mined; the Grocery/Basement sheets might.
-- The **doors** are still Run 12's procedural wooden frame + swinging leaf, drawn over the new thin wall tops.
-  They work and animate, but they are the last brown rectangles in the room. Restyling them from the tileset's
-  door frames is a half-day I didn't spend before the checkpoint.
-- The **HUD** (room banner, progress panel) covers the top 40 px of wall and the top-right plant. That is
-  UI-03's problem, not this run's, but it is visible in every shot.
-- The two **zone icons** (sign-in clipboard, privacy notice) sit on the counter's front ledge now, but they are
-  still bobbing 1×1 icons with gold rings — they look like pickups, not like a clipboard on a counter.
-- **Lighting taste:** I backed the vignette off from 0.42 to 0.34 after the first render; it is deliberately
-  quiet. If you want the "cold ER / warm break room" contrast to be obvious, the numbers are in `ROOM_ART`.
+**Not proud of / want your eyes on:**
+- **Doors.** Still Run 12's procedural wooden frame + swinging leaf, drawn over the new thin wall tops; the back-wall
+  closet door now sits inside the face. They work and animate, but they are the last brown rectangles in the game.
+  LimeZu has animated doors (`3_Animated_objects/.../animated_door_*`) that would close this — a half-day.
+- **The water dispensers** are LimeZu's white kiosk (`prop.machine.white`) in Reception and a stand + blender-bottle
+  elsewhere. Neither is a great water cooler; the pack doesn't have one.
+- **Zone and item icons** sit on counters and walls now but are still bobbing 1×1 pickups with gold rings.
+- **The HUD** (banner, progress panel) covers the top 40 px of every wall and whatever is in the top-right corner.
+  UI-03's problem, visible in every shot.
+- **Lighting taste** is deliberately quiet. The numbers are all in `ROOM_ART`; the ER and IT office are the two
+  rooms where I pushed it.
+- The **hallways** are 4 floor rows now (they were 5) — fine to walk, but the wall is a third of the screen.
+- The Run 12 ambience overlays (server-rack LEDs, monitor flashes, the fluorescent tube in Reception) were written
+  for the old prop positions; they still draw on the new obstacle rects, so they land on the atlas racks and banks,
+  but nobody has re-tuned them against the new art.
 
 ## 9. Caveats
 
-- The dev server on :8080 during this run was another chat's process, but its cwd is this working tree, so
-  Vite HMR served every edit; all captures are fresh page loads. The Playwright config reuses it.
+- The dev server on :8080 during this run was another chat's process, but its cwd is this working tree, so Vite
+  HMR served every edit; all captures are fresh page loads. The Playwright config reuses it.
 - The in-app browser pane was not used for any proof (it throttles Phaser's rAF — see the memory note).
-- Only Reception has a `ROOM_ART` entry. Walking through the right door into `hallway_reception_break` drops
-  you back into the old procedural look — expected at this checkpoint, jarring to play.
 
-## 10. Next (once you say go on the fork)
+## 10. Next
 
-Per room: ~1–2 hours of frame picking + dressing + capture. Sheets to mine that I have not yet sliced:
-**Kitchen** (break room: fridge, microwave, coffee, tables, mugs — partly sliced), **Basement / control room**
-(IT: server racks, monitor banks, cable trays; the `3_Animated_objects` server and screens are animated
-spritesheets worth using), **Classroom & Library** (records: shelving, archive boxes, whiteboards),
-**Hospital** (ER: beds, gurneys, curtains, IV poles, crash carts, vitals — already sliced; lab: counters,
-microscope, fridges, lockers — already sliced). Then: delete `sprites/furniture/*`, `compositeFurniture.ts`
-and the legacy half of `roomRenderer.ts`; restyle the door frames; run the 12-room grid and the full
-progression suite; update `CONTENT_MANIFEST.md` only if a content-bearing prop moves (none did here).
+Doors from the tileset (animated LimeZu doors, `DoorSystem.ts`), a proper water cooler (a custom 1×2 frame is
+probably faster than hunting), re-tune the Run 12 ambience overlays to the new props, and then the UI runs
+(UI-01..05) — the HUD is now the least finished thing on screen.

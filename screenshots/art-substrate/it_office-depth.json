@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "whiteboard_wall@2@10",
+  "playerTile": [
+   2,
+   9
+  ],
+  "rel": "behind",
+  "playerDepth": 14,
+  "propDepth": 15
+ },
+ {
+  "prop": "whiteboard_wall@2@10",
+  "playerTile": [
+   1,
+   10
+  ],
+  "rel": "beside",
+  "playerDepth": 15,
+  "propDepth": 15
+ },
+ {
+  "prop": "whiteboard_wall@2@10",
+  "playerTile": [
+   3,
+   11
+  ],
+  "rel": "front",
+  "playerDepth": 16,
+  "propDepth": 15
+ }
+]

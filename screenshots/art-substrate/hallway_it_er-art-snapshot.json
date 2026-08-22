@@ -1,0 +1,85 @@
+{
+ "roomId": "hallway_it_er",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.terrazzo",
+ "wallStyle": "bluegray",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "bench",
+   "x": 5,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.orange",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 14,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.white.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 5,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "emergency_light",
+   "x": 16,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.sign.exit",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "defibrillator_mount",
+   "x": 15,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.table.small.gray",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "defibrillator_mount",
+   "x": 15,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.firstaid",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "wheelchair",
+   "x": 10,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.wheelchair.side.tan",
+   "depth": 10,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 5,
+ "animated": 0,
+ "missing": [],
+ "imageRequests": 27
+}

@@ -141,50 +141,12 @@ export function spawnInteractables(
     const act = ctx.getCurrentAct();
     const board = getHallwayBoard(room.id, act);
     if (board) {
-      const boardX = w / 2;
-      const boardY = 64;
+      // Run 11: the board hangs on the back wall right of centre (the PHI-tip poster
+      // takes the centre); its interactable anchor is the floor tile beneath it.
+      const boardX = w / 2 + TILE * 1.5;
+      const boardY = TILE * 2 + TILE / 2;
 
-      // Board shadow (depth illusion)
-      scene.add.rectangle(boardX + 2, boardY + 2, 60, 44, 0x000000, 0.3)
-        .setDepth(4);
-      // Cork board backing with wooden frame
-      const boardG = scene.add.graphics().setDepth(5);
-      // Outer frame (dark wood)
-      boardG.fillStyle(0x5a3a1a, 1);
-      boardG.fillRect(boardX - 31, boardY - 23, 62, 46);
-      // Inner frame highlight
-      boardG.fillStyle(0x8B6914, 1);
-      boardG.fillRect(boardX - 29, boardY - 21, 58, 42);
-      // Cork texture — alternating shades
-      boardG.fillStyle(0xa07828, 1);
-      boardG.fillRect(boardX - 27, boardY - 19, 54, 38);
-      boardG.fillStyle(0x9a7020, 0.5);
-      for (let cy = 0; cy < 4; cy++) {
-        for (let cx = 0; cx < 6; cx++) {
-          if ((cx + cy) % 2 === 0) {
-            boardG.fillRect(boardX - 27 + cx * 9, boardY - 19 + cy * 10, 9, 10);
-          }
-        }
-      }
-      // Paper note — slightly tilted via offset
-      scene.add.rectangle(boardX - 1, boardY + 1, 44, 28, 0xe8dcc4).setDepth(6);
-      scene.add.rectangle(boardX, boardY, 44, 28, 0xF5E6C8).setDepth(6);
-      // Paper fold line
-      boardG.lineStyle(1, 0xd4c8a8, 0.4);
-      boardG.lineBetween(boardX - 20, boardY - 12, boardX - 20, boardY + 12);
-      boardG.setDepth(7);
-      // Push pins (red circles at corners)
-      scene.add.circle(boardX - 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
-      scene.add.circle(boardX + 18, boardY - 10, 2, 0xcc2222, 1).setDepth(7);
-      // Pin highlights
-      scene.add.circle(boardX - 19, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
-      scene.add.circle(boardX + 17, boardY - 11, 1, 0xff6666, 0.6).setDepth(7);
-      // NOTICE label
-      scene.add.text(boardX, boardY - 6, 'NOTICE', {
-        fontFamily: '"Press Start 2P"',
-        fontSize: '5px',
-        color: '#8B0000',
-      }).setOrigin(0.5).setDepth(7);
+      scene.add.image(boardX - TILE, 0, ATLAS_KEY, 'prop.bulletin.notes').setOrigin(0, 0).setDepth(2);
 
       // Invisible interactive sprite overlapping the board
       const boardTex = objectTexture('poster');

@@ -1,0 +1,95 @@
+{
+ "roomId": "hallway_reception_break",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.terrazzo",
+ "wallStyle": "beige",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "bench",
+   "x": 5,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.tan",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "bench",
+   "x": 14,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.orange",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 10,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.white.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 4,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 15,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "water_cooler",
+   "x": 7,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.table.small.white",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "water_cooler",
+   "x": 7,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.watercooler.top",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "vending_machine",
+   "x": 12,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.fridge.glass.tall",
+   "depth": 10,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 5,
+ "animated": 0,
+ "missing": [],
+ "imageRequests": 27
+}

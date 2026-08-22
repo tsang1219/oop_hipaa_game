@@ -1,0 +1,85 @@
+{
+ "roomId": "hallway_break_lab",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.terrazzo",
+ "wallStyle": "beige",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "plant",
+   "x": 6,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.orange.s",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 13,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.white.s",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "bench",
+   "x": 9,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.tan",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 4,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 16,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "biohazard_sign",
+   "x": 15,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.sign.warning",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "glove_dispenser",
+   "x": 3,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.dispenser.c",
+   "depth": 10,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 5,
+ "animated": 0,
+ "missing": [],
+ "imageRequests": 27
+}

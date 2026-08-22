@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "plant@8@6",
+  "playerTile": [
+   8,
+   5
+  ],
+  "rel": "behind",
+  "playerDepth": 10,
+  "propDepth": 11
+ },
+ {
+  "prop": "plant@8@6",
+  "playerTile": [
+   7,
+   6
+  ],
+  "rel": "beside",
+  "playerDepth": 11,
+  "propDepth": 11
+ },
+ {
+  "prop": "archive_box@7@2",
+  "playerTile": [
+   7,
+   3
+  ],
+  "rel": "front",
+  "playerDepth": 8,
+  "propDepth": 7
+ }
+]

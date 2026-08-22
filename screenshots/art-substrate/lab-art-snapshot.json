@@ -1,0 +1,405 @@
+{
+ "roomId": "lab",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.whitetile",
+ "wallStyle": "bluegray",
+ "trim": "white",
+ "lighting": true,
+ "props": [
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.shelf",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.shelf",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.drawers",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.shelf",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.doors",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.shelf",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.drawers",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.shelf",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.doors",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain2",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.doors",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.doors",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.doors",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain2",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.doors",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.doors",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "microscope_station",
+   "x": 2,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.desk.monitor.3",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "centrifuge",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.scanner.ct",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "centrifuge",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.cart.monitor",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "fume_hood",
+   "x": 5,
+   "y": 2,
+   "w": 3,
+   "h": 1,
+   "frame": "prop.cabinet.glass.3",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "results_board",
+   "x": 8,
+   "y": 1,
+   "w": 4,
+   "h": 1,
+   "frame": "prop.chalkboard.dark.3",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "specimen_fridge",
+   "x": 2,
+   "y": 10,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.fridge.gray.2",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "bio_cabinet",
+   "x": 16,
+   "y": 10,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.cabinet.glass.2",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "sink_station",
+   "x": 7,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.sink.white",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "sink_station",
+   "x": 7,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.counter.kw.drawers",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "eyewash_station",
+   "x": 9,
+   "y": 10,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.dispenser.c",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "sample_rack",
+   "x": 11,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.shelf.meds",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "autoclave",
+   "x": 13,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.fridge.gray.c",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "autoclave",
+   "x": 13,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.counter.kw.plain",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "autoclave",
+   "x": 13,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.microwave.c",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "chemical_shelf",
+   "x": 1,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.shelf.narrow.meds",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chemical_shelf",
+   "x": 18,
+   "y": 8,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.shelf.narrow.meds",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 1,
+   "y": 4,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.fern.m",
+   "depth": 9,
+   "anchor": "floor"
+  },
+  {
+   "type": "trash_can",
+   "x": 1,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.trash.blue",
+   "depth": 18,
+   "anchor": "floor"
+  },
+  {
+   "type": "box",
+   "x": 18,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.box.single",
+   "depth": 18,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 16,
+ "animated": 0,
+ "missing": [],
+ "imageRequests": 27
+}

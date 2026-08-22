@@ -1,0 +1,85 @@
+{
+ "roomId": "hallway_records_it",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.terrazzo",
+ "wallStyle": "bluegray",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "plant",
+   "x": 7,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.white.s",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 12,
+   "y": 2,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.orange.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "bench",
+   "x": 9,
+   "y": 5,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.tan",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 4,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "wall_sconce",
+   "x": 16,
+   "y": 1,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.lightbar.2",
+   "depth": 2,
+   "anchor": "wall"
+  },
+  {
+   "type": "server_rack",
+   "x": 15,
+   "y": 5,
+   "w": 1,
+   "h": 1,
+   "frame": "anim.server.0",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "cable_tray",
+   "x": 14,
+   "y": 1,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.rail.lights.2",
+   "depth": 2,
+   "anchor": "wall"
+  }
+ ],
+ "decor": 6,
+ "animated": 2,
+ "missing": [],
+ "imageRequests": 27
+}

@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "bench@9@5",
+  "playerTile": [
+   9,
+   4
+  ],
+  "rel": "behind",
+  "playerDepth": 9,
+  "propDepth": 10
+ },
+ {
+  "prop": "bench@9@5",
+  "playerTile": [
+   8,
+   5
+  ],
+  "rel": "beside",
+  "playerDepth": 10,
+  "propDepth": 10
+ },
+ {
+  "prop": "plant@6@2",
+  "playerTile": [
+   6,
+   3
+  ],
+  "rel": "front",
+  "playerDepth": 8,
+  "propDepth": 7
+ }
+]

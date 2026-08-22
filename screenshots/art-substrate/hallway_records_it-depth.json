@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "server_rack@15@5",
+  "playerTile": [
+   15,
+   4
+  ],
+  "rel": "behind",
+  "playerDepth": 9,
+  "propDepth": 10
+ },
+ {
+  "prop": "server_rack@15@5",
+  "playerTile": [
+   14,
+   5
+  ],
+  "rel": "beside",
+  "playerDepth": 10,
+  "propDepth": 10
+ },
+ {
+  "prop": "plant@7@2",
+  "playerTile": [
+   7,
+   3
+  ],
+  "rel": "front",
+  "playerDepth": 8,
+  "propDepth": 7
+ }
+]

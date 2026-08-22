@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "document_cart@6@11",
+  "playerTile": [
+   6,
+   10
+  ],
+  "rel": "behind",
+  "playerDepth": 15,
+  "propDepth": 16
+ },
+ {
+  "prop": "document_cart@6@11",
+  "playerTile": [
+   5,
+   11
+  ],
+  "rel": "beside",
+  "playerDepth": 16,
+  "propDepth": 16
+ },
+ {
+  "prop": "document_cart@6@11",
+  "playerTile": [
+   6,
+   12
+  ],
+  "rel": "front",
+  "playerDepth": 17,
+  "propDepth": 16
+ }
+]

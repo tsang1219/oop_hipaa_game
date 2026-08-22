@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "filing_cart@12@5",
+  "playerTile": [
+   12,
+   4
+  ],
+  "rel": "behind",
+  "playerDepth": 9,
+  "propDepth": 10
+ },
+ {
+  "prop": "filing_cart@12@5",
+  "playerTile": [
+   11,
+   5
+  ],
+  "rel": "beside",
+  "playerDepth": 10,
+  "propDepth": 10
+ },
+ {
+  "prop": "plant@10@2",
+  "playerTile": [
+   10,
+   3
+  ],
+  "rel": "front",
+  "playerDepth": 8,
+  "propDepth": 7
+ }
+]

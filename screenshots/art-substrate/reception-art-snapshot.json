@@ -219,6 +219,7 @@
   }
  ],
  "decor": 15,
+ "animated": 0,
  "missing": [],
  "imageRequests": 27
 }

@@ -1,0 +1,65 @@
+{
+ "roomId": "supply_closet",
+ "atlas": "interiors",
+ "wallRows": 2,
+ "floorSet": "floor.tan",
+ "wallStyle": "gray",
+ "trim": "cream",
+ "lighting": true,
+ "props": [
+  {
+   "type": "shelf",
+   "x": 1,
+   "y": 2,
+   "w": 3,
+   "h": 1,
+   "frame": "prop.shelf.bottles.a",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "shelf",
+   "x": 1,
+   "y": 2,
+   "w": 3,
+   "h": 1,
+   "frame": "prop.shelf.narrow.books",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "archive_box",
+   "x": 7,
+   "y": 2,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.boxes.stack",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "trash",
+   "x": 1,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.trash.green",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 8,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.fern.s",
+   "depth": 11,
+   "anchor": "floor"
+  }
+ ],
+ "decor": 5,
+ "animated": 0,
+ "missing": [],
+ "imageRequests": 27
+}

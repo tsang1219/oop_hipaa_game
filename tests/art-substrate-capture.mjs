@@ -27,6 +27,20 @@ for (const room of ROOMS) {
     await page.waitForFunction(r => window.__QA__?.currentRoomId === r, room, { timeout: 30000 });
   } catch (e) { console.log(`!! ${room}: never loaded (${String(e.message).split('\n')[0]})`); continue; }
   await page.waitForTimeout(3200); // fade-in (500ms) + room banner (300+400+1500+500ms)
+  // Some rooms open a scenario prompt on entry (records_room); click through it so the
+  // screenshot shows the room, not the modal. qa-no-save means nothing persists.
+  for (let i = 0; i < 12; i++) {
+    const sel = await page.evaluate(() => {
+      for (const s of ['[data-testid="button-choice-0"]', '[data-testid="choice-button-1"]', '[data-testid="button-next-scene"]', '[data-testid="button-close-modal"]', '[data-testid="container-battle-dialogue"]', '[data-testid="observation-hint-overlay"]']) {
+        const el = document.querySelector(s); if (el && (el.getClientRects().length > 0)) return s;
+      }
+      return null;
+    });
+    if (!sel) break;
+    await page.locator(sel).first().click({ force: true }).catch(() => {});
+    await page.waitForTimeout(600);
+  }
+  await page.waitForTimeout(400);
   const box = await page.locator('canvas').first().boundingBox();
   const clip = { x: Math.round(box.x), y: Math.round(box.y), width: Math.round(box.width), height: Math.round(box.height) };
   await page.screenshot({ path: `${OUT}/${room}-${suffix}.png`, clip });

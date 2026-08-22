@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "wheelchair@10@5",
+  "playerTile": [
+   10,
+   4
+  ],
+  "rel": "behind",
+  "playerDepth": 9,
+  "propDepth": 10
+ },
+ {
+  "prop": "wheelchair@10@5",
+  "playerTile": [
+   9,
+   5
+  ],
+  "rel": "beside",
+  "playerDepth": 10,
+  "propDepth": 10
+ },
+ {
+  "prop": "plant@14@2",
+  "playerTile": [
+   14,
+   3
+  ],
+  "rel": "front",
+  "playerDepth": 8,
+  "propDepth": 7
+ }
+]

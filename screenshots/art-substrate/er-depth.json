@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "crash_cart@13@11",
+  "playerTile": [
+   13,
+   10
+  ],
+  "rel": "behind",
+  "playerDepth": 15,
+  "propDepth": 16
+ },
+ {
+  "prop": "crash_cart@13@11",
+  "playerTile": [
+   15,
+   11
+  ],
+  "rel": "beside",
+  "playerDepth": 16,
+  "propDepth": 16
+ },
+ {
+  "prop": "crash_cart@13@11",
+  "playerTile": [
+   13,
+   12
+  ],
+  "rel": "front",
+  "playerDepth": 17,
+  "propDepth": 16
+ }
+]

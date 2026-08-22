@@ -1,0 +1,32 @@
+[
+ {
+  "prop": "trash_bin@13@6",
+  "playerTile": [
+   13,
+   5
+  ],
+  "rel": "behind",
+  "playerDepth": 10,
+  "propDepth": 12
+ },
+ {
+  "prop": "trash_bin@13@6",
+  "playerTile": [
+   14,
+   7
+  ],
+  "rel": "beside",
+  "playerDepth": 12,
+  "propDepth": 12
+ },
+ {
+  "prop": "trash_bin@13@6",
+  "playerTile": [
+   13,
+   8
+  ],
+  "rel": "front",
+  "playerDepth": 13,
+  "propDepth": 12
+ }
+]
