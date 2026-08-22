@@ -1,0 +1,23 @@
+{
+  "frames": 1985,
+  "p50": 16.7,
+  "p90": 16.7,
+  "p95": 16.8,
+  "p99": 16.8,
+  "max": 16.8,
+  "over16_7": 782,
+  "over33": 0,
+  "mean": 16.67,
+  "startWave": 1,
+  "endState": {
+    "securityScore": 80,
+    "budget": 110,
+    "wave": 2,
+    "totalWaves": 4,
+    "gameState": "PLAYING",
+    "enemyCount": 0,
+    "towerCount": 2
+  },
+  "sampledMs": 33166,
+  "displayRefreshNote": "deltas are rAF intervals on this machine; 16.7ms = 60Hz frame"
+}

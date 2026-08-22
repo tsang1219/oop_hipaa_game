@@ -37,7 +37,7 @@ function hostNow(host: SfxHost): number {
 
 const MIX_KEY = 'pq:audio:mix:v1';
 const MUSIC_KEY = 'music_volume';
-const MIX_DEFAULTS: Record<Exclude<Bus, 'music'>, number> = { sfx: 0.8, voice: 0.8, ambience: 0.7 };
+const MIX_DEFAULTS: Record<Exclude<Bus, 'music'>, number> = { sfx: 0.7, voice: 0.7, ambience: 0.7 }; // under the music, not over it
 
 function readMix(): Record<Exclude<Bus, 'music'>, number> {
   try {

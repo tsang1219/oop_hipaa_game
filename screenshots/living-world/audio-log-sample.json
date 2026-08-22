@@ -1,0 +1,56 @@
+[
+  {
+    "t": 0,
+    "key": "ambience:hospital_entrance:hvac+pa-chime",
+    "bus": "ambience",
+    "volume": 0.9
+  },
+  {
+    "t": 0,
+    "key": "sfx_room_enter",
+    "bus": "sfx",
+    "volume": 0.098,
+    "rate": 1.15
+  },
+  {
+    "t": 935,
+    "key": "ambience:break_room:fridge+hvac",
+    "bus": "ambience",
+    "volume": 1
+  },
+  {
+    "t": 935,
+    "key": "sfx_room_enter",
+    "bus": "sfx",
+    "volume": 0.098,
+    "rate": 1.15
+  },
+  {
+    "t": 2134.9,
+    "key": "sfx_step_carpet_4",
+    "bus": "sfx",
+    "volume": 0.13999999999999999,
+    "rate": 0.9788263799950754
+  },
+  {
+    "t": 2251.6,
+    "key": "sfx_step_carpet_2",
+    "bus": "sfx",
+    "volume": 0.13999999999999999,
+    "rate": 0.9750371416756198
+  },
+  {
+    "t": 2351.6,
+    "key": "sfx_step_carpet_1",
+    "bus": "sfx",
+    "volume": 0.13999999999999999,
+    "rate": 0.9607681993612358
+  },
+  {
+    "t": 2451.6,
+    "key": "sfx_step_carpet_0",
+    "bus": "sfx",
+    "volume": 0.13999999999999999,
+    "rate": 0.9530898679038209
+  }
+]
