@@ -15,3 +15,11 @@ screenshots/*.png
 # tests/living-world-proof.spec.ts; only break_room's is committed as the hand-back artifact.
 screenshots/living-world/reception/
 screenshots/living-world/er/
+
+# Run 11 (art-substrate): LimeZu "Modern Interiors" raw pack. Paid, licensed for use
+# in this project but NOT for redistribution — and this repo is public + deploys
+# attached_assets/ to GitHub Pages. Keep the raw pack local; only the sliced atlas
+# (attached_assets/generated_images/privacyquest/atlas/) is committed and shipped.
+attached_assets/vendor/modern-interiors/*
+!attached_assets/vendor/modern-interiors/LICENSE.txt
+!attached_assets/vendor/modern-interiors/README.md

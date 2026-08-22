@@ -1,5 +1,24 @@
 # Asset Credits
 
+## Environment art (tilesets)
+
+### LimeZu — Modern Interiors (RPG tileset), full version
+- Author: LimeZu — https://limezu.itch.io/moderninteriors
+- Acquired: 2026-08-22 (Run 11, art-substrate) — paid full version (pay-what-you-want)
+- License (`LICENSE.txt` in the pack, verified 2026-08-22): may edit and use the asset in
+  **any commercial or non-commercial project**; may **not** resell or redistribute the asset,
+  edited or not; **credit required** → link to https://limezu.itch.io/moderninteriors
+- Raw pack: `attached_assets/vendor/modern-interiors/` — **git-ignored on purpose**
+  (no-redistribution clause; this repo is public and deploys `attached_assets/` to GitHub
+  Pages). Only the sliced atlas is committed and shipped:
+  `attached_assets/generated_images/privacyquest/atlas/interiors.png` + `interiors.json`,
+  built by `scripts/art/slice-atlas.mjs` from `scripts/art/atlas-manifest.json`.
+- Used from the pack: 32×32 Room Builder (floors, walls, baseboards, floor shadows) and the
+  32×32 theme sheets (Hospital, Generic, Conference Hall, Living Room, Classroom/Library, …)
+  for PrivacyQuest's room substrate — floors, walls, and all furniture/props.
+- Credit line for the in-game credits: **"Interior art: Modern Interiors by LimeZu —
+  limezu.itch.io/moderninteriors"**
+
 ## Audio
 
 ### Kenney — Impact Sounds (1.0)
