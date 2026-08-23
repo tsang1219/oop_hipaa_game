@@ -2,7 +2,7 @@
  "roomId": "records_room",
  "atlas": "interiors",
  "wallRows": 2,
- "floorSet": "floor.carpet.tan",
+ "floorSet": "floor.stone.beige",
  "wallStyle": "green",
  "trim": "cream",
  "lighting": true,

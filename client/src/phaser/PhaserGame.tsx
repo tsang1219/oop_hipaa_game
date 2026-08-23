@@ -3,15 +3,21 @@ import Phaser from 'phaser';
 import { createGameConfig } from './config';
 import { eventBridge, BRIDGE_EVENTS } from './EventBridge';
 import { playSfx, playVoiceBlip, type Bus } from './systems/exploration/audioMixer';
+import { useIntegerZoom } from '@/hooks/useIntegerZoom';
 
 interface PhaserGameProps {
+  /** Omit both to auto-fit an integer zoom of the 640×480 game to the window (recommended). */
   width?: number;
   height?: number;
   onSceneReady?: (sceneKey: string) => void;
 }
 
 export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
-  ({ width = 960, height = 720, onSceneReady }, ref) => {
+  ({ width: widthProp, height: heightProp, onSceneReady }, ref) => {
+    const fit = useIntegerZoom();
+    const width = widthProp ?? fit.width;
+    const height = heightProp ?? fit.height;
+    const crisp = widthProp === undefined ? fit.crisp : true;
     const containerRef = useRef<HTMLDivElement>(null);
     const gameRef = useRef<Phaser.Game | null>(null);
     // State toggle to force useImperativeHandle to re-evaluate after game creation
@@ -32,10 +38,10 @@ export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
       // Trigger re-evaluation of useImperativeHandle so parent gets the game instance
       setGameReady(true);
 
-      // Ensure crisp pixel rendering on the canvas
+      // Ensure crisp pixel rendering on the canvas (the fit effect below keeps it in sync)
       const canvas = containerRef.current?.querySelector('canvas');
       if (canvas) {
-        canvas.style.imageRendering = 'pixelated';
+        canvas.style.imageRendering = crisp ? 'pixelated' : 'auto';
       }
 
       const handleSceneReady = (sceneKey: string) => {
@@ -75,13 +81,23 @@ export const PhaserGame = forwardRef<Phaser.Game | null, PhaserGameProps>(
       };
     }, []);
 
+    // Re-fit Phaser's FIT scaler whenever the integer zoom changes (window resize), and
+    // keep the canvas pixelated only at integer scales — a fractional fallback is smoothed.
+    useEffect(() => {
+      const game = gameRef.current;
+      if (!game) return;
+      game.scale.refresh();
+      const canvas = containerRef.current?.querySelector('canvas');
+      if (canvas) canvas.style.imageRendering = crisp ? 'pixelated' : 'auto';
+    }, [width, height, crisp, gameReady]);
+
     return (
       <div
         ref={containerRef}
         style={{
           width,
           height,
-          imageRendering: 'pixelated',
+          imageRendering: crisp ? 'pixelated' : 'auto',
           // @ts-expect-error -- crisp-edges is a valid CSS value for cross-browser pixel art rendering
           WebkitImageRendering: 'crisp-edges',
         }}

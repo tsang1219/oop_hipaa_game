@@ -133,12 +133,14 @@ for (const ROOM of ROOMS) {
     await page.waitForTimeout(350);
     expect((await page.evaluate(() => window.__QA__!.art!.lighting))).toBe(false);
     const off = await shoot(page, `${ROOM}-lighting-off`);
-    // sample the room's left/right edges at mid-height (inside the canvas, outside the HUD)
+    // sample the floor in the bottom corners (inside the walls, clear of the HUD) — where the
+    // vignette bites; the void/trim columns at the very edge are dark either way
     const png = PNG.sync.read(on);
-    const s = 50, y0 = Math.round(png.height * 0.45);
-    const edgesOn = (meanLuma(on, 40, y0, s, s) + meanLuma(on, png.width - s - 40, y0, s, s)) / 2;
-    const edgesOff = (meanLuma(off, 40, y0, s, s) + meanLuma(off, png.width - s - 40, y0, s, s)) / 2;
-    expect(edgesOff, 'lighting off → room edges brighter').toBeGreaterThan(edgesOn + 2);
-    fs.writeFileSync(`${OUT}/${ROOM}-lighting.json`, JSON.stringify({ edgesOn, edgesOff }, null, 1));
+    const W = png.width, H = png.height, w = Math.round(W * 0.06), h = Math.round(H * 0.06);
+    const x0 = Math.round(W * 0.08), x1 = Math.round(W * 0.86), y0 = Math.round(H * 0.78);
+    const cornersOn = (meanLuma(on, x0, y0, w, h) + meanLuma(on, x1, y0, w, h)) / 2;
+    const cornersOff = (meanLuma(off, x0, y0, w, h) + meanLuma(off, x1, y0, w, h)) / 2;
+    expect(cornersOff, 'lighting off → floor corners brighter').toBeGreaterThan(cornersOn + 3);
+    fs.writeFileSync(`${OUT}/${ROOM}-lighting.json`, JSON.stringify({ cornersOn, cornersOff }, null, 1));
   });
 }

@@ -515,14 +515,15 @@ export const ROOM_INTERACTABLE_ART: Record<string, Record<string, InteractableAr
 // ── Room styles ──────────────────────────────────────────────────────────────
 const floor = (set: string): RoomArtStyle['floor'] => ({ set, variants: 6, pattern: [3, 2], scatter: 0.18 });
 
-const hallwayStyle = (wall: WallStyle): RoomArtStyle => ({
-  floor: floor('floor.terrazzo'),
+/** Corridors follow the act they sit in: bright stone for Acts 1–2, darker terrazzo + heavier vignette for Act 3. */
+const hallwayStyle = (wall: WallStyle, floorSet: string, ambientAlpha: number, vignette: number): RoomArtStyle => ({
+  floor: floor(floorSet),
   wall: { style: wall, rows: 2, trim: 'cream' },
   wear: [{ tx: 2, ty: 3, r: 26 }, { tx: 6, ty: 3.2, r: 34 }, { tx: 10, ty: 3, r: 36 }, { tx: 14, ty: 3.2, r: 34 }, { tx: 17, ty: 3, r: 26 }],
   light: {
-    ambient: 0xf4e6d0, ambientAlpha: 0.18,
+    ambient: 0xf4e6d0, ambientAlpha,
     pools: [{ tx: 4, ty: 3, r: 130, color: 0xffe9c8, alpha: 0.11 }, { tx: 10, ty: 3, r: 130, color: 0xffe9c8, alpha: 0.1 }, { tx: 15, ty: 3, r: 130, color: 0xffe9c8, alpha: 0.11 }],
-    vignette: 0.34,
+    vignette,
   },
 });
 
@@ -532,13 +533,13 @@ export const ROOM_ART: Record<string, RoomArtStyle> = {
     wall: { style: 'blue', rows: 2, trim: 'white' },
     wear: [{ tx: 17, ty: 7, r: 28 }, { tx: 14, ty: 6.2, r: 32 }, { tx: 10, ty: 5.5, r: 40, alpha: 0.07 }, { tx: 10, ty: 8.5, r: 30 }, { tx: 10, ty: 11, r: 32 }],
     light: {
-      ambient: 0xfff1df, ambientAlpha: 0.1,
+      ambient: 0xfff1df, ambientAlpha: 0.06,
       pools: [{ tx: 5, ty: 6, r: 150, color: 0xfff4e0, alpha: 0.1 }, { tx: 10, ty: 6, r: 170, color: 0xffffff, alpha: 0.1 }, { tx: 15, ty: 6, r: 150, color: 0xfff4e0, alpha: 0.1 }, { tx: 10, ty: 11, r: 140, color: 0xfff4e0, alpha: 0.08 }],
-      vignette: 0.3,
+      vignette: 0.18,
     },
   },
   reception: {
-    floor: floor('floor.reception'),
+    floor: floor('floor.cream'),
     wall: { style: 'cream', rows: 2, trim: 'cream' },
     wear: [
       { tx: 2, ty: 7, r: 26 }, { tx: 5, ty: 6.5, r: 30 }, { tx: 8, ty: 5.5, r: 34 },
@@ -546,19 +547,19 @@ export const ROOM_ART: Record<string, RoomArtStyle> = {
       { tx: 17, ty: 7, r: 26 }, { tx: 10, ty: 8.5, r: 30 }, { tx: 10, ty: 11.5, r: 30 },
     ],
     light: {
-      ambient: 0xffe4c2, ambientAlpha: 0.16,
+      ambient: 0xffe4c2, ambientAlpha: 0.1,
       pools: [
         { tx: 5, ty: 6, r: 150, color: 0xffe9c8, alpha: 0.11 }, { tx: 10, ty: 7, r: 170, color: 0xffefd6, alpha: 0.12 },
         { tx: 15, ty: 6, r: 150, color: 0xffe9c8, alpha: 0.11 }, { tx: 10, ty: 12, r: 140, color: 0xffe9c8, alpha: 0.08 },
       ],
-      vignette: 0.34,
+      vignette: 0.2,
     },
   },
-  hallway_reception_break: hallwayStyle('beige'),
-  hallway_break_lab: hallwayStyle('beige'),
-  hallway_lab_records: hallwayStyle('beige'),
-  hallway_records_it: hallwayStyle('bluegray'),
-  hallway_it_er: hallwayStyle('bluegray'),
+  hallway_reception_break: hallwayStyle('beige', 'floor.lightgray', 0.12, 0.22),
+  hallway_break_lab: hallwayStyle('beige', 'floor.lightgray', 0.12, 0.24),
+  hallway_lab_records: hallwayStyle('beige', 'floor.stone.beige', 0.14, 0.28),
+  hallway_records_it: hallwayStyle('bluegray', 'floor.terrazzo', 0.18, 0.34),
+  hallway_it_er: hallwayStyle('bluegray', 'floor.terrazzo', 0.2, 0.36),
   supply_closet: {
     floor: floor('floor.tan'),
     wall: { style: 'gray', rows: 2, trim: 'cream' },
@@ -574,19 +575,19 @@ export const ROOM_ART: Record<string, RoomArtStyle> = {
     wall: { style: 'bluegray', rows: 2, trim: 'white' },
     wear: [{ tx: 2, ty: 7, r: 26 }, { tx: 10, ty: 8, r: 40, alpha: 0.07 }, { tx: 17, ty: 7, r: 26 }, { tx: 10, ty: 11.5, r: 30 }, { tx: 5, ty: 8, r: 28 }, { tx: 15, ty: 8, r: 28 }],
     light: {
-      ambient: 0xd8f0ec, ambientAlpha: 0.16,
+      ambient: 0xd8f0ec, ambientAlpha: 0.12,
       pools: [{ tx: 5, ty: 6, r: 150, color: 0xd0f8ff, alpha: 0.11 }, { tx: 14, ty: 6, r: 150, color: 0xd0f8ff, alpha: 0.11 }, { tx: 10, ty: 11, r: 150, color: 0xe0fff8, alpha: 0.09 }],
-      vignette: 0.36,
+      vignette: 0.26,
     },
   },
   records_room: {
-    floor: floor('floor.carpet.tan'),
+    floor: floor('floor.stone.beige'),
     wall: { style: 'green', rows: 2, trim: 'cream' },
     wear: [{ tx: 2, ty: 7, r: 26 }, { tx: 4.5, ty: 5, r: 26, alpha: 0.06 }, { tx: 14.5, ty: 5, r: 26, alpha: 0.06 }, { tx: 10, ty: 7, r: 36 }, { tx: 17, ty: 7, r: 26 }, { tx: 10, ty: 11.5, r: 30 }],
     light: {
-      ambient: 0xd8d0b8, ambientAlpha: 0.3,
+      ambient: 0xd8d0b8, ambientAlpha: 0.2,
       pools: [{ tx: 4.5, ty: 4, r: 120, color: 0xffe2b0, alpha: 0.14 }, { tx: 14.5, ty: 4, r: 120, color: 0xffe2b0, alpha: 0.14 }, { tx: 10, ty: 9, r: 150, color: 0xffe6b8, alpha: 0.13 }],
-      vignette: 0.5,
+      vignette: 0.3,
     },
   },
   it_office: {
@@ -594,9 +595,9 @@ export const ROOM_ART: Record<string, RoomArtStyle> = {
     wall: { style: 'gray', rows: 2, trim: 'white' },
     wear: [{ tx: 2, ty: 7, r: 26 }, { tx: 10, ty: 8, r: 36, alpha: 0.07 }, { tx: 17, ty: 7, r: 26 }, { tx: 10, ty: 11.5, r: 30 }],
     light: {
-      ambient: 0xa8b8e8, ambientAlpha: 0.3,
+      ambient: 0xa8b8e8, ambientAlpha: 0.24,
       pools: [{ tx: 4, ty: 7, r: 140, color: 0x9fe8ff, alpha: 0.12 }, { tx: 15, ty: 7, r: 140, color: 0x9fe8ff, alpha: 0.12 }, { tx: 10, ty: 6, r: 150, color: 0x7fd0ff, alpha: 0.16 }, { tx: 10, ty: 1, r: 150, color: 0x7fd0ff, alpha: 0.1 }],
-      vignette: 0.5,
+      vignette: 0.4,
     },
   },
   er: {
@@ -604,9 +605,9 @@ export const ROOM_ART: Record<string, RoomArtStyle> = {
     wall: { style: 'teal', rows: 2, trim: 'white' },
     wear: [{ tx: 2, ty: 7, r: 28 }, { tx: 6, ty: 7.5, r: 32 }, { tx: 10, ty: 7.5, r: 40, alpha: 0.07 }, { tx: 10, ty: 11.5, r: 32 }, { tx: 4, ty: 6, r: 26 }, { tx: 16, ty: 6, r: 26 }],
     light: {
-      ambient: 0xc4d6ff, ambientAlpha: 0.26,
+      ambient: 0xc4d6ff, ambientAlpha: 0.24,
       pools: [{ tx: 4, ty: 4, r: 140, color: 0xe0f0ff, alpha: 0.12 }, { tx: 15, ty: 4, r: 140, color: 0xe0f0ff, alpha: 0.12 }, { tx: 10, ty: 8, r: 160, color: 0xe8f4ff, alpha: 0.12 }, { tx: 1, ty: 7, r: 90, color: 0xff6060, alpha: 0.1 }],
-      vignette: 0.46,
+      vignette: 0.4,
     },
   },
   break_room: {
@@ -614,9 +615,9 @@ export const ROOM_ART: Record<string, RoomArtStyle> = {
     wall: { style: 'green', rows: 2, trim: 'cream' },
     wear: [{ tx: 2, ty: 7, r: 26 }, { tx: 6, ty: 7, r: 30 }, { tx: 13, ty: 7, r: 30 }, { tx: 17, ty: 7, r: 26 }, { tx: 10, ty: 10, r: 34 }, { tx: 10, ty: 12, r: 28 }],
     light: {
-      ambient: 0xffd9a8, ambientAlpha: 0.24,
+      ambient: 0xffd9a8, ambientAlpha: 0.16,
       pools: [{ tx: 4, ty: 8, r: 150, color: 0xffe6b8, alpha: 0.14 }, { tx: 15, ty: 8, r: 150, color: 0xffe6b8, alpha: 0.14 }, { tx: 10, ty: 4, r: 150, color: 0xffe6b8, alpha: 0.12 }],
-      vignette: 0.34,
+      vignette: 0.22,
     },
   },
 };

@@ -2,7 +2,7 @@
 import { chromium } from '@playwright/test';
 const room = process.argv[2] || 'reception';
 const browser = await chromium.launch({ channel: process.env.PW_CHANNEL || 'chrome' });
-const page = await browser.newPage({ viewport: { width: 1280, height: 960 } });
+const page = await browser.newPage({ viewport: { width: 1400, height: 1100 } });
 const logs = [];
 page.on('console', m => { if (/\[art\]|error|warn/i.test(m.text()) || m.type() === 'error') logs.push(`${m.type()}: ${m.text()}`); });
 page.on('pageerror', e => logs.push(`PAGEERROR: ${e.message}`));

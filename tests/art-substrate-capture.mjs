@@ -15,7 +15,9 @@ const ROOMS = [
   'hallway_it_er', 'er', 'supply_closet',
 ];
 const browser = await chromium.launch({ channel: process.env.PW_CHANNEL || 'chrome' });
-const page = await browser.newPage({ viewport: { width: 1280, height: 960 } });
+// VIEWPORT=WxH overrides (1400x1100 → 2× canvas; 1280x960 → 1×)
+const [vw, vh] = (process.env.VIEWPORT || '1400x1100').split('x').map(Number);
+const page = await browser.newPage({ viewport: { width: vw, height: vh } });
 const errors = [];
 page.on('pageerror', e => errors.push(`PAGEERROR ${e.message}`));
 page.on('console', m => { if (m.type() === 'error') errors.push(`CONSOLE ${m.text()}`); });

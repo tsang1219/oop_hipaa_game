@@ -135,20 +135,72 @@ cols 11–12 so it no longer sits on top of the PHI-tip poster; its anchor tile 
 
 - `grid-before-vs-after.png` — all 13 rooms, before | after. (`grid-before-vs-after-vs-variantA.png` is the
   Reception checkpoint with the one-row alternative.)
-- `<room>-before.png` / `<room>-after.png` for all 13 rooms. The Records *before* shot carries the room's entry
-  prompt (the capture script learned to click through it only after the before-shots were taken).
+- `<room>-before.png` (960×720, the original 1.5× display) / `<room>-after.png` (1280×960, pixel-exact 2×) for all 13
+  rooms. The Records *before* shot carries the room's entry prompt (the capture script learned to click through
+  it only after the before-shots were taken).
 - `<room>-depth-<prop>-{behind,beside,front}.png` + `<room>-depth.json` — the player's live depth vs the prop's.
 - `<room>-lighting-on.png` / `-off.png` + `<room>-lighting.json` — edge luminance with the layer on and off.
 - `<room>-art-snapshot.json` — the `__QA__.art` dump: every prop's frame and depth, decor count, animated count,
   `missing: []`, image request count.
-- `tests/art-substrate-proof.spec.ts` — **39/39 green** (13 rooms × atlas / depth / lighting), 3.7 min.
+- `tests/art-substrate-proof.spec.ts` — **39/39 green** (13 rooms × atlas / depth / lighting), 3.7 min — re-run
+  after the §7b changes at the 2× viewport; the lighting check now samples the floor's bottom corners
+  (inside the walls), where the vignette lives, instead of the void column at the canvas edge.
 - `tests/progression/*.spec.ts` — **31 passed, 0 failed, 4 skipped** (the `breach-gameplay` group is
-  `test.skip` in the suite itself; unchanged), 5.3 min, run against the fully converted game — door unlocks,
+  `test.skip` in the suite itself; unchanged), 5.3 min, run against the fully converted game and again after §7b at
+  the 2× viewport — door unlocks,
   full playthrough, NPC interaction, room completion and navigation all green, zero console errors.
 - `npm run check` (tsc) clean. `npm run test:data` 26/26. `npm run test:unit` shows 14 failures in
   `saveData.test.ts` that are **pre-existing** (verified identical on the base commit in a temp worktree):
   Node 26's experimental `localStorage` global shadows jsdom's, so `localStorage.clear()` throws in
   `beforeEach`. Not touched by this run; worth a one-line fix in the vitest setup later.
+
+## 7b. Follow-up (same day): integer scaling + the brightness arc
+
+You asked whether the rooms were dark and the floors "spotty". Measured answer: both were real, for two
+different reasons, and both are fixed on the branch.
+
+**Spotty = a 1.5× canvas.** `UnifiedGamePage.tsx` hard-coded a 960×720 box around the 640×480 game, so every
+player saw pixel art upscaled 1.5× with nearest-neighbour — every other pixel row doubled, which turns the
+floor's fine grain into uneven stripes (`screenshots/art-substrate/` had exactly that baked in). Now
+`hooks/useIntegerZoom.ts` picks the largest **integer** zoom that fits the window (1×–3×), `PhaserGame`
+auto-fits and re-fits Phaser on resize, and only when even 1× cannot fit does it fall back to a fractional
+size — smoothed (`image-rendering: auto`), so it degrades to "soft", never "uneven". Probe
+(`scripts/art/scale-probe.mjs`):
+
+| window | canvas | scale | rendering |
+|---|---|---|---|
+| 1280×960 | 640×480 | **1.000** | pixelated |
+| 1400×1100 | 1280×960 | **2.000** | pixelated |
+| 2000×1500 | 1920×1440 | **3.000** | pixelated |
+| 600×500 | 560×420 | 0.875 | smoothed fallback |
+
+Trade-off to know about: a laptop window that used to get 1.5× (960×720) now gets a crisp 1× (640×480) unless
+it has ~1300×1000 free for 2×. If that feels small on your machine, a "prefer 1.5× smooth" toggle is a
+one-line change in the hook. `playwright.config.ts` and the capture scripts use a 1400×1100 viewport now, so
+every `*-after.png`, depth and lighting shot is a pixel-exact 2× (1280×960); the `*-before.png` set is the
+original 1.5× capture.
+
+**Dark = mid-tone floors + the vignette, now graded by act.** The lighting layer itself cost 1–11 luma in the
+room centre; the old floors were simply near-white. Per your call — start light, darken as the story goes —
+floors and light now step down through the acts (`ROOM_ART`; `scripts/art/brightness.mjs`, mean luma of the
+canvas centre, HUD excluded):
+
+| Room (story order) | before | now | what changed |
+|---|---|---|---|
+| Hospital Lobby | 137 | **192** | white tile, vignette 0.18 |
+| Reception | 194 | **202** | `floor.cream`, vignette 0.20 |
+| Hallway 1–2 | 101 / 106 | **136 / 136** | light-gray stone, vignette 0.22–0.24 |
+| Break Room | 170 | **163** | parquet kept (warm beats bright), vignette 0.22 |
+| Hallway 3 | 105 | **128** | beige stone, vignette 0.28 |
+| Laboratory | 198 | **185** | white tile, vignette 0.26 |
+| Medical Records | 227 | **158** | carpet → beige stone, amber pools, vignette 0.30 |
+| Hallway 4–5 | 100 / 105 | **117 / 116** | terrazzo, blue-gray wall, vignette 0.34–0.36 |
+| IT Office | 127 | **108** | dark raised floor kept, vignette 0.40 |
+| Emergency Room | 198 | **134** | blue tile kept, cold tint, red pool at the door, vignette 0.40 |
+| Supply Closet B | 71 | **84** | secret stays dim |
+
+Every floor set's own brightness is in the same script's output if you want to swap one (cream 221 …
+dark grid 114).
 
 ## 8. Proud of / not proud of
 

@@ -2,7 +2,7 @@
  "roomId": "hallway_lab_records",
  "atlas": "interiors",
  "wallRows": 2,
- "floorSet": "floor.terrazzo",
+ "floorSet": "floor.stone.beige",
  "wallStyle": "beige",
  "trim": "cream",
  "lighting": true,

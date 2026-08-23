@@ -15,7 +15,8 @@ export default defineConfig({
     // when the bundled Chromium isn't downloaded (undefined = Playwright default).
     channel: process.env.PW_CHANNEL || undefined,
     baseURL: 'http://localhost:8080',
-    viewport: { width: 1280, height: 960 },
+    // Run 11: the game box is an integer multiple of 640×480; 1400×1100 yields a 2× (1280×960) canvas.
+    viewport: { width: 1400, height: 1100 },
     actionTimeout: 30_000,
   },
   webServer: {

@@ -2,7 +2,7 @@
  "roomId": "reception",
  "atlas": "interiors",
  "wallRows": 2,
- "floorSet": "floor.reception",
+ "floorSet": "floor.cream",
  "wallStyle": "cream",
  "trim": "cream",
  "lighting": true,

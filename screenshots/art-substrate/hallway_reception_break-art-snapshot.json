@@ -2,7 +2,7 @@
  "roomId": "hallway_reception_break",
  "atlas": "interiors",
  "wallRows": 2,
- "floorSet": "floor.terrazzo",
+ "floorSet": "floor.lightgray",
  "wallStyle": "beige",
  "trim": "cream",
  "lighting": true,

@@ -61,6 +61,7 @@ import { CORKBOARD_SCORE } from '@/data/corkboardData';
 import { getTriageIncidentSet } from '@/data/triageData';
 import { computeDoorStates, type RoomWithDoors } from '@/lib/doorGraph';
 import { StandaloneTDView, type TDStandaloneResult } from '../components/breach-defense/StandaloneTDView';
+import { useIntegerZoom } from '@/hooks/useIntegerZoom';
 
 // Map an encounter ID to the NPC display name for the SorterDebrief "BACK TO {NPC}" close button.
 // PHASE 22 (data-only change — no routing, no state-machine changes):
@@ -117,6 +118,8 @@ export type { DoorState } from '@/lib/doorGraph';
 export default function UnifiedGamePage() {
   // QA: clear save data on FIRST render only for clean test state
   const qaNoSaveRef = useRef(new URLSearchParams(window.location.search).has('qa-no-save'));
+  // Run 11: the game box is an integer multiple of 640×480 (see hooks/useIntegerZoom)
+  const gameFit = useIntegerZoom();
   const qaClearedRef = useRef(false);
   if (qaNoSaveRef.current && !qaClearedRef.current) {
     qaClearedRef.current = true;
@@ -1690,7 +1693,7 @@ export default function UnifiedGamePage() {
   if (pageMode === 'demo-complete') {
     return (
       <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4">
-        <div className="relative w-[960px] h-[720px] border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+        <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden" style={{ width: gameFit.width, height: gameFit.height }}>
           <CertificateOverlay
             onReturn={() => {
               endDemo();
@@ -1758,7 +1761,7 @@ export default function UnifiedGamePage() {
   return (
     <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4">
       <div className="relative border-4 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        <PhaserGame ref={gameRef} width={960} height={720} />
+        <PhaserGame ref={gameRef} />
 
         {/* CRT scanline overlay */}
         <div
