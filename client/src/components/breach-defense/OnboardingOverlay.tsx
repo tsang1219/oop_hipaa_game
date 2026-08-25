@@ -83,8 +83,8 @@ function WelcomeStep({ onAdvance }: { onAdvance: () => void }) {
            style={{ fontFamily: '"Press Start 2P", monospace' }}>
           MISSION BRIEF
         </p>
-        <p className="text-[9px] text-gray-200 leading-relaxed"
-           style={{ fontFamily: '"Press Start 2P", monospace' }}>
+        <p className="text-[16px] text-gray-200 leading-snug"
+           style={{ fontFamily: 'var(--font-body)' }}>
           {displayedText}
           {isTyping && <span className="animate-pulse text-[#00d4aa]">|</span>}
         </p>
@@ -129,7 +129,7 @@ function PlaceTowerStep() {
       <div className="absolute top-4 left-1/2 z-30 pointer-events-none" style={{ transform: 'translateX(-50%)' }}>
         <div className="text-center px-4 py-2 rounded border border-[#44ff44]/40"
              style={{ fontFamily: '"Press Start 2P", monospace', background: 'rgba(20, 22, 40, 0.9)', boxShadow: '0 0 12px rgba(68, 255, 68, 0.2)' }}>
-          <span className="text-[9px] text-[#44ff44]">{displayedText}</span>
+          <span className="text-[16px] text-[#44ff44]" style={{ fontFamily: 'var(--font-body)' }}>{displayedText}</span>
           {isTyping && <span className="animate-pulse text-[#44ff44]">|</span>}
         </div>
       </div>
@@ -162,8 +162,8 @@ function TowerPlacedStep({ onAdvance }: { onAdvance: () => void }) {
            style={{ fontFamily: '"Press Start 2P", monospace' }}>
           TOWER PLACED!
         </p>
-        <p className="text-[9px] text-gray-300 leading-relaxed max-w-xs"
-           style={{ fontFamily: '"Press Start 2P", monospace' }}>
+        <p className="text-[16px] text-gray-300 leading-snug max-w-xs"
+           style={{ fontFamily: 'var(--font-body)' }}>
           {displayedText}
           {isTyping && <span className="animate-pulse text-[#2ECC71]">|</span>}
         </p>

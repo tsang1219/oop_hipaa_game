@@ -38,6 +38,7 @@ import {
 } from '@/data/triageData';
 import { TriageIncidentCard } from './TriageIncidentCard';
 import { TriageFollowUpPanel } from './TriageFollowUpPanel';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 // ── Public contract ───────────────────────────────────────────────────────────
 
@@ -116,6 +117,7 @@ export function BreachTriageOverlay({
   onAbort,
 }: BreachTriageOverlayProps) {
   const set = useMemo(() => getTriageIncidentSet(incidentSetId), [incidentSetId]);
+  const motion = useOverlayMotion('fade');
 
   // ── Error fallback — unknown set ID ──────────────────────────────────────────
   if (!set) {
@@ -396,7 +398,7 @@ export function BreachTriageOverlay({
       // Esc always works
       if (e.key === 'Escape') {
         e.preventDefault();
-        if (onAbort) onAbort();
+        if (onAbort) motion.close(onAbort);
         return;
       }
 
@@ -446,7 +448,7 @@ export function BreachTriageOverlay({
 
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [followUpState, focusedSlot, classifySlot, handleFollowUpPick, onAbort]);
+  }, [followUpState, focusedSlot, classifySlot, handleFollowUpPick, onAbort, motion.close]);
 
   // ── Single tick engine — spawn + timer decrement + expiry ────────────────────
   // Uses refs for all mutable values so we never need to re-register the interval.
@@ -624,7 +626,7 @@ export function BreachTriageOverlay({
   // ── Render ──────────────────────────────────────────────────────────────────
   return (
     <div
-      className="absolute inset-0 z-40 bg-black/85 flex flex-col"
+      className={`absolute inset-0 z-40 bg-black/85 flex flex-col ${motion.isClosing ? 'overlay-fade-out' : 'overlay-fade-in'}`}
       data-testid="breach-triage-overlay"
     >
       {/* Escalating tension vignette — pulsing red inset shadow when 2+ active slots */}
@@ -685,7 +687,7 @@ export function BreachTriageOverlay({
           </span>
           {onAbort && (
             <button
-              onClick={onAbort}
+              onClick={() => motion.close(onAbort)}
               aria-label="Abort triage"
               data-testid="button-triage-abort"
               className="bg-[#3a1a2a] hover:bg-[#5a2a3a] text-white border-4 border-[#FF6B9D] w-10 h-10 flex items-center justify-center transition-colors"
@@ -705,13 +707,13 @@ export function BreachTriageOverlay({
       >
         <p
           className="text-[#7FE5C0]"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', lineHeight: '1.6' }}
+          style={{ fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '1.6' }}
         >
           {set.ruleStrip[0]}
         </p>
         <p
           className="text-[#4FB3D9]"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '7px', lineHeight: '1.6' }}
+          style={{ fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '1.6' }}
         >
           {set.ruleStrip[1]}
         </p>
@@ -796,7 +798,7 @@ export function BreachTriageOverlay({
               {ruleTicker.kind === 'correct' ? '✓ ' : '⏱ MISSED — '}
               {ruleTicker.tag}
             </span>
-            <span className="text-white/85">{'  ·  '}{ruleTicker.short}</span>
+            <span className="text-white/85" style={{ fontFamily: 'var(--font-body)', fontSize: '14px' }}>{'  ·  '}{ruleTicker.short}</span>
           </p>
         </div>
       )}

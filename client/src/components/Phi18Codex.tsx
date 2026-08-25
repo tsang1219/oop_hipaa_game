@@ -16,6 +16,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { PHI18_ENTRIES, PHI18_TOTAL, phi18Count, type Phi18Entry } from '@/data/phi18';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 export type Phi18CodexProps = {
   foundKeys: string[];
@@ -26,6 +27,7 @@ export type Phi18CodexProps = {
 
 export function Phi18Codex({ foundKeys, recentKey, onClose }: Phi18CodexProps) {
   useOverlaySfx(null, 'close');
+  const motion = useOverlayMotion('pop');
   const found = useMemo(() => new Set(foundKeys), [foundKeys]);
   const count = phi18Count(foundKeys);
   const complete = count >= PHI18_TOTAL;
@@ -45,12 +47,12 @@ export function Phi18Codex({ foundKeys, recentKey, onClose }: Phi18CodexProps) {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape' || e.key === 'i' || e.key === 'I') {
         e.preventDefault();
-        onClose();
+        motion.close(onClose);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onClose]);
+  }, [onClose, motion.close]);
 
   const accent = complete ? '#FFD93D' : '#4FB3D9';
 
@@ -58,13 +60,13 @@ export function Phi18Codex({ foundKeys, recentKey, onClose }: Phi18CodexProps) {
     <div
       className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
         visible ? 'bg-black/85' : 'bg-black/0'
-      }`}
+      } ${motion.isClosing ? 'overlay-fade-out' : ''}`}
       data-testid="phi18-codex"
     >
       <div
         className={`max-w-2xl w-[94%] border-4 bg-[#10182a] transform transition-all duration-300 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
-        }`}
+        } ${motion.isClosing ? 'overlay-pop-out' : ''}`}
         style={{ borderColor: accent, boxShadow: `0 0 50px ${accent}2e` }}
       >
         {/* Header */}
@@ -138,7 +140,7 @@ export function Phi18Codex({ foundKeys, recentKey, onClose }: Phi18CodexProps) {
                   </span>
                   <span
                     className={`block truncate ${isFound ? 'text-white' : 'text-white/25'}`}
-                    style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '6px', lineHeight: '1.5' }}
+                    style={{ fontFamily: 'var(--font-body)', fontSize: '12px', lineHeight: '1.15' }}
                   >
                     {isFound ? entry.name : '???'}
                   </span>
@@ -171,7 +173,7 @@ export function Phi18Codex({ foundKeys, recentKey, onClose }: Phi18CodexProps) {
             45 CFR §164.514(b)(2) · SAFE HARBOR
           </span>
           <button
-            onClick={onClose}
+            onClick={() => motion.close(onClose)}
             className="bg-[#1f3a4a] hover:bg-[#2a4f63] border-2 border-[#4FB3D9]/60 text-white px-4 py-2 transition-colors"
             style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
             data-testid="phi18-close"

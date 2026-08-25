@@ -248,7 +248,7 @@ export function EncounterGameUI({ availableTowerIds, onExit }: EncounterGameUIPr
                     </span>
                   </div>
                   {/* Description */}
-                  <p className="text-[7px] text-gray-400 leading-relaxed mb-1.5" style={pixelFont}>
+                  <p className="text-[14px] text-gray-400 leading-snug mb-1.5" style={{ fontFamily: 'var(--font-body)' }}>
                     {tower.desc.split('.')[0]}.
                   </p>
                   {/* Cost badge */}

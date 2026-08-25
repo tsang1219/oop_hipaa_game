@@ -37,11 +37,11 @@ export function TriageFollowUpPanel({ incident, step, wrongPick, onPick }: Triag
   return (
     /* Full-screen overlay — dims the incident board behind it */
     <div
-      className="absolute inset-0 z-50 flex items-center justify-center bg-black/75"
+      className="absolute inset-0 z-50 flex items-center justify-center bg-black/75 overlay-fade-in"
       data-testid="triage-follow-up-panel"
     >
       <div
-        className="max-w-lg w-full mx-4 bg-[#1a1a2e] border-4 border-[#fbbf24] shadow-[0_0_40px_rgba(251,191,36,0.2)]"
+        className="max-w-lg w-full mx-4 bg-[#1a1a2e] border-4 border-[#fbbf24] shadow-[0_0_40px_rgba(251,191,36,0.2)] overlay-pop-in"
       >
         {/* Header */}
         <div className="bg-[#2a2a0a] border-b-4 border-[#fbbf24] px-4 py-3">
@@ -85,7 +85,7 @@ export function TriageFollowUpPanel({ incident, step, wrongPick, onPick }: Triag
         <div className="px-4 pb-3">
           <p
             className="text-white"
-            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', lineHeight: '1.6' }}
+            style={{ fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '1.45' }}
             data-testid="follow-up-prompt"
           >
             {prompt}
@@ -112,7 +112,7 @@ export function TriageFollowUpPanel({ incident, step, wrongPick, onPick }: Triag
               >
                 <span
                   className={`${isWrongPick ? 'text-[#ef4444] line-through' : 'text-white'}`}
-                  style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1.6' }}
+                  style={{ fontFamily: 'var(--font-body)', fontSize: '15px', lineHeight: '1.4' }}
                 >
                   [{keyNum}] {option.label}
                 </span>

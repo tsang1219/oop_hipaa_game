@@ -177,7 +177,7 @@ function StandaloneTDResultOverlay({
         >
           {isWin ? 'NETWORK SECURED' : 'NETWORK BREACHED'}
         </h1>
-        <p className="text-[8px] text-gray-400 mb-4 leading-relaxed">
+        <p className="text-[15px] text-gray-400 mb-4 leading-snug" style={{ fontFamily: 'var(--font-body)' }}>
           {isWin
             ? 'You held the line through every wave. The patient data is safe today.'
             : 'The attackers got through. Try again — every restart is more practice.'}

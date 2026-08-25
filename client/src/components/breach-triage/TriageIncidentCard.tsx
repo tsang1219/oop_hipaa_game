@@ -103,7 +103,7 @@ export function TriageIncidentCard({
       <div className="px-3 pb-2">
         <p
           className="text-[#fbbf24] leading-snug"
-          style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px', lineHeight: '1.5' }}
+          style={{ fontFamily: 'var(--font-body)', fontSize: '16px', lineHeight: '1.5' }}
           data-testid={`card-headline-${slotNumber}`}
         >
           {incident.headline}
@@ -116,7 +116,7 @@ export function TriageIncidentCard({
           <span
             key={i}
             className="inline-flex items-center gap-1 bg-[#0d0d20] border-2 border-[#4a4a7e] px-1.5 py-1 text-white"
-            style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px', lineHeight: '1' }}
+            style={{ fontFamily: 'var(--font-body)', fontSize: '14px', lineHeight: '1' }}
           >
             <span style={{ fontSize: '10px', lineHeight: '1' }}>{f.icon}</span>
             {f.text}

@@ -10,8 +10,12 @@
  * is caught in the wild.
  */
 
+import { useEffect, useState } from 'react';
 import type { Phi18Entry } from '@/data/phi18';
 import { PHI18_TOTAL } from '@/data/phi18';
+
+/** Length of the self-played fade-out at the end of a ttlMs lifetime. */
+const FADE_OUT_MS = 250;
 
 export type IdentifierGetBannerProps = {
   entry: Phi18Entry;
@@ -20,11 +24,23 @@ export type IdentifierGetBannerProps = {
   /** Vertical offset in px (default 56). The sorter passes a lower offset so the
    *  banner clears the NPC reaction bubble that owns the top of that overlay. */
   topPx?: number;
+  /** Total lifetime in ms (the parent's unmount timer). When provided, the
+   *  banner fades itself out over the final 250ms so the parent's unmount
+   *  isn't a hard cut. Omit for the legacy pop-off behavior. */
+  ttlMs?: number;
 };
 
-export function IdentifierGetBanner({ entry, count, topPx = 56 }: IdentifierGetBannerProps) {
+export function IdentifierGetBanner({ entry, count, topPx = 56, ttlMs }: IdentifierGetBannerProps) {
   const complete = count >= PHI18_TOTAL;
   const accent = complete ? '#FFD93D' : '#7FE5C0';
+  const [leaving, setLeaving] = useState(false);
+
+  useEffect(() => {
+    if (ttlMs == null) return;
+    setLeaving(false);
+    const timer = setTimeout(() => setLeaving(true), Math.max(0, ttlMs - FADE_OUT_MS));
+    return () => clearTimeout(timer);
+  }, [ttlMs, entry]);
 
   return (
     <div
@@ -36,6 +52,8 @@ export function IdentifierGetBanner({ entry, count, topPx = 56 }: IdentifierGetB
         boxShadow: `0 0 30px ${accent}44`,
         animation: 'identifier-banner-in 0.35s ease-out',
         transform: 'translateX(-50%)',
+        opacity: leaving ? 0 : 1,
+        transition: `opacity ${FADE_OUT_MS}ms ease-out`,
       }}
       data-testid="identifier-get-banner"
     >

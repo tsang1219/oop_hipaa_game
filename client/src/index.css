@@ -1,5 +1,23 @@
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Pixelify+Sans:wght@400;500;600;700&display=swap');
 
+/* UI-01 — body font: Pixel Operator (CC0, self-hosted; see
+   attached_assets/fonts/PixelOperator-LICENSE.txt). A readable SNES-era
+   bitmap face for prose; Press Start 2P stays on headers/counters/labels. */
+@font-face {
+  font-family: 'Pixel Operator';
+  src: url('/attached_assets/fonts/PixelOperator.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Pixel Operator';
+  src: url('/attached_assets/fonts/PixelOperator-Bold.ttf') format('truetype');
+  font-weight: 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -82,8 +100,11 @@
   --font-serif: 'Press Start 2P', 'Courier New', monospace;
   --font-mono: 'Press Start 2P', 'Courier New', monospace;
   /* Legible pixel/RPG face for long-form body text (dialogue, instructions,
-     modals). Press Start 2P stays on headers + UI chrome for identity. */
-  --font-body: 'Pixelify Sans', 'Press Start 2P', 'Courier New', sans-serif;
+     modals). Press Start 2P stays on headers + UI chrome for identity.
+     Run 14 (UI-01, provisional pending taste check): Pixel Operator, with
+     Pixelify Sans (the previous body face) as the first fallback — swapping
+     the candidate back is a one-line change here. */
+  --font-body: 'Pixel Operator', 'Pixelify Sans', 'Press Start 2P', 'Courier New', sans-serif;
   --radius: .125rem;
   --shadow-2xs: 0px 1px 0px 0px hsl(0 0% 0% / 0.20);
   --shadow-xs: 0px 2px 0px 0px hsl(0 0% 0% / 0.30);
@@ -619,4 +640,53 @@
   0%   { transform: rotate(var(--note-tilt, 0deg)) scale(1); opacity: 1; }
   40%  { transform: rotate(var(--note-tilt, 0deg)) scale(1.06) translateY(2px); opacity: 1; }
   100% { transform: rotate(18deg) scale(0.7) translateY(90px); opacity: 0; }
+}
+
+/* ── UI-04: shared overlay motion ─────────────────────────────────
+   Every modal/overlay enters in ~180ms and exits in ~150ms — never a
+   hard cut. `pop` for centered modals, `rise` for bottom sheets and
+   trays, `fade` for backdrops and full-screen scenes. Exit duration
+   must stay in sync with OVERLAY_EXIT_MS in hooks/useOverlayMotion.ts. */
+@keyframes overlay-pop-in {
+  from { opacity: 0; transform: scale(0.94) translateY(8px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+@keyframes overlay-pop-out {
+  from { opacity: 1; transform: scale(1) translateY(0); }
+  to   { opacity: 0; transform: scale(0.96) translateY(6px); }
+}
+@keyframes overlay-rise-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes overlay-rise-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(14px); }
+}
+@keyframes overlay-fade-in  { from { opacity: 0; } to { opacity: 1; } }
+@keyframes overlay-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+.overlay-pop-in   { animation: overlay-pop-in 180ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.overlay-pop-out  { animation: overlay-pop-out 150ms cubic-bezier(0.55, 0, 1, 0.45) both; }
+.overlay-rise-in  { animation: overlay-rise-in 200ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+.overlay-rise-out { animation: overlay-rise-out 150ms cubic-bezier(0.55, 0, 1, 0.45) both; }
+.overlay-fade-in  { animation: overlay-fade-in 180ms ease-out both; }
+.overlay-fade-out { animation: overlay-fade-out 150ms ease-in both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .overlay-pop-in, .overlay-pop-out,
+  .overlay-rise-in, .overlay-rise-out,
+  .overlay-fade-in, .overlay-fade-out { animation-duration: 1ms; }
+}
+
+/* ── UI-05: title screen ─────────────────────────────────────────
+   Slow pan across the lobby plate (variant a) and the cast's two-step
+   idle bob (variant b). */
+@keyframes title-bg-drift {
+  0%   { transform: scale(1.06) translate(0.8%, 0.6%); }
+  100% { transform: scale(1.06) translate(-0.8%, -0.6%); }
+}
+@keyframes title-cast-bob {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-3px); }
 }

@@ -27,6 +27,7 @@ import {
   captureScreenshot,
 } from '@/lib/feedback';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 export type FeedbackModalProps = {
   gameRef: React.RefObject<Phaser.Game | null>;
@@ -40,6 +41,8 @@ const ACCENT = '#4FB3D9';
 
 export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProps) {
   useOverlaySfx(null, 'close');
+  const motion = useOverlayMotion('pop');
+  const requestClose = () => motion.close(onClose);
   const [visible, setVisible] = useState(false);
   const [type, setType] = useState<FeedbackType>('bug');
   const [message, setMessage] = useState('');
@@ -59,12 +62,12 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        if (status !== 'sending') onClose();
+        if (status !== 'sending') motion.close(onClose);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onClose, status]);
+  }, [onClose, status, motion.close]);
 
   const trimmed = message.trim();
   const canSend = trimmed.length > 0 && status !== 'sending';
@@ -94,7 +97,7 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
       if (body.delivered === true) {
         setStatus('sent');
         eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_sorter_correct', volume: 0.5 });
-        setTimeout(onClose, 1100);
+        setTimeout(requestClose, 1100);
       } else {
         setStatus('failed');
       }
@@ -107,7 +110,7 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
     try {
       await navigator.clipboard.writeText(lastSnapshotRef.current);
       setStatus('sent');
-      setTimeout(onClose, 900);
+      setTimeout(requestClose, 900);
     } catch {
       // Clipboard blocked — leave the textarea content in place so nothing is lost.
     }
@@ -119,13 +122,13 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
     <div
       className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
         visible ? 'bg-black/85' : 'bg-black/0'
-      }`}
+      } ${motion.isClosing ? 'overlay-fade-out' : ''}`}
       data-testid="feedback-modal"
     >
       <div
         className={`max-w-md w-[92%] border-4 bg-[#10182a] transform transition-all duration-300 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
-        }`}
+        } ${motion.isClosing ? 'overlay-pop-out' : ''}`}
         style={{ borderColor: ACCENT, boxShadow: `0 0 50px ${ACCENT}2e` }}
       >
         {/* Header */}
@@ -134,7 +137,7 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
             💬 Send feedback
           </h2>
           <button
-            onClick={onClose}
+            onClick={requestClose}
             disabled={status === 'sending'}
             className="text-gray-400 hover:text-white text-sm disabled:opacity-40"
             aria-label="Close feedback"
@@ -186,17 +189,17 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
                 }}
                 placeholder={placeholderFor(activeType.id)}
                 rows={4}
-                className="w-full bg-[#0a1120] border-2 border-[#2a3550] text-gray-100 text-[11px] p-2 resize-none focus:outline-none focus:border-[#4FB3D9]"
-                style={{ fontFamily: '"Pixelify Sans", sans-serif' }}
+                className="w-full bg-[#0a1120] border-2 border-[#2a3550] text-gray-100 text-[15px] p-2 resize-none focus:outline-none focus:border-[#4FB3D9]"
+                style={{ fontFamily: 'var(--font-body)' }}
               />
 
-              <p className="mt-2 text-[7px] text-gray-500 leading-relaxed" style={{ fontFamily: '"Press Start 2P"' }}>
+              <p className="mt-2 text-[13px] text-gray-500 leading-snug" style={{ fontFamily: 'var(--font-body)' }}>
                 Includes your current room, recent actions &amp; a screenshot. No personal data.
               </p>
 
               {status === 'failed' && (
                 <div className="mt-3 border-2 border-amber-600/60 bg-amber-900/20 p-2">
-                  <p className="text-[8px] text-amber-300 leading-relaxed mb-2" style={{ fontFamily: '"Press Start 2P"' }}>
+                  <p className="text-[14px] text-amber-300 leading-snug mb-2" style={{ fontFamily: 'var(--font-body)' }}>
                     Couldn't send automatically.
                   </p>
                   <button
@@ -212,7 +215,7 @@ export function FeedbackModal({ gameRef, gameState, onClose }: FeedbackModalProp
               {/* Actions */}
               <div className="mt-4 flex items-center justify-end gap-2">
                 <button
-                  onClick={onClose}
+                  onClick={requestClose}
                   disabled={status === 'sending'}
                   className="text-[9px] text-gray-400 hover:text-white px-3 py-2 disabled:opacity-40"
                   style={{ fontFamily: '"Press Start 2P"' }}

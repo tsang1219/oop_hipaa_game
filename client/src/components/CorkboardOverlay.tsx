@@ -18,6 +18,7 @@ import { CORKBOARD_NOTES, CORKBOARD_VIOLATION_COUNT, type CorkboardNote } from '
 import { getPhi18Entry, phi18Count, type Phi18Entry } from '@/data/phi18';
 import { IdentifierGetBanner } from '@/components/IdentifierGetBanner';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 export type CorkboardOverlayProps = {
   /** Zone already completed — render the cleaned board, no re-scoring. */
@@ -40,6 +41,7 @@ export function CorkboardOverlay({
 }: CorkboardOverlayProps) {
   useOverlaySfx(null, 'close');
   const [visible, setVisible] = useState(false);
+  const motion = useOverlayMotion('pop');
   const [pulled, setPulled] = useState<Set<string>>(
     () => new Set(alreadyCleaned ? CORKBOARD_NOTES.filter((n) => n.kind === 'violation').map((n) => n.id) : []),
   );
@@ -118,7 +120,7 @@ export function CorkboardOverlay({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         e.preventDefault();
-        onClose();
+        motion.close(onClose);
         return;
       }
       const idx = ['1', '2', '3', '4', '5', '6'].indexOf(e.key);
@@ -129,20 +131,20 @@ export function CorkboardOverlay({
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  });
+  }, [handleNote, onClose, motion.close]);
 
   return (
     <div
       className={`absolute inset-0 z-40 flex items-center justify-center transition-all duration-300 ${
         visible ? 'bg-black/80' : 'bg-black/0'
-      }`}
+      } ${motion.isClosing ? 'overlay-fade-out' : ''}`}
       data-testid="corkboard-overlay"
     >
       {/* Board panel — cork texture via layered browns */}
       <div
         className={`max-w-2xl w-[94%] border-8 border-[#5a3a1a] bg-[#a07828] shadow-[8px_8px_0px_0px_rgba(0,0,0,0.8)] transform transition-all duration-300 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
-        }`}
+        } ${motion.isClosing ? 'overlay-pop-out' : ''}`}
         style={{
           backgroundImage:
             'repeating-linear-gradient(45deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 3px, transparent 3px, transparent 9px)',
@@ -161,7 +163,7 @@ export function CorkboardOverlay({
             {done ? 'BOARD CLEAN' : `PHI DOWN: ${violationsPulled}/${CORKBOARD_VIOLATION_COUNT}`}
           </span>
           <button
-            onClick={onClose}
+            onClick={() => motion.close(onClose)}
             aria-label="Close corkboard"
             data-testid="corkboard-close"
             className="bg-[#3a2410] hover:bg-[#6a4a2a] text-[#F5E6C8] border-2 border-[#F5E6C8]/40 w-8 h-8 flex items-center justify-center transition-colors"
@@ -271,7 +273,7 @@ export function CorkboardOverlay({
           </span>
           {done && (
             <button
-              onClick={onClose}
+              onClick={() => motion.close(onClose)}
               className="bg-[#1f3a2a] hover:bg-[#2a5340] border-2 border-[#7FE5C0]/70 text-white px-4 py-2 transition-colors"
               style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '8px' }}
               data-testid="corkboard-done-close"
@@ -282,8 +284,14 @@ export function CorkboardOverlay({
         </div>
       </div>
 
-      {/* The Eighteen item-get banner */}
-      {banner && <IdentifierGetBanner entry={banner.entry} count={banner.count} />}
+      {/* The Eighteen item-get banner — ttl mirrors the setBanner(null) timer above */}
+      {banner && (
+        <IdentifierGetBanner
+          entry={banner.entry}
+          count={banner.count}
+          ttlMs={banner.count >= 18 ? 3600 : 2200}
+        />
+      )}
     </div>
   );
 }

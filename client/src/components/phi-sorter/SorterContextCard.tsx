@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 export type SorterContextCardProps = {
   title: string;
@@ -18,24 +19,29 @@ export type SorterContextCardProps = {
  */
 export function SorterContextCard({ title, body, onConfirm }: SorterContextCardProps) {
   useOverlaySfx('open', 'close');
+  const motion = useOverlayMotion('pop');
   // Enter/Space confirms — keyboard-first, no mouse required
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        onConfirm();
+        motion.close(onConfirm);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onConfirm]);
+  }, [onConfirm, motion.close]);
 
   return (
     <div
-      className="absolute inset-0 z-40 flex items-center justify-center bg-black/70"
+      className={`absolute inset-0 z-40 flex items-center justify-center bg-black/70 ${
+        motion.isClosing ? 'overlay-fade-out' : 'overlay-fade-in'
+      }`}
       data-testid="sorter-context-card"
     >
-      <div className="max-w-xl w-[90%] bg-[#1a2a3e] border-4 border-[#4FB3D9] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6">
+      <div className={`max-w-xl w-[90%] bg-[#1a2a3e] border-4 border-[#4FB3D9] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-6 ${
+        motion.isClosing ? 'overlay-pop-out' : 'overlay-pop-in'
+      }`}>
         <div
           className="text-[#4FB3D9] mb-3"
           style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}
@@ -49,7 +55,7 @@ export function SorterContextCard({ title, body, onConfirm }: SorterContextCardP
           {body}
         </div>
         <button
-          onClick={onConfirm}
+          onClick={() => motion.close(onConfirm)}
           className="bg-[#4FB3D9] hover:bg-[#7ECDE8] text-[#1a1a2e] px-6 py-3 border-4 border-black transition-colors"
           style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}
           data-testid="button-sorter-context-confirm"

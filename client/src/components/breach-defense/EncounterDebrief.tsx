@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 interface EncounterDebriefProps {
   encounterId: string;
@@ -22,6 +23,7 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
 }) => {
   useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
+  const motion = useOverlayMotion('pop');
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
@@ -40,12 +42,12 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
     <div
       className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
         visible ? 'bg-black/85' : 'bg-black/0'
-      }`}
+      } ${motion.isClosing ? 'overlay-fade-out' : ''}`}
     >
       <div
-        className={`max-w-lg w-full mx-4 border-2 ${isVictory ? 'border-green-500/60' : 'border-red-500/60'} bg-gray-900/95 shadow-[0_0_40px_rgba(0,200,100,0.1)] transform transition-all duration-400 ${
+        className={`max-w-lg w-full mx-4 border-2 ${isVictory ? 'border-green-500/60' : 'border-red-500/60'} bg-gray-900/95 shadow-[0_0_40px_rgba(0,200,100,0.1)] transform transition-all duration-300 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-95'
-        }`}
+        } ${motion.isClosing ? 'overlay-pop-out' : ''}`}
       >
         {/* Header */}
         <div className={`${headerBg} border-b px-4 py-3 flex items-center gap-3`}>
@@ -127,7 +129,7 @@ export const EncounterDebrief: React.FC<EncounterDebriefProps> = ({
         {/* Action */}
         <div className="px-5 pb-5">
           <button
-            onClick={onDismiss}
+            onClick={() => motion.close(onDismiss)}
             className="w-full py-3 bg-blue-700 hover:bg-blue-600 border-2 border-blue-500/60 text-white transition-colors"
             style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}
           >

@@ -20,6 +20,7 @@ import {
 } from '@/data/sorterReactions';
 import { NPCReactionBubble } from './NPCReactionBubble';
 import { SorterCompletionOverlay } from './SorterCompletionOverlay';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 // NOTE: SorterContextCard is intentionally NOT imported here.
 // UnifiedGamePage owns that render during encounterPhase === 'narrative-card'.
 // By the time this overlay mounts, the player has already dismissed the context card.
@@ -108,6 +109,7 @@ const SHIFT_OVER_LINES: Record<NPCSorterId, string> = {
  */
 export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound, onIdentifierFound, onComplete, onAbort }: PHISorterOverlayProps) {
   const docSet = useMemo(() => getSorterDocumentSet(documentSetId), [documentSetId]);
+  const motion = useOverlayMotion('fade');
 
   // Error fallback — graceful exit on bad documentSetId (does NOT crash)
   if (!docSet) {
@@ -542,7 +544,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound,
       // Escape — abort encounter (no scoring, no registry write, replayable)
       if (e.key === 'Escape' && onAbort) {
         e.preventDefault();
-        onAbort();
+        motion.close(onAbort);
         return;
       }
       if (e.key === 'ArrowLeft') {
@@ -560,7 +562,7 @@ export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound,
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [phase, focusedStamp, handleStamp, onAbort]);
+  }, [phase, focusedStamp, handleStamp, onAbort, motion.close]);
 
   // ── Computed values ──────────────────────────────────────────────────────────
   const currentItem = docSet.items[currentDocIndex];
@@ -576,14 +578,14 @@ export function PHISorterOverlay({ documentSetId, encounterId, identifiersFound,
   // OUTSIDE the shake surface (Phase 23-02 decision: shaking anchored overlays looks like a bug).
   return (
     <div
-      className="absolute inset-0 z-40 bg-black/85 flex flex-col items-stretch justify-center p-6"
+      className={`absolute inset-0 z-40 bg-black/85 flex flex-col items-stretch justify-center p-6 ${motion.isClosing ? 'overlay-fade-out' : 'overlay-fade-in'}`}
       data-testid="phi-sorter-overlay"
     >
       {/* Close button — exits without scoring, encounter remains replayable.
           Kept outside shake surface — anchored overlay, shaking it would look like a bug. */}
       {onAbort && (
         <button
-          onClick={onAbort}
+          onClick={() => motion.close(onAbort)}
           aria-label="Close sorter"
           data-testid="button-sorter-close"
           className="absolute top-4 right-4 z-50 bg-[#3a1a2a] hover:bg-[#5a2a3a] text-white border-4 border-[#FF6B9D] w-10 h-10 flex items-center justify-center transition-colors"

@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 interface EducationalItemModalProps {
   title: string;
@@ -18,6 +19,7 @@ const ITEM_ICONS = {
 
 export default function EducationalItemModal({ title, fact, type, onClose }: EducationalItemModalProps) {
   const [isVisible, setIsVisible] = useState(false);
+  const motion = useOverlayMotion('pop');
 
   useEffect(() => {
     requestAnimationFrame(() => {
@@ -30,10 +32,10 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
     <div
       className={`absolute inset-0 flex items-center justify-center z-50 p-4 transition-all duration-200 ${
         isVisible ? 'bg-black/70' : 'bg-black/0'
-      }`}
+      } ${motion.isClosing ? 'overlay-fade-out' : ''}`}
       onClick={() => {
         uiSfx('close');
-        onClose();
+        motion.close(onClose);
       }}
       role="dialog"
       aria-modal="true"
@@ -43,7 +45,7 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
       <div
         className={`bg-white border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] max-w-[580px] w-full p-6 md:p-8 transform transition-all duration-300 ease-out ${
           isVisible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
-        }`}
+        } ${motion.isClosing ? 'overlay-pop-out' : ''}`}
         onClick={(e) => e.stopPropagation()}
         style={{
           imageRendering: 'pixelated',
@@ -77,7 +79,7 @@ export default function EducationalItemModal({ title, fact, type, onClose }: Edu
           <button
             onClick={() => {
               uiSfx('close');
-              onClose();
+              motion.close(onClose);
             }}
             className="font-['Press_Start_2P'] text-xs bg-[#FF6B9D] hover:bg-[#FF5A8A] text-white px-8 py-3 border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-1 active:shadow-none cursor-pointer"
             data-testid="button-close-modal"

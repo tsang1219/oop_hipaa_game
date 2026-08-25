@@ -13,6 +13,7 @@
 
 import { useEffect, useState } from 'react';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 export type EncounterRequestModalProps = {
   npcName: string;
@@ -39,6 +40,7 @@ export function EncounterRequestModal({
 }: EncounterRequestModalProps) {
   useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
+  const motion = useOverlayMotion('pop');
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
@@ -48,27 +50,27 @@ export function EncounterRequestModal({
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Enter' || e.key === '1') {
         e.preventDefault();
-        onAccept();
+        motion.close(onAccept);
       } else if (e.key === 'Escape' || e.key === '2') {
         e.preventDefault();
-        onDecline();
+        motion.close(onDecline);
       }
     };
     window.addEventListener('keydown', handleKey);
     return () => window.removeEventListener('keydown', handleKey);
-  }, [onAccept, onDecline]);
+  }, [onAccept, onDecline, motion.close]);
 
   return (
     <div
       className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
         visible ? 'bg-black/80' : 'bg-black/0'
-      }`}
+      } ${motion.isClosing ? 'overlay-fade-out' : ''}`}
       data-testid="encounter-request-modal"
     >
       <div
         className={`max-w-md w-full mx-4 border-4 bg-[#1a2a3e] transform transition-all duration-300 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-6 opacity-0 scale-95'
-        }`}
+        } ${motion.isClosing ? 'overlay-pop-out' : ''}`}
         style={{ borderColor: accentColor, boxShadow: `0 0 40px ${accentColor}33` }}
       >
         {/* NPC name header — name in the asker's signature color (Run 08) */}
@@ -104,7 +106,7 @@ export function EncounterRequestModal({
         {/* Choice buttons */}
         <div className="px-5 pb-5 flex flex-col gap-3">
           <button
-            onClick={onAccept}
+            onClick={() => motion.close(onAccept)}
             data-testid="button-encounter-accept"
             className="w-full py-3 bg-[#1f4a3a] hover:bg-[#2a6350] border-2 border-[#7FE5C0]/60 text-white transition-colors"
             style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px' }}
@@ -112,7 +114,7 @@ export function EncounterRequestModal({
             {acceptLabel}
           </button>
           <button
-            onClick={onDecline}
+            onClick={() => motion.close(onDecline)}
             data-testid="button-encounter-decline"
             className="w-full py-3 bg-[#2a2a3a] hover:bg-[#3a3a4a] border-2 border-white/30 text-white/80 transition-colors"
             style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '9px' }}

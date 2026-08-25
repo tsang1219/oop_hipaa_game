@@ -17,6 +17,7 @@
 
 import { useEffect, useState } from 'react';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 export type TriageDebriefProps = {
   encounterId: string;
@@ -49,6 +50,7 @@ export function TriageDebrief({
 }: TriageDebriefProps) {
   useOverlaySfx('open', 'close');
   const [visible, setVisible] = useState(false);
+  const motion = useOverlayMotion('pop');
 
   useEffect(() => {
     requestAnimationFrame(() => setVisible(true));
@@ -83,13 +85,13 @@ export function TriageDebrief({
     <div
       className={`absolute inset-0 z-50 flex items-center justify-center transition-all duration-300 ${
         visible ? 'bg-black/85' : 'bg-black/0'
-      }`}
+      } ${motion.isClosing ? 'overlay-fade-out' : ''}`}
       data-testid="triage-debrief"
     >
       <div
-        className={`max-w-lg w-full mx-4 border-2 ${borderColor} bg-[#0f1419]/95 shadow-[0_0_40px_rgba(127,229,192,0.1)] transform transition-all duration-400 ${
+        className={`max-w-lg w-full mx-4 border-2 ${borderColor} bg-[#0f1419]/95 shadow-[0_0_40px_rgba(127,229,192,0.1)] transform transition-all duration-300 ${
           visible ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-95'
-        }`}
+        } ${motion.isClosing ? 'overlay-pop-out' : ''}`}
       >
         {/* Header */}
         <div className={`${headerBg} border-b px-4 py-3 flex items-center gap-3`}>
@@ -238,7 +240,7 @@ export function TriageDebrief({
         {/* Action */}
         <div className="px-5 pb-5">
           <button
-            onClick={onDismiss}
+            onClick={() => motion.close(onDismiss)}
             data-testid="button-triage-debrief-dismiss"
             className="w-full py-3 bg-[#1f3a4a] hover:bg-[#2a4f63] border-2 border-[#4FB3D9]/60 text-white transition-colors"
             style={{ fontFamily: '"Press Start 2P", monospace', fontSize: '10px' }}

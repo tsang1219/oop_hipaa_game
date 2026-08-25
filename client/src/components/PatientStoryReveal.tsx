@@ -4,6 +4,7 @@ import { Heart, Shield, Lock, FileText, Server, Users } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { uiSfx, useOverlaySfx } from '@/lib/uiSfx';
+import { useOverlayMotion } from '@/hooks/useOverlayMotion';
 
 interface PatientStoryRevealProps {
   story: PatientStory;
@@ -24,6 +25,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
   const [phase, setPhase] = useState<'entering' | 'title' | 'story' | 'complete'>('entering');
   const [displayedText, setDisplayedText] = useState('');
   const [textIndex, setTextIndex] = useState(0);
+  const motion = useOverlayMotion('pop');
 
   const IconComponent = iconMap[story.icon] || Heart;
 
@@ -58,9 +60,9 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
       setTextIndex(story.text.length);
       setPhase('complete');
     } else if (phase === 'complete') {
-      onClose();
+      motion.close(onClose);
     }
-  }, [phase, textIndex, story.text, onClose]);
+  }, [phase, textIndex, story.text, onClose, motion.close]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -75,11 +77,13 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
 
   return (
     <div 
-      className="absolute inset-0 bg-black/95 flex items-center justify-center z-50 p-4"
+      className={`absolute inset-0 bg-black/95 flex items-center justify-center z-50 p-4 ${
+        motion.isClosing ? 'overlay-fade-out' : 'overlay-fade-in'
+      }`}
       onClick={handleSkip}
       data-testid="patient-story-reveal"
     >
-      <div className="max-w-xl w-full text-center">
+      <div className={`max-w-xl w-full text-center ${motion.isClosing ? 'overlay-pop-out' : 'overlay-pop-in'}`}>
         {phase === 'entering' && (
           <div className="animate-pulse">
             <IconComponent className="w-16 h-16 text-[#FF6B9D] mx-auto" />
@@ -120,7 +124,7 @@ export function PatientStoryReveal({ story, roomName, onClose }: PatientStoryRev
                 <Button
                   onClick={(e) => {
                     e.stopPropagation();
-                    onClose();
+                    motion.close(onClose);
                   }}
                   className="bg-[#FF6B9D] hover:bg-[#FF6B9D]/80 text-white font-['Press_Start_2P'] text-[10px]"
                   data-testid="button-continue"

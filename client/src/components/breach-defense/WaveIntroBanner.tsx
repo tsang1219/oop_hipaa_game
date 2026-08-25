@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { THREATS, THREAT_COLORS, TOWERS } from '../../game/breach-defense/constants';
 import { eventBridge, BRIDGE_EVENTS } from '../../phaser/EventBridge';
+import { useOverlayMotion, OVERLAY_EXIT_MS } from '@/hooks/useOverlayMotion';
 
 const colorToHex = (c: number) => '#' + c.toString(16).padStart(6, '0');
 
@@ -23,18 +24,25 @@ export function WaveIntroBanner({
   onDismiss,
   autoDismissMs = 3000,
 }: WaveIntroBannerProps) {
+  const motion = useOverlayMotion('pop');
+
   useEffect(() => {
     eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_wave_start', volume: 0.5 });
   }, []);
 
   useEffect(() => {
-    const timer = setTimeout(onDismiss, autoDismissMs);
+    // Start the exit animation OVERLAY_EXIT_MS before the deadline so the
+    // banner leaves with a pop-out instead of a hard cut at autoDismissMs.
+    const timer = setTimeout(
+      () => motion.close(onDismiss),
+      Math.max(0, autoDismissMs - OVERLAY_EXIT_MS)
+    );
     return () => clearTimeout(timer);
-  }, [onDismiss, autoDismissMs]);
+  }, [onDismiss, autoDismissMs, motion.close]);
 
   return (
     <div
-      className="absolute inset-x-0 top-0 z-40 border-4 border-black bg-[#1a1a2e] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4"
+      className={`absolute inset-x-0 top-0 z-40 border-4 border-black bg-[#1a1a2e] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] p-4 ${motion.className}`}
       style={{ fontFamily: '"Press Start 2P", monospace' }}
     >
       {/* Header row */}
@@ -43,7 +51,10 @@ export function WaveIntroBanner({
       </div>
 
       {/* Intro text */}
-      <p className="text-[7px] text-gray-400 mt-2 leading-relaxed line-clamp-2">
+      <p
+        className="text-gray-400 mt-2 leading-snug line-clamp-2"
+        style={{ fontFamily: 'var(--font-body)', fontSize: '14px' }}
+      >
         {intro}
       </p>
 

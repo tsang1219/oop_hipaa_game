@@ -259,13 +259,14 @@ export function CertificateOverlay({ onReturn }: CertificateOverlayProps): JSX.E
               data-testid="cert-dialogue"
             >
               {showLine1 && (
-                <p className="text-[10px] text-white leading-relaxed" data-testid="cert-line-1">
+                <p className="text-[17px] text-white leading-snug" style={{ fontFamily: 'var(--font-body)' }} data-testid="cert-line-1">
                   {SPONSOR_CONFIG.two_dialogue_lines[0]}
                 </p>
               )}
               {showLine2 && (
                 <p
-                  className="text-[10px] text-white leading-relaxed mt-3"
+                  className="text-[17px] text-white leading-snug mt-3"
+                  style={{ fontFamily: 'var(--font-body)' }}
                   data-testid="cert-line-2"
                 >
                   {SPONSOR_CONFIG.two_dialogue_lines[1]}
