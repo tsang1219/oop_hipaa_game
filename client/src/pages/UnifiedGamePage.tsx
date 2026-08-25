@@ -55,6 +55,7 @@ import { BreachTriageOverlay } from '@/components/breach-triage/BreachTriageOver
 import { TriageDebrief } from '@/components/breach-triage/TriageDebrief';
 import { Phi18Codex } from '@/components/Phi18Codex';
 import { FeedbackModal } from '@/components/FeedbackModal';
+import { PauseMenu } from '@/components/PauseMenu';
 import { phi18Count, PHI18_TOTAL, phi18Complete } from '@/data/phi18';
 import { CorkboardOverlay } from '@/components/CorkboardOverlay';
 import { CORKBOARD_SCORE } from '@/data/corkboardData';
@@ -251,6 +252,7 @@ export default function UnifiedGamePage() {
   // ── The Eighteen codex (HIPAA-is-the-game pass) ────────────────
   const [showCodex, setShowCodex] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
+  const [showPauseMenu, setShowPauseMenu] = useState(false);
   const [recentIdentifierKey, setRecentIdentifierKey] = useState<string | null>(null);
   const [codexChipPulse, setCodexChipPulse] = useState(0);
 
@@ -614,6 +616,7 @@ export default function UnifiedGamePage() {
     corkboardOpen ||
     showCodex ||
     showFeedback ||
+    showPauseMenu ||
     encounterRequest !== null;
 
   // ── Auto-complete current room + refresh door visuals ─────────
@@ -1363,17 +1366,58 @@ export default function UnifiedGamePage() {
     eventBridge.emit(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION);
   }, []);
 
+  // ── Pause menu (Run 14 — UI-05) ────────────────────────────────
+  // ESC during free exploration. Mirrors the codex pause/resume contract;
+  // presentation-only (Phaser frozen, no game state touched).
+  const handleOpenPause = useCallback(() => {
+    setShowPauseMenu(true);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PAUSE_EXPLORATION);
+  }, []);
+
+  const handleClosePause = useCallback(() => {
+    setShowPauseMenu(false);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_RESUME_EXPLORATION);
+  }, []);
+
+  const handlePauseHowToPlay = useCallback(() => {
+    setShowPauseMenu(false);
+    // The help modal pauses on open and resumes on dismiss; no resume here,
+    // so the scene stays frozen across the hand-off.
+    setShowIntroModal(true);
+    eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.3, rate: 1.1 });
+  }, []);
+
+  const handlePauseQuitToMenu = useCallback(() => {
+    // The full game saves continuously; a reload lands on the save-aware
+    // start menu (same pattern as the demo/TD exits).
+    window.location.reload();
+  }, []);
+
   // [I] opens the codex during idle exploration (codex handles its own close)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key !== 'i' && e.key !== 'I') return;
-      if (showCodex || corkboardOpen || pageMode !== 'exploration' || encounterPhase !== 'idle') return;
+      if (showCodex || corkboardOpen || showPauseMenu || pageMode !== 'exploration' || encounterPhase !== 'idle') return;
       e.preventDefault();
       handleOpenCodex();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
-  }, [pageMode, encounterPhase, showCodex, corkboardOpen, handleOpenCodex]);
+  }, [pageMode, encounterPhase, showCodex, corkboardOpen, showPauseMenu, handleOpenCodex]);
+
+  // [ESC] opens the pause menu during free exploration (Run 14 — UI-05).
+  // Every blocking overlay is excluded via celebrationBlocked, and the demo
+  // keeps its own ESC contract (exit demo, DEMO-07) — see the effect below.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== 'Escape') return;
+      if (showPauseMenu || celebrationBlocked || isDemoActive()) return;
+      e.preventDefault();
+      handleOpenPause();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [showPauseMenu, celebrationBlocked, handleOpenPause]);
 
   // ── Corkboard minigame handlers ────────────────────────────────
   const handleCorkboardComplete = useCallback((result: { mistakes: number }) => {
@@ -1821,6 +1865,16 @@ export default function UnifiedGamePage() {
             gameRef={gameRef}
             gameState={gameState.state}
             onClose={handleCloseFeedback}
+          />
+        )}
+
+        {/* Pause menu (Run 14 — UI-05): ESC during free exploration */}
+        {showPauseMenu && (
+          <PauseMenu
+            roomName={currentRoom?.name}
+            onResume={handleClosePause}
+            onHowToPlay={handlePauseHowToPlay}
+            onQuitToMenu={handlePauseQuitToMenu}
           />
         )}
 
