@@ -118,6 +118,7 @@ export const BRIDGE_EVENTS = {
   QA_NAVIGATE_DOOR: 'qa:navigate-door',            // payload: { doorId: string }
   QA_TELEPORT_TO: 'qa:teleport-to',                // payload: { tileX: number, tileY: number } — instant teleport
   QA_SET_LIGHTING: 'qa:set-lighting',              // payload: { on: boolean } — Run 11 art lighting layer toggle
+  QA_REVEAL_NAMEPLATES: 'qa:reveal-nameplates',    // payload: { on: boolean } — Run 14 nameplate stress shots
   EXPLORATION_STATE_UPDATE: 'exploration:state-update', // payload: ExplorationStatePayload
 
   // Bidirectional

@@ -86,6 +86,8 @@ export function spawnInteractables(
 ): {
   interactables: InteractableData[];
   zoneGlows: Map<string, { ring: Phaser.GameObjects.Arc; tween: Phaser.Tweens.Tween }>;
+  /** BOSS tags — static obstacles for the Run 14 nameplate layout. */
+  bossTags: Phaser.GameObjects.Text[];
 } {
   const w = room.width * TILE;
   const interactables: InteractableData[] = [];
@@ -201,7 +203,7 @@ export function spawnInteractables(
   // ── NPCs ─────────────────────────────────────────────────────
   // Collected name plates → a post-loop de-collision pass stacks any that overlap
   // (adjacent NPCs used to garble, e.g. "Marcus" + "Lab Technician" → "Marcushnician").
-  const npcLabels: Phaser.GameObjects.Text[] = [];
+  const bossTags: Phaser.GameObjects.Text[] = [];
   for (const npc of room.npcs) {
     // Phase 17 (2026-06-10): Act-gated and demo-excluded NPCs.
     // If the NPC's encounterTrigger.minAct is set, skip spawning when the
@@ -267,7 +269,6 @@ export function spawnInteractables(
     // Proximity-revealed: start hidden; the scene fades it in near the player.
     nameLabel.setData('baseAlpha', completed ? 0.45 : 1);
     nameLabel.setAlpha(0);
-    npcLabels.push(nameLabel);
 
     // Idle breathing tween — slight vertical scale oscillation, offset per NPC so they don't sync
     scene.tweens.add({
@@ -292,9 +293,9 @@ export function spawnInteractables(
         stroke: '#000000', strokeThickness: 4,
         backgroundColor: '#0b0b16ee', padding: { x: 4, y: 3 },
       }).setOrigin(0.5).setDepth(96);
-      // Join the de-collision pass so the boss tag can't garble against an
-      // adjacent NPC's name plate (records: BOSS vs "Records Clerk").
-      npcLabels.push(bossText);
+      // A static obstacle for the nameplate layout, so a plate can't garble
+      // against the tag (records: BOSS vs "Records Clerk").
+      bossTags.push(bossText);
       scene.tweens.add({ targets: bossText, alpha: 0.3, duration: 700, yoyo: true, repeat: -1 });
 
       // Boss glow ring — pulsing aura that draws the player's attention
@@ -352,24 +353,10 @@ export function spawnInteractables(
     interactables.push({ type: 'npc', id: npc.id, data: npc, sprite, label: nameLabel, shadow: npcShadow, cue: npcCue });
   }
 
-  // ── Name-plate de-collision ──────────────────────────────────
-  // Greedily place labels top-to-bottom; if one overlaps an already-placed
-  // plate, push it down a line until it clears. Turns garbled adjacent labels
-  // ("Marcushnician") into a clean vertical stack.
-  const placed: Phaser.Geom.Rectangle[] = [];
-  const overlaps = (a: Phaser.Geom.Rectangle, b: Phaser.Geom.Rectangle) =>
-    a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
-  const sorted = [...npcLabels].sort((a, b) => (a.y - b.y) || (a.x - b.x));
-  const lineH = 15;
-  for (const lbl of sorted) {
-    let rect = lbl.getBounds();
-    let guard = 0;
-    while (guard++ < 8 && placed.some((p) => overlaps(rect, p))) {
-      lbl.y += lineH;
-      rect = lbl.getBounds();
-    }
-    placed.push(rect);
-  }
+  // Name-plate de-collision moved to systems/exploration/nameplateLayout.ts
+  // (Run 14, UI-02): plates now avoid props, pickups, bubbles and each other,
+  // live, with leader lines when displaced. The scene builds it right after
+  // npcLife so walking NPCs re-solve on every tile arrival.
 
-  return { interactables, zoneGlows };
+  return { interactables, zoneGlows, bossTags };
 }

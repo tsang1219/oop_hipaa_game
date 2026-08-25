@@ -195,7 +195,8 @@ export class NpcLifeController {
       };
       attach(ia.shadow);
       attach(ia.cue);
-      attach(ia.label);
+      // ia.label is NOT attached — the Run 14 nameplate layout owns plate
+      // positions (it follows the sprite itself and re-solves collisions).
 
       const entry: LifeEntry = {
         ia, npc, id: npc.id, role, sprite,

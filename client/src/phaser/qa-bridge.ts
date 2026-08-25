@@ -76,6 +76,8 @@ export interface QABridge {
     teleportTo(tileX: number, tileY: number): void;
     /** Run 11: toggle the atlas renderer's lighting layer (ART-06 proof shots). */
     setLighting(on: boolean): void;
+    /** Run 14: force every NPC nameplate visible (UI-02 stress shots). */
+    revealNameplates(on: boolean): void;
   };
 
   // Promise-based waiters for Playwright
@@ -185,6 +187,9 @@ export function initQABridge() {
       },
       setLighting(on: boolean): void {
         eventBridge.emit(BRIDGE_EVENTS.QA_SET_LIGHTING, { on });
+      },
+      revealNameplates(on: boolean): void {
+        eventBridge.emit(BRIDGE_EVENTS.QA_REVEAL_NAMEPLATES, { on });
       },
     },
 

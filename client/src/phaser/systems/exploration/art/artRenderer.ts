@@ -50,6 +50,9 @@ export interface ArtHandle {
   ground: Phaser.GameObjects.RenderTexture;
   /** first sprite of each obstacle, keyed `${type}@${x},${y}` (obstacle tile coords) */
   props: Map<string, Phaser.GameObjects.Image>;
+  /** every placed prop/decor sprite (walls + floor pieces), for screen-space
+      avoidance queries — Run 14 nameplate layout reads their getBounds(). */
+  colliders: Phaser.GameObjects.Image[];
   lightObjects: Phaser.GameObjects.GameObject[];
   lightingOn: boolean;
   snapshot: ArtSnapshot;
@@ -268,6 +271,7 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
 
   // ── Props (ART-02 / ART-07) ────────────────────────────────────────────────
   const props = new Map<string, Phaser.GameObjects.Image>();
+  const colliders: Phaser.GameObjects.Image[] = [];
   const makeSprite = (x: number, y: number, frame: string, anim: AnimDef | undefined, originX: number, originY: number): Phaser.GameObjects.Image => {
     if (anim) {
       const sp = scene.add.sprite(x, y, ATLAS_KEY, frame).setOrigin(originX, originY);
@@ -287,6 +291,7 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
       if (def.alpha !== undefined) img.setAlpha(def.alpha);
       if (def.flipX) img.setFlipX(true);
       if (!props.has(key)) props.set(key, img);
+      colliders.push(img);
       return img;
     };
     if (def.fill && def.fill.length) {
@@ -350,12 +355,12 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
     if (!frameExists(scene, d.frame)) { missing.push(`decor:${d.frame}`); continue; }
     const s = sizeOf(d.frame);
     if (d.layer === 'wall') {
-      makeSprite(d.tx * TILE + (d.dx ?? 0), d.ty * TILE + (d.dy ?? 0), d.frame, d.anim, 0, 0)
-        .setDepth(2).setAlpha(d.alpha ?? 1).setFlipX(!!d.flipX);
+      colliders.push(makeSprite(d.tx * TILE + (d.dx ?? 0), d.ty * TILE + (d.dy ?? 0), d.frame, d.anim, 0, 0)
+        .setDepth(2).setAlpha(d.alpha ?? 1).setFlipX(!!d.flipX));
     } else {
       const cols = Math.max(1, Math.round(s.w / TILE));
-      makeSprite(d.tx * TILE + (cols * TILE) / 2 + (d.dx ?? 0), (d.ty + 1) * TILE + (d.dy ?? 0), d.frame, d.anim, 0.5, 1)
-        .setDepth(5 + (d.depthRow ?? d.ty) + 0.5).setAlpha(d.alpha ?? 1).setFlipX(!!d.flipX);
+      colliders.push(makeSprite(d.tx * TILE + (cols * TILE) / 2 + (d.dx ?? 0), (d.ty + 1) * TILE + (d.dy ?? 0), d.frame, d.anim, 0.5, 1)
+        .setDepth(5 + (d.depthRow ?? d.ty) + 0.5).setAlpha(d.alpha ?? 1).setFlipX(!!d.flipX));
     }
     decorCount++;
   }
@@ -393,7 +398,7 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
     props: snapshotProps, decor: decorCount, animated, missing,
   };
   const handle: ArtHandle = {
-    roomId: room.id, style, ground, props, lightObjects, lightingOn: true, snapshot,
+    roomId: room.id, style, ground, props, colliders, lightObjects, lightingOn: true, snapshot,
     setLighting(on: boolean) {
       this.lightingOn = on;
       for (const o of this.lightObjects) (o as Phaser.GameObjects.Image).setVisible(on);

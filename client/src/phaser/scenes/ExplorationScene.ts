@@ -39,6 +39,7 @@ import {
 import { MusicController } from '../systems/exploration/MusicController';
 import { DoorSystem } from '../systems/exploration/DoorSystem';
 import { NpcLifeController } from '../systems/exploration/npcLife';
+import { NameplateLayout } from '../systems/exploration/nameplateLayout';
 import { floorMaterialForRoom, playFootstep } from '../systems/exploration/footsteps';
 import { playSfx, playRoundRobin, duckMusic, unduckMusic, playStinger } from '../systems/exploration/audioMixer';
 import { hitStopSquash, InputBuffer, anticipationBeat, type SquashStyle } from '../systems/exploration/feel';
@@ -83,6 +84,9 @@ export class ExplorationScene extends Phaser.Scene {
   private runKey!: Phaser.Input.Keyboard.Key;
   private walls!: Phaser.Physics.Arcade.StaticGroup;
   private interactables: InteractableData[] = [];
+  private nameplates?: NameplateLayout;
+  /** QA: force every nameplate fully visible (stress-test screenshots). */
+  private qaRevealNameplates = false;
   private nearbyInteractable: InteractableData | null = null;
   private promptText!: Phaser.GameObjects.Text;
   private roomNameText!: Phaser.GameObjects.Text;
@@ -352,6 +356,10 @@ export class ExplorationScene extends Phaser.Scene {
       getBubble: (id) => this.npcBubbles.get(id),
     });
     this.npcLife.build(this.interactables);
+
+    // Run 14 (UI-02): collision-aware nameplates. Built after the art pass
+    // (prop colliders) and npcLife (walkers re-solve on tile arrival).
+    this.nameplates = new NameplateLayout(this, room, this.interactables, this.npcBubbles, spawned.bossTags);
 
     // Threat Console — the visible, interactable BreachDefense launcher
     // (HIPAA-is-the-game pass; replaces the old hidden proximity trigger)
@@ -682,6 +690,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.on(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     eventBridge.on(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
     eventBridge.on(BRIDGE_EVENTS.QA_SET_LIGHTING, this.onQASetLighting, this);
+    eventBridge.on(BRIDGE_EVENTS.QA_REVEAL_NAMEPLATES, this.onQARevealNameplates, this);
 
     // ── Type-driven furniture idle animations (Phase 26-02) ──────
     // (Round 4 → systems/exploration/roomAmbience)
@@ -823,6 +832,9 @@ export class ExplorationScene extends Phaser.Scene {
 
     // Reveal NPC name plates only near the player (declutter — Stardew-style)
     this.updateNPCLabels();
+
+    // Run 14 (UI-02): plates follow their NPCs and dodge props live.
+    this.nameplates?.update();
 
     // Update interaction radius indicator
     if (this.interactionIndicator) {
@@ -997,6 +1009,7 @@ export class ExplorationScene extends Phaser.Scene {
     eventBridge.off(BRIDGE_EVENTS.QA_NAVIGATE_DOOR, this.onQANavigateDoor, this);
     eventBridge.off(BRIDGE_EVENTS.QA_TELEPORT_TO, this.onQATeleportTo, this);
     eventBridge.off(BRIDGE_EVENTS.QA_SET_LIGHTING, this.onQASetLighting, this);
+    eventBridge.off(BRIDGE_EVENTS.QA_REVEAL_NAMEPLATES, this.onQARevealNameplates, this);
   }
 
   /** F-25 (Run 07): now actually invoked — wired in create() via
@@ -1127,6 +1140,12 @@ export class ExplorationScene extends Phaser.Scene {
       return false;
     }
   }
+
+  /** Run 14 proof hook: hold every nameplate at full alpha for stress shots. */
+  private onQARevealNameplates = (data: { on: boolean }) => {
+    if (!this.isSceneAlive()) return;
+    this.qaRevealNameplates = !!data?.on;
+  };
 
   /** Run 11 proof hook: show/hide the atlas renderer's lighting layer. */
   private onQASetLighting = (data: { on: boolean }) => {
@@ -2041,10 +2060,13 @@ export class ExplorationScene extends Phaser.Scene {
     const REVEAL = 3; // tiles (Manhattan) at which a name is fully shown
     for (const ia of this.interactables) {
       if (ia.type !== 'npc' || !ia.label) continue;
-      const d = ia.data as { x: number; y: number };
-      const dist = Math.abs(this.tileX - d.x) + Math.abs(this.tileY - d.y);
+      // Run 14: measure against the sprite's live tile — walkers (Run 12)
+      // drift from their spawn tile, and the plate follows the sprite now.
+      const ntx = Math.round((ia.sprite.x - TILE / 2) / TILE);
+      const nty = Math.round((ia.sprite.y - TILE / 2) / TILE);
+      const dist = Math.abs(this.tileX - ntx) + Math.abs(this.tileY - nty);
       const ceiling = (ia.label.getData('baseAlpha') as number) ?? 1;
-      const target = dist <= REVEAL ? ceiling : 0;
+      const target = this.qaRevealNameplates || dist <= REVEAL ? ceiling : 0;
       const cur = ia.label.alpha;
       ia.label.setAlpha(cur + (target - cur) * 0.2); // ease toward target
     }
@@ -2589,6 +2611,9 @@ export class ExplorationScene extends Phaser.Scene {
           ease: 'Sine.easeOut',
         });
         ia.sprite.setTint(0x888888); // tint is subtle under fade — immediate is fine
+        // Run 14: the plate dims with its NPC (parity with the reload render,
+        // which spawns completed NPCs with baseAlpha 0.45).
+        ia.label?.setData('baseAlpha', 0.45);
         // Pop the live checkmark (same position as the at-render mark in the NPC loop)
         this.addCompletionCheck(ia.sprite.x, ia.sprite.y - 20, ia.sprite.depth + 1, true);
       }
@@ -2631,5 +2656,9 @@ export class ExplorationScene extends Phaser.Scene {
     this.completedNPCs = newNPCs;
     this.completedZones = newZones;
     this.collectedItems = newItems;
+
+    // Run 14: bubbles/glows just changed — the nameplate solver's obstacle
+    // set is stale, so re-solve (cheap; a few rect checks per plate).
+    this.nameplates?.refresh();
   }
 }
