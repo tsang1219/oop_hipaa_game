@@ -169,7 +169,7 @@ export function RoomProgressHUD({
                     style={{
                       fontFamily: 'var(--font-body)',
                       color: done ? '#8a7a58' : '#3a3122',
-                      textDecoration: done ? 'line-through' : 'none',
+                      textDecorationLine: done ? 'line-through' : 'none',
                       textDecorationColor: '#8a7a58',
                     }}
                   >
