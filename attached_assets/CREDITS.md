@@ -77,3 +77,16 @@
   plays `music_hub` via the Run 12 seating plan in `MusicController.ts`.
 - No new music was added in Run 12 (new tracks require a download the run could not
   authorise — the candidate CC0 packs are listed in `.planning/fable-runs/RUN_REPORT-12.md`).
+
+## Fonts
+
+### Pixel Operator — body text face (Run 14, UI-01)
+- Author: Jayvee Enaguas (HarvettFox96) — https://www.dafont.com/pixel-operator.font
+- Acquired: 2026-08-25 (Run 14, ui-polish)
+- License: **CC0 1.0 Universal** (public domain dedication) — full text at
+  `attached_assets/fonts/PixelOperator-LICENSE.txt`. Redistribution permitted; no
+  credit required (credited here anyway).
+- Files shipped: `attached_assets/fonts/PixelOperator.ttf` (regular),
+  `PixelOperator-Bold.ttf`, `PixelOperator8.ttf` (small-size variant, unused so far).
+- Used as `--font-body` (long-form dialogue/modal prose) via `client/src/index.css`.
+  Press Start 2P (Google Fonts, OFL) remains the header/label face.
