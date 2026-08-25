@@ -67,13 +67,12 @@ const cpage = await composer.newPage({ viewport: { width: 200, height: 200 } });
 await cpage.setContent('<canvas id="c"></canvas>');
 for (const rec of [opened, closed]) {
   if (rec.frames.length === 0) { console.log(`!! no frames for ${rec.label}`); continue; }
-  // First frame at/after the trigger minus one baseline frame before it.
+  // Anchor on the trigger: one baseline frame before it, then everything up
+  // to ~500ms after, so the enter/exit window is always inside the strip.
   const tTrig = rec.t0;
-  const wallStart = rec.frames[0].t;
-  // Normalize timestamps to ms offsets from the first frame.
-  const rel = rec.frames.map(f => ({ ...f, dt: f.t - wallStart }));
-  // Keep up to 12 frames covering the first ~450ms after the last pre-trigger frame.
-  const strip = rel.filter((f, i) => i % 1 === 0).slice(0, 14);
+  const around = rec.frames.filter(f => f.t >= tTrig - 80 && f.t <= tTrig + 520);
+  const rel = (around.length >= 4 ? around : rec.frames).map(f => ({ ...f, dt: Math.round(f.t - tTrig) }));
+  const strip = rel.slice(0, 14);
   const CW = 350, CH = 275; // 1/4 of viewport
   const data = await cpage.evaluate(async ([cells, CW, CH]) => {
     const c = document.getElementById('c');
@@ -88,7 +87,8 @@ for (const rec of [opened, closed]) {
       const img = new Image(); img.src = 'data:image/png;base64,' + cells[i].data; await img.decode();
       g.drawImage(img, x, y, CW, CH);
       g.fillStyle = '#ffd166'; g.font = 'bold 13px monospace'; g.textAlign = 'left';
-      g.fillText(`+${Math.round(cells[i].dt)}ms`, x + 4, y + CH + 17);
+      const dt = Math.round(cells[i].dt);
+      g.fillText(`${dt >= 0 ? '+' : ''}${dt}ms`, x + 4, y + CH + 17);
     }
     return c.toDataURL('image/png').split(',')[1];
   }, [strip, CW, CH]);

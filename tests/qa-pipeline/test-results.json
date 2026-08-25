@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/Users/admin/Documents/GitHub/oop_hipaa_game/playwright.config.ts",
-    "rootDir": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests",
+    "configFile": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/playwright.config.ts",
+    "rootDir": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -16,7 +16,7 @@
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/Users/admin/Documents/GitHub/oop_hipaa_game/test-results",
+        "outputDir": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/test-results",
         "repeatEach": 1,
         "retries": 1,
         "metadata": {
@@ -24,7 +24,7 @@
         },
         "id": "",
         "name": "",
-        "testDir": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests",
+        "testDir": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.spec.ts"
@@ -63,1394 +63,1464 @@
     "version": "1.58.2",
     "workers": 1,
     "webServer": {
-      "command": "npm run dev",
-      "port": 8080,
+      "command": "PORT=8090 npm run dev",
+      "port": 8090,
       "reuseExistingServer": true,
       "timeout": 30000
     }
   },
   "suites": [
     {
-      "title": "progression/breach-gameplay.spec.ts",
-      "file": "progression/breach-gameplay.spec.ts",
+      "title": "art-substrate-proof.spec.ts",
+      "file": "art-substrate-proof.spec.ts",
       "column": 0,
       "line": 0,
-      "specs": [],
-      "suites": [
+      "specs": [
         {
-          "title": "BreachDefense Gameplay",
-          "file": "progression/breach-gameplay.spec.ts",
-          "line": 15,
-          "column": 6,
-          "specs": [
+          "title": "hospital_entrance: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
             {
-              "title": "Breach defense page loads",
-              "ok": true,
-              "tags": [],
-              "tests": [
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
                 {
-                  "timeout": 90000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                        "line": 18,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:06:27.116Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                            "line": 18,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "5e1c580557fe8afacc91-aaeba23de31df44ef280",
-              "file": "progression/breach-gameplay.spec.ts",
-              "line": 18,
-              "column": 8
-            },
-            {
-              "title": "Start Mission button begins game",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                        "line": 22,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:06:27.117Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                            "line": 22,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "5e1c580557fe8afacc91-fc3003f41f8eca22db77",
-              "file": "progression/breach-gameplay.spec.ts",
-              "line": 22,
-              "column": 8
-            },
-            {
-              "title": "Game auto-start via qa-start param",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                        "line": 26,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:06:27.117Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                            "line": 26,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "5e1c580557fe8afacc91-e3b15269b7299e1bdaca",
-              "file": "progression/breach-gameplay.spec.ts",
-              "line": 26,
-              "column": 8
-            },
-            {
-              "title": "No console errors during breach gameplay",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [
-                    {
-                      "type": "skip",
-                      "location": {
-                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                        "line": 30,
-                        "column": 8
-                      }
-                    }
-                  ],
-                  "expectedStatus": "skipped",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:06:27.117Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
-                            "line": 30,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "skipped"
-                }
-              ],
-              "id": "5e1c580557fe8afacc91-4b566ea3421540c41b03",
-              "file": "progression/breach-gameplay.spec.ts",
-              "line": 30,
-              "column": 8
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "progression/door-unlocks.spec.ts",
-      "file": "progression/door-unlocks.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Door Unlocks",
-          "file": "progression/door-unlocks.spec.ts",
-          "line": 17,
-          "column": 6,
-          "specs": [
-            {
-              "title": "Hospital entrance to reception after completing entrance",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4941,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:56:33.337Z",
                   "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9708,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:06:27.689Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "attachments": []
                 }
               ],
-              "id": "3ad502fa7408326ec0f1-b12240683f62683eab70",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 31,
-              "column": 3
-            },
-            {
-              "title": "Break room is locked when reception is not completed",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4667,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:06:37.968Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3ad502fa7408326ec0f1-599e20ce16c9e37162ff",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 45,
-              "column": 3
-            },
-            {
-              "title": "Break room unlocks after completing reception",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 20908,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:06:42.645Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3ad502fa7408326ec0f1-3ec92c42f9600adfd611",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 71,
-              "column": 3
-            },
-            {
-              "title": "Lab unlocks after completing break room",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 20580,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:07:03.564Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3ad502fa7408326ec0f1-da59fae822a3f7828c58",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 95,
-              "column": 3
-            },
-            {
-              "title": "Records room unlocks after completing lab",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 17688,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:07:24.154Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3ad502fa7408326ec0f1-d0cd18f6f1fda3cbad2c",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 123,
-              "column": 3
-            },
-            {
-              "title": "IT office unlocks after completing records room",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 16297,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:07:41.853Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3ad502fa7408326ec0f1-e5a6bed0bed2e1066993",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 142,
-              "column": 3
-            },
-            {
-              "title": "ER unlocks after completing IT office",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 17668,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:07:58.160Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3ad502fa7408326ec0f1-254e7cc5afab8f4cdfe7",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 170,
-              "column": 3
-            },
-            {
-              "title": "Entrance door is always accessible from hospital_entrance",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 10865,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:08:15.838Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "3ad502fa7408326ec0f1-1d5616f3d1d08175ebcc",
-              "file": "progression/door-unlocks.spec.ts",
-              "line": 189,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "progression/full-playthrough.spec.ts",
-      "file": "progression/full-playthrough.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Full Playthrough",
-          "file": "progression/full-playthrough.spec.ts",
-          "line": 15,
-          "column": 6,
-          "specs": [
-            {
-              "title": "Complete hospital entrance and reception",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 180000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 26254,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:08:26.724Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "2bfb80d3c40e2a656f1a-5e91cef178f3acbfddd4",
-              "file": "progression/full-playthrough.spec.ts",
-              "line": 18,
-              "column": 3
-            },
-            {
-              "title": "Screenshot at each milestone",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 180000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 26880,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:08:52.987Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "2bfb80d3c40e2a656f1a-3bb13b8a825bf6fa1c4a",
-              "file": "progression/full-playthrough.spec.ts",
-              "line": 74,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "progression/npc-interaction.spec.ts",
-      "file": "progression/npc-interaction.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "NPC Interaction",
-          "file": "progression/npc-interaction.spec.ts",
-          "line": 15,
-          "column": 6,
-          "specs": [
-            {
-              "title": "Can talk to Riley in hospital entrance",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 7763,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:09:19.880Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "005ada3f36d72ed697a3-9e0c88633cb45b3ba5f5",
-              "file": "progression/npc-interaction.spec.ts",
-              "line": 18,
-              "column": 3
-            },
-            {
-              "title": "Dialogue overlay appears when talking to NPC",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6934,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:09:27.649Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "005ada3f36d72ed697a3-8a28f9ea0cf9b75a00fd",
-              "file": "progression/npc-interaction.spec.ts",
-              "line": 26,
-              "column": 3
-            },
-            {
-              "title": "Can talk to multiple NPCs in reception",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 11935,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:09:34.592Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "005ada3f36d72ed697a3-a152fa79992941c3fc79",
-              "file": "progression/npc-interaction.spec.ts",
-              "line": 39,
-              "column": 3
-            },
-            {
-              "title": "Scene unpauses after dialogue dismissal",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 7802,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:09:46.537Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "005ada3f36d72ed697a3-a37d348aa10fbe1b5ad0",
-              "file": "progression/npc-interaction.spec.ts",
-              "line": 50,
-              "column": 3
-            },
-            {
-              "title": "No console errors during NPC interactions",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 60000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 15189,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:09:54.347Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "005ada3f36d72ed697a3-6d71b3e03e967d66f26f",
-              "file": "progression/npc-interaction.spec.ts",
-              "line": 58,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "progression/room-completion.spec.ts",
-      "file": "progression/room-completion.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Room Completion",
-          "file": "progression/room-completion.spec.ts",
-          "line": 14,
-          "column": 6,
-          "specs": [
-            {
-              "title": "Hospital entrance completes after talking to Riley",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9715,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:10:09.557Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "cd2f9af4161352775043-d4ef7e8f57231b74ade7",
-              "file": "progression/room-completion.spec.ts",
-              "line": 28,
-              "column": 3
-            },
-            {
-              "title": "Reception completes after all requirements met",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 19187,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:10:19.280Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "cd2f9af4161352775043-cd33e4d014b637780c5b",
-              "file": "progression/room-completion.spec.ts",
-              "line": 37,
-              "column": 3
-            },
-            {
-              "title": "Incomplete room does NOT mark as complete",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9322,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:10:38.478Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "cd2f9af4161352775043-b5f2bd84fbcdbf344cdd",
-              "file": "progression/room-completion.spec.ts",
-              "line": 57,
-              "column": 3
-            },
-            {
-              "title": "Social-gated NPC becomes interactable after gate resolves",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 120000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 12067,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:10:47.810Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "cd2f9af4161352775043-31c571c102fcbeedf3f4",
-              "file": "progression/room-completion.spec.ts",
-              "line": 70,
-              "column": 3
-            }
-          ]
-        }
-      ]
-    },
-    {
-      "title": "progression/room-navigation.spec.ts",
-      "file": "progression/room-navigation.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [],
-      "suites": [
-        {
-          "title": "Room Navigation",
-          "file": "progression/room-navigation.spec.ts",
-          "line": 13,
-          "column": 6,
-          "specs": [
-            {
-              "title": "Hospital entrance loads on fresh start",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2588,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:10:59.896Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "7de6de0e276c92e06065-a548ff06e2849cc03c89",
-              "file": "progression/room-navigation.spec.ts",
-              "line": 16,
-              "column": 3
-            },
-            {
-              "title": "Navigate entrance -> reception via door (after completing entrance)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9621,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:11:02.491Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "7de6de0e276c92e06065-a7a5a2346b22f9c80708",
-              "file": "progression/room-navigation.spec.ts",
-              "line": 23,
-              "column": 3
-            },
-            {
-              "title": "Navigate reception -> entrance (backtrack always allowed)",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4231,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:11:12.119Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "7de6de0e276c92e06065-1167c1b70872d589661e",
-              "file": "progression/room-navigation.spec.ts",
-              "line": 34,
-              "column": 3
-            },
-            {
-              "title": "Hallway loads via qa-room param",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2610,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:11:16.360Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "7de6de0e276c92e06065-bb2e288647d8351a4abb",
-              "file": "progression/room-navigation.spec.ts",
-              "line": 42,
-              "column": 3
-            },
-            {
-              "title": "No console errors during navigation",
-              "ok": true,
-              "tags": [],
-              "tests": [
-                {
-                  "timeout": 90000,
-                  "annotations": [],
-                  "expectedStatus": "passed",
-                  "projectId": "",
-                  "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 0,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9382,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-23T15:11:37.471Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
-                }
-              ],
-              "id": "7de6de0e276c92e06065-d072d03e60997aa99ac7",
-              "file": "progression/room-navigation.spec.ts",
-              "line": 60,
-              "column": 3
+              "status": "expected"
             }
           ],
-          "suites": [
+          "id": "bcb7417cefdc5b8f942d-36d71553c5bc51f7896b",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "hospital_entrance: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
             {
-              "title": "Direct room load via qa-room param",
-              "file": "progression/room-navigation.spec.ts",
-              "line": 50,
-              "column": 8,
-              "specs": [
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
                 {
-                  "title": "loads hospital_entrance directly",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 90000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2774,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-23T15:11:18.979Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "7de6de0e276c92e06065-8ef699ebea77e616309a",
-                  "file": "progression/room-navigation.spec.ts",
-                  "line": 52,
-                  "column": 7
-                },
-                {
-                  "title": "loads reception directly",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 90000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2616,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-23T15:11:21.762Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "7de6de0e276c92e06065-bf0d855c310a4180069a",
-                  "file": "progression/room-navigation.spec.ts",
-                  "line": 52,
-                  "column": 7
-                },
-                {
-                  "title": "loads break_room directly",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 90000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2632,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-23T15:11:24.386Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "7de6de0e276c92e06065-93cb3ca90ee22101cdc7",
-                  "file": "progression/room-navigation.spec.ts",
-                  "line": 52,
-                  "column": 7
-                },
-                {
-                  "title": "loads lab directly",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 90000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2593,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-23T15:11:27.026Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "7de6de0e276c92e06065-9e9ea1f9f194a6b72633",
-                  "file": "progression/room-navigation.spec.ts",
-                  "line": 52,
-                  "column": 7
-                },
-                {
-                  "title": "loads records_room directly",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 90000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2596,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-23T15:11:29.628Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "7de6de0e276c92e06065-070ea3a7f03a67439a75",
-                  "file": "progression/room-navigation.spec.ts",
-                  "line": 52,
-                  "column": 7
-                },
-                {
-                  "title": "loads it_office directly",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 90000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2595,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-23T15:11:32.231Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "7de6de0e276c92e06065-9317e6b0ab92da8bd0a9",
-                  "file": "progression/room-navigation.spec.ts",
-                  "line": 52,
-                  "column": 7
-                },
-                {
-                  "title": "loads er directly",
-                  "ok": true,
-                  "tags": [],
-                  "tests": [
-                    {
-                      "timeout": 90000,
-                      "annotations": [],
-                      "expectedStatus": "passed",
-                      "projectId": "",
-                      "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 0,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2628,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-23T15:11:34.835Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
-                    }
-                  ],
-                  "id": "7de6de0e276c92e06065-a650522b3a08a169d626",
-                  "file": "progression/room-navigation.spec.ts",
-                  "line": 52,
-                  "column": 7
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6378,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:56:38.715Z",
+                  "annotations": [],
+                  "attachments": []
                 }
-              ]
+              ],
+              "status": "expected"
             }
-          ]
+          ],
+          "id": "bcb7417cefdc5b8f942d-2b2d8d87a52e32b409cd",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "hospital_entrance: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5239,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:56:45.101Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-89715a6aed69286dca42",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "reception: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5412,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:56:50.348Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-41616cec9b1e55442ada",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "reception: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8306,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:56:55.773Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-4212dea53904b7bf78a4",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "reception: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5414,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:04.087Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-c523a889de8ce0f40f40",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "hallway_reception_break: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4687,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:09.512Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-bfa5445174467897c567",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "hallway_reception_break: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6365,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:14.209Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-dcd952116a1ad3373183",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "hallway_reception_break: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5469,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:20.583Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-d2f81d0c1cebebc83cf7",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "hallway_break_lab: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4732,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:26.059Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-48ec37c1e7ff17593214",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "hallway_break_lab: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6417,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:30.799Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-515c92d3abaeaa186cf0",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "hallway_break_lab: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5351,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:37.224Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-eef51af5d3fdddf3896d",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "hallway_lab_records: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4808,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:42.582Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-96708ac0185bff5a7e44",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "hallway_lab_records: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6428,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:47.400Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-ce7ca84be743ee79c46a",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "hallway_lab_records: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5309,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:53.837Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-6af42d4d120820a1614e",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "hallway_records_it: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4717,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:57:59.152Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-0eaf531619eccef09b72",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "hallway_records_it: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6414,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:03.879Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-073ea98c670f94a8832c",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "hallway_records_it: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5864,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:10.301Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-6fbe53496adf15e4152e",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "hallway_it_er: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4756,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:16.172Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-6c66833f403d3bf60c28",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "hallway_it_er: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6495,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:20.937Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-f5e8fe008af1f6a26da5",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "hallway_it_er: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5367,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:27.439Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-b9f0ea6c507ea935a53c",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "supply_closet: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4727,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:32.813Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-a85e1411881d11c646ec",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "supply_closet: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6346,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:37.548Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-a79fcdef0e0075f88cd5",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "supply_closet: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5323,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:43.901Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-ac521b2add5fd4a5dbca",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "lab: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4819,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:49.230Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-eeb5b8941d66b7e704ca",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "lab: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6490,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:58:54.061Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-1600be7a2ff797c7502c",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "lab: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5382,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:00.559Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-16477bfc29b33cec8bd7",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "records_room: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5440,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:05.947Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-ca3541449bb852aa5b18",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "records_room: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 7091,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:11.396Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-bebd0a6566077f0208d1",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "records_room: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6031,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:18.495Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-c6bfc9a90c2341276775",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "it_office: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4715,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:24.533Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-edbe6fb37125a5ca17bf",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "it_office: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6482,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:29.255Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-554bb7792bf1aef88ae7",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "it_office: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5363,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:35.745Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-9037391e026a83fa0ac3",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "er: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4686,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:41.114Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-75324336142dd4304b85",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "er: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6557,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:45.807Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-8b7a20b11d4f9edf89fe",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "er: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5404,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:52.372Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-52d66939db2b5e7850bc",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        },
+        {
+          "title": "break_room: renders from the atlas — no missing frames, one atlas request, zero console errors",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 4769,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T18:59:57.782Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-26e4fd47b49f615af3e8",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 89,
+          "column": 3
+        },
+        {
+          "title": "break_room: y-sorted depth — behind / beside / in front of a tall prop",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6505,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T19:00:02.558Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-7de9db6cfdd95fbd4b02",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 106,
+          "column": 3
+        },
+        {
+          "title": "break_room: lighting layer toggles off and the room edges brighten",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 5466,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T19:00:09.070Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "bcb7417cefdc5b8f942d-e63cba208d1be9f5465d",
+          "file": "art-substrate-proof.spec.ts",
+          "line": 129,
+          "column": 3
+        }
+      ]
+    },
+    {
+      "title": "living-world-feel.spec.ts",
+      "file": "living-world-feel.spec.ts",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "FEEL-20 — NPC squash frame + door leaf ajar/open frames",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 8107,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T19:00:15.268Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c737f18c1186d91559de-878dfd102c918acbee62",
+          "file": "living-world-feel.spec.ts",
+          "line": 24,
+          "column": 1
+        },
+        {
+          "title": "ANIM-01 — catch a blink on camera",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2890,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T19:00:23.918Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c737f18c1186d91559de-7621779e0f0002aa3431",
+          "file": "living-world-feel.spec.ts",
+          "line": 58,
+          "column": 1
+        },
+        {
+          "title": "ANIM-01 — the generated closed-eye frames, magnified, next to the originals",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 60000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "",
+              "projectName": "",
+              "results": [
+                {
+                  "workerIndex": 1,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 2750,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2026-08-25T19:00:26.819Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "c737f18c1186d91559de-6aa00df267ac6aaa6e2b",
+          "file": "living-world-feel.spec.ts",
+          "line": 73,
+          "column": 1
         }
       ]
     }
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-23T15:06:27.070Z",
-    "duration": 319891.66,
-    "expected": 31,
-    "skipped": 4,
+    "startTime": "2026-08-25T18:56:32.680Z",
+    "duration": 236969.618,
+    "expected": 42,
+    "skipped": 0,
     "unexpected": 0,
     "flaky": 0
   }
