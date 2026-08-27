@@ -12,16 +12,16 @@
     "pass": true,
     "worstSmallOverlap": 0,
     "worstTransientSmall": 0,
-    "worstLargeWeighted": 22,
+    "worstLargeWeighted": 0,
     "worstPlateClash": 0,
     "plates": 3,
     "samples": 6
   },
   "break_room": {
-    "pass": false,
-    "worstSmallOverlap": 18,
-    "worstTransientSmall": 20,
-    "worstLargeWeighted": 218,
+    "pass": true,
+    "worstSmallOverlap": 8,
+    "worstTransientSmall": 8,
+    "worstLargeWeighted": 8,
     "worstPlateClash": 0,
     "plates": 5,
     "samples": 6
@@ -29,79 +29,79 @@
   "lab": {
     "pass": true,
     "worstSmallOverlap": 0,
-    "worstTransientSmall": 3,
-    "worstLargeWeighted": 562,
+    "worstTransientSmall": 0,
+    "worstLargeWeighted": 521,
     "worstPlateClash": 0,
     "plates": 4,
     "samples": 6
   },
   "records_room": {
-    "pass": true,
-    "worstSmallOverlap": 9,
-    "worstTransientSmall": 9,
-    "worstLargeWeighted": 9,
+    "pass": false,
+    "worstSmallOverlap": 18,
+    "worstTransientSmall": 18,
+    "worstLargeWeighted": 15,
     "worstPlateClash": 0,
     "plates": 5,
     "samples": 6
   },
   "it_office": {
-    "pass": true,
-    "worstSmallOverlap": 0,
-    "worstTransientSmall": 0,
-    "worstLargeWeighted": 437,
+    "pass": false,
+    "worstSmallOverlap": 485,
+    "worstTransientSmall": 485,
+    "worstLargeWeighted": 485,
     "worstPlateClash": 0,
     "plates": 3,
     "samples": 6
   },
   "er": {
     "pass": false,
-    "worstSmallOverlap": 50,
-    "worstTransientSmall": 50,
-    "worstLargeWeighted": 414,
-    "worstPlateClash": 15,
+    "worstSmallOverlap": 38,
+    "worstTransientSmall": 38,
+    "worstLargeWeighted": 87,
+    "worstPlateClash": 0,
     "plates": 3,
     "samples": 6
   },
   "reception-naive": {
     "overlaps": {
       "riley": {
-        "weighted": 190,
-        "small": 190
+        "weighted": 356,
+        "small": 356
       },
       "nervous_patient": {
-        "weighted": 222,
-        "small": 0
+        "weighted": 424,
+        "small": 424
       },
       "chatty_visitor": {
-        "weighted": 85,
-        "small": 0
+        "weighted": 144,
+        "small": 144
       }
     }
   },
   "er-naive": {
     "overlaps": {
       "dr_martinez": {
-        "weighted": 2941,
-        "small": 2941
+        "weighted": 2340,
+        "small": 2340
       },
       "officer": {
-        "weighted": 405,
-        "small": 129
+        "weighted": 415,
+        "small": 357
       },
       "frantic_family": {
-        "weighted": 2892,
-        "small": 2628
+        "weighted": 2243,
+        "small": 2185
       }
     }
   },
   "break_room-naive": {
     "overlaps": {
       "gossiping_coworker": {
-        "weighted": 631,
-        "small": 0
+        "weighted": 749,
+        "small": 364
       },
       "friend_fishing": {
-        "weighted": 140,
+        "weighted": 0,
         "small": 0
       },
       "tired_employee": {
@@ -109,8 +109,8 @@
         "small": 0
       },
       "hr_director": {
-        "weighted": 555,
-        "small": 613
+        "weighted": 475,
+        "small": 533
       },
       "selfie_coworker": {
         "weighted": 440,

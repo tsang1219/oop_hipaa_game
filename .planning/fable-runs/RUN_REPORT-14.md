@@ -197,6 +197,26 @@ diff presentation-only; flag it for a cleanup run).
   against the new art. Cheap follow-up.
 - `AudioMixPanel` (footer, below the game box) untouched — it's outside the game frame.
 
+## 2026-08-26 — the merge (everything-but-main, at your instruction)
+
+The art session's finished-but-uncommitted follow-ups (RUN_REPORT-11 §11 doors, §12 re-slice,
+§13 room-clean loop) and the humor session's dialogue/idle/whimsy rewrites were committed on
+`fable/art-substrate` (`a88f0df` art, `a3658c7` content — messages carry the attribution and the
+partition; only `package.json`/`server/index.ts` tailscale infra and `.planning/hermes|nightly-runs`
+scratch remain uncommitted in the main tree). `fable/ui-polish` was then **rebased on top** — one
+linear stack, `main` untouched.
+
+The rebase auto-merged every shared file; the one real casualty was semantic, and the stress suite
+caught it: §12 rebuilds desks/workstations from many individually-small sprites, so the solver's
+per-sprite small/large call misread whole desks as garble hazards (it_office regressed to a 485px²
+resting overlap). Fix: `placeProp` stamps each part with its obstacle footprint
+(`npFootprintTiles`); parts of ≥2-tile obstacles are large flat surfaces. Stress suite **7/7 rooms
+clean on the merged art**; tsc clean. Full-battery results on the combined branch (one run, 11.0 min): **87 passed / 0 failed /
+4 skipped** — art-substrate-proof 53/53, living-world-feel 3/3, progression 31 + the 4
+pre-existing `breach-gameplay` skips.
+Key screenshots re-captured on the clean rooms (the earlier `nameplates-*` shots show pre-§12
+furniture; the re-captures replace them).
+
 ## Caveats
 
 - **Base**: this branch forked from `b7818fd`. The art session's tileset doors + object re-slice
