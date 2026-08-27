@@ -13,27 +13,7 @@
    "y": 5,
    "w": 5,
    "h": 2,
-   "frame": "prop.counter.kw.shelf",
-   "depth": 10,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 3,
-   "y": 5,
-   "w": 5,
-   "h": 2,
    "frame": "prop.counter.kw.plain",
-   "depth": 10,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 3,
-   "y": 5,
-   "w": 5,
-   "h": 2,
-   "frame": "prop.counter.kw.shelf",
    "depth": 10,
    "anchor": "floor"
   },
@@ -53,8 +33,38 @@
    "y": 5,
    "w": 5,
    "h": 2,
-   "frame": "prop.counter.kw.shelf",
+   "frame": "prop.counter.kw.doors",
    "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain2",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 11,
    "anchor": "floor"
   },
   {
@@ -73,26 +83,6 @@
    "y": 5,
    "w": 5,
    "h": 2,
-   "frame": "prop.counter.kw.plain",
-   "depth": 11,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 3,
-   "y": 5,
-   "w": 5,
-   "h": 2,
-   "frame": "prop.counter.kw.shelf",
-   "depth": 11,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 3,
-   "y": 5,
-   "w": 5,
-   "h": 2,
    "frame": "prop.counter.kw.drawers",
    "depth": 11,
    "anchor": "floor"
@@ -105,6 +95,36 @@
    "h": 2,
    "frame": "prop.counter.kw.shelf",
    "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 3,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.end",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 10,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.drawers",
+   "depth": 10,
    "anchor": "floor"
   },
   {
@@ -133,58 +153,8 @@
    "y": 5,
    "w": 5,
    "h": 2,
-   "frame": "prop.counter.kw.doors",
-   "depth": 10,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 12,
-   "y": 5,
-   "w": 5,
-   "h": 2,
    "frame": "prop.counter.kw.plain",
    "depth": 10,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 12,
-   "y": 5,
-   "w": 5,
-   "h": 2,
-   "frame": "prop.counter.kw.doors",
-   "depth": 10,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 12,
-   "y": 5,
-   "w": 5,
-   "h": 2,
-   "frame": "prop.counter.kw.doors",
-   "depth": 11,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 12,
-   "y": 5,
-   "w": 5,
-   "h": 2,
-   "frame": "prop.counter.kw.plain2",
-   "depth": 11,
-   "anchor": "floor"
-  },
-  {
-   "type": "lab_bench",
-   "x": 12,
-   "y": 5,
-   "w": 5,
-   "h": 2,
-   "frame": "prop.counter.kw.doors",
-   "depth": 11,
    "anchor": "floor"
   },
   {
@@ -204,6 +174,36 @@
    "w": 5,
    "h": 2,
    "frame": "prop.counter.kw.doors",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.drawers",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.shelf",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "lab_bench",
+   "x": 12,
+   "y": 5,
+   "w": 5,
+   "h": 2,
+   "frame": "prop.counter.kw.end",
    "depth": 11,
    "anchor": "floor"
   },
@@ -213,7 +213,7 @@
    "y": 2,
    "w": 3,
    "h": 2,
-   "frame": "prop.desk.monitor.3",
+   "frame": "prop.microscope",
    "depth": 8,
    "anchor": "floor"
   },
@@ -233,7 +233,7 @@
    "y": 2,
    "w": 3,
    "h": 2,
-   "frame": "prop.cart.monitor",
+   "frame": "prop.autoclave",
    "depth": 8,
    "anchor": "floor"
   },
@@ -243,7 +243,27 @@
    "y": 2,
    "w": 3,
    "h": 1,
-   "frame": "prop.cabinet.glass.3",
+   "frame": "prop.cabinet.glass.l",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "fume_hood",
+   "x": 5,
+   "y": 2,
+   "w": 3,
+   "h": 1,
+   "frame": "prop.cabinet.glass.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "fume_hood",
+   "x": 5,
+   "y": 2,
+   "w": 3,
+   "h": 1,
+   "frame": "prop.cabinet.glass.r",
    "depth": 7,
    "anchor": "floor"
   },
@@ -263,7 +283,7 @@
    "y": 10,
    "w": 2,
    "h": 2,
-   "frame": "prop.fridge.gray.2",
+   "frame": "prop.fridge.glass.tall",
    "depth": 16,
    "anchor": "floor"
   },
@@ -273,7 +293,17 @@
    "y": 10,
    "w": 2,
    "h": 2,
-   "frame": "prop.cabinet.glass.2",
+   "frame": "prop.cabinet.glass.l",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "bio_cabinet",
+   "x": 16,
+   "y": 10,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.cabinet.glass.l",
    "depth": 16,
    "anchor": "floor"
   },
@@ -283,17 +313,7 @@
    "y": 10,
    "w": 2,
    "h": 1,
-   "frame": "prop.sink.white",
-   "depth": 15,
-   "anchor": "floor"
-  },
-  {
-   "type": "sink_station",
-   "x": 7,
-   "y": 10,
-   "w": 2,
-   "h": 1,
-   "frame": "prop.counter.kw.drawers",
+   "frame": "prop.sink.counter",
    "depth": 15,
    "anchor": "floor"
   },
@@ -303,7 +323,7 @@
    "y": 10,
    "w": 1,
    "h": 1,
-   "frame": "prop.dispenser.c",
+   "frame": "prop.sink.wash",
    "depth": 15,
    "anchor": "floor"
   },
@@ -323,27 +343,7 @@
    "y": 10,
    "w": 2,
    "h": 1,
-   "frame": "prop.fridge.gray.c",
-   "depth": 15,
-   "anchor": "floor"
-  },
-  {
-   "type": "autoclave",
-   "x": 13,
-   "y": 10,
-   "w": 2,
-   "h": 1,
-   "frame": "prop.counter.kw.plain",
-   "depth": 15,
-   "anchor": "floor"
-  },
-  {
-   "type": "autoclave",
-   "x": 13,
-   "y": 10,
-   "w": 2,
-   "h": 1,
-   "frame": "prop.microwave.c",
+   "frame": "prop.autoclave",
    "depth": 15,
    "anchor": "floor"
   },
@@ -393,12 +393,12 @@
    "y": 13,
    "w": 1,
    "h": 1,
-   "frame": "prop.box.single",
+   "frame": "prop.boxes.tall",
    "depth": 18,
    "anchor": "floor"
   }
  ],
- "decor": 16,
+ "decor": 14,
  "animated": 0,
  "missing": [],
  "imageRequests": 27

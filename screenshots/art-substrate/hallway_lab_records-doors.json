@@ -1,0 +1,30 @@
+[
+ {
+  "id": "hallway_labrecords_to_lab",
+  "side": "left",
+  "kind": "side-left",
+  "state": "next",
+  "frame": "door.side.r.0",
+  "x": 3,
+  "y": 128,
+  "depth": 7.5
+ },
+ {
+  "id": "hallway_labrecords_to_records",
+  "side": "right",
+  "kind": "side-right",
+  "state": "locked",
+  "frame": "door.side.l.0",
+  "x": 573,
+  "y": 128,
+  "depth": 7.5
+ },
+ {
+  "id": "hallway_labrecords_to_records",
+  "check": "locked: stayed on frame 0, room unchanged"
+ },
+ {
+  "id": "hallway_labrecords_to_lab",
+  "check": "ajar → frame 1, SPACE → frame 4, arrived in lab"
+ }
+]

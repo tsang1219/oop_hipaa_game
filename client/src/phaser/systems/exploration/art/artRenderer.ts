@@ -21,6 +21,7 @@ import {
   ROOM_DECOR, resolveProp, type RoomArtStyle, type PropDef, type DecorDef, type AnimDef,
 } from './artCatalog';
 import { closetFound } from '../../../../data/whimsyData';
+import { DOOR_ART } from './doorArt';
 
 const TILE = 32;
 const LIGHT_DEPTH = 40;
@@ -186,13 +187,15 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
       ground.batchDrawFrame(ATLAS_KEY, wallFrame(style.wall.style, 'bot', end), x * TILE, 0);
     }
   }
-  // a door in the back wall: the opening is a dark recess in the face
-  for (const d of doors) {
-    if (d.y !== 0) continue;
-    if (d.hidden && !closetFound()) continue; // Supply Closet B stays a seam until someone finds it
-    ground.batchDrawFrame(ATLAS_KEY, 'trim.void', d.x * TILE + 4, 6, 0.9);
-    if (faceRows === 2) ground.batchDrawFrame(ATLAS_KEY, 'trim.void', d.x * TILE + 4, TILE + 2, 0.9);
+  // (a door in the back wall gets its dark recess after endDraw — see below)
+  // nothing outside the wall line: the thin side/bottom trims are 14/12 px of their tile, so
+  // the floor painted under them would show beyond the wall in camera-centred rooms (the
+  // closet, hallways). Void covers the outer strip of the edge columns and the bottom row.
+  for (let y = 0; y < H; y++) {
+    ground.batchDrawFrame(ATLAS_KEY, 'trim.void', -14, y * TILE);
+    ground.batchDrawFrame(ATLAS_KEY, 'trim.void', (W - 1) * TILE + 14, y * TILE);
   }
+  for (let x = 0; x < W; x++) ground.batchDrawFrame(ATLAS_KEY, 'trim.void', x * TILE, (H - 1) * TILE + 12);
   // contact shadows on the floor along every wall (soft AO, from the tileset)
   for (let x = 1; x < W - 1; x++) {
     ground.batchDrawFrame(ATLAS_KEY, 'shadow.top', x * TILE, faceRows * TILE);
@@ -234,6 +237,21 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
     ground.batchDrawFrame(ATLAS_KEY, d.frame, d.tx * TILE + (d.dx ?? 0), d.ty * TILE + (d.dy ?? 0), d.alpha ?? 1);
   }
   ground.endDraw();
+  // a door in the back wall: the opening is a dark recess in the face, exactly the
+  // big door's body (32 × DOOR_ART.faceBodyH, foot on the floor line) so nothing
+  // peeks out around the closed leaf and the doorway is what you see when it swings
+  for (const d of doors) {
+    if (d.y !== 0 || d.side !== 'top') continue;
+    if (d.hidden && !closetFound()) continue; // Supply Closet B stays a seam until someone finds it
+    const g = scene.make.graphics({ x: 0, y: 0 }, false);
+    const top = Math.max(0, faceRows * TILE - DOOR_ART.faceBodyH), bottom = faceRows * TILE;
+    g.fillStyle(0x1c1c2a, 1);
+    g.fillRect(d.x * TILE, top, TILE, bottom - top);
+    g.fillStyle(VOID_COLOR, 0.55); // a little of the corridor beyond, lower down
+    g.fillRect(d.x * TILE + 3, top + 12, TILE - 6, bottom - top - 12);
+    ground.draw(g);
+    g.destroy();
+  }
   // wear — soft darkening where people actually walk (ART-05)
   if (style.wear.length) {
     const g = scene.make.graphics({ x: 0, y: 0 }, false);
@@ -274,7 +292,10 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
     if (def.fill && def.fill.length) {
       // one frame per footprint tile, each y-sorted by its own row
       for (let ty = oy; ty < oy + oh; ty++) for (let tx = ox; tx < ox + ow; tx++) {
-        const frame = checkFrame(def.fill[hash(tx, ty, 7) % def.fill.length], type);
+        const pick = def.fillEnds && ow > 1 && tx === ox ? def.fillEnds[0]
+          : def.fillEnds && ow > 1 && tx === ox + ow - 1 ? def.fillEnds[1]
+          : def.fill[hash(tx, ty, 7) % def.fill.length];
+        const frame = checkFrame(pick, type);
         const depth = 5 + ty;
         finish(makeSprite(tx * TILE + (def.dx ?? 0), (ty + 1) * TILE + (def.dy ?? 0), frame, undefined, 0, 1).setDepth(depth));
         record(frame, depth);

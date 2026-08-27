@@ -3,7 +3,7 @@ import { eventBridge, BRIDGE_EVENTS } from '../EventBridge';
 import { generateAllTextures } from '../sprites';
 import { objectTexture } from '../systems/exploration/art/objectFrames';
 import { getArtHandle } from '../systems/exploration/art/artRenderer';
-import { isArtRoom } from '../systems/exploration/art/artCatalog';
+import { isArtRoom, getRoomArt } from '../systems/exploration/art/artCatalog';
 import { npcSpriteTextureKey } from '../sprites/npcTextures';
 import {
   ENCOUNTER_WAVES_INBOUND,
@@ -252,12 +252,15 @@ export class ExplorationScene extends Phaser.Scene {
     if (data.spawnDoorId && (data.room as any).doors) {
       const spawnDoor = (data.room as any).doors.find((d: any) => d.id === data.spawnDoorId);
       if (spawnDoor) {
-        // Offset spawn 1 tile inward from the door based on its side
+        // Offset spawn 1 tile inward from the door based on its side. Run 11: a
+        // back-wall door sits inside a face that is `wall.rows` deep, so "inward"
+        // is the first floor row below it, not row 1 (which is wall now).
+        const wallRows = getRoomArt(data.room.id)?.wall.rows ?? 1;
         let sx = spawnDoor.x;
         let sy = spawnDoor.y;
         if (spawnDoor.side === 'left') sx += 1;
         else if (spawnDoor.side === 'right') sx -= 1;
-        else if (spawnDoor.side === 'top') sy += 1;
+        else if (spawnDoor.side === 'top') sy += wallRows;
         else if (spawnDoor.side === 'bottom') sy -= 1;
         this.pendingSpawnTileX = sx;
         this.pendingSpawnTileY = sy;
@@ -1197,9 +1200,10 @@ export class ExplorationScene extends Phaser.Scene {
     let targetX = door.x;
     let targetY = door.y;
     // Offset 1 tile inward from door side so player is inside the room
+    // (Run 11: below a back-wall door that means past the whole wall face)
     if (door.side === 'left') targetX += 1;
     else if (door.side === 'right') targetX -= 1;
-    else if (door.side === 'top') targetY += 1;
+    else if (door.side === 'top') targetY += getRoomArt(this.room.id)?.wall.rows ?? 1;
     else if (door.side === 'bottom') targetY -= 1;
 
     // Teleport player to adjacent tile
@@ -1953,6 +1957,8 @@ export class ExplorationScene extends Phaser.Scene {
     // camera flash carries the rejection feedback; SFX is just a soft accent.
     // Run 12: a proper "locked" error blip instead of the breach-alert horn
     playSfx(this, 'sfx_door_locked', { volume: 0.4, cooldownKey: 'door_locked', cooldownMs: 400 });
+    // Run 11: the door itself answers too — shuts if it had cracked open, then rattles
+    this.doors.rattle(this.doors.nearDoor?.id);
   };
 
   private startPathMovement(path: Position[], pending: InteractableData | null) {

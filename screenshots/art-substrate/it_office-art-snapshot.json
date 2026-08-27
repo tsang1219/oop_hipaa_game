@@ -153,7 +153,27 @@
    "y": 5,
    "w": 1,
    "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "monitor_bank",
+   "x": 1,
+   "y": 5,
+   "w": 1,
+   "h": 2,
    "frame": "anim.monitor.0",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "monitor_bank",
+   "x": 18,
+   "y": 5,
+   "w": 1,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
    "depth": 11,
    "anchor": "floor"
   },
@@ -213,7 +233,7 @@
    "y": 6,
    "w": 1,
    "h": 1,
-   "frame": "prop.phone.black",
+   "frame": "prop.monitor.pc",
    "depth": 11,
    "anchor": "floor"
   },
@@ -223,7 +243,17 @@
    "y": 8,
    "w": 2,
    "h": 1,
-   "frame": "prop.console.blue.2",
+   "frame": "prop.console.blue.l",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "workstation_cluster",
+   "x": 2,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.console.blue.r",
    "depth": 13,
    "anchor": "floor"
   },
@@ -233,7 +263,17 @@
    "y": 8,
    "w": 2,
    "h": 1,
-   "frame": "prop.console.blue.2",
+   "frame": "prop.console.blue.l",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "workstation_cluster",
+   "x": 16,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.console.blue.r",
    "depth": 13,
    "anchor": "floor"
   },
@@ -253,7 +293,7 @@
    "y": 10,
    "w": 3,
    "h": 2,
-   "frame": "prop.desk.glass.3",
+   "frame": "prop.desk.glass.2",
    "depth": 16,
    "anchor": "floor"
   },
@@ -273,7 +313,7 @@
    "y": 12,
    "w": 2,
    "h": 1,
-   "frame": "prop.table.wood.2",
+   "frame": "prop.desk.k.wood",
    "depth": 17,
    "anchor": "floor"
   },
@@ -290,11 +330,11 @@
   {
    "type": "locked_cabinet",
    "x": 16,
-   "y": 12,
+   "y": 13,
    "w": 2,
    "h": 1,
-   "frame": "prop.cabinet.gray.2",
-   "depth": 17,
+   "frame": "prop.locker.teal.2",
+   "depth": 18,
    "anchor": "floor"
   },
   {
@@ -343,12 +383,12 @@
    "y": 12,
    "w": 1,
    "h": 1,
-   "frame": "prop.box.single",
+   "frame": "prop.boxes.tall",
    "depth": 17,
    "anchor": "floor"
   }
  ],
- "decor": 15,
+ "decor": 17,
  "animated": 17,
  "missing": [],
  "imageRequests": 27

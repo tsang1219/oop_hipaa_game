@@ -22,9 +22,9 @@
    "x": 2,
    "y": 2,
    "w": 2,
-   "h": 3,
+   "h": 2,
    "frame": "prop.vending.snacks",
-   "depth": 9,
+   "depth": 8,
    "anchor": "floor"
   },
   {
@@ -32,9 +32,9 @@
    "x": 5,
    "y": 2,
    "w": 2,
-   "h": 3,
+   "h": 2,
    "frame": "prop.vending.gray",
-   "depth": 9,
+   "depth": 8,
    "anchor": "floor"
   },
   {
@@ -52,9 +52,9 @@
    "x": 14,
    "y": 2,
    "w": 1,
-   "h": 1,
-   "frame": "prop.counter.k.plain",
-   "depth": 7,
+   "h": 2,
+   "frame": "prop.counter.kt.l",
+   "depth": 8,
    "anchor": "floor"
   },
   {
@@ -62,9 +62,29 @@
    "x": 14,
    "y": 2,
    "w": 1,
-   "h": 1,
-   "frame": "prop.microwave.a",
-   "depth": 7,
+   "h": 2,
+   "frame": "prop.microwave.b",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.counter.kt.m",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "coffee_station",
+   "x": 15,
+   "y": 2,
+   "w": 3,
+   "h": 2,
+   "frame": "prop.counter.kt.r",
+   "depth": 8,
    "anchor": "floor"
   },
   {
@@ -74,46 +94,6 @@
    "w": 3,
    "h": 2,
    "frame": "prop.fridge.gray.b",
-   "depth": 8,
-   "anchor": "floor"
-  },
-  {
-   "type": "coffee_station",
-   "x": 15,
-   "y": 2,
-   "w": 3,
-   "h": 2,
-   "frame": "prop.counter.k.plain",
-   "depth": 8,
-   "anchor": "floor"
-  },
-  {
-   "type": "coffee_station",
-   "x": 15,
-   "y": 2,
-   "w": 3,
-   "h": 2,
-   "frame": "prop.counter.k.shelf",
-   "depth": 8,
-   "anchor": "floor"
-  },
-  {
-   "type": "coffee_station",
-   "x": 15,
-   "y": 2,
-   "w": 3,
-   "h": 2,
-   "frame": "prop.counter.k.drawers",
-   "depth": 8,
-   "anchor": "floor"
-  },
-  {
-   "type": "coffee_station",
-   "x": 15,
-   "y": 2,
-   "w": 3,
-   "h": 2,
-   "frame": "prop.counter.k.doors",
    "depth": 8,
    "anchor": "floor"
   },
@@ -173,6 +153,16 @@
    "y": 10,
    "w": 2,
    "h": 1,
+   "frame": "prop.tv.sideboard",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "tv_stand",
+   "x": 7,
+   "y": 10,
+   "w": 2,
+   "h": 1,
    "frame": "anim.tvnews.0",
    "depth": 15,
    "anchor": "floor"
@@ -193,7 +183,7 @@
    "y": 10,
    "w": 3,
    "h": 2,
-   "frame": "prop.couch.orange.3l",
+   "frame": "prop.couch.gray.3",
    "depth": 16,
    "anchor": "floor"
   },
@@ -223,7 +213,7 @@
    "y": 8,
    "w": 1,
    "h": 1,
-   "frame": "prop.chair.wood.side.tan",
+   "frame": "prop.stool.blue",
    "depth": 13,
    "anchor": "floor"
   },
@@ -233,7 +223,7 @@
    "y": 8,
    "w": 1,
    "h": 1,
-   "frame": "prop.chair.wood.side.orange",
+   "frame": "prop.stool.red",
    "depth": 13,
    "anchor": "floor"
   },
@@ -243,12 +233,12 @@
    "y": 13,
    "w": 1,
    "h": 1,
-   "frame": "prop.box.single",
+   "frame": "prop.boxes.tall",
    "depth": 18,
    "anchor": "floor"
   }
  ],
- "decor": 13,
+ "decor": 14,
  "animated": 2,
  "missing": [],
  "imageRequests": 27

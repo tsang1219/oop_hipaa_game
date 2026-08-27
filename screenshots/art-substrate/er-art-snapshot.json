@@ -13,7 +13,7 @@
    "y": 4,
    "w": 4,
    "h": 3,
-   "frame": "prop.nurse_station.2",
+   "frame": "prop.nurse_station.2.body",
    "depth": 11,
    "anchor": "floor"
   },
@@ -23,7 +23,47 @@
    "y": 4,
    "w": 4,
    "h": 3,
-   "frame": "prop.nurse_station.2",
+   "frame": "prop.nurse_station.2.counter",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "nurse_station",
+   "x": 8,
+   "y": 4,
+   "w": 4,
+   "h": 3,
+   "frame": "prop.nurse_station.2.mon",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "nurse_station",
+   "x": 8,
+   "y": 4,
+   "w": 4,
+   "h": 3,
+   "frame": "prop.nurse_station.meds.body",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "nurse_station",
+   "x": 8,
+   "y": 4,
+   "w": 4,
+   "h": 3,
+   "frame": "prop.nurse_station.meds.counter",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
+   "type": "nurse_station",
+   "x": 8,
+   "y": 4,
+   "w": 4,
+   "h": 3,
+   "frame": "prop.nurse_station.meds.mon",
    "depth": 11,
    "anchor": "floor"
   },
@@ -33,17 +73,7 @@
    "y": 9,
    "w": 4,
    "h": 1,
-   "frame": "prop.counter.kw.drawers",
-   "depth": 14,
-   "anchor": "floor"
-  },
-  {
-   "type": "triage_desk",
-   "x": 8,
-   "y": 9,
-   "w": 4,
-   "h": 1,
-   "frame": "prop.counter.kw.shelf",
+   "frame": "prop.counter.kw.plain",
    "depth": 14,
    "anchor": "floor"
   },
@@ -68,12 +98,22 @@
    "anchor": "floor"
   },
   {
+   "type": "triage_desk",
+   "x": 8,
+   "y": 9,
+   "w": 4,
+   "h": 1,
+   "frame": "prop.counter.kw.end",
+   "depth": 14,
+   "anchor": "floor"
+  },
+  {
    "type": "patient_bay",
    "x": 2,
    "y": 2,
    "w": 4,
    "h": 3,
-   "frame": "prop.bed.blue",
+   "frame": "prop.bed.side.blue",
    "depth": 9,
    "anchor": "floor"
   },
@@ -83,7 +123,7 @@
    "y": 2,
    "w": 4,
    "h": 3,
-   "frame": "prop.table.small.white",
+   "frame": "prop.bedside.white",
    "depth": 9,
    "anchor": "floor"
   },
@@ -93,7 +133,7 @@
    "y": 2,
    "w": 4,
    "h": 3,
-   "frame": "prop.ivpole.a",
+   "frame": "prop.ivpole.single",
    "depth": 9,
    "anchor": "floor"
   },
@@ -103,7 +143,7 @@
    "y": 2,
    "w": 4,
    "h": 3,
-   "frame": "prop.monitor.stand",
+   "frame": "prop.bed.side.pink",
    "depth": 9,
    "anchor": "floor"
   },
@@ -113,7 +153,7 @@
    "y": 2,
    "w": 4,
    "h": 3,
-   "frame": "prop.table.small.white",
+   "frame": "prop.bedside.wood",
    "depth": 9,
    "anchor": "floor"
   },
@@ -123,7 +163,7 @@
    "y": 2,
    "w": 4,
    "h": 3,
-   "frame": "prop.bed.pink",
+   "frame": "prop.ivpole.single",
    "depth": 9,
    "anchor": "floor"
   },
@@ -133,7 +173,7 @@
    "y": 2,
    "w": 1,
    "h": 3,
-   "frame": "prop.blinds.blue",
+   "frame": "prop.curtain.blue",
    "depth": 9,
    "anchor": "floor"
   },
@@ -143,7 +183,7 @@
    "y": 2,
    "w": 1,
    "h": 3,
-   "frame": "prop.blinds.tan",
+   "frame": "prop.curtain.tan",
    "depth": 9,
    "anchor": "floor"
   },
@@ -163,7 +203,7 @@
    "y": 9,
    "w": 3,
    "h": 2,
-   "frame": "prop.ivpole.b",
+   "frame": "prop.ivpole.single",
    "depth": 15,
    "anchor": "floor"
   },
@@ -193,7 +233,7 @@
    "y": 10,
    "w": 1,
    "h": 1,
-   "frame": "prop.ivpole.a",
+   "frame": "prop.ivpole.single",
    "depth": 15,
    "anchor": "floor"
   },
@@ -213,47 +253,27 @@
    "y": 11,
    "w": 2,
    "h": 1,
+   "frame": "prop.machine.arms",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "crash_cart",
+   "x": 13,
+   "y": 11,
+   "w": 2,
+   "h": 1,
    "frame": "prop.cart.monitor",
    "depth": 16,
    "anchor": "floor"
   },
   {
-   "type": "equipment",
-   "x": 5,
+   "type": "crash_cart",
+   "x": 13,
    "y": 11,
    "w": 2,
    "h": 1,
    "frame": "prop.cart.wood.a",
-   "depth": 16,
-   "anchor": "floor"
-  },
-  {
-   "type": "crash_cart",
-   "x": 13,
-   "y": 11,
-   "w": 2,
-   "h": 1,
-   "frame": "prop.cart.wood.b",
-   "depth": 16,
-   "anchor": "floor"
-  },
-  {
-   "type": "crash_cart",
-   "x": 13,
-   "y": 11,
-   "w": 2,
-   "h": 1,
-   "frame": "prop.table.small.gray",
-   "depth": 16,
-   "anchor": "floor"
-  },
-  {
-   "type": "crash_cart",
-   "x": 13,
-   "y": 11,
-   "w": 2,
-   "h": 1,
-   "frame": "prop.monitor.ecg",
    "depth": 16,
    "anchor": "floor"
   },
@@ -273,7 +293,7 @@
    "y": 13,
    "w": 1,
    "h": 1,
-   "frame": "prop.wheelchair.side.tan",
+   "frame": "prop.wheelchair.front.tan",
    "depth": 18,
    "anchor": "floor"
   },
@@ -283,12 +303,12 @@
    "y": 12,
    "w": 1,
    "h": 1,
-   "frame": "prop.ivpole.b",
+   "frame": "prop.ivpole.single",
    "depth": 17,
    "anchor": "floor"
   }
  ],
- "decor": 11,
+ "decor": 12,
  "animated": 2,
  "missing": [],
  "imageRequests": 27

@@ -624,7 +624,7 @@ export class NpcLifeController {
         break;
       }
       case 'sip': {
-        const icon = this.floatIcon(e, atlasRef('prop.mug.red'), 0.7, 11, -14, 1100);
+        const icon = this.floatIcon(e, atlasRef('prop.mug.brown'), 1, 11, -14, 1100); // Run 11 audit: 'mug.red' was LimeZu's dish rack
         if (icon) scene.tweens.add({ targets: icon, angle: -28, duration: 260, delay: 380, yoyo: true, ease: 'Sine.easeInOut' });
         playSfx(scene, 'sfx_fidget_mug', { bus: 'sfx', volume: 0.07, rate: 1.35, cooldownKey: 'fidget_mug', cooldownMs: 900 });
         scene.tweens.add({ targets: s, scaleY: 1.03, duration: 300, delay: 380, yoyo: true, ease: 'Sine.easeInOut', onComplete: () => { s.scaleY = 1; } });

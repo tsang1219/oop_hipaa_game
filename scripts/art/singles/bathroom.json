@@ -1,0 +1,1908 @@
+{
+ "sheet": "bathroom",
+ "source": "1_Interiors/32x32/Theme_Sorter_32x32/3_Bathroom_32x32.png",
+ "singles": "attached_assets/vendor/modern-interiors/1_Interiors/32x32/Theme_Sorter_Singles_32x32/3_Bathroom_Singles_32x32",
+ "objects": [
+  {
+   "n": 1,
+   "file": "Bathroom_Singles_32x32_1.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    0,
+    768
+   ],
+   "bbox": [
+    2,
+    778,
+    62,
+    40
+   ]
+  },
+  {
+   "n": 2,
+   "file": "Bathroom_Singles_32x32_2.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    64,
+    768
+   ],
+   "bbox": [
+    66,
+    768,
+    62,
+    50
+   ]
+  },
+  {
+   "n": 8,
+   "file": "Bathroom_Singles_32x32_8.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    0,
+    832
+   ],
+   "bbox": [
+    2,
+    842,
+    62,
+    40
+   ]
+  },
+  {
+   "n": 9,
+   "file": "Bathroom_Singles_32x32_9.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    64,
+    832
+   ],
+   "bbox": [
+    66,
+    832,
+    62,
+    50
+   ]
+  },
+  {
+   "n": 12,
+   "file": "Bathroom_Singles_32x32_12.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    160,
+    800
+   ],
+   "bbox": [
+    162,
+    814,
+    62,
+    68
+   ]
+  },
+  {
+   "n": 15,
+   "file": "Bathroom_Singles_32x32_15.png",
+   "w": 64,
+   "h": 16,
+   "at": [
+    256,
+    944
+   ],
+   "bbox": [
+    256,
+    944,
+    62,
+    16
+   ]
+  },
+  {
+   "n": 18,
+   "file": "Bathroom_Singles_32x32_18.png",
+   "w": 64,
+   "h": 16,
+   "at": [
+    320,
+    944
+   ],
+   "bbox": [
+    320,
+    944,
+    62,
+    16
+   ]
+  },
+  {
+   "n": 21,
+   "file": "Bathroom_Singles_32x32_21.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    256,
+    736
+   ],
+   "bbox": [
+    258,
+    750,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 22,
+   "file": "Bathroom_Singles_32x32_22.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    256,
+    832
+   ],
+   "bbox": [
+    258,
+    846,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 23,
+   "file": "Bathroom_Singles_32x32_23.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    288,
+    736
+   ],
+   "bbox": [
+    290,
+    750,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 24,
+   "file": "Bathroom_Singles_32x32_24.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    288,
+    832
+   ],
+   "bbox": [
+    290,
+    846,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 25,
+   "file": "Bathroom_Singles_32x32_25.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    320,
+    736
+   ],
+   "bbox": [
+    322,
+    750,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 26,
+   "file": "Bathroom_Singles_32x32_26.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    320,
+    832
+   ],
+   "bbox": [
+    322,
+    846,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 27,
+   "file": "Bathroom_Singles_32x32_27.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    352,
+    736
+   ],
+   "bbox": [
+    354,
+    750,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 28,
+   "file": "Bathroom_Singles_32x32_28.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    352,
+    832
+   ],
+   "bbox": [
+    354,
+    846,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 29,
+   "file": "Bathroom_Singles_32x32_29.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    384,
+    736
+   ],
+   "bbox": [
+    386,
+    750,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 30,
+   "file": "Bathroom_Singles_32x32_30.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    384,
+    832
+   ],
+   "bbox": [
+    386,
+    846,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 31,
+   "file": "Bathroom_Singles_32x32_31.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    416,
+    736
+   ],
+   "bbox": [
+    418,
+    750,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 32,
+   "file": "Bathroom_Singles_32x32_32.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    416,
+    832
+   ],
+   "bbox": [
+    418,
+    846,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 33,
+   "file": "Bathroom_Singles_32x32_33.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    448,
+    736
+   ],
+   "bbox": [
+    454,
+    740,
+    20,
+    22
+   ]
+  },
+  {
+   "n": 34,
+   "file": "Bathroom_Singles_32x32_34.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    480,
+    736
+   ],
+   "bbox": [
+    486,
+    740,
+    20,
+    22
+   ]
+  },
+  {
+   "n": 35,
+   "file": "Bathroom_Singles_32x32_35.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    0,
+    1472
+   ],
+   "bbox": [
+    2,
+    1486,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 36,
+   "file": "Bathroom_Singles_32x32_36.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    0,
+    1568
+   ],
+   "bbox": [
+    2,
+    1582,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 37,
+   "file": "Bathroom_Singles_32x32_37.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    0,
+    1664
+   ],
+   "bbox": [
+    2,
+    1678,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 38,
+   "file": "Bathroom_Singles_32x32_38.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    32,
+    1472
+   ],
+   "bbox": [
+    34,
+    1486,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 39,
+   "file": "Bathroom_Singles_32x32_39.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    32,
+    1568
+   ],
+   "bbox": [
+    34,
+    1582,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 40,
+   "file": "Bathroom_Singles_32x32_40.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    32,
+    1664
+   ],
+   "bbox": [
+    34,
+    1678,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 41,
+   "file": "Bathroom_Singles_32x32_41.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    64,
+    1472
+   ],
+   "bbox": [
+    66,
+    1486,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 42,
+   "file": "Bathroom_Singles_32x32_42.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    64,
+    1568
+   ],
+   "bbox": [
+    66,
+    1582,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 43,
+   "file": "Bathroom_Singles_32x32_43.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    64,
+    1664
+   ],
+   "bbox": [
+    66,
+    1678,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 44,
+   "file": "Bathroom_Singles_32x32_44.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    96,
+    1472
+   ],
+   "bbox": [
+    98,
+    1486,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 45,
+   "file": "Bathroom_Singles_32x32_45.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    96,
+    1568
+   ],
+   "bbox": [
+    98,
+    1582,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 46,
+   "file": "Bathroom_Singles_32x32_46.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    96,
+    1664
+   ],
+   "bbox": [
+    98,
+    1678,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 47,
+   "file": "Bathroom_Singles_32x32_47.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    128,
+    1472
+   ],
+   "bbox": [
+    130,
+    1486,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 48,
+   "file": "Bathroom_Singles_32x32_48.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    128,
+    1568
+   ],
+   "bbox": [
+    130,
+    1582,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 49,
+   "file": "Bathroom_Singles_32x32_49.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    128,
+    1664
+   ],
+   "bbox": [
+    130,
+    1678,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 50,
+   "file": "Bathroom_Singles_32x32_50.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    160,
+    1472
+   ],
+   "bbox": [
+    162,
+    1486,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 51,
+   "file": "Bathroom_Singles_32x32_51.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    160,
+    1568
+   ],
+   "bbox": [
+    162,
+    1582,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 52,
+   "file": "Bathroom_Singles_32x32_52.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    160,
+    1664
+   ],
+   "bbox": [
+    162,
+    1678,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 53,
+   "file": "Bathroom_Singles_32x32_53.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    192,
+    1472
+   ],
+   "bbox": [
+    194,
+    1486,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 54,
+   "file": "Bathroom_Singles_32x32_54.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    192,
+    1568
+   ],
+   "bbox": [
+    194,
+    1582,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 55,
+   "file": "Bathroom_Singles_32x32_55.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    192,
+    1664
+   ],
+   "bbox": [
+    194,
+    1678,
+    28,
+    70
+   ]
+  },
+  {
+   "n": 56,
+   "file": "Bathroom_Singles_32x32_56.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    224,
+    1488
+   ],
+   "bbox": [
+    224,
+    1488,
+    32,
+    80
+   ]
+  },
+  {
+   "n": 57,
+   "file": "Bathroom_Singles_32x32_57.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    256,
+    1504
+   ],
+   "bbox": [
+    260,
+    1506,
+    28,
+    58
+   ]
+  },
+  {
+   "n": 58,
+   "file": "Bathroom_Singles_32x32_58.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    320,
+    992
+   ],
+   "bbox": [
+    328,
+    1006,
+    18,
+    34
+   ]
+  },
+  {
+   "n": 59,
+   "file": "Bathroom_Singles_32x32_59.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    352,
+    992
+   ],
+   "bbox": [
+    360,
+    1006,
+    18,
+    34
+   ]
+  },
+  {
+   "n": 60,
+   "file": "Bathroom_Singles_32x32_60.png",
+   "w": 16,
+   "h": 96,
+   "at": [
+    16,
+    1184
+   ],
+   "bbox": [
+    26,
+    1198,
+    6,
+    80
+   ]
+  },
+  {
+   "n": 61,
+   "file": "Bathroom_Singles_32x32_61.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    32,
+    1184
+   ],
+   "bbox": [
+    32,
+    1198,
+    64,
+    80
+   ]
+  },
+  {
+   "n": 62,
+   "file": "Bathroom_Singles_32x32_62.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    192,
+    1184
+   ],
+   "bbox": [
+    192,
+    1198,
+    64,
+    80
+   ]
+  },
+  {
+   "n": 64,
+   "file": "Bathroom_Singles_32x32_64.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    128,
+    1376
+   ],
+   "bbox": [
+    128,
+    1386,
+    32,
+    66
+   ]
+  },
+  {
+   "n": 65,
+   "file": "Bathroom_Singles_32x32_65.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    160,
+    1376
+   ],
+   "bbox": [
+    160,
+    1376,
+    64,
+    68
+   ]
+  },
+  {
+   "n": 66,
+   "file": "Bathroom_Singles_32x32_66.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    448,
+    768
+   ],
+   "bbox": [
+    452,
+    768,
+    24,
+    50
+   ]
+  },
+  {
+   "n": 67,
+   "file": "Bathroom_Singles_32x32_67.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    480,
+    784
+   ],
+   "bbox": [
+    484,
+    788,
+    24,
+    34
+   ]
+  },
+  {
+   "n": 68,
+   "file": "Bathroom_Singles_32x32_68.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    448,
+    832
+   ],
+   "bbox": [
+    452,
+    832,
+    24,
+    50
+   ]
+  },
+  {
+   "n": 69,
+   "file": "Bathroom_Singles_32x32_69.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    480,
+    848
+   ],
+   "bbox": [
+    484,
+    852,
+    24,
+    34
+   ]
+  },
+  {
+   "n": 70,
+   "file": "Bathroom_Singles_32x32_70.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    224,
+    1376
+   ],
+   "bbox": [
+    230,
+    1376,
+    24,
+    58
+   ]
+  },
+  {
+   "n": 71,
+   "file": "Bathroom_Singles_32x32_71.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    288,
+    1360
+   ],
+   "bbox": [
+    292,
+    1366,
+    24,
+    48
+   ]
+  },
+  {
+   "n": 72,
+   "file": "Bathroom_Singles_32x32_72.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    256,
+    1440
+   ],
+   "bbox": [
+    260,
+    1440,
+    24,
+    58
+   ]
+  },
+  {
+   "n": 73,
+   "file": "Bathroom_Singles_32x32_73.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    256,
+    1360
+   ],
+   "bbox": [
+    260,
+    1366,
+    24,
+    50
+   ]
+  },
+  {
+   "n": 74,
+   "file": "Bathroom_Singles_32x32_74.png",
+   "w": 64,
+   "h": 48,
+   "at": [
+    384,
+    114
+   ],
+   "bbox": [
+    390,
+    118,
+    52,
+    30
+   ]
+  },
+  {
+   "n": 75,
+   "file": "Bathroom_Singles_32x32_75.png",
+   "w": 64,
+   "h": 48,
+   "at": [
+    64,
+    912
+   ],
+   "bbox": [
+    68,
+    916,
+    54,
+    24
+   ]
+  },
+  {
+   "n": 76,
+   "file": "Bathroom_Singles_32x32_76.png",
+   "w": 64,
+   "h": 48,
+   "at": [
+    0,
+    976
+   ],
+   "bbox": [
+    6,
+    980,
+    52,
+    36
+   ]
+  },
+  {
+   "n": 77,
+   "file": "Bathroom_Singles_32x32_77.png",
+   "w": 64,
+   "h": 48,
+   "at": [
+    128,
+    912
+   ],
+   "bbox": [
+    134,
+    916,
+    52,
+    36
+   ]
+  },
+  {
+   "n": 78,
+   "file": "Bathroom_Singles_32x32_78.png",
+   "w": 64,
+   "h": 48,
+   "at": [
+    192,
+    912
+   ],
+   "bbox": [
+    198,
+    916,
+    52,
+    20
+   ]
+  },
+  {
+   "n": 79,
+   "file": "Bathroom_Singles_32x32_79.png",
+   "w": 64,
+   "h": 48,
+   "at": [
+    64,
+    976
+   ],
+   "bbox": [
+    70,
+    980,
+    52,
+    20
+   ]
+  },
+  {
+   "n": 80,
+   "file": "Bathroom_Singles_32x32_80.png",
+   "w": 64,
+   "h": 16,
+   "at": [
+    128,
+    976
+   ],
+   "bbox": [
+    134,
+    980,
+    52,
+    12
+   ]
+  },
+  {
+   "n": 81,
+   "file": "Bathroom_Singles_32x32_81.png",
+   "w": 64,
+   "h": 16,
+   "at": [
+    128,
+    1008
+   ],
+   "bbox": [
+    134,
+    1012,
+    52,
+    12
+   ]
+  },
+  {
+   "n": 82,
+   "file": "Bathroom_Singles_32x32_82.png",
+   "w": 64,
+   "h": 80,
+   "at": [
+    384,
+    976
+   ],
+   "bbox": [
+    388,
+    982,
+    56,
+    58
+   ]
+  },
+  {
+   "n": 83,
+   "file": "Bathroom_Singles_32x32_83.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    448,
+    960
+   ],
+   "bbox": [
+    452,
+    972,
+    56,
+    68
+   ]
+  },
+  {
+   "n": 85,
+   "file": "Bathroom_Singles_32x32_85.png",
+   "w": 64,
+   "h": 80,
+   "at": [
+    288,
+    1456
+   ],
+   "bbox": [
+    292,
+    1460,
+    56,
+    62
+   ]
+  },
+  {
+   "n": 86,
+   "file": "Bathroom_Singles_32x32_86.png",
+   "w": 64,
+   "h": 80,
+   "at": [
+    352,
+    1456
+   ],
+   "bbox": [
+    356,
+    1456,
+    56,
+    66
+   ]
+  },
+  {
+   "n": 87,
+   "file": "Bathroom_Singles_32x32_87.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    64,
+    1024
+   ],
+   "bbox": [
+    76,
+    1024,
+    40,
+    58
+   ]
+  },
+  {
+   "n": 88,
+   "file": "Bathroom_Singles_32x32_88.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    128,
+    1024
+   ],
+   "bbox": [
+    136,
+    1038,
+    56,
+    82
+   ]
+  },
+  {
+   "n": 90,
+   "file": "Bathroom_Singles_32x32_90.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    192,
+    1056
+   ],
+   "bbox": [
+    192,
+    1058,
+    32,
+    52
+   ]
+  },
+  {
+   "n": 95,
+   "file": "Bathroom_Singles_32x32_95.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    0,
+    1040
+   ],
+   "bbox": [
+    0,
+    1042,
+    32,
+    26
+   ]
+  },
+  {
+   "n": 96,
+   "file": "Bathroom_Singles_32x32_96.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    32,
+    1024
+   ],
+   "bbox": [
+    32,
+    1036,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 97,
+   "file": "Bathroom_Singles_32x32_97.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    32,
+    1104
+   ],
+   "bbox": [
+    32,
+    1104,
+    32,
+    28
+   ]
+  },
+  {
+   "n": 98,
+   "file": "Bathroom_Singles_32x32_98.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    0,
+    1104
+   ],
+   "bbox": [
+    0,
+    1104,
+    32,
+    28
+   ]
+  },
+  {
+   "n": 99,
+   "file": "Bathroom_Singles_32x32_99.png",
+   "w": 64,
+   "h": 32,
+   "at": [
+    0,
+    1152
+   ],
+   "bbox": [
+    4,
+    1166,
+    50,
+    18
+   ]
+  },
+  {
+   "n": 100,
+   "file": "Bathroom_Singles_32x32_100.png",
+   "w": 64,
+   "h": 32,
+   "at": [
+    64,
+    1152
+   ],
+   "bbox": [
+    68,
+    1166,
+    50,
+    18
+   ]
+  },
+  {
+   "n": 101,
+   "file": "Bathroom_Singles_32x32_101.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    192,
+    1120
+   ],
+   "bbox": [
+    194,
+    1124,
+    28,
+    28
+   ]
+  },
+  {
+   "n": 102,
+   "file": "Bathroom_Singles_32x32_102.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    288,
+    1056
+   ],
+   "bbox": [
+    290,
+    1070,
+    28,
+    34
+   ]
+  },
+  {
+   "n": 105,
+   "file": "Bathroom_Singles_32x32_105.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    224,
+    1120
+   ],
+   "bbox": [
+    226,
+    1124,
+    28,
+    28
+   ]
+  },
+  {
+   "n": 106,
+   "file": "Bathroom_Singles_32x32_106.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    320,
+    1056
+   ],
+   "bbox": [
+    322,
+    1070,
+    28,
+    34
+   ]
+  },
+  {
+   "n": 109,
+   "file": "Bathroom_Singles_32x32_109.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    320,
+    1136
+   ],
+   "bbox": [
+    328,
+    1136,
+    22,
+    22
+   ]
+  },
+  {
+   "n": 110,
+   "file": "Bathroom_Singles_32x32_110.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    352,
+    1072
+   ],
+   "bbox": [
+    356,
+    1076,
+    24,
+    26
+   ]
+  },
+  {
+   "n": 111,
+   "file": "Bathroom_Singles_32x32_111.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    352,
+    1136
+   ],
+   "bbox": [
+    356,
+    1138,
+    24,
+    28
+   ]
+  },
+  {
+   "n": 112,
+   "file": "Bathroom_Singles_32x32_112.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    384,
+    1072
+   ],
+   "bbox": [
+    388,
+    1076,
+    24,
+    26
+   ]
+  },
+  {
+   "n": 113,
+   "file": "Bathroom_Singles_32x32_113.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    384,
+    1136
+   ],
+   "bbox": [
+    388,
+    1138,
+    24,
+    28
+   ]
+  },
+  {
+   "n": 114,
+   "file": "Bathroom_Singles_32x32_114.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    416,
+    1072
+   ],
+   "bbox": [
+    420,
+    1076,
+    24,
+    26
+   ]
+  },
+  {
+   "n": 115,
+   "file": "Bathroom_Singles_32x32_115.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    416,
+    1136
+   ],
+   "bbox": [
+    420,
+    1138,
+    24,
+    28
+   ]
+  },
+  {
+   "n": 116,
+   "file": "Bathroom_Singles_32x32_116.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    448,
+    1072
+   ],
+   "bbox": [
+    452,
+    1076,
+    24,
+    26
+   ]
+  },
+  {
+   "n": 117,
+   "file": "Bathroom_Singles_32x32_117.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    448,
+    1136
+   ],
+   "bbox": [
+    452,
+    1138,
+    24,
+    28
+   ]
+  },
+  {
+   "n": 118,
+   "file": "Bathroom_Singles_32x32_118.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    480,
+    1072
+   ],
+   "bbox": [
+    484,
+    1076,
+    24,
+    26
+   ]
+  },
+  {
+   "n": 119,
+   "file": "Bathroom_Singles_32x32_119.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    480,
+    1136
+   ],
+   "bbox": [
+    484,
+    1138,
+    24,
+    28
+   ]
+  },
+  {
+   "n": 120,
+   "file": "Bathroom_Singles_32x32_120.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    320,
+    1248
+   ],
+   "bbox": [
+    322,
+    1248,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 122,
+   "file": "Bathroom_Singles_32x32_122.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    352,
+    1248
+   ],
+   "bbox": [
+    354,
+    1248,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 124,
+   "file": "Bathroom_Singles_32x32_124.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    384,
+    1248
+   ],
+   "bbox": [
+    386,
+    1248,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 126,
+   "file": "Bathroom_Singles_32x32_126.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    416,
+    1248
+   ],
+   "bbox": [
+    418,
+    1248,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 128,
+   "file": "Bathroom_Singles_32x32_128.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    448,
+    1248
+   ],
+   "bbox": [
+    450,
+    1248,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 130,
+   "file": "Bathroom_Singles_32x32_130.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    480,
+    1248
+   ],
+   "bbox": [
+    482,
+    1248,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 132,
+   "file": "Bathroom_Singles_32x32_132.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    320,
+    1376
+   ],
+   "bbox": [
+    322,
+    1376,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 134,
+   "file": "Bathroom_Singles_32x32_134.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    352,
+    1376
+   ],
+   "bbox": [
+    354,
+    1376,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 136,
+   "file": "Bathroom_Singles_32x32_136.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    384,
+    1376
+   ],
+   "bbox": [
+    386,
+    1376,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 138,
+   "file": "Bathroom_Singles_32x32_138.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    322,
+    1204
+   ],
+   "bbox": [
+    328,
+    1208,
+    14,
+    18
+   ]
+  },
+  {
+   "n": 139,
+   "file": "Bathroom_Singles_32x32_139.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    448,
+    1328
+   ],
+   "bbox": [
+    450,
+    1332,
+    26,
+    26
+   ]
+  },
+  {
+   "n": 140,
+   "file": "Bathroom_Singles_32x32_140.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    416,
+    1344
+   ],
+   "bbox": [
+    416,
+    1354,
+    32,
+    48
+   ]
+  },
+  {
+   "n": 141,
+   "file": "Bathroom_Singles_32x32_141.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    128,
+    1296
+   ],
+   "bbox": [
+    128,
+    1300,
+    32,
+    20
+   ]
+  },
+  {
+   "n": 147,
+   "file": "Bathroom_Singles_32x32_147.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    224,
+    1280
+   ],
+   "bbox": [
+    224,
+    1294,
+    32,
+    44
+   ]
+  },
+  {
+   "n": 149,
+   "file": "Bathroom_Singles_32x32_149.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    256,
+    1280
+   ],
+   "bbox": [
+    256,
+    1294,
+    32,
+    44
+   ]
+  },
+  {
+   "n": 151,
+   "file": "Bathroom_Singles_32x32_151.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    0,
+    1376
+   ],
+   "bbox": [
+    8,
+    1380,
+    48,
+    70
+   ]
+  },
+  {
+   "n": 155,
+   "file": "Bathroom_Singles_32x32_155.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    448,
+    1376
+   ],
+   "bbox": [
+    462,
+    1390,
+    36,
+    40
+   ]
+  },
+  {
+   "n": 156,
+   "file": "Bathroom_Singles_32x32_156.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    448,
+    1440
+   ],
+   "bbox": [
+    452,
+    1442,
+    58,
+    50
+   ]
+  },
+  {
+   "n": 157,
+   "file": "Bathroom_Singles_32x32_157.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    448,
+    1504
+   ],
+   "bbox": [
+    452,
+    1506,
+    58,
+    50
+   ]
+  },
+  {
+   "n": 158,
+   "file": "Bathroom_Singles_32x32_158.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    448,
+    1568
+   ],
+   "bbox": [
+    452,
+    1570,
+    58,
+    50
+   ]
+  },
+  {
+   "n": 159,
+   "file": "Bathroom_Singles_32x32_159.png",
+   "w": 64,
+   "h": 112,
+   "at": [
+    384,
+    1552
+   ],
+   "bbox": [
+    396,
+    1552,
+    40,
+    90
+   ]
+  }
+ ],
+ "missing": [
+  "Bathroom_Singles_32x32_3.png",
+  "Bathroom_Singles_32x32_4.png",
+  "Bathroom_Singles_32x32_5.png",
+  "Bathroom_Singles_32x32_6.png",
+  "Bathroom_Singles_32x32_7.png",
+  "Bathroom_Singles_32x32_10.png",
+  "Bathroom_Singles_32x32_11.png",
+  "Bathroom_Singles_32x32_13.png",
+  "Bathroom_Singles_32x32_14.png",
+  "Bathroom_Singles_32x32_16.png",
+  "Bathroom_Singles_32x32_17.png",
+  "Bathroom_Singles_32x32_19.png",
+  "Bathroom_Singles_32x32_20.png",
+  "Bathroom_Singles_32x32_63.png",
+  "Bathroom_Singles_32x32_84.png",
+  "Bathroom_Singles_32x32_89.png",
+  "Bathroom_Singles_32x32_91.png",
+  "Bathroom_Singles_32x32_92.png",
+  "Bathroom_Singles_32x32_93.png",
+  "Bathroom_Singles_32x32_94.png",
+  "Bathroom_Singles_32x32_103.png",
+  "Bathroom_Singles_32x32_104.png",
+  "Bathroom_Singles_32x32_107.png",
+  "Bathroom_Singles_32x32_108.png",
+  "Bathroom_Singles_32x32_121.png",
+  "Bathroom_Singles_32x32_123.png",
+  "Bathroom_Singles_32x32_125.png",
+  "Bathroom_Singles_32x32_127.png",
+  "Bathroom_Singles_32x32_129.png",
+  "Bathroom_Singles_32x32_131.png",
+  "Bathroom_Singles_32x32_133.png",
+  "Bathroom_Singles_32x32_135.png",
+  "Bathroom_Singles_32x32_137.png",
+  "Bathroom_Singles_32x32_142.png",
+  "Bathroom_Singles_32x32_143.png",
+  "Bathroom_Singles_32x32_144.png",
+  "Bathroom_Singles_32x32_145.png",
+  "Bathroom_Singles_32x32_146.png",
+  "Bathroom_Singles_32x32_148.png",
+  "Bathroom_Singles_32x32_150.png",
+  "Bathroom_Singles_32x32_152.png",
+  "Bathroom_Singles_32x32_153.png",
+  "Bathroom_Singles_32x32_154.png"
+ ]
+}

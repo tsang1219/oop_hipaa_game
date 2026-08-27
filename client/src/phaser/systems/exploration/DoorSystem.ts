@@ -1,5 +1,7 @@
 import Phaser from 'phaser';
 import { getArtHandle } from './art/artRenderer';
+import { ATLAS_KEY, type AtlasFrame } from './art/atlasFrames.generated';
+import { DOOR_ART, DOOR_OPEN_STEPS, opennessToStep, type DoorKind } from './art/doorArt';
 import { eventBridge, BRIDGE_EVENTS } from '../../EventBridge';
 import type { Room } from '@shared/schema';
 import type { MusicController } from './MusicController';
@@ -29,10 +31,23 @@ export interface DoorHostScene extends Phaser.Scene {
 }
 
 interface DoorLeaf {
-  leaf: Phaser.GameObjects.Container;
-  /** 1 = closed, 0 = fully open (scaleX toward the hinge) */
+  sprite: Phaser.GameObjects.Sprite;
+  kind: DoorKind;
+  /** closed → open frames (5) */
+  frames: AtlasFrame[];
+  /** tween proxy: 0 = closed … DOOR_OPEN_STEPS = open */
+  pose: { step: number };
+  /** 1 = closed, 0 = fully open (Run 12's number; QA reads it) */
   openness: number;
   state: DoorState;
+  /** resting x — the locked rattle shakes around it */
+  homeX: number;
+}
+
+/** Run 11 proof surface: what each door is drawn with right now (window.__QA__.doors). */
+export interface DoorSnapshot {
+  id: string; kind: DoorKind | 'seam'; state: DoorState; frame: string | null;
+  x: number; y: number; depth: number; openness: number;
 }
 
 /**
@@ -46,6 +61,12 @@ interface DoorLeaf {
  * Run 12 (ANIM-07): every visible door has a real leaf. It cracks ajar with a
  * creak as you approach, closes again if you walk away, and swings fully
  * open — before the fade — when you go through.
+ *
+ * Run 11 (art-substrate, item 1): the leaf is one of LimeZu's animated doors
+ * from the interiors atlas (see art/doorArt.ts for which door goes where and
+ * how it sits on the wall). Openness drives the frame index, so the Run 12
+ * beats are unchanged: ajar = one step, through = the full swing. A locked
+ * door no longer swings open before React says no — it rattles in its frame.
  */
 export class DoorSystem {
   private doorStates: Record<string, DoorState> = {};
@@ -79,7 +100,10 @@ export class DoorSystem {
     let found: Door | null = null;
     for (const door of doors) {
       const dx = Math.abs(px - (door.x * TILE + TILE / 2));
-      const dy = Math.abs(py - (door.y * TILE + TILE / 2));
+      // Run 11: a back-wall door sits inside a two-row face — measure from the
+      // doorway's floor edge (the wall's last row), or no one could ever reach it
+      const refY = door.side === 'top' ? this.wallBottom(door) - TILE / 2 : door.y * TILE + TILE / 2;
+      const dy = Math.abs(py - refY);
       if (dx < TILE * 1.5 && dy < TILE * 1.5) {
         found = door;
         break;
@@ -110,19 +134,24 @@ export class DoorSystem {
     this.scene.transitioning = true;
 
     // ANIM-07 — the door visibly swings open before the fade takes the screen.
-    const hasLeaf = this.leaves.has(door.id);
+    // Run 11: not when we already know it's locked — that one rattles instead
+    // (React stays the authority on access; onDoorLocked rattles too).
+    const locked = this.doorStates[door.id] === 'locked';
+    const hasLeaf = this.leaves.has(door.id) && !locked;
     if (hasLeaf) {
       this.setLeaf(door.id, 0.06, 230, 'Sine.easeIn');
       playRoundRobin(this.scene, 'door_open', ['sfx_door_open_0', 'sfx_door_open_1', 'sfx_door_open_2'], {
         volume: 0.42, rate: 0.95 + Math.random() * 0.1, cooldownMs: 0,
       });
+    } else if (locked) {
+      this.rattle(door.id);
     }
 
     // Fade music out in sync with camera fade so shutdown doesn't hard-stop it
     this.music.fadeOutForDoor();
-    // A short lead so the swing reads before the screen dims (skipped for
-    // still-hidden doors — no leaf to swing, so no reason to add the delay).
-    this.scene.time.delayedCall(hasLeaf ? 150 : 0, () => {
+    // A short lead so the swing (or the rattle) reads before the screen dims
+    // (skipped for still-hidden doors — no leaf to swing, so no reason to add the delay).
+    this.scene.time.delayedCall(hasLeaf || locked ? 150 : 0, () => {
       this.scene.cameras.main.fadeOut(300, 0, 0, 0);
       this.scene.time.delayedCall(300, () => {
         eventBridge.emit(BRIDGE_EVENTS.EXPLORATION_EXIT_ROOM, {
@@ -133,60 +162,109 @@ export class DoorSystem {
     });
   }
 
+  /** Locked feedback on the door itself: the leaf shuts if it was open, then the
+   *  big door thuds in its frame (LimeZu's locked frames) or a side door shakes
+   *  on its hinge. Called from enter() for a known-locked door and from the
+   *  scene's onDoorLocked (React's verdict) — the cooldown keeps it to one beat. */
+  rattle(doorId: string | undefined | null): void {
+    if (!doorId) return;
+    const entry = this.leaves.get(doorId);
+    if (!entry || !entry.sprite.active) return;
+    // a leaf that had swung on a stale 'available' always shuts; the shake itself is
+    // one beat per attempt (SPACE rattles at once, React's refusal ~450 ms later is the echo)
+    if (entry.openness < 1) this.setLeaf(doorId, 1, 120, 'Sine.easeIn');
+    if (this.scene.time.now - this.lastRattleAt < 1000) return;
+    this.lastRattleAt = this.scene.time.now;
+    const sprite = entry.sprite;
+    if (entry.kind === 'face' && this.hasFrame(DOOR_ART.faceLocked[0])) {
+      const key = 'door:face:locked';
+      if (!this.scene.anims.exists(key)) {
+        this.scene.anims.create({ key, frames: DOOR_ART.faceLocked.map(f => ({ key: ATLAS_KEY, frame: f })), frameRate: 14, repeat: 0 });
+      }
+      sprite.once(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+        if (sprite.active) sprite.setFrame(entry.frames[opennessToStep(entry.openness)]);
+      });
+      sprite.play(key);
+    } else {
+      this.scene.tweens.killTweensOf(sprite);
+      sprite.x = entry.homeX;
+      this.scene.tweens.add({
+        targets: sprite, x: entry.homeX + 2, duration: 36, yoyo: true, repeat: 3, ease: 'Sine.easeInOut',
+        onComplete: () => { if (sprite.active) sprite.x = entry.homeX; },
+      });
+    }
+    this.publishSnapshot();
+  }
+  private lastRattleAt = -1000;
+
   /** Run 11: a door in the back wall sits inside the rendered wall face (2 rows),
-   *  so its frame's top is measured down from the face's bottom edge. */
+   *  so anything measured from the wall's bottom edge uses the face height. */
   private wallBottom(door: Door): number {
     const rows = getArtHandle(this.scene)?.style.wall.rows ?? 1;
     return door.side === 'top' ? rows * TILE : (door.y + 1) * TILE;
   }
 
-  private frameTop(door: Door): number {
-    return door.side === 'top' ? this.wallBottom(door) - (TILE + TILE / 2) : door.y * TILE - TILE / 2;
+  private hasFrame(frame: string): boolean {
+    return this.scene.textures.exists(ATLAS_KEY) && this.scene.textures.get(ATLAS_KEY).has(frame);
   }
 
-  /** Tween a door leaf's openness (1 closed → 0 open) about its hinge. */
+  /** Where a door's sprite stands (origin = bottom-left of the frame) and how it sorts. */
+  private anchor(door: Door): { kind: DoorKind; x: number; y: number; depth: number } {
+    const side = door.side;
+    if (side === 'left') return { kind: 'side-left', x: door.x * TILE + DOOR_ART.sideLeftDx, y: (door.y + 1) * TILE, depth: 5 + door.y - 0.5 };
+    if (side === 'right') return { kind: 'side-right', x: door.x * TILE + DOOR_ART.sideRightDx, y: (door.y + 1) * TILE, depth: 5 + door.y - 0.5 };
+    // back wall: inside the face, behind everything that stands on the floor
+    if (side === 'top') return { kind: 'face', x: door.x * TILE, y: this.wallBottom(door), depth: 2 };
+    // bottom wall: standing in the gap, y-sorted so you walk up behind it
+    return { kind: 'face', x: door.x * TILE, y: (door.y + 1) * TILE, depth: 5 + door.y - 0.5 };
+  }
+
+  /** Tween a door leaf's openness (1 closed → 0 open): the frame index follows. */
   private setLeaf(doorId: string, openness: number, ms: number, ease: string): void {
     const entry = this.leaves.get(doorId);
-    if (!entry || !entry.leaf.active) return;
+    if (!entry || !entry.sprite.active) return;
     entry.openness = openness;
-    this.scene.tweens.killTweensOf(entry.leaf);
-    this.scene.tweens.add({ targets: entry.leaf, scaleX: openness, duration: ms, ease });
+    this.scene.tweens.killTweensOf(entry.pose);
+    const apply = () => {
+      if (!entry.sprite.active) return;
+      const step = Math.max(0, Math.min(DOOR_OPEN_STEPS, Math.round(entry.pose.step)));
+      const frame = entry.frames[step];
+      if (entry.sprite.frame.name !== frame) { entry.sprite.setFrame(frame); this.publishSnapshot(); }
+    };
+    this.scene.tweens.add({
+      targets: entry.pose, step: opennessToStep(openness), duration: ms, ease,
+      onUpdate: apply, onComplete: apply,
+    });
+    this.publishSnapshot();
   }
 
-  /** Build the leaf for a door: a wooden slab with a panel line and a knob,
-   *  hinged on the side away from the room's interior. */
-  private buildLeaf(door: Door, state: DoorState): Phaser.GameObjects.Container {
-    const fx = door.x * TILE;
-    const fy = this.frameTop(door);
-    const openingW = TILE - 4;
-    const openingH = TILE + TILE / 2 - 6;
-    const hingeOnRight = door.side === 'right';
-    const hingeX = hingeOnRight ? fx + TILE - 2 : fx + 2;
-    const leaf = this.scene.add.container(hingeX, fy + 5).setDepth(2);
-    const g = this.scene.add.graphics();
-    const x0 = hingeOnRight ? -openingW : 0;
-    const wood = state === 'locked' ? 0x5a4230 : 0x8a6440;
-    const woodDark = state === 'locked' ? 0x3e2c20 : 0x6a4a2e;
-    const woodLight = state === 'locked' ? 0x6c5040 : 0xa8805a;
-    g.fillStyle(wood, 1);
-    g.fillRect(x0, 0, openingW, openingH);
-    // panel inset
-    g.fillStyle(woodDark, 1);
-    g.fillRect(x0 + 4, 5, openingW - 8, openingH - 10);
-    g.fillStyle(wood, 1);
-    g.fillRect(x0 + 6, 7, openingW - 12, openingH - 14);
-    // edge highlight along the hinge side
-    g.fillStyle(woodLight, 0.9);
-    g.fillRect(hingeOnRight ? -1 : 0, 0, 1, openingH);
-    // knob on the far side from the hinge
-    g.fillStyle(0xe8c860, 1);
-    const knobX = hingeOnRight ? x0 + 5 : x0 + openingW - 6;
-    g.fillRect(knobX, Math.floor(openingH / 2) - 1, 2, 2);
-    // floor shadow under the leaf
-    g.fillStyle(0x000000, 0.25);
-    g.fillRect(x0, openingH, openingW, 2);
-    leaf.add(g);
-    return leaf;
+  /** Build the leaf for a door: a LimeZu door sprite in its closed frame. */
+  private buildLeaf(door: Door, state: DoorState): DoorLeaf | null {
+    const a = this.anchor(door);
+    const frames = DOOR_ART.frames[a.kind];
+    if (!this.hasFrame(frames[0])) {
+      if (import.meta.env.DEV) console.warn(`[doors] ${this.room.id}/${door.id}: atlas frame '${frames[0]}' missing — re-run node scripts/art/slice-atlas.mjs`);
+      return null;
+    }
+    const sprite = this.scene.add.sprite(a.x, a.y, ATLAS_KEY, frames[0]).setOrigin(0, 1).setDepth(a.depth);
+    if (state === 'locked') sprite.setTint(0x8c8c9c); // dimmed: this one isn't for you yet
+    return { sprite, kind: a.kind, frames, pose: { step: 0 }, openness: 1, state, homeX: a.x };
+  }
+
+  /** What each door is drawn with right now — window.__QA__.doors (DEV only, proof surface). */
+  snapshot(): DoorSnapshot[] {
+    const doors: Door[] = (this.room as any).doors ?? [];
+    return doors.map(d => {
+      const leaf = this.leaves.get(d.id);
+      const state = this.doorStates[d.id] ?? 'available';
+      if (!leaf) return { id: d.id, kind: 'seam' as const, state, frame: null, x: d.x, y: d.y, depth: 2, openness: 1 };
+      return { id: d.id, kind: leaf.kind, state, frame: leaf.sprite.frame.name, x: leaf.sprite.x, y: leaf.sprite.y, depth: leaf.sprite.depth, openness: leaf.openness };
+    });
+  }
+
+  private publishSnapshot(): void {
+    const qa = (window as unknown as { __QA__?: { doors?: DoorSnapshot[] } }).__QA__;
+    if (qa) qa.doors = this.snapshot();
   }
 
   render(): void {
@@ -194,6 +272,10 @@ export class DoorSystem {
     if (!doors || doors.length === 0) return;
 
     // Clear existing door visuals so we can re-render cleanly
+    this.leaves.forEach(leaf => {
+      this.scene.tweens.killTweensOf(leaf.pose);
+      this.scene.tweens.killTweensOf(leaf.sprite);
+    });
     for (const v of this.doorVisuals) {
       v.destroy();
     }
@@ -202,7 +284,9 @@ export class DoorSystem {
     this.ajarDoorId = null;
 
     for (const door of doors) {
-      const doorPixelX = door.x * TILE + TILE / 2;
+      // Rings, lock mark and badge centre on the door itself: for a side door that is
+      // the wall line (the closed leaf's edge-on line), 8–9 px off the tile centre
+      const doorPixelX = door.x * TILE + TILE / 2 + (door.side === 'left' ? 8 : door.side === 'right' ? -9 : 0);
       const doorPixelY = door.y * TILE + TILE / 2;
       const state = this.doorStates[door.id] ?? 'available';
 
@@ -243,50 +327,24 @@ export class DoorSystem {
         continue; // no frame, no state visuals, no label
       }
 
-      // Door frame — prominent wood frame with highlight and shadow
-      const frameG = this.scene.add.graphics().setDepth(1);
-      this.doorVisuals.push(frameG);
-      const fx = door.x * TILE;
-      const fy = this.frameTop(door);
-      // Dark opening behind the leaf (what you see when it swings open)
-      frameG.fillStyle(0x0b0b14, 1);
-      frameG.fillRect(fx + 2, fy + 5, TILE - 4, TILE + TILE / 2 - 6);
-      frameG.fillStyle(0x2a2438, 0.6);
-      frameG.fillRect(fx + 4, fy + 7, TILE - 8, TILE / 2);
-      // Frame posts (solid wood)
-      frameG.fillStyle(0xa0845a, 1);
-      frameG.fillRect(fx - 3, fy, 5, TILE + TILE / 2);
-      frameG.fillRect(fx + TILE - 2, fy, 5, TILE + TILE / 2);
-      // Frame header
-      frameG.fillStyle(0xa0845a, 1);
-      frameG.fillRect(fx - 3, fy, TILE + 6, 5);
-      // Highlight (inner edge)
-      frameG.fillStyle(0xc4a870, 0.8);
-      frameG.fillRect(fx + 1, fy + 1, 1, TILE + TILE / 2 - 1);
-      frameG.fillRect(fx + TILE - 3, fy + 1, 1, TILE + TILE / 2 - 1);
-      frameG.fillRect(fx, fy + 1, TILE, 1);
-      // Shadow (outer edge)
-      frameG.fillStyle(0x5a4430, 0.7);
-      frameG.fillRect(fx - 3, fy + TILE + TILE / 2 - 1, TILE + 6, 2);
-
-      // ANIM-07 — the leaf itself (closed), hinged away from the room
+      // The door itself (closed), from the atlas — see art/doorArt.ts
       const leaf = this.buildLeaf(door, state);
-      this.doorVisuals.push(leaf);
-      this.leaves.set(door.id, { leaf, openness: 1, state });
+      if (leaf) {
+        this.doorVisuals.push(leaf.sprite);
+        this.leaves.set(door.id, leaf);
+      }
+      // State dressing sits just above its own door (and y-sorts with it)
+      const dressDepth = (leaf?.sprite.depth ?? 2) + 0.1;
 
       if (state === 'locked') {
-        // Dark overlay + lock icon
-        const overlay = this.scene.add.graphics().setDepth(2);
-        overlay.fillStyle(0x000000, 0.55);
-        overlay.fillRect(door.x * TILE - TILE / 2, door.y * TILE - TILE, TILE * 2, TILE * 3);
         const lockText = this.scene.add.text(doorPixelX, doorPixelY, '[X]', {
           fontFamily: '"Press Start 2P"',
           fontSize: '10px',
           color: '#ff4444',
           stroke: '#000000',
           strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(3);
-        this.doorVisuals.push(overlay, lockText);
+        }).setOrigin(0.5).setDepth(dressDepth + 0.1);
+        this.doorVisuals.push(lockText);
 
       } else if (state === 'next') {
         // Breathing warm-gold filled aura (Phase 27 VIS-07) — critical-path "next" door
@@ -296,7 +354,7 @@ export class DoorSystem {
             .setTint(0xffa000)
             .setBlendMode(Phaser.BlendModes.ADD)
             .setAlpha(0.6)
-            .setDepth(2);
+            .setDepth(dressDepth);
           this.scene.tweens.add({
             targets: aura,
             alpha: { from: 0.6, to: 0.95 },
@@ -310,7 +368,7 @@ export class DoorSystem {
           this.doorVisuals.push(aura);
         } else {
           // Fallback: filled gold circle alpha pulse (never stroke-only)
-          const fallbackAura = this.scene.add.circle(doorPixelX, doorPixelY, 20, 0xffd700, 0.22).setDepth(2);
+          const fallbackAura = this.scene.add.circle(doorPixelX, doorPixelY, 20, 0xffd700, 0.22).setDepth(dressDepth);
           this.scene.tweens.add({
             targets: fallbackAura,
             alpha: { from: 0.22, to: 0.45 },
@@ -325,7 +383,7 @@ export class DoorSystem {
         }
         // Gold stroke ring — slower (1600ms) vs the blue available ring (1000ms) for distinct read
         const nextRing = this.scene.add.circle(doorPixelX, doorPixelY, 18, 0xffd700, 0)
-          .setStrokeStyle(2, 0xffd700, 1).setDepth(2);
+          .setStrokeStyle(2, 0xffd700, 1).setDepth(dressDepth);
         this.scene.tweens.add({
           targets: nextRing,
           alpha: { from: 0.3, to: 0.9 },
@@ -341,7 +399,7 @@ export class DoorSystem {
       } else if (state === 'available') {
         // Pulsing glow ring
         const glow = this.scene.add.circle(doorPixelX, doorPixelY, 18, 0x4a90e2, 0)
-          .setStrokeStyle(2, 0x4a90e2, 1).setDepth(2);
+          .setStrokeStyle(2, 0x4a90e2, 1).setDepth(dressDepth);
         this.scene.tweens.add({
           targets: glow,
           alpha: { from: 0.2, to: 0.8 },
@@ -357,7 +415,7 @@ export class DoorSystem {
       } else if (state === 'completed') {
         // Gold checkmark badge above door (Phase 15 upgrade — persistent fanfare badge)
         const badge = this.scene.add.circle(doorPixelX, doorPixelY - TILE, 9, 0x2a6a2a, 1)
-          .setDepth(3);
+          .setDepth(dressDepth + 0.1);
         this.doorVisuals.push(badge);
         const check = this.scene.add.text(doorPixelX, doorPixelY - TILE, '✓', {
           fontFamily: '"Press Start 2P"',
@@ -365,18 +423,19 @@ export class DoorSystem {
           color: '#ffd700',
           stroke: '#000000',
           strokeThickness: 2,
-        }).setOrigin(0.5).setDepth(4);
+        }).setOrigin(0.5).setDepth(dressDepth + 0.2);
         this.doorVisuals.push(check);
       }
 
-      // Door label (always shown)
+      // Door label (always shown) — depth 30: signage floats above y-sorted props (a wheelchair
+      // parked by a door used to eat the label's left half), below the lighting/HUD layers
       const labelText = this.scene.add.text(doorPixelX, doorPixelY + TILE, door.label, {
         fontFamily: '"Press Start 2P"',
         fontSize: '6px',
         color: state === 'locked' ? '#888888' : '#ffffff',
         stroke: '#000000',
         strokeThickness: 1,
-      }).setOrigin(0.5).setDepth(3);
+      }).setOrigin(0.5).setDepth(30);
       // F-20 fix (Run 07): clamp inside the room bounds — edge-door labels used
       // to truncate at the canvas edge ("Recepti", "Hallwa"). Same clamp the
       // NPC nameplates already use.
@@ -392,5 +451,6 @@ export class DoorSystem {
       }
       this.doorVisuals.push(labelText);
     }
+    this.publishSnapshot();
   }
 }

@@ -1,5 +1,5 @@
 {
-  "_comment": "Run 11 (art-substrate). Every frame the game slices out of LimeZu Modern Interiors (32x32). Rects are in TILES [tx, ty, tw, th] on the named sheet; 'split' explodes a block into per-tile variants (name.0 .. name.N). Re-slice with: node scripts/art/slice-atlas.mjs",
+  "_comment": "Run 11 (art-substrate). Every frame the game slices out of LimeZu Modern Interiors (32x32). Floors/walls/trims are tile rects [tx,ty,tw,th] (split explodes a block into variants); every object is a PIXEL rect [x,y,w,h] on its sheet \u2014 LimeZu packs objects edge to edge and off the tile grid, so tile rects cut them (audit, 2026-08-23). `_single` = the Theme_Sorter_Singles file it matches (scripts/art/singles-index.mjs). Re-slice with: node scripts/art/slice-atlas.mjs",
   "vendor": "attached_assets/vendor/modern-interiors",
   "tile": 32,
   "output": "attached_assets/generated_images/privacyquest/atlas",
@@ -25,7 +25,13 @@
     "anim_hscreen": "3_Animated_objects/32x32/spritesheets/animated_hospital_screen_color_32x32.png",
     "anim_camera": "3_Animated_objects/32x32/spritesheets/animated_security_camera_wall_left_32x32.png",
     "anim_screens": "3_Animated_objects/32x32/spritesheets/animated_control_room_screens_32x32.png",
-    "anim_fridge": "3_Animated_objects/32x32/spritesheets/animated_canteen_fridge_empty_32x32.png"
+    "anim_fridge": "3_Animated_objects/32x32/spritesheets/animated_canteen_fridge_empty_32x32.png",
+    "anim_door_vr": "3_Animated_objects/32x32/spritesheets/animated_door_vertical_right_1_32x32.png",
+    "anim_door_vl": "3_Animated_objects/32x32/spritesheets/animated_door_vertical_left_1_32x32.png",
+    "anim_door_big": "3_Animated_objects/32x32/spritesheets/animated_door_big_1_32x32.png",
+    "anim_door_big_locked": "3_Animated_objects/32x32/spritesheets/animated_door_big_1_locked_32x32.png",
+    "custom": "../../art-src/custom_props_32x32.png",
+    "bathroom": "1_Interiors/32x32/Theme_Sorter_32x32/3_Bathroom_32x32.png"
   },
   "frames": {
     "floor.reception": {
@@ -729,2706 +735,6 @@
         1
       ]
     },
-    "prop.counter.reception.wood": {
-      "sheet": "hospital",
-      "t": [
-        4,
-        0,
-        6,
-        3
-      ]
-    },
-    "prop.counter.reception.beige": {
-      "sheet": "hospital",
-      "t": [
-        10,
-        0,
-        6,
-        3
-      ]
-    },
-    "prop.counter.reception.white": {
-      "sheet": "hospital",
-      "t": [
-        4,
-        9,
-        6,
-        3
-      ]
-    },
-    "prop.whiteboard": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        0,
-        2,
-        2
-      ]
-    },
-    "prop.noticeboard": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        0,
-        2,
-        2
-      ]
-    },
-    "prop.sign.small": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.sign.exit": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.extinguisher": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.binders": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.printer.small": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        4,
-        1,
-        1
-      ]
-    },
-    "prop.fax.a": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        4,
-        1,
-        1
-      ]
-    },
-    "prop.fax.b": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        4,
-        1,
-        1
-      ]
-    },
-    "prop.printer.b": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        5,
-        1,
-        1
-      ]
-    },
-    "prop.clipboard.green": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        5,
-        1,
-        1
-      ]
-    },
-    "prop.clipboard.blue": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        5,
-        1,
-        1
-      ]
-    },
-    "prop.clipboard.plain": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        6,
-        1,
-        1
-      ]
-    },
-    "prop.clipboard.orange": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        7,
-        1,
-        1
-      ]
-    },
-    "prop.clipboard.navy": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        8,
-        1,
-        1
-      ]
-    },
-    "prop.clipboard.sky": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        8,
-        1,
-        1
-      ]
-    },
-    "prop.shelf.empty": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        6,
-        2,
-        2
-      ]
-    },
-    "prop.shelf.meds": {
-      "sheet": "hospital",
-      "t": [
-        4,
-        6,
-        2,
-        2
-      ]
-    },
-    "prop.boxes.stack": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        9,
-        2,
-        2
-      ]
-    },
-    "prop.box.single": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        9,
-        1,
-        1
-      ]
-    },
-    "prop.bush": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        11,
-        1,
-        1
-      ]
-    },
-    "prop.plant.orange.s": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        12,
-        1,
-        2
-      ]
-    },
-    "prop.plant.orange.m": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        12,
-        1,
-        2
-      ]
-    },
-    "prop.plant.orange.l": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        12,
-        2,
-        2
-      ]
-    },
-    "prop.plant.white.s": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        15,
-        1,
-        2
-      ]
-    },
-    "prop.plant.white.m": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        15,
-        1,
-        2
-      ]
-    },
-    "prop.plant.white.l": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        15,
-        2,
-        2
-      ]
-    },
-    "prop.armchair.yellow": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        12,
-        1,
-        2
-      ]
-    },
-    "prop.armchair.tan": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        14,
-        1,
-        2
-      ]
-    },
-    "prop.armchair.green": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        16,
-        1,
-        2
-      ]
-    },
-    "prop.armchair.blue": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        18,
-        1,
-        2
-      ]
-    },
-    "prop.armchair.red": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        20,
-        1,
-        2
-      ]
-    },
-    "prop.chair.left.yellow": {
-      "sheet": "hospital",
-      "t": [
-        5,
-        12,
-        1,
-        2
-      ]
-    },
-    "prop.chair.right.yellow": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        12,
-        1,
-        2
-      ]
-    },
-    "prop.chair.left.blue": {
-      "sheet": "hospital",
-      "t": [
-        5,
-        18,
-        1,
-        2
-      ]
-    },
-    "prop.chair.right.blue": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        18,
-        1,
-        2
-      ]
-    },
-    "prop.ottoman.yellow": {
-      "sheet": "hospital",
-      "t": [
-        10,
-        13,
-        1,
-        1
-      ]
-    },
-    "prop.ottoman.blue": {
-      "sheet": "hospital",
-      "t": [
-        10,
-        19,
-        1,
-        1
-      ]
-    },
-    "prop.vending.gray": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        12,
-        2,
-        3
-      ]
-    },
-    "prop.vending.snacks": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        12,
-        2,
-        3
-      ]
-    },
-    "prop.lightswitch": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        14,
-        1,
-        1
-      ]
-    },
-    "prop.tv.wide": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        15,
-        2,
-        2
-      ]
-    },
-    "prop.tv.small": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        15,
-        1,
-        2
-      ]
-    },
-    "prop.trash.green": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        42,
-        1,
-        2
-      ]
-    },
-    "prop.trash.blue": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        42,
-        1,
-        2
-      ]
-    },
-    "prop.rubbish": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        44,
-        1,
-        1
-      ]
-    },
-    "prop.debris": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        44,
-        1,
-        1
-      ]
-    },
-    "prop.bench.olive": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        22,
-        2,
-        1
-      ]
-    },
-    "prop.bench.yellow": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        23,
-        2,
-        1
-      ]
-    },
-    "prop.bench.green": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        24,
-        2,
-        1
-      ]
-    },
-    "prop.bench.pink": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        25,
-        2,
-        1
-      ]
-    },
-    "prop.bench.gray": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        26,
-        2,
-        1
-      ]
-    },
-    "prop.bench.round.olive": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        22,
-        2,
-        1
-      ]
-    },
-    "prop.bench.round.yellow": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        23,
-        2,
-        1
-      ]
-    },
-    "prop.bench.round.green": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        24,
-        2,
-        1
-      ]
-    },
-    "prop.bench.round.pink": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        25,
-        2,
-        1
-      ]
-    },
-    "prop.bench.round.gray": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        26,
-        2,
-        1
-      ]
-    },
-    "prop.bed.blue": {
-      "sheet": "hospital",
-      "t": [
-        5,
-        24,
-        2,
-        3
-      ]
-    },
-    "prop.bed.pink": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        21,
-        2,
-        3
-      ]
-    },
-    "prop.ivpole.a": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        24,
-        1,
-        3
-      ]
-    },
-    "prop.ivpole.b": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        24,
-        1,
-        3
-      ]
-    },
-    "prop.window.gray.3": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        31,
-        3,
-        2
-      ]
-    },
-    "prop.window.orange.3": {
-      "sheet": "hospital",
-      "t": [
-        5,
-        31,
-        3,
-        2
-      ]
-    },
-    "prop.cabinet.gray.tall": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        27,
-        2,
-        4
-      ]
-    },
-    "prop.cabinet.blue.tall": {
-      "sheet": "hospital",
-      "t": [
-        4,
-        27,
-        2,
-        4
-      ]
-    },
-    "prop.cabinet.green.tall": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        27,
-        2,
-        4
-      ]
-    },
-    "prop.sign.chart": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        37,
-        1,
-        1
-      ]
-    },
-    "prop.sign.cross": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        37,
-        1,
-        1
-      ]
-    },
-    "prop.sign.warning": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        37,
-        1,
-        1
-      ]
-    },
-    "prop.sign.warning.big": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        39,
-        1,
-        2
-      ]
-    },
-    "prop.picture.landscape.a": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        39,
-        2,
-        1
-      ]
-    },
-    "prop.picture.landscape.b": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        40,
-        2,
-        1
-      ]
-    },
-    "prop.picture.landscape.c": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        41,
-        2,
-        1
-      ]
-    },
-    "prop.picture.landscape.d": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        41,
-        2,
-        1
-      ]
-    },
-    "prop.radiator.pink": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        37,
-        2,
-        1
-      ]
-    },
-    "prop.radiator.blue": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        37,
-        2,
-        1
-      ]
-    },
-    "prop.curtain.blue": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        39,
-        2,
-        3
-      ]
-    },
-    "prop.curtain.tan": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        39,
-        2,
-        3
-      ]
-    },
-    "prop.table.small.brown": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        38,
-        1,
-        1
-      ]
-    },
-    "prop.table.small.white": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        39,
-        1,
-        1
-      ]
-    },
-    "prop.table.small.gray": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        40,
-        1,
-        1
-      ]
-    },
-    "prop.table.round.white": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        41,
-        1,
-        1
-      ]
-    },
-    "prop.chair.back.blue": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        38,
-        1,
-        1
-      ]
-    },
-    "prop.chair.back.tan": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        38,
-        1,
-        1
-      ]
-    },
-    "prop.chair.back.lavender": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        39,
-        1,
-        1
-      ]
-    },
-    "prop.wheelchair.back": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        38,
-        1,
-        2
-      ]
-    },
-    "prop.infostand.red": {
-      "sheet": "hospital",
-      "t": [
-        10,
-        42,
-        2,
-        3
-      ]
-    },
-    "prop.infostand.blue": {
-      "sheet": "hospital",
-      "t": [
-        12,
-        42,
-        2,
-        3
-      ]
-    },
-    "prop.infostand.green": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        42,
-        2,
-        3
-      ]
-    },
-    "prop.poster.blue.a": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        48,
-        1,
-        1
-      ]
-    },
-    "prop.bulletin.notes": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        48,
-        2,
-        2
-      ]
-    },
-    "prop.poster.blue.b": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        48,
-        1,
-        1
-      ]
-    },
-    "prop.poster.orange": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        50,
-        1,
-        1
-      ]
-    },
-    "prop.poster.pink": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        50,
-        1,
-        1
-      ]
-    },
-    "prop.poster.red": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        50,
-        1,
-        1
-      ]
-    },
-    "prop.poster.green": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        50,
-        1,
-        1
-      ]
-    },
-    "prop.monitor.ecg": {
-      "sheet": "hospital",
-      "t": [
-        4,
-        49,
-        1,
-        1
-      ]
-    },
-    "prop.microscope": {
-      "sheet": "hospital",
-      "t": [
-        5,
-        49,
-        2,
-        1
-      ]
-    },
-    "prop.exam_table": {
-      "sheet": "hospital",
-      "t": [
-        4,
-        50,
-        3,
-        2
-      ]
-    },
-    "prop.door.double.gray": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        49,
-        2,
-        2
-      ]
-    },
-    "prop.switch.a": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        49,
-        1,
-        1
-      ]
-    },
-    "prop.switch.b": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        50,
-        1,
-        1
-      ]
-    },
-    "prop.firstaid": {
-      "sheet": "hospital",
-      "t": [
-        10,
-        49,
-        1,
-        1
-      ]
-    },
-    "prop.monitor.pc": {
-      "sheet": "hospital",
-      "t": [
-        12,
-        52,
-        1,
-        1
-      ]
-    },
-    "prop.monitor.pc.b": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        52,
-        1,
-        1
-      ]
-    },
-    "prop.keyboard": {
-      "sheet": "hospital",
-      "t": [
-        12,
-        53,
-        1,
-        1
-      ]
-    },
-    "prop.counter.glass.beige.6": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        56,
-        6,
-        2
-      ]
-    },
-    "prop.counter.glass.gray.6": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        56,
-        6,
-        2
-      ]
-    },
-    "prop.files.a": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        58,
-        1,
-        1
-      ]
-    },
-    "prop.files.b": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        58,
-        1,
-        1
-      ]
-    },
-    "prop.desk.wood.pc": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        58,
-        2,
-        2
-      ]
-    },
-    "prop.picture.bird": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        58,
-        1,
-        1
-      ]
-    },
-    "prop.picture.coffee": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        58,
-        1,
-        1
-      ]
-    },
-    "prop.picture.cup": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        58,
-        1,
-        1
-      ]
-    },
-    "prop.papers.a": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        61,
-        1,
-        1
-      ]
-    },
-    "prop.papers.b": {
-      "sheet": "hospital",
-      "t": [
-        8,
-        61,
-        1,
-        1
-      ]
-    },
-    "prop.bottle.orange": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        60,
-        1,
-        1
-      ]
-    },
-    "prop.bottle.blue": {
-      "sheet": "hospital",
-      "t": [
-        8,
-        60,
-        1,
-        1
-      ]
-    },
-    "prop.locker.gray.3": {
-      "sheet": "hospital",
-      "t": [
-        10,
-        60,
-        3,
-        2
-      ]
-    },
-    "prop.locker.tan.3": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        60,
-        3,
-        2
-      ]
-    },
-    "prop.monitor.stand": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        64,
-        1,
-        3
-      ]
-    },
-    "prop.cart.monitor": {
-      "sheet": "hospital",
-      "t": [
-        5,
-        64,
-        1,
-        3
-      ]
-    },
-    "prop.cart.tall": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        64,
-        1,
-        4
-      ]
-    },
-    "prop.desk.pc.2": {
-      "sheet": "hospital",
-      "t": [
-        8,
-        64,
-        2,
-        3
-      ]
-    },
-    "prop.nurse_station.2": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        64,
-        2,
-        3
-      ]
-    },
-    "prop.nurse_station.3": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        64,
-        3,
-        3
-      ]
-    },
-    "prop.clock.white": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        67,
-        1,
-        1
-      ]
-    },
-    "prop.clock.blue": {
-      "sheet": "hospital",
-      "t": [
-        12,
-        67,
-        1,
-        1
-      ]
-    },
-    "prop.clock.teal": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        67,
-        1,
-        1
-      ]
-    },
-    "prop.clock.gray": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        67,
-        1,
-        1
-      ]
-    },
-    "prop.clock.sky": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        67,
-        1,
-        1
-      ]
-    },
-    "prop.locker.teal.3": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        68,
-        3,
-        2
-      ]
-    },
-    "prop.locker.white.3": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        68,
-        3,
-        2
-      ]
-    },
-    "prop.wheelchair.front.blue": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        75,
-        2,
-        2
-      ]
-    },
-    "prop.wheelchair.side.blue": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        75,
-        1,
-        2
-      ]
-    },
-    "prop.wheelchair.front.tan": {
-      "sheet": "hospital",
-      "t": [
-        0,
-        77,
-        2,
-        2
-      ]
-    },
-    "prop.wheelchair.side.tan": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        77,
-        1,
-        2
-      ]
-    },
-    "prop.toyshelf.a": {
-      "sheet": "hospital",
-      "t": [
-        12,
-        79,
-        1,
-        2
-      ]
-    },
-    "prop.toyshelf.b": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        79,
-        1,
-        2
-      ]
-    },
-    "prop.toychest.red": {
-      "sheet": "hospital",
-      "t": [
-        12,
-        81,
-        1,
-        2
-      ]
-    },
-    "prop.toychest.blue": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        81,
-        1,
-        2
-      ]
-    },
-    "prop.bookshelf.wood": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        93,
-        1,
-        2
-      ]
-    },
-    "prop.bookshelf.round.a": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        93,
-        1,
-        3
-      ]
-    },
-    "prop.bookshelf.round.b": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        93,
-        1,
-        3
-      ]
-    },
-    "prop.sanitizer": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        96,
-        1,
-        2
-      ]
-    },
-    "prop.thermometer": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        96,
-        1,
-        2
-      ]
-    },
-    "prop.dispenser.c": {
-      "sheet": "hospital",
-      "t": [
-        8,
-        96,
-        1,
-        2
-      ]
-    },
-    "prop.flowers.red": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        96,
-        1,
-        2
-      ]
-    },
-    "prop.towels.a": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        98,
-        1,
-        2
-      ]
-    },
-    "prop.towels.b": {
-      "sheet": "hospital",
-      "t": [
-        10,
-        98,
-        1,
-        2
-      ]
-    },
-    "prop.stanchion.rope.r.top": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        19,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.rope.mid": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        19,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.rope.l.top": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        19,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.rope.r": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        20,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.plain": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        20,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.rope.l": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        20,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.gold.rope.r": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        22,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.gold.plain": {
-      "sheet": "hospital",
-      "t": [
-        14,
-        22,
-        1,
-        1
-      ]
-    },
-    "prop.stanchion.gold.rope.l": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        22,
-        1,
-        1
-      ]
-    },
-    "prop.poster.kids": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        73,
-        1,
-        1
-      ]
-    },
-    "prop.rug.kids": {
-      "sheet": "hospital",
-      "t": [
-        7,
-        73,
-        2,
-        2
-      ]
-    },
-    "prop.fridge.white": {
-      "sheet": "generic",
-      "t": [
-        4,
-        0,
-        1,
-        3
-      ]
-    },
-    "prop.kiosk.pc": {
-      "sheet": "generic",
-      "t": [
-        6,
-        0,
-        1,
-        2
-      ]
-    },
-    "prop.table.white.small": {
-      "sheet": "generic",
-      "t": [
-        6,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.sign.sleep": {
-      "sheet": "generic",
-      "t": [
-        9,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.sign.arrow.l": {
-      "sheet": "generic",
-      "t": [
-        10,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.sign.arrow.r": {
-      "sheet": "generic",
-      "t": [
-        11,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.tv.flat": {
-      "sheet": "generic",
-      "t": [
-        4,
-        3,
-        2,
-        2
-      ]
-    },
-    "prop.crate.orange": {
-      "sheet": "generic",
-      "t": [
-        6,
-        3,
-        1,
-        1
-      ]
-    },
-    "prop.chest.orange": {
-      "sheet": "generic",
-      "t": [
-        7,
-        3,
-        1,
-        1
-      ]
-    },
-    "prop.rug.red.4x3": {
-      "sheet": "generic",
-      "t": [
-        9,
-        4,
-        4,
-        3
-      ]
-    },
-    "prop.rug.blue.4x3": {
-      "sheet": "generic",
-      "t": [
-        9,
-        7,
-        4,
-        3
-      ]
-    },
-    "prop.rug.red.2x2": {
-      "sheet": "generic",
-      "t": [
-        9,
-        10,
-        2,
-        2
-      ]
-    },
-    "prop.rug.green.2x2": {
-      "sheet": "generic",
-      "t": [
-        11,
-        10,
-        2,
-        2
-      ]
-    },
-    "prop.couch.orange.3": {
-      "sheet": "generic",
-      "t": [
-        4,
-        6,
-        3,
-        2
-      ]
-    },
-    "prop.stool.orange": {
-      "sheet": "generic",
-      "t": [
-        4,
-        5,
-        1,
-        1
-      ]
-    },
-    "prop.loveseat.red": {
-      "sheet": "generic",
-      "t": [
-        6,
-        11,
-        2,
-        2
-      ]
-    },
-    "prop.painting.green": {
-      "sheet": "generic",
-      "t": [
-        0,
-        13,
-        2,
-        2
-      ]
-    },
-    "prop.painting.sunset": {
-      "sheet": "generic",
-      "t": [
-        2,
-        13,
-        2,
-        2
-      ]
-    },
-    "prop.painting.beach": {
-      "sheet": "generic",
-      "t": [
-        4,
-        13,
-        2,
-        2
-      ]
-    },
-    "prop.bench.wood.tan": {
-      "sheet": "generic",
-      "t": [
-        0,
-        15,
-        2,
-        2
-      ]
-    },
-    "prop.bench.wood.orange": {
-      "sheet": "generic",
-      "t": [
-        2,
-        15,
-        2,
-        2
-      ]
-    },
-    "prop.stool.a": {
-      "sheet": "generic",
-      "t": [
-        0,
-        17,
-        1,
-        1
-      ]
-    },
-    "prop.stool.b": {
-      "sheet": "generic",
-      "t": [
-        1,
-        17,
-        1,
-        1
-      ]
-    },
-    "prop.stool.c": {
-      "sheet": "generic",
-      "t": [
-        2,
-        17,
-        1,
-        1
-      ]
-    },
-    "prop.dresser.orange": {
-      "sheet": "generic",
-      "t": [
-        3,
-        20,
-        1,
-        2
-      ]
-    },
-    "prop.dresser.tan": {
-      "sheet": "generic",
-      "t": [
-        4,
-        20,
-        1,
-        2
-      ]
-    },
-    "prop.dresser.yellow": {
-      "sheet": "generic",
-      "t": [
-        5,
-        20,
-        1,
-        2
-      ]
-    },
-    "prop.palm": {
-      "sheet": "generic",
-      "t": [
-        13,
-        25,
-        2,
-        3
-      ]
-    },
-    "prop.tree.a": {
-      "sheet": "generic",
-      "t": [
-        13,
-        28,
-        2,
-        3
-      ]
-    },
-    "prop.window.blue.3": {
-      "sheet": "generic",
-      "t": [
-        9,
-        29,
-        3,
-        2
-      ]
-    },
-    "prop.mirror.gold": {
-      "sheet": "generic",
-      "t": [
-        12,
-        29,
-        1,
-        2
-      ]
-    },
-    "prop.mirror.plain": {
-      "sheet": "generic",
-      "t": [
-        13,
-        29,
-        1,
-        2
-      ]
-    },
-    "prop.plant.pot.a": {
-      "sheet": "generic",
-      "t": [
-        14,
-        29,
-        1,
-        2
-      ]
-    },
-    "prop.plant.pot.b": {
-      "sheet": "generic",
-      "t": [
-        15,
-        29,
-        1,
-        2
-      ]
-    },
-    "prop.cabinet.gray.2": {
-      "sheet": "generic",
-      "t": [
-        0,
-        31,
-        2,
-        2
-      ]
-    },
-    "prop.cabinet.pink.2": {
-      "sheet": "generic",
-      "t": [
-        2,
-        31,
-        2,
-        2
-      ]
-    },
-    "prop.thermostat": {
-      "sheet": "generic",
-      "t": [
-        7,
-        32,
-        1,
-        1
-      ]
-    },
-    "prop.panel": {
-      "sheet": "generic",
-      "t": [
-        8,
-        32,
-        1,
-        1
-      ]
-    },
-    "prop.table.wood.3": {
-      "sheet": "generic",
-      "t": [
-        5,
-        34,
-        3,
-        2
-      ]
-    },
-    "prop.table.wood.2": {
-      "sheet": "generic",
-      "t": [
-        8,
-        34,
-        2,
-        2
-      ]
-    },
-    "prop.counter.tan": {
-      "sheet": "generic",
-      "t": [
-        10,
-        37,
-        1,
-        2
-      ]
-    },
-    "prop.counter.red": {
-      "sheet": "generic",
-      "t": [
-        11,
-        37,
-        1,
-        2
-      ]
-    },
-    "prop.counter.orange": {
-      "sheet": "generic",
-      "t": [
-        12,
-        37,
-        1,
-        2
-      ]
-    },
-    "prop.counter.brown": {
-      "sheet": "generic",
-      "t": [
-        13,
-        37,
-        1,
-        2
-      ]
-    },
-    "prop.phone.gray": {
-      "sheet": "generic",
-      "t": [
-        10,
-        39,
-        1,
-        1
-      ]
-    },
-    "prop.phone.blue": {
-      "sheet": "generic",
-      "t": [
-        12,
-        39,
-        1,
-        1
-      ]
-    },
-    "prop.phone.black": {
-      "sheet": "generic",
-      "t": [
-        13,
-        39,
-        1,
-        1
-      ]
-    },
-    "prop.phone.sky": {
-      "sheet": "generic",
-      "t": [
-        15,
-        39,
-        1,
-        1
-      ]
-    },
-    "prop.phone.white": {
-      "sheet": "generic",
-      "t": [
-        10,
-        41,
-        1,
-        1
-      ]
-    },
-    "prop.phone.red": {
-      "sheet": "generic",
-      "t": [
-        12,
-        41,
-        1,
-        1
-      ]
-    },
-    "prop.phone.pink": {
-      "sheet": "generic",
-      "t": [
-        13,
-        41,
-        1,
-        1
-      ]
-    },
-    "prop.phone.silver": {
-      "sheet": "generic",
-      "t": [
-        15,
-        41,
-        1,
-        1
-      ]
-    },
-    "prop.door.tan": {
-      "sheet": "generic",
-      "t": [
-        0,
-        40,
-        1,
-        2
-      ]
-    },
-    "prop.door.orange": {
-      "sheet": "generic",
-      "t": [
-        1,
-        40,
-        1,
-        2
-      ]
-    },
-    "prop.door.red": {
-      "sheet": "generic",
-      "t": [
-        2,
-        40,
-        1,
-        2
-      ]
-    },
-    "prop.door.tan.window": {
-      "sheet": "generic",
-      "t": [
-        0,
-        42,
-        1,
-        2
-      ]
-    },
-    "prop.door.orange.window": {
-      "sheet": "generic",
-      "t": [
-        1,
-        42,
-        1,
-        2
-      ]
-    },
-    "prop.door.red.window": {
-      "sheet": "generic",
-      "t": [
-        2,
-        42,
-        1,
-        2
-      ]
-    },
-    "prop.wardrobe": {
-      "sheet": "generic",
-      "t": [
-        3,
-        40,
-        3,
-        2
-      ]
-    },
-    "prop.shelf.small.drawers": {
-      "sheet": "generic",
-      "t": [
-        6,
-        40,
-        1,
-        2
-      ]
-    },
-    "prop.window.orange.2": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        33,
-        2,
-        2
-      ]
-    },
-    "prop.window.tan.2": {
-      "sheet": "generic",
-      "t": [
-        8,
-        43,
-        2,
-        2
-      ]
-    },
-    "prop.window.brown.2": {
-      "sheet": "generic",
-      "t": [
-        10,
-        43,
-        2,
-        2
-      ]
-    },
-    "prop.window.yellow.2": {
-      "sheet": "generic",
-      "t": [
-        12,
-        43,
-        2,
-        2
-      ]
-    },
-    "prop.window.orange4": {
-      "sheet": "generic",
-      "t": [
-        14,
-        43,
-        2,
-        2
-      ]
-    },
-    "prop.mat.green.3x2": {
-      "sheet": "generic",
-      "t": [
-        0,
-        44,
-        3,
-        2
-      ]
-    },
-    "prop.mat.tan.3x2": {
-      "sheet": "generic",
-      "t": [
-        0,
-        46,
-        3,
-        2
-      ]
-    },
-    "prop.curtain.red": {
-      "sheet": "generic",
-      "t": [
-        5,
-        45,
-        2,
-        3
-      ]
-    },
-    "prop.curtain.gray": {
-      "sheet": "generic",
-      "t": [
-        7,
-        45,
-        2,
-        3
-      ]
-    },
-    "prop.curtain.tan.g": {
-      "sheet": "generic",
-      "t": [
-        9,
-        45,
-        2,
-        3
-      ]
-    },
-    "prop.hooks.a": {
-      "sheet": "generic",
-      "t": [
-        0,
-        48,
-        1,
-        2
-      ]
-    },
-    "prop.hooks.keys": {
-      "sheet": "generic",
-      "t": [
-        0,
-        50,
-        1,
-        2
-      ]
-    },
-    "prop.chair.wood.front.tan": {
-      "sheet": "generic",
-      "t": [
-        4,
-        50,
-        1,
-        2
-      ]
-    },
-    "prop.chair.wood.front.orange": {
-      "sheet": "generic",
-      "t": [
-        5,
-        50,
-        1,
-        2
-      ]
-    },
-    "prop.chair.wood.side.tan": {
-      "sheet": "generic",
-      "t": [
-        9,
-        50,
-        1,
-        2
-      ]
-    },
-    "prop.chair.wood.side.orange": {
-      "sheet": "generic",
-      "t": [
-        11,
-        50,
-        1,
-        2
-      ]
-    },
-    "prop.desk.wood.pc.2": {
-      "sheet": "generic",
-      "t": [
-        0,
-        52,
-        2,
-        2
-      ]
-    },
-    "prop.desk.wood.pc.3": {
-      "sheet": "generic",
-      "t": [
-        3,
-        52,
-        3,
-        2
-      ]
-    },
-    "prop.desk.wood.pc.3b": {
-      "sheet": "generic",
-      "t": [
-        6,
-        52,
-        3,
-        2
-      ]
-    },
-    "prop.desk.glass.3": {
-      "sheet": "generic",
-      "t": [
-        4,
-        54,
-        3,
-        2
-      ]
-    },
-    "prop.desk.glass.3b": {
-      "sheet": "generic",
-      "t": [
-        7,
-        54,
-        3,
-        2
-      ]
-    },
-    "prop.shelf.tall.3x4": {
-      "sheet": "generic",
-      "t": [
-        10,
-        54,
-        3,
-        4
-      ]
-    },
-    "prop.tvstand.tan": {
-      "sheet": "generic",
-      "t": [
-        0,
-        56,
-        2,
-        3
-      ]
-    },
-    "prop.tvstand.orange": {
-      "sheet": "generic",
-      "t": [
-        2,
-        56,
-        2,
-        3
-      ]
-    },
-    "prop.tvstand.blue": {
-      "sheet": "generic",
-      "t": [
-        4,
-        56,
-        2,
-        3
-      ]
-    },
-    "prop.fern.s": {
-      "sheet": "generic",
-      "t": [
-        6,
-        56,
-        1,
-        3
-      ]
-    },
-    "prop.fern.m": {
-      "sheet": "generic",
-      "t": [
-        7,
-        56,
-        1,
-        3
-      ]
-    },
-    "prop.fern.l": {
-      "sheet": "generic",
-      "t": [
-        8,
-        56,
-        2,
-        3
-      ]
-    },
-    "prop.chair.office.gray": {
-      "sheet": "generic",
-      "t": [
-        4,
-        63,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.gray.b": {
-      "sheet": "generic",
-      "t": [
-        5,
-        63,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.gray.c": {
-      "sheet": "generic",
-      "t": [
-        6,
-        63,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.brown": {
-      "sheet": "generic",
-      "t": [
-        4,
-        64,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.sky": {
-      "sheet": "generic",
-      "t": [
-        4,
-        65,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.green": {
-      "sheet": "generic",
-      "t": [
-        7,
-        65,
-        1,
-        1
-      ]
-    },
-    "prop.drawers.orange": {
-      "sheet": "generic",
-      "t": [
-        7,
-        63,
-        1,
-        2
-      ]
-    },
-    "prop.drawers.tan": {
-      "sheet": "generic",
-      "t": [
-        8,
-        63,
-        1,
-        2
-      ]
-    },
-    "prop.drawers.yellow": {
-      "sheet": "generic",
-      "t": [
-        9,
-        63,
-        1,
-        2
-      ]
-    },
-    "prop.door.double.glass": {
-      "sheet": "generic",
-      "t": [
-        11,
-        64,
-        3,
-        2
-      ]
-    },
-    "prop.switch.c": {
-      "sheet": "generic",
-      "t": [
-        13,
-        64,
-        1,
-        1
-      ]
-    },
-    "prop.plant.bonsai": {
-      "sheet": "generic",
-      "t": [
-        13,
-        63,
-        1,
-        2
-      ]
-    },
-    "prop.tree.b": {
-      "sheet": "generic",
-      "t": [
-        14,
-        63,
-        2,
-        3
-      ]
-    },
-    "prop.lamp.a": {
-      "sheet": "generic",
-      "t": [
-        13,
-        61,
-        1,
-        1
-      ]
-    },
-    "prop.lamp.b": {
-      "sheet": "generic",
-      "t": [
-        14,
-        61,
-        1,
-        1
-      ]
-    },
-    "prop.lamp.c": {
-      "sheet": "generic",
-      "t": [
-        15,
-        61,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.conf.a": {
-      "sheet": "conference",
-      "t": [
-        6,
-        0,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.conf.b": {
-      "sheet": "conference",
-      "t": [
-        8,
-        0,
-        1,
-        1
-      ]
-    },
-    "prop.chair.office.conf.c": {
-      "sheet": "conference",
-      "t": [
-        9,
-        0,
-        1,
-        1
-      ]
-    },
-    "prop.copier": {
-      "sheet": "conference",
-      "t": [
-        5,
-        2,
-        1,
-        2
-      ]
-    },
-    "prop.stapler": {
-      "sheet": "conference",
-      "t": [
-        5,
-        1,
-        1,
-        1
-      ]
-    },
-    "prop.bin.wood": {
-      "sheet": "conference",
-      "t": [
-        6,
-        2,
-        1,
-        2
-      ]
-    },
-    "prop.bin.gold": {
-      "sheet": "conference",
-      "t": [
-        7,
-        2,
-        1,
-        2
-      ]
-    },
-    "prop.conftable": {
-      "sheet": "conference",
-      "t": [
-        1,
-        1,
-        4,
-        3
-      ]
-    },
-    "prop.conftable.bench": {
-      "sheet": "conference",
-      "t": [
-        1,
-        4,
-        4,
-        1
-      ]
-    },
-    "prop.banner.red": {
-      "sheet": "conference",
-      "t": [
-        6,
-        4,
-        1,
-        2
-      ]
-    },
-    "prop.banner.redblue": {
-      "sheet": "conference",
-      "t": [
-        7,
-        4,
-        1,
-        2
-      ]
-    },
-    "prop.banner.blue": {
-      "sheet": "conference",
-      "t": [
-        8,
-        4,
-        1,
-        2
-      ]
-    },
-    "prop.bar.wood": {
-      "sheet": "conference",
-      "t": [
-        10,
-        5,
-        4,
-        1
-      ]
-    },
-    "prop.mat.blue": {
-      "sheet": "conference",
-      "t": [
-        14,
-        4,
-        1,
-        1
-      ]
-    },
-    "prop.mat.gray": {
-      "sheet": "conference",
-      "t": [
-        15,
-        4,
-        1,
-        1
-      ]
-    },
-    "prop.podium.a": {
-      "sheet": "conference",
-      "t": [
-        0,
-        6,
-        2,
-        2
-      ]
-    },
-    "prop.podium.b": {
-      "sheet": "conference",
-      "t": [
-        2,
-        6,
-        2,
-        2
-      ]
-    },
-    "prop.screen.white": {
-      "sheet": "conference",
-      "t": [
-        0,
-        8,
-        4,
-        3
-      ]
-    },
-    "prop.extinguisher.stand": {
-      "sheet": "conference",
-      "t": [
-        13,
-        7,
-        1,
-        2
-      ]
-    },
-    "prop.machine.white": {
-      "sheet": "conference",
-      "t": [
-        14,
-        8,
-        1,
-        2
-      ]
-    },
-    "prop.mic.stand": {
-      "sheet": "conference",
-      "t": [
-        13,
-        5,
-        1,
-        1
-      ]
-    },
-    "prop.portrait.a": {
-      "sheet": "conference",
-      "t": [
-        14,
-        2,
-        1,
-        2
-      ]
-    },
-    "prop.portrait.b": {
-      "sheet": "conference",
-      "t": [
-        15,
-        2,
-        1,
-        2
-      ]
-    },
-    "prop.mug.red": {
-      "sheet": "kitchen",
-      "t": [
-        12,
-        7,
-        1,
-        1
-      ]
-    },
-    "prop.mug.brown": {
-      "sheet": "kitchen",
-      "t": [
-        13,
-        7,
-        1,
-        1
-      ]
-    },
-    "prop.mug.blue": {
-      "sheet": "kitchen",
-      "t": [
-        15,
-        7,
-        1,
-        1
-      ]
-    },
-    "prop.coffeemaker.a": {
-      "sheet": "kitchen",
-      "t": [
-        9,
-        6,
-        1,
-        1
-      ]
-    },
-    "prop.coffeemaker.b": {
-      "sheet": "kitchen",
-      "t": [
-        10,
-        6,
-        1,
-        1
-      ]
-    },
-    "prop.appliance.c": {
-      "sheet": "kitchen",
-      "t": [
-        11,
-        6,
-        1,
-        1
-      ]
-    },
-    "prop.fridge.white.s": {
-      "sheet": "kitchen",
-      "t": [
-        8,
-        11,
-        1,
-        2
-      ]
-    },
-    "prop.oven": {
-      "sheet": "kitchen",
-      "t": [
-        8,
-        13,
-        1,
-        2
-      ]
-    },
-    "prop.water.crate": {
-      "sheet": "kitchen",
-      "t": [
-        15,
-        13,
-        1,
-        2
-      ]
-    },
     "floor.whitetile": {
       "sheet": "floors",
       "t": [
@@ -3643,1400 +949,2424 @@
         1
       ]
     },
-    "prop.drawers.column": {
-      "sheet": "hospital",
-      "t": [
-        1,
-        97,
-        1,
-        4
-      ]
-    },
-    "prop.cabinet.glass.2": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        48,
-        2,
-        3
-      ]
-    },
-    "prop.cabinet.glass.3": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        48,
-        3,
-        3
-      ]
-    },
-    "prop.blinds.blue": {
-      "sheet": "hospital",
-      "t": [
-        8,
-        34,
-        1,
-        3
-      ]
-    },
-    "prop.blinds.tan": {
-      "sheet": "hospital",
-      "t": [
-        9,
-        34,
-        1,
-        3
-      ]
-    },
-    "prop.examtable.white": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        32,
-        2,
-        2
-      ]
-    },
-    "prop.examtable.blue": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        32,
-        2,
-        2
-      ]
-    },
-    "prop.examtable.eq.white": {
-      "sheet": "hospital",
-      "t": [
-        11,
-        34,
-        2,
-        3
-      ]
-    },
-    "prop.examtable.eq.blue": {
-      "sheet": "hospital",
-      "t": [
-        13,
-        34,
-        2,
-        3
-      ]
-    },
-    "prop.bed.narrow.white": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        32,
-        1,
-        3
-      ]
-    },
-    "prop.bed.narrow.tan": {
-      "sheet": "hospital",
-      "t": [
-        15,
-        35,
-        1,
-        3
-      ]
-    },
-    "prop.cart.wood.a": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        73,
-        1,
-        2
-      ]
-    },
-    "prop.cart.wood.b": {
-      "sheet": "hospital",
-      "t": [
-        4,
-        72,
-        1,
-        3
-      ]
-    },
-    "prop.fridge.white.2": {
-      "sheet": "hospital",
-      "t": [
-        2,
-        72,
-        1,
-        2
-      ]
-    },
-    "prop.picture.kids": {
-      "sheet": "hospital",
-      "t": [
-        6,
-        73,
-        1,
-        1
-      ]
-    },
-    "prop.scanner.ct": {
-      "sheet": "hospital",
-      "t": [
-        3,
-        37,
-        2,
-        2
-      ]
-    },
-    "prop.scanner.ct.bed": {
-      "sheet": "hospital",
-      "t": [
-        5,
-        37,
-        2,
-        3
-      ]
-    },
-    "prop.machine.arms": {
-      "sheet": "hospital",
-      "t": [
-        1,
+    "door.side.r.0": {
+      "sheet": "anim_door_vr",
+      "px": [
+        0,
+        0,
         64,
-        2,
-        3
+        96
       ]
+    },
+    "door.side.r.1": {
+      "sheet": "anim_door_vr",
+      "px": [
+        64,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.r.2": {
+      "sheet": "anim_door_vr",
+      "px": [
+        128,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.r.3": {
+      "sheet": "anim_door_vr",
+      "px": [
+        192,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.r.4": {
+      "sheet": "anim_door_vr",
+      "px": [
+        256,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.l.0": {
+      "sheet": "anim_door_vl",
+      "px": [
+        0,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.l.1": {
+      "sheet": "anim_door_vl",
+      "px": [
+        64,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.l.2": {
+      "sheet": "anim_door_vl",
+      "px": [
+        128,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.l.3": {
+      "sheet": "anim_door_vl",
+      "px": [
+        192,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.side.l.4": {
+      "sheet": "anim_door_vl",
+      "px": [
+        256,
+        0,
+        64,
+        96
+      ]
+    },
+    "door.face.0": {
+      "sheet": "anim_door_big",
+      "px": [
+        0,
+        0,
+        32,
+        96
+      ]
+    },
+    "door.face.1": {
+      "sheet": "anim_door_big",
+      "px": [
+        32,
+        0,
+        32,
+        96
+      ]
+    },
+    "door.face.2": {
+      "sheet": "anim_door_big",
+      "px": [
+        64,
+        0,
+        32,
+        96
+      ]
+    },
+    "door.face.3": {
+      "sheet": "anim_door_big",
+      "px": [
+        96,
+        0,
+        32,
+        96
+      ]
+    },
+    "door.face.4": {
+      "sheet": "anim_door_big",
+      "px": [
+        128,
+        0,
+        32,
+        96
+      ]
+    },
+    "door.face.locked.0": {
+      "sheet": "anim_door_big_locked",
+      "px": [
+        0,
+        0,
+        32,
+        64
+      ]
+    },
+    "door.face.locked.1": {
+      "sheet": "anim_door_big_locked",
+      "px": [
+        32,
+        0,
+        32,
+        64
+      ]
+    },
+    "door.face.locked.2": {
+      "sheet": "anim_door_big_locked",
+      "px": [
+        64,
+        0,
+        32,
+        64
+      ]
+    },
+    "door.face.locked.3": {
+      "sheet": "anim_door_big_locked",
+      "px": [
+        96,
+        0,
+        32,
+        64
+      ]
+    },
+    "door.face.locked.4": {
+      "sheet": "anim_door_big_locked",
+      "px": [
+        128,
+        0,
+        32,
+        64
+      ]
+    },
+    "prop.whiteboard": {
+      "sheet": "hospital",
+      "px": [
+        2,
+        14,
+        58,
+        36
+      ],
+      "_single": "hospital#48"
+    },
+    "prop.noticeboard": {
+      "sheet": "hospital",
+      "px": [
+        66,
+        14,
+        58,
+        38
+      ],
+      "_single": "hospital#49"
+    },
+    "prop.sign.exit": {
+      "sheet": "hospital",
+      "px": [
+        36,
+        82,
+        24,
+        14
+      ],
+      "_single": "hospital#51"
+    },
+    "prop.sign.small": {
+      "sheet": "hospital",
+      "px": [
+        8,
+        86,
+        16,
+        22
+      ],
+      "_single": "hospital#50"
+    },
+    "prop.extinguisher": {
+      "sheet": "hospital",
+      "px": [
+        70,
+        84,
+        20,
+        26
+      ],
+      "_single": "hospital#52"
+    },
+    "prop.binders": {
+      "sheet": "hospital",
+      "px": [
+        96,
+        82,
+        32,
+        24
+      ],
+      "_single": "hospital#36"
+    },
+    "prop.fax.a": {
+      "sheet": "hospital",
+      "px": [
+        38,
+        142,
+        22,
+        18
+      ],
+      "_single": "hospital#39"
+    },
+    "prop.clipboard.green": {
+      "sheet": "hospital",
+      "px": [
+        32,
+        174,
+        15,
+        18
+      ],
+      "_note": "board only \u2014 the diagonal checker pen beside it reads as noise at game scale"
+    },
+    "prop.clipboard.blue": {
+      "sheet": "hospital",
+      "px": [
+        64,
+        174,
+        15,
+        18
+      ],
+      "_note": "board only \u2014 the diagonal checker pen beside it reads as noise at game scale"
+    },
+    "prop.clipboard.orange": {
+      "sheet": "hospital",
+      "px": [
+        32,
+        238,
+        15,
+        18
+      ],
+      "_note": "board only \u2014 the diagonal checker pen beside it reads as noise at game scale"
+    },
+    "prop.clipboard.plain": {
+      "sheet": "hospital",
+      "px": [
+        0,
+        212,
+        15,
+        18
+      ],
+      "_note": "board only \u2014 the diagonal checker pen beside it reads as noise at game scale"
+    },
+    "prop.clipboard.navy": {
+      "sheet": "hospital",
+      "px": [
+        0,
+        276,
+        15,
+        18
+      ],
+      "_note": "board only \u2014 the diagonal checker pen beside it reads as noise at game scale"
+    },
+    "prop.clipboard.sky": {
+      "sheet": "hospital",
+      "px": [
+        32,
+        276,
+        15,
+        18
+      ],
+      "_note": "board only \u2014 the diagonal checker pen beside it reads as noise at game scale"
+    },
+    "prop.lightswitch": {
+      "sheet": "hospital",
+      "px": [
+        8,
+        466,
+        18,
+        28
+      ],
+      "_single": "hospital#68"
+    },
+    "prop.switch.a": {
+      "sheet": "hospital",
+      "px": [
+        306,
+        1568,
+        12,
+        20
+      ],
+      "_single": "hospital#272"
+    },
+    "prop.firstaid": {
+      "sheet": "hospital",
+      "px": [
+        324,
+        1588,
+        22,
+        18
+      ],
+      "_single": "hospital#274"
+    },
+    "prop.sign.chart": {
+      "sheet": "hospital",
+      "px": [
+        2,
+        1202,
+        28,
+        28
+      ],
+      "_single": "hospital#241"
+    },
+    "prop.sign.cross": {
+      "sheet": "hospital",
+      "px": [
+        36,
+        1202,
+        24,
+        28
+      ],
+      "_single": "hospital#242"
+    },
+    "prop.sign.warning": {
+      "sheet": "hospital",
+      "px": [
+        66,
+        1204,
+        26,
+        24
+      ],
+      "_single": "hospital#243"
+    },
+    "prop.poster.blue.a": {
+      "sheet": "hospital",
+      "px": [
+        0,
+        1552,
+        20,
+        32
+      ]
+    },
+    "prop.poster.blue.b": {
+      "sheet": "hospital",
+      "px": [
+        96,
+        1552,
+        20,
+        32
+      ]
+    },
+    "prop.poster.orange": {
+      "sheet": "hospital",
+      "px": [
+        0,
+        1616,
+        20,
+        32
+      ]
+    },
+    "prop.poster.pink": {
+      "sheet": "hospital",
+      "px": [
+        32,
+        1616,
+        20,
+        32
+      ]
+    },
+    "prop.poster.red": {
+      "sheet": "hospital",
+      "px": [
+        64,
+        1616,
+        20,
+        32
+      ]
+    },
+    "prop.poster.green": {
+      "sheet": "hospital",
+      "px": [
+        96,
+        1616,
+        20,
+        32
+      ]
+    },
+    "prop.picture.landscape.a": {
+      "sheet": "hospital",
+      "px": [
+        12,
+        1262,
+        40,
+        18
+      ],
+      "_single": "hospital#248"
+    },
+    "prop.picture.landscape.b": {
+      "sheet": "hospital",
+      "px": [
+        12,
+        1294,
+        40,
+        18
+      ],
+      "_single": "hospital#249"
+    },
+    "prop.picture.landscape.c": {
+      "sheet": "hospital",
+      "px": [
+        12,
+        1326,
+        40,
+        18
+      ],
+      "_single": "hospital#250"
+    },
+    "prop.picture.landscape.d": {
+      "sheet": "hospital",
+      "px": [
+        78,
+        1326,
+        36,
+        18
+      ],
+      "_single": "hospital#251"
+    },
+    "prop.picture.coffee": {
+      "sheet": "hospital",
+      "px": [
+        452,
+        1874,
+        24,
+        28
+      ],
+      "_single": "hospital#103"
+    },
+    "prop.picture.cup": {
+      "sheet": "hospital",
+      "px": [
+        484,
+        1874,
+        24,
+        28
+      ],
+      "_single": "hospital#104"
+    },
+    "prop.bulletin.notes": {
+      "sheet": "hospital",
+      "px": [
+        38,
+        1550,
+        46,
+        34
+      ],
+      "_single": "hospital#265"
+    },
+    "prop.clock.white": {
+      "sheet": "hospital",
+      "px": [
+        356,
+        2160,
+        22,
+        20
+      ],
+      "_single": "hospital#333"
+    },
+    "prop.clock.blue": {
+      "sheet": "hospital",
+      "px": [
+        388,
+        2160,
+        22,
+        20
+      ],
+      "_single": "hospital#334"
+    },
+    "prop.clock.teal": {
+      "sheet": "hospital",
+      "px": [
+        420,
+        2160,
+        22,
+        20
+      ],
+      "_single": "hospital#335"
+    },
+    "prop.clock.gray": {
+      "sheet": "hospital",
+      "px": [
+        450,
+        2164,
+        26,
+        22
+      ],
+      "_single": "hospital#336"
+    },
+    "prop.window.gray.3": {
+      "sheet": "hospital",
+      "px": [
+        76,
+        1006,
+        70,
+        34
+      ],
+      "_single": "hospital#538"
+    },
+    "prop.sanitizer": {
+      "sheet": "hospital",
+      "px": [
+        204,
+        3094,
+        10,
+        24
+      ],
+      "_single": "hospital#495"
+    },
+    "prop.dispenser.c": {
+      "sheet": "hospital",
+      "px": [
+        268,
+        3094,
+        10,
+        24
+      ],
+      "_single": "hospital#497"
+    },
+    "prop.monitor.wall": {
+      "sheet": "hospital",
+      "px": [
+        362,
+        494,
+        44,
+        30
+      ],
+      "_single": "hospital#120"
+    },
+    "prop.monitor.wall.b": {
+      "sheet": "hospital",
+      "px": [
+        362,
+        560,
+        44,
+        30
+      ],
+      "_single": "hospital#123"
+    },
+    "prop.counter.reception.wood": {
+      "sheet": "hospital",
+      "px": [
+        128,
+        14,
+        192,
+        78
+      ],
+      "_note": "whole 6-wide counter; the beige one touches it at x=320"
+    },
+    "prop.counter.reception.white": {
+      "sheet": "hospital",
+      "px": [
+        128,
+        294,
+        192,
+        58
+      ],
+      "_note": "top slab only (wings+back, rows 0-57); the source rect bottom-left held a detached leaf bush at y78-85 - front section split to prop.counter.reception.white.front"
+    },
+    "prop.counter.reception.white.front": {
+      "sheet": "hospital",
+      "px": [
+        160,
+        352,
+        128,
+        28
+      ],
+      "_note": "front run of the white reception counter (rows 58-85 of the original rect), leaf bush excluded"
+    },
+    "prop.nurse_station.2.body": {
+      "sheet": "hospital",
+      "px": [
+        326,
+        2064,
+        46,
+        76
+      ],
+      "_single": "hospital#544",
+      "_note": "split of #544 cols 0-45 (machine + counter-left); the source draws the back monitor floating 4px above the counter, so the island composite re-seats it"
+    },
+    "prop.nurse_station.2.counter": {
+      "sheet": "hospital",
+      "px": [
+        372,
+        2094,
+        24,
+        46
+      ],
+      "_single": "hospital#544",
+      "_note": "split of #544 cols 46-69 rows 30-75 (counter-right)"
+    },
+    "prop.nurse_station.2.mon": {
+      "sheet": "hospital",
+      "px": [
+        372,
+        2064,
+        24,
+        26
+      ],
+      "_single": "hospital#544",
+      "_note": "split of #544 cols 46-69 rows 0-25 (back monitor + slab); composed dy -45 so the slab lands on the counter's back edge"
+    },
+    "prop.nurse_station.meds.body": {
+      "sheet": "hospital",
+      "px": [
+        420,
+        2064,
+        48,
+        76
+      ],
+      "_single": "hospital#545",
+      "_note": "split of #545 cols 0-47 (machine + med bottles + counter-left)"
+    },
+    "prop.nurse_station.meds.counter": {
+      "sheet": "hospital",
+      "px": [
+        468,
+        2092,
+        24,
+        48
+      ],
+      "_single": "hospital#545",
+      "_note": "split of #545 cols 48-71 rows 28-75 (paper box + counter-right)"
+    },
+    "prop.nurse_station.meds.mon": {
+      "sheet": "hospital",
+      "px": [
+        468,
+        2064,
+        24,
+        26
+      ],
+      "_single": "hospital#545",
+      "_note": "split of #545 cols 48-71 rows 0-25 (back monitor + slab); composed dy -47 so the slab lands on the paper box"
+    },
+    "prop.desk.wood.pc": {
+      "sheet": "hospital",
+      "px": [
+        236,
+        1864,
+        40,
+        36
+      ],
+      "_single": "hospital#131"
+    },
+    "prop.desk.glass.pc": {
+      "sheet": "hospital",
+      "px": [
+        236,
+        1928,
+        40,
+        36
+      ],
+      "_single": "hospital#136",
+      "_note": "a small glass-top desk (no PC) \u2014 hospital #136"
+    },
+    "prop.workstation.pc": {
+      "sheet": "hospital",
+      "px": [
+        450,
+        1676,
+        58,
+        64
+      ],
+      "_single": "hospital#315"
+    },
+    "prop.monitor.pc": {
+      "sheet": "hospital",
+      "px": [
+        386,
+        1676,
+        28,
+        34
+      ]
+    },
+    "prop.keyboard": {
+      "sheet": "hospital",
+      "px": [
+        394,
+        1708,
+        22,
+        18
+      ]
+    },
+    "prop.papers.a": {
+      "sheet": "hospital",
+      "px": [
+        2,
+        160,
+        22,
+        18
+      ],
+      "_single": "hospital#38",
+      "_note": "loose paper stack with red seal; old rect (202,1960) was a bedside screen device"
+    },
+    "prop.bottles.lab.a": {
+      "sheet": "hospital",
+      "px": [
+        262,
+        960,
+        22,
+        24
+      ],
+      "_single": "hospital#203"
+    },
+    "prop.bottles.lab.b": {
+      "sheet": "hospital",
+      "px": [
+        288,
+        960,
+        26,
+        28
+      ],
+      "_single": "hospital#204"
+    },
+    "prop.bottles.lab.c": {
+      "sheet": "hospital",
+      "px": [
+        324,
+        960,
+        24,
+        24
+      ],
+      "_single": "hospital#205"
+    },
+    "prop.table.small.brown": {
+      "sheet": "hospital",
+      "px": [
+        370,
+        1230,
+        22,
+        32
+      ],
+      "_note": "pedestal tray table WITH its leg \u2014 the singles bbox cut it at the tray top"
+    },
+    "prop.table.phone.wood": {
+      "sheet": "living",
+      "px": [
+        32,
+        426,
+        32,
+        40
+      ],
+      "_single": "living#65",
+      "_note": "nightstand-height side table for the phone zone"
+    },
+    "prop.table.small.white": {
+      "sheet": "hospital",
+      "px": [
+        370,
+        1262,
+        22,
+        32
+      ],
+      "_note": "pedestal tray table WITH its leg \u2014 the singles bbox cut it at the tray top"
+    },
+    "prop.table.small.gray": {
+      "sheet": "hospital",
+      "px": [
+        370,
+        1294,
+        22,
+        18
+      ],
+      "_note": "pedestal tray table WITH its leg; h=18 \u2014 the old h=32 rect reached into the white sack single below-left (360,1314) and drew its corner as a floor blob"
+    },
+    "prop.table.round.white": {
+      "sheet": "hospital",
+      "px": [
+        360,
+        1314,
+        22,
+        22
+      ],
+      "_single": "hospital#247"
+    },
+    "prop.bedside.white": {
+      "sheet": "hospital",
+      "px": [
+        484,
+        2224,
+        24,
+        38
+      ],
+      "_single": "hospital#358"
+    },
+    "prop.bedside.wood": {
+      "sheet": "hospital",
+      "px": [
+        484,
+        2288,
+        24,
+        38
+      ],
+      "_single": "hospital#359"
+    },
+    "prop.shelf.meds": {
+      "sheet": "hospital",
+      "px": [
+        164,
+        198,
+        58,
+        68
+      ],
+      "_single": "hospital#57"
+    },
+    "prop.shelf.meds.b": {
+      "sheet": "hospital",
+      "px": [
+        228,
+        198,
+        58,
+        68
+      ],
+      "_single": "hospital#58"
     },
     "prop.shelf.narrow.meds": {
       "sheet": "hospital",
-      "t": [
-        10,
-        6,
-        1,
-        2
-      ]
+      "px": [
+        416,
+        214,
+        30,
+        52
+      ],
+      "_single": "hospital#63"
     },
-    "prop.cabinet.upper.beige": {
+    "prop.shelf.narrow.meds.b": {
       "sheet": "hospital",
-      "t": [
+      "px": [
+        448,
+        214,
+        30,
+        52
+      ],
+      "_single": "hospital#64"
+    },
+    "prop.shelf.supply": {
+      "sheet": "hospital",
+      "px": [
+        388,
+        294,
+        58,
+        68
+      ],
+      "_single": "hospital#60"
+    },
+    "prop.shelf.empty": {
+      "sheet": "hospital",
+      "px": [
+        100,
+        198,
+        58,
+        68
+      ],
+      "_single": "hospital#56"
+    },
+    "prop.cabinet.narrow.white": {
+      "sheet": "hospital",
+      "px": [
+        322,
+        294,
+        18,
+        86
+      ],
+      "_single": "hospital#67"
+    },
+    "prop.drawers.column": {
+      "sheet": "hospital",
+      "px": [
         0,
-        52,
-        2,
-        2
-      ]
+        3122,
+        32,
+        110
+      ],
+      "_single": "hospital#548"
     },
-    "prop.cabinet.upper.gray": {
+    "prop.drawers.bank.m": {
       "sheet": "hospital",
-      "t": [
-        7,
-        52,
-        2,
-        2
-      ]
+      "px": [
+        32,
+        3122,
+        64,
+        110
+      ],
+      "_single": "hospital#549"
     },
-    "prop.window.blinds.2": {
+    "prop.drawers.column.r": {
       "sheet": "hospital",
-      "t": [
-        6,
-        35,
-        2,
-        2
-      ]
+      "px": [
+        96,
+        3122,
+        32,
+        110
+      ],
+      "_single": "hospital#550"
     },
-    "prop.sink.hospital": {
+    "prop.locker.teal.2": {
       "sheet": "hospital",
-      "t": [
-        8,
+      "px": [
+        2,
+        2194,
+        58,
+        58
+      ],
+      "_single": "hospital#338"
+    },
+    "prop.locker.white.2": {
+      "sheet": "hospital",
+      "px": [
         98,
+        2194,
+        58,
+        58
+      ],
+      "_single": "hospital#339"
+    },
+    "prop.locker.blue.2": {
+      "sheet": "hospital",
+      "px": [
         2,
-        2
-      ]
+        2290,
+        58,
+        58
+      ],
+      "_single": "hospital#340"
     },
-    "prop.fridge.gray.a": {
-      "sheet": "kitchen",
-      "t": [
-        9,
-        24,
-        1,
-        2
-      ]
-    },
-    "prop.fridge.gray.b": {
-      "sheet": "kitchen",
-      "t": [
-        10,
-        24,
-        1,
-        2
-      ]
-    },
-    "prop.fridge.gray.c": {
-      "sheet": "kitchen",
-      "t": [
-        11,
-        24,
-        1,
-        2
-      ]
-    },
-    "prop.fridge.gray.d": {
-      "sheet": "kitchen",
-      "t": [
-        12,
-        24,
-        1,
-        2
-      ]
-    },
-    "prop.fridge.gray.2": {
-      "sheet": "kitchen",
-      "t": [
-        7,
-        1,
-        2,
-        3
-      ]
-    },
-    "prop.fridge.white.2x3": {
-      "sheet": "kitchen",
-      "t": [
-        0,
-        1,
-        2,
-        3
-      ]
-    },
-    "prop.fridge.open.a": {
-      "sheet": "kitchen",
-      "t": [
-        9,
-        26,
-        2,
-        3
-      ]
-    },
-    "prop.fridge.open.b": {
-      "sheet": "kitchen",
-      "t": [
-        11,
-        26,
-        2,
-        3
-      ]
-    },
-    "prop.coffeemaker.c": {
-      "sheet": "kitchen",
-      "t": [
-        13,
-        26,
-        1,
-        1
-      ]
-    },
-    "prop.kettle": {
-      "sheet": "kitchen",
-      "t": [
-        12,
+    "prop.locker.teal.1": {
+      "sheet": "hospital",
+      "px": [
+        64,
+        2194,
         30,
-        1,
-        1
-      ]
+        58
+      ],
+      "_single": "hospital#341"
     },
-    "prop.microwave.a": {
-      "sheet": "kitchen",
-      "t": [
-        13,
+    "prop.locker.white.1": {
+      "sheet": "hospital",
+      "px": [
+        160,
+        2194,
         30,
-        1,
-        1
-      ]
+        58
+      ],
+      "_single": "hospital#342"
     },
-    "prop.microwave.b": {
-      "sheet": "kitchen",
-      "t": [
-        15,
+    "prop.drawers.blue": {
+      "sheet": "hospital",
+      "px": [
+        130,
+        2272,
         30,
-        1,
-        1
-      ]
+        44
+      ],
+      "_single": "hospital#345"
     },
-    "prop.microwave.c": {
-      "sheet": "kitchen",
-      "t": [
-        9,
+    "prop.drawers.tan.h": {
+      "sheet": "hospital",
+      "px": [
+        130,
+        2336,
+        30,
+        44
+      ],
+      "_single": "hospital#349"
+    },
+    "prop.drawers.purple": {
+      "sheet": "hospital",
+      "px": [
+        194,
+        2272,
+        30,
+        44
+      ],
+      "_single": "hospital#347"
+    },
+    "prop.cabinet.glass.l": {
+      "sheet": "hospital",
+      "px": [
+        384,
+        1570,
         32,
-        1,
-        1
-      ]
+        62
+      ],
+      "_single": "hospital#275"
     },
-    "prop.microwave.d": {
-      "sheet": "kitchen",
-      "t": [
-        10,
+    "prop.cabinet.glass.m": {
+      "sheet": "hospital",
+      "px": [
+        416,
+        1570,
         32,
-        1,
-        1
-      ]
+        62
+      ],
+      "_single": "hospital#276"
     },
-    "prop.counter.sinks.3": {
-      "sheet": "kitchen",
-      "t": [
-        13,
-        33,
-        3,
-        1
-      ]
+    "prop.cabinet.glass.r": {
+      "sheet": "hospital",
+      "px": [
+        480,
+        1570,
+        32,
+        62
+      ],
+      "_single": "hospital#277"
     },
-    "prop.picture.plant.a": {
+    "prop.cabinet.upper.wood": {
       "sheet": "kitchen",
-      "t": [
-        10,
-        29,
-        1,
-        1
-      ]
+      "px": [
+        420,
+        1068,
+        92,
+        28
+      ],
+      "_note": "union of kitchen#123+#124+#125 \u2014 full 3-door glass upper cabinet"
     },
-    "prop.picture.plant.b": {
-      "sheet": "kitchen",
-      "t": [
-        11,
-        29,
-        1,
-        1
-      ]
+    "prop.box.single": {
+      "sheet": "hospital",
+      "px": [
+        104,
+        296,
+        18,
+        18
+      ],
+      "_single": "hospital#53"
     },
-    "prop.watercooler.top": {
-      "sheet": "kitchen",
-      "t": [
-        13,
+    "prop.boxes.stack": {
+      "sheet": "hospital",
+      "px": [
+        64,
+        294,
+        64,
+        56
+      ],
+      "_note": "three box piles"
+    },
+    "prop.boxes.tall": {
+      "sheet": "hospital",
+      "px": [
+        64,
+        294,
+        32,
+        50
+      ],
+      "_single": "hospital#55"
+    },
+    "prop.toychest.red": {
+      "sheet": "hospital",
+      "px": [
+        386,
+        2610,
+        30,
+        30
+      ],
+      "_single": "hospital#402"
+    },
+    "prop.chair.wait.yellow": {
+      "sheet": "hospital",
+      "px": [
+        226,
+        400,
+        28,
+        42
+      ],
+      "_single": "hospital#74"
+    },
+    "prop.chair.wait.tan": {
+      "sheet": "hospital",
+      "px": [
+        226,
+        464,
+        28,
+        42
+      ],
+      "_single": "hospital#80"
+    },
+    "prop.chair.wait.green": {
+      "sheet": "hospital",
+      "px": [
+        226,
+        528,
+        28,
+        42
+      ],
+      "_single": "hospital#86"
+    },
+    "prop.chair.wait.blue": {
+      "sheet": "hospital",
+      "px": [
+        226,
+        592,
+        28,
+        42
+      ],
+      "_single": "hospital#92"
+    },
+    "prop.chair.wait.red": {
+      "sheet": "hospital",
+      "px": [
+        226,
+        656,
+        28,
+        42
+      ],
+      "_single": "hospital#98"
+    },
+    "prop.chair.wait.side.yellow": {
+      "sheet": "hospital",
+      "px": [
+        168,
+        404,
+        22,
+        42
+      ],
+      "_single": "hospital#72"
+    },
+    "prop.chair.wait.side.tan": {
+      "sheet": "hospital",
+      "px": [
+        168,
+        468,
+        22,
+        42
+      ],
+      "_single": "hospital#78"
+    },
+    "prop.stool.yellow": {
+      "sheet": "hospital",
+      "px": [
+        324,
+        424,
         24,
-        1,
-        1
+        24
+      ],
+      "_single": "hospital#77"
+    },
+    "prop.stool.tan": {
+      "sheet": "hospital",
+      "px": [
+        324,
+        488,
+        24,
+        24
+      ],
+      "_single": "hospital#83"
+    },
+    "prop.bench.yellow": {
+      "sheet": "hospital",
+      "px": [
+        236,
+        736,
+        38,
+        20
       ]
     },
-    "prop.counter.k.plain": {
-      "sheet": "kitchen",
-      "t": [
+    "prop.bench.green": {
+      "sheet": "hospital",
+      "px": [
+        236,
+        768,
+        38,
+        20
+      ]
+    },
+    "prop.bench.round.yellow": {
+      "sheet": "hospital",
+      "px": [
+        300,
+        742,
+        38,
+        26
+      ]
+    },
+    "prop.bench.round.green": {
+      "sheet": "hospital",
+      "px": [
+        300,
+        774,
+        38,
+        26
+      ]
+    },
+    "prop.bench.round.pink": {
+      "sheet": "hospital",
+      "px": [
+        300,
+        806,
+        38,
+        26
+      ]
+    },
+    "prop.wheelchair.side.blue": {
+      "sheet": "hospital",
+      "px": [
+        66,
+        2404,
+        36,
+        50
+      ],
+      "_single": "hospital#361"
+    },
+    "prop.wheelchair.front.white": {
+      "sheet": "hospital",
+      "px": [
+        8,
+        2402,
+        42,
+        54
+      ],
+      "_single": "hospital#360"
+    },
+    "prop.wheelchair.front.tan": {
+      "sheet": "hospital",
+      "px": [
+        202,
+        2402,
+        42,
+        54
+      ],
+      "_single": "hospital#366"
+    },
+    "prop.stanchion.plain": {
+      "sheet": "hospital",
+      "px": [
+        422,
+        640,
+        54,
+        30
+      ],
+      "_single": "hospital left-post @422,640 + #161 (union)",
+      "_note": "complete 2-post silver barrier, both rope ends terminate at posts; the lone #161 post carried a severed rope stub"
+    },
+    "prop.stanchion.rope.blue": {
+      "sheet": "hospital",
+      "px": [
+        422,
+        608,
+        26,
+        30
+      ],
+      "_single": "hospital#159"
+    },
+    "prop.infostand.blue": {
+      "sheet": "hospital",
+      "px": [
+        446,
+        1356,
+        36,
+        70
+      ],
+      "_note": "the right-hand stand \u2014 the left one has a cut pole leaning on its corner"
+    },
+    "prop.bed.blue": {
+      "sheet": "hospital",
+      "px": [
+        172,
+        774,
+        38,
+        78
+      ],
+      "_single": "hospital#178"
+    },
+    "prop.bed.side.pink": {
+      "sheet": "hospital",
+      "px": [
+        224,
+        2222,
+        64,
+        48
+      ],
+      "_single": "hospital#350"
+    },
+    "prop.bed.side.white": {
+      "sheet": "hospital",
+      "px": [
+        288,
+        2222,
+        64,
+        48
+      ],
+      "_single": "hospital#351"
+    },
+    "prop.bed.side.blue": {
+      "sheet": "hospital",
+      "px": [
+        352,
+        2222,
+        64,
+        48
+      ],
+      "_single": "hospital#354"
+    },
+    "prop.bed.side.pink.b": {
+      "sheet": "hospital",
+      "px": [
+        416,
+        2222,
+        64,
+        48
+      ],
+      "_single": "hospital#355"
+    },
+    "prop.examtable.white": {
+      "sheet": "hospital",
+      "px": [
+        356,
+        1024,
+        60,
+        40
+      ],
+      "_single": "hospital#220"
+    },
+    "prop.examtable.blue": {
+      "sheet": "hospital",
+      "px": [
+        420,
+        1024,
+        60,
+        40
+      ],
+      "_single": "hospital#224"
+    },
+    "prop.exambed.white": {
+      "sheet": "hospital",
+      "px": [
+        352,
+        1120,
+        60,
+        40
+      ],
+      "_single": "hospital#222"
+    },
+    "prop.exambed.blue": {
+      "sheet": "hospital",
+      "px": [
+        416,
+        1120,
+        60,
+        40
+      ],
+      "_single": "hospital#226"
+    },
+    "prop.ivpole.single": {
+      "sheet": "hospital",
+      "px": [
+        6,
+        806,
+        14,
+        56
+      ],
+      "_single": "hospital#536 (lower pole only)",
+      "_note": "one rolling drip stand: cap, shaft, wheeled base"
+    },
+    "prop.curtain.blue": {
+      "sheet": "hospital",
+      "px": [
+        224,
+        1262,
+        60,
+        72
+      ],
+      "_single": "hospital#245"
+    },
+    "prop.curtain.tan": {
+      "sheet": "hospital",
+      "px": [
+        288,
+        1262,
+        60,
+        72
+      ],
+      "_single": "hospital#246"
+    },
+    "prop.scanner.ct": {
+      "sheet": "hospital",
+      "px": [
+        98,
+        1208,
+        60,
+        62
+      ],
+      "_single": "hospital#239"
+    },
+    "prop.microscope": {
+      "sheet": "hospital",
+      "px": [
+        128,
+        1578,
+        84,
+        78
+      ],
+      "_single": "hospital#533"
+    },
+    "prop.monitor.stand": {
+      "sheet": "hospital",
+      "px": [
+        16,
+        2084,
+        32,
+        74
+      ],
+      "_single": "hospital#327"
+    },
+    "prop.cart.monitor": {
+      "sheet": "hospital",
+      "px": [
+        264,
+        2070,
+        48,
+        58
+      ],
+      "_single": "hospital#331"
+    },
+    "prop.machine.arms": {
+      "sheet": "hospital",
+      "px": [
+        64,
+        2062,
+        64,
+        82
+      ],
+      "_single": "hospital#328"
+    },
+    "prop.autoclave": {
+      "sheet": "hospital",
+      "px": [
+        72,
+        1458,
+        50,
+        68
+      ],
+      "_single": "hospital#111"
+    },
+    "prop.cart.wood.a": {
+      "sheet": "hospital",
+      "px": [
+        98,
+        2348,
+        28,
+        32
+      ],
+      "_single": "hospital#348"
+    },
+    "prop.cart.wood.b": {
+      "sheet": "hospital",
+      "px": [
+        130,
+        2336,
+        30,
+        44
+      ],
+      "_single": "hospital#349"
+    },
+    "prop.sink.counter": {
+      "sheet": "hospital",
+      "px": [
+        450,
+        1796,
+        60,
+        42
+      ],
+      "_note": "counter body only \u2014 the single's top rows are flasks on an implied wall shelf, which float when the counter stands mid-room"
+    },
+    "prop.tray.tools": {
+      "sheet": "hospital",
+      "px": [
+        134,
+        1962,
+        54,
+        46
+      ],
+      "_single": "hospital#322"
+    },
+    "prop.vending.snacks": {
+      "sheet": "hospital",
+      "px": [
+        72,
+        1362,
+        46,
+        66
+      ],
+      "_single": "hospital#117"
+    },
+    "prop.vending.sweets": {
+      "sheet": "hospital",
+      "px": [
+        136,
+        1362,
+        46,
+        66
+      ],
+      "_single": "hospital#118"
+    },
+    "prop.vending.drinks": {
+      "sheet": "hospital",
+      "px": [
+        202,
+        1362,
+        42,
+        66
+      ],
+      "_single": "hospital#119"
+    },
+    "prop.vending.gray": {
+      "sheet": "hospital",
+      "px": [
+        392,
+        402,
+        50,
+        68
+      ],
+      "_single": "hospital#105"
+    },
+    "prop.trash.green": {
+      "sheet": "hospital",
+      "px": [
         2,
-        7,
-        1,
-        1
+        1360,
+        28,
+        34
+      ],
+      "_single": "hospital#253"
+    },
+    "prop.trash.blue": {
+      "sheet": "hospital",
+      "px": [
+        34,
+        1360,
+        28,
+        34
+      ],
+      "_single": "hospital#254"
+    },
+    "prop.plant.orange.s": {
+      "sheet": "hospital",
+      "px": [
+        34,
+        388,
+        28,
+        46
+      ],
+      "_single": "hospital#69"
+    },
+    "prop.plant.orange.m": {
+      "sheet": "hospital",
+      "px": [
+        66,
+        376,
+        28,
+        58
+      ],
+      "_single": "hospital#70"
+    },
+    "prop.plant.orange.l": {
+      "sheet": "hospital",
+      "px": [
+        106,
+        370,
+        44,
+        60
+      ],
+      "_single": "hospital#71"
+    },
+    "prop.plant.white.s": {
+      "sheet": "hospital",
+      "px": [
+        34,
+        484,
+        28,
+        46
       ]
     },
-    "prop.counter.k.drawers": {
+    "prop.plant.white.m": {
+      "sheet": "hospital",
+      "px": [
+        66,
+        472,
+        28,
+        58
+      ]
+    },
+    "prop.flowers.red": {
+      "sheet": "hospital",
+      "px": [
+        290,
+        3086,
+        28,
+        32
+      ],
+      "_single": "hospital#471"
+    },
+    "prop.rubbish": {
+      "sheet": "hospital",
+      "px": [
+        2,
+        1424,
+        30,
+        16
+      ]
+    },
+    "prop.debris": {
+      "sheet": "hospital",
+      "px": [
+        34,
+        1422,
+        30,
+        18
+      ]
+    },
+    "prop.printer.small": {
+      "sheet": "hospital",
+      "px": [
+        130,
+        3118,
+        28,
+        26
+      ],
+      "_single": "hospital#498"
+    },
+    "prop.mug.brown": {
       "sheet": "kitchen",
-      "t": [
-        3,
-        7,
-        1,
-        1
+      "px": [
+        422,
+        240,
+        14,
+        16
+      ]
+    },
+    "prop.mug.blue": {
+      "sheet": "kitchen",
+      "px": [
+        484,
+        240,
+        14,
+        16
       ]
     },
     "prop.counter.k.doors": {
       "sheet": "kitchen",
-      "t": [
-        4,
-        7,
-        1,
-        1
-      ]
+      "px": [
+        128,
+        224,
+        32,
+        22
+      ],
+      "_single": "kitchen#94"
     },
-    "prop.counter.k.shelf": {
+    "prop.counter.kt.l": {
       "sheet": "kitchen",
-      "t": [
-        5,
-        7,
-        1,
-        1
-      ]
+      "px": [
+        402,
+        552,
+        30,
+        28
+      ],
+      "_single": "kitchen#291",
+      "_note": "tan counter run, left end"
     },
-    "prop.counter.k.plain2": {
+    "prop.counter.kt.m": {
       "sheet": "kitchen",
-      "t": [
-        6,
-        7,
-        1,
-        1
-      ]
+      "px": [
+        432,
+        552,
+        32,
+        28
+      ],
+      "_single": "kitchen#292",
+      "_note": "tan counter run, middle"
     },
-    "prop.counter.k.end": {
+    "prop.counter.kt.r": {
       "sheet": "kitchen",
-      "t": [
-        7,
-        7,
-        1,
-        1
-      ]
+      "px": [
+        464,
+        552,
+        30,
+        28
+      ],
+      "_single": "kitchen#293",
+      "_note": "tan counter run, right end"
     },
     "prop.counter.kw.plain": {
       "sheet": "kitchen",
-      "t": [
-        2,
-        8,
-        1,
-        1
-      ]
+      "px": [
+        64,
+        256,
+        32,
+        22
+      ],
+      "_single": "kitchen#101"
     },
     "prop.counter.kw.drawers": {
       "sheet": "kitchen",
-      "t": [
-        3,
-        8,
-        1,
-        1
-      ]
+      "px": [
+        96,
+        256,
+        32,
+        22
+      ],
+      "_single": "kitchen#102"
     },
     "prop.counter.kw.doors": {
       "sheet": "kitchen",
-      "t": [
-        4,
-        8,
-        1,
-        1
-      ]
+      "px": [
+        128,
+        256,
+        32,
+        22
+      ],
+      "_single": "kitchen#104"
     },
     "prop.counter.kw.shelf": {
       "sheet": "kitchen",
-      "t": [
-        5,
-        8,
-        1,
-        1
-      ]
+      "px": [
+        160,
+        256,
+        32,
+        22
+      ],
+      "_single": "kitchen#108"
     },
     "prop.counter.kw.plain2": {
       "sheet": "kitchen",
-      "t": [
-        6,
-        8,
-        1,
-        1
-      ]
+      "px": [
+        192,
+        256,
+        32,
+        22
+      ],
+      "_single": "kitchen#109"
+    },
+    "prop.counter.kw.end": {
+      "sheet": "kitchen",
+      "px": [
+        224,
+        256,
+        32,
+        30
+      ],
+      "_single": "kitchen#105"
     },
     "prop.sink.white": {
       "sheet": "kitchen",
-      "t": [
+      "px": [
+        266,
+        226,
+        48,
+        28
+      ],
+      "_single": "kitchen#141"
+    },
+    "prop.sink.wash": {
+      "sheet": "bathroom",
+      "px": [
         8,
-        7,
-        1,
-        1
-      ]
+        1380,
+        48,
+        70
+      ],
+      "_single": "bathroom#151",
+      "_note": "front-facing utility wash basin (faucet + red/blue taps) \u2014 the lab eyewash station; sink.white/gray are top-down counter inserts"
     },
     "prop.sink.gray": {
       "sheet": "kitchen",
-      "t": [
-        8,
-        8,
-        1,
-        1
-      ]
+      "px": [
+        266,
+        258,
+        48,
+        28
+      ],
+      "_single": "kitchen#143"
     },
     "prop.desk.k.wood": {
       "sheet": "kitchen",
-      "t": [
-        10,
-        7,
-        2,
-        1
-      ]
+      "px": [
+        324,
+        236,
+        58,
+        28
+      ],
+      "_single": "kitchen#121"
     },
-    "prop.bar.display": {
+    "prop.fridge.open.a": {
       "sheet": "kitchen",
-      "t": [
-        5,
-        40,
-        2,
-        2
-      ]
+      "px": [
+        288,
+        846,
+        48,
+        72
+      ],
+      "_single": "kitchen#162"
     },
-    "prop.counter.display": {
+    "prop.fridge.gray.2": {
       "sheet": "kitchen",
-      "t": [
-        4,
-        38,
-        2,
-        2
-      ]
+      "px": [
+        224,
+        44,
+        64,
+        84
+      ],
+      "_note": "one 2-door fridge of the row"
+    },
+    "prop.fridge.gray.b": {
+      "sheet": "kitchen",
+      "px": [
+        320,
+        750,
+        32,
+        72
+      ],
+      "_single": "kitchen#159"
+    },
+    "prop.microwave.b": {
+      "sheet": "kitchen",
+      "px": [
+        288,
+        1024,
+        32,
+        28
+      ],
+      "_single": "kitchen#187",
+      "_note": "white microwave, fits one counter cell"
+    },
+    "prop.fridge.gray.c": {
+      "sheet": "kitchen",
+      "px": [
+        352,
+        750,
+        32,
+        72
+      ],
+      "_single": "kitchen#160"
+    },
+    "prop.microwave.c": {
+      "sheet": "kitchen",
+      "px": [
+        288,
+        1024,
+        32,
+        28
+      ],
+      "_single": "kitchen#187"
+    },
+    "prop.blender": {
+      "sheet": "kitchen",
+      "px": [
+        418,
+        758,
+        30,
+        34
+      ],
+      "_single": "kitchen#183"
+    },
+    "prop.coffeemaker.b": {
+      "sheet": "kitchen",
+      "px": [
+        416,
+        822,
+        30,
+        36
+      ],
+      "_single": "kitchen#186",
+      "_note": "machine body only; kitchen#186 bbox is 42 wide and includes an attached thin side pole (x32-41) that reads as a detached paddle in-game - cropped at the x30 gap (base bridge rows y28-29 cut deliberately)"
     },
     "prop.plate.a": {
       "sheet": "kitchen",
-      "t": [
-        3,
-        38,
-        1,
-        1
-      ]
-    },
-    "prop.plate.b": {
-      "sheet": "kitchen",
-      "t": [
-        3,
-        40,
-        1,
-        1
-      ]
+      "px": [
+        100,
+        1220,
+        24,
+        20
+      ],
+      "_single": "kitchen#399"
     },
     "prop.food.a": {
       "sheet": "kitchen",
-      "t": [
-        0,
-        46,
-        1,
-        1
-      ]
-    },
-    "prop.food.b": {
-      "sheet": "kitchen",
-      "t": [
-        4,
-        46,
-        1,
-        1
+      "px": [
+        6,
+        1476,
+        20,
+        24
       ]
     },
     "prop.food.c": {
       "sheet": "kitchen",
-      "t": [
-        8,
-        46,
-        1,
-        1
-      ]
+      "px": [
+        64,
+        768,
+        28,
+        24
+      ],
+      "_single": "kitchen#389"
     },
     "prop.food.d": {
       "sheet": "kitchen",
-      "t": [
-        10,
-        46,
-        1,
-        1
-      ]
-    },
-    "prop.food.e": {
-      "sheet": "kitchen",
-      "t": [
-        12,
-        46,
-        1,
-        1
+      "px": [
+        324,
+        1478,
+        24,
+        24
       ]
     },
     "prop.basket": {
       "sheet": "kitchen",
-      "t": [
-        0,
+      "px": [
+        4,
+        772,
         24,
-        1,
-        1
+        20
+      ],
+      "_single": "kitchen#387"
+    },
+    "prop.conftable": {
+      "sheet": "conference",
+      "px": [
+        22,
+        54,
+        120,
+        68
+      ],
+      "_note": "whole table (7 singles)"
+    },
+    "prop.copier": {
+      "sheet": "conference",
+      "px": [
+        160,
+        70,
+        32,
+        56
+      ],
+      "_note": "copier body only; the slatted pill at (166,48,20,12) is a separate wall object that floated over the wall in-game"
+    },
+    "prop.machine.white": {
+      "sheet": "conference",
+      "px": [
+        448,
+        232,
+        32,
+        86
+      ],
+      "_note": "kiosk"
+    },
+    "prop.mat.blue": {
+      "sheet": "conference",
+      "px": [
+        448,
+        130,
+        32,
+        22
       ]
     },
-    "prop.blender.a": {
-      "sheet": "kitchen",
-      "t": [
-        0,
-        36,
-        1,
-        2
-      ]
-    },
-    "prop.stool.bar.tan": {
-      "sheet": "kitchen",
-      "t": [
-        7,
-        38,
-        1,
-        2
-      ]
-    },
-    "prop.stool.bar.orange": {
-      "sheet": "kitchen",
-      "t": [
-        9,
-        38,
-        1,
-        2
+    "prop.mat.gray": {
+      "sheet": "conference",
+      "px": [
+        480,
+        130,
+        32,
+        22
       ]
     },
     "prop.couch.gray.3": {
       "sheet": "basement",
-      "t": [
-        9,
-        8,
-        3,
-        2
-      ]
+      "px": [
+        224,
+        256,
+        96,
+        54
+      ],
+      "_note": "front-facing 3-seat (3 singles)"
+    },
+    "prop.stool.blue": {
+      "sheet": "basement",
+      "px": [
+        452,
+        440,
+        24,
+        34
+      ],
+      "_single": "basement#150"
+    },
+    "prop.stool.red": {
+      "sheet": "basement",
+      "px": [
+        452,
+        568,
+        24,
+        34
+      ],
+      "_single": "basement#146"
     },
     "prop.couch.orange.3l": {
       "sheet": "basement",
-      "t": [
-        9,
-        0,
-        3,
-        2
-      ]
-    },
-    "prop.couch.white.3": {
-      "sheet": "basement",
-      "t": [
-        6,
-        0,
-        3,
-        2
-      ]
+      "px": [
+        288,
+        12,
+        96,
+        52
+      ],
+      "_note": "top-down 3-seat (3 singles)"
     },
     "prop.couch.blue.3": {
       "sheet": "basement",
-      "t": [
-        3,
-        0,
-        3,
-        2
-      ]
-    },
-    "prop.loveseat.gray": {
-      "sheet": "basement",
-      "t": [
-        12,
-        8,
-        2,
-        2
+      "px": [
+        96,
+        10,
+        96,
+        54
       ]
     },
     "prop.tv.stand.dark": {
       "sheet": "basement",
-      "t": [
-        12,
-        31,
-        2,
-        2
-      ]
+      "px": [
+        388,
+        1008,
+        58,
+        40
+      ],
+      "_single": "basement#166"
     },
-    "prop.tv.flat.gray": {
-      "sheet": "basement",
-      "t": [
-        10,
-        29,
-        2,
-        2
-      ]
-    },
-    "prop.lamp.floor": {
+    "prop.tv.sideboard": {
       "sheet": "living",
-      "t": [
-        12,
-        12,
-        1,
-        3
-      ]
-    },
-    "prop.cushion.blue": {
-      "sheet": "living",
-      "t": [
-        12,
-        1,
-        1,
-        1
-      ]
-    },
-    "prop.cushion.yellow": {
-      "sheet": "living",
-      "t": [
-        12,
-        30,
-        1,
-        1
-      ]
-    },
-    "prop.cushion.gray": {
-      "sheet": "living",
-      "t": [
-        13,
-        1,
-        1,
-        1
-      ]
-    },
-    "prop.table.round.wood": {
-      "sheet": "basement",
-      "t": [
-        1,
-        0,
-        1,
-        2
-      ]
-    },
-    "prop.bench.wood.3": {
-      "sheet": "basement",
-      "t": [
-        7,
-        13,
-        3,
-        2
-      ]
-    },
-    "prop.stool.bar.blue": {
-      "sheet": "basement",
-      "t": [
-        14,
-        13,
-        1,
-        2
-      ]
-    },
-    "prop.slots": {
-      "sheet": "basement",
-      "t": [
-        0,
-        41,
-        2,
-        3
-      ]
-    },
-    "prop.locker.dark": {
-      "sheet": "basement",
-      "t": [
-        0,
-        44,
-        1,
-        3
-      ]
-    },
-    "prop.pictures.small.a": {
-      "sheet": "basement",
-      "t": [
-        5,
-        43,
-        2,
-        1
-      ]
-    },
-    "prop.pictures.small.b": {
-      "sheet": "basement",
-      "t": [
-        7,
-        43,
-        1,
-        1
-      ]
-    },
-    "prop.mirror.tall": {
-      "sheet": "living",
-      "t": [
-        8,
-        25,
-        2,
-        3
-      ]
-    },
-    "prop.screen.dark.3x2": {
-      "sheet": "basement",
-      "t": [
-        13,
-        44,
-        3,
-        2
-      ]
-    },
-    "prop.screen.dark.2x2": {
-      "sheet": "basement",
-      "t": [
-        13,
-        46,
-        2,
-        2
-      ]
+      "px": [
+        160,
+        362,
+        64,
+        42
+      ],
+      "_single": "living#53",
+      "_note": "low wood dresser used as the break-room TV stand"
     },
     "prop.desk.monitor.3": {
       "sheet": "basement",
-      "t": [
-        7,
-        47,
-        3,
-        3
-      ]
-    },
-    "prop.rug.teal.4x3": {
-      "sheet": "basement",
-      "t": [
-        9,
-        44,
-        4,
-        3
-      ]
-    },
-    "prop.cabinet.dark.2": {
-      "sheet": "basement",
-      "t": [
-        10,
-        47,
-        2,
-        2
-      ]
-    },
-    "prop.pooltable.green": {
-      "sheet": "basement",
-      "t": [
-        0,
-        27,
-        3,
-        3
-      ]
+      "px": [
+        212,
+        1520,
+        120,
+        68
+      ],
+      "_note": "two 60-wide halves"
     },
     "prop.lightbar.3": {
       "sheet": "basement",
-      "t": [
-        7,
-        31,
-        3,
-        1
-      ]
+      "px": [
+        256,
+        1004,
+        96,
+        20
+      ],
+      "_note": "fluorescent tube"
     },
     "prop.lightbar.3b": {
       "sheet": "basement",
-      "t": [
-        7,
-        32,
-        3,
-        1
+      "px": [
+        256,
+        1028,
+        96,
+        16
       ]
     },
     "prop.console.blue.4": {
       "sheet": "tvstudio",
-      "t": [
-        3,
-        8,
-        4,
-        2
+      "px": [
+        96,
+        276,
+        128,
+        42
       ]
     },
-    "prop.console.blue.3c": {
+    "prop.console.blue.l": {
       "sheet": "tvstudio",
-      "t": [
-        0,
-        8,
-        3,
-        2
+      "px": [
+        96,
+        276,
+        32,
+        42
       ]
     },
-    "prop.console.red.4": {
+    "prop.console.blue.r": {
       "sheet": "tvstudio",
-      "t": [
-        3,
-        10,
-        4,
-        2
-      ]
-    },
-    "prop.console.green.4": {
-      "sheet": "tvstudio",
-      "t": [
-        3,
-        12,
-        4,
-        2
-      ]
-    },
-    "prop.console.blue.2": {
-      "sheet": "tvstudio",
-      "t": [
-        3,
-        8,
-        2,
-        2
-      ]
-    },
-    "prop.console.green.2": {
-      "sheet": "tvstudio",
-      "t": [
-        3,
-        12,
-        2,
-        2
-      ]
-    },
-    "prop.rackunit.blue": {
-      "sheet": "tvstudio",
-      "t": [
-        7,
-        8,
-        1,
-        1
-      ]
-    },
-    "prop.rackunit.red": {
-      "sheet": "tvstudio",
-      "t": [
-        7,
-        10,
-        1,
-        1
-      ]
-    },
-    "prop.rackunit.green": {
-      "sheet": "tvstudio",
-      "t": [
-        7,
-        12,
-        1,
-        1
-      ]
-    },
-    "prop.screen.big": {
-      "sheet": "tvstudio",
-      "t": [
-        10,
-        1,
-        4,
-        2
-      ]
-    },
-    "prop.screen.narrow": {
-      "sheet": "tvstudio",
-      "t": [
-        13,
-        1,
-        1,
-        2
+      "px": [
+        192,
+        276,
+        32,
+        42
       ]
     },
     "prop.rail.lights.6": {
       "sheet": "tvstudio",
-      "t": [
-        10,
-        0,
-        6,
-        1
+      "px": [
+        334,
+        16,
+        164,
+        16
       ]
     },
     "prop.rail.lights.2": {
       "sheet": "tvstudio",
-      "t": [
-        11,
-        0,
-        2,
-        1
+      "px": [
+        352,
+        16,
+        64,
+        16
       ]
     },
-    "prop.rail.lights.1": {
-      "sheet": "tvstudio",
-      "t": [
-        11,
-        0,
-        1,
-        1
-      ]
-    },
-    "prop.ring.red": {
-      "sheet": "tvstudio",
-      "t": [
-        14,
-        1,
-        1,
-        1
-      ]
-    },
-    "prop.ring.green": {
-      "sheet": "tvstudio",
-      "t": [
-        15,
-        1,
-        1,
-        1
-      ]
-    },
-    "prop.ring.blue": {
-      "sheet": "tvstudio",
-      "t": [
-        15,
-        2,
-        1,
-        1
-      ]
-    },
-    "prop.spotlight": {
-      "sheet": "tvstudio",
-      "t": [
-        5,
-        0,
-        1,
-        3
-      ]
-    },
-    "prop.camera.studio": {
-      "sheet": "tvstudio",
-      "t": [
-        0,
-        0,
-        1,
-        2
-      ]
-    },
-    "prop.chair.studio.tan": {
-      "sheet": "tvstudio",
-      "t": [
-        5,
-        4,
-        2,
-        2
-      ]
-    },
-    "prop.chair.studio.gray": {
-      "sheet": "tvstudio",
-      "t": [
-        7,
-        4,
-        2,
-        2
-      ]
-    },
-    "prop.shelf.narrow.books": {
-      "sheet": "classroom",
-      "t": [
-        3,
-        13,
-        1,
-        3
-      ]
-    },
-    "prop.bookcase.2.a": {
-      "sheet": "classroom",
-      "t": [
-        4,
-        13,
-        2,
-        3
-      ]
-    },
-    "prop.bookcase.2.b": {
-      "sheet": "classroom",
-      "t": [
-        6,
-        13,
-        2,
-        3
-      ]
-    },
-    "prop.bookcase.2.c": {
-      "sheet": "classroom",
-      "t": [
-        8,
-        13,
-        2,
-        3
-      ]
-    },
-    "prop.bookcase.2.d": {
-      "sheet": "classroom",
-      "t": [
-        10,
-        13,
-        2,
-        3
-      ]
-    },
-    "prop.bookcase.3.red": {
-      "sheet": "classroom",
-      "t": [
-        0,
-        24,
-        3,
-        2
-      ]
-    },
-    "prop.bookcase.3.beige": {
-      "sheet": "classroom",
-      "t": [
-        0,
+    "prop.lamp.floor": {
+      "sheet": "living",
+      "px": [
+        386,
+        400,
         26,
-        3,
-        4
-      ]
-    },
-    "prop.bookcase.3.tan": {
-      "sheet": "classroom",
-      "t": [
-        0,
-        30,
-        3,
-        4
-      ]
-    },
-    "prop.shelf.end.beige.4": {
-      "sheet": "classroom",
-      "t": [
-        12,
-        26,
-        1,
-        4
-      ]
-    },
-    "prop.shelf.end.tan.4": {
-      "sheet": "classroom",
-      "t": [
-        12,
-        30,
-        1,
-        4
-      ]
-    },
-    "prop.shelf.end.beige.3": {
-      "sheet": "classroom",
-      "t": [
-        13,
-        27,
-        1,
-        3
-      ]
-    },
-    "prop.shelf.end.tan.3": {
-      "sheet": "classroom",
-      "t": [
-        13,
-        31,
-        1,
-        3
-      ]
-    },
-    "prop.shelf.end.rust.2": {
-      "sheet": "classroom",
-      "t": [
-        12,
-        24,
-        1,
-        2
-      ]
-    },
-    "prop.chalkboard.green": {
-      "sheet": "classroom",
-      "t": [
-        7,
-        1,
-        2,
-        2
-      ]
-    },
-    "prop.chalkboard.dark.3": {
-      "sheet": "classroom",
-      "t": [
-        13,
-        5,
-        3,
-        2
-      ]
-    },
-    "prop.chalkboard.stand": {
-      "sheet": "classroom",
-      "t": [
-        10,
-        5,
-        2,
-        2
-      ]
-    },
-    "prop.board.colorful": {
-      "sheet": "classroom",
-      "t": [
-        13,
-        3,
-        3,
-        2
-      ]
-    },
-    "prop.terminal.old": {
-      "sheet": "classroom",
-      "t": [
-        0,
-        10,
-        1,
-        2
-      ]
-    },
-    "prop.terminal.desk": {
-      "sheet": "classroom",
-      "t": [
-        3,
-        10,
-        1,
-        2
-      ]
-    },
-    "prop.globe": {
-      "sheet": "classroom",
-      "t": [
-        13,
-        1,
-        1,
-        1
-      ]
-    },
-    "prop.desk.school": {
-      "sheet": "classroom",
-      "t": [
-        0,
-        1,
-        1,
-        2
-      ]
-    },
-    "prop.desk.book": {
-      "sheet": "classroom",
-      "t": [
-        5,
-        1,
-        2,
-        2
-      ]
-    },
-    "prop.bookstack.a": {
-      "sheet": "classroom",
-      "t": [
-        12,
-        15,
-        2,
-        1
-      ]
-    },
-    "prop.bookstack.b": {
-      "sheet": "classroom",
-      "t": [
-        12,
-        17,
-        1,
-        2
-      ]
-    },
-    "prop.books.pile": {
-      "sheet": "classroom",
-      "t": [
-        12,
-        19,
-        2,
-        1
+        66
       ]
     },
     "prop.shelf.bottles.a": {
       "sheet": "classroom",
-      "t": [
-        4,
-        7,
-        2,
-        3
+      "px": [
+        128,
+        236,
+        64,
+        68
       ]
     },
-    "prop.shelf.bottles.b": {
+    "prop.shelf.narrow.books": {
       "sheet": "classroom",
-      "t": [
-        6,
-        7,
-        2,
-        3
+      "px": [
+        98,
+        420,
+        28,
+        80
       ]
     },
-    "prop.shelf.bottles.c": {
+    "prop.bookcase.2.a": {
       "sheet": "classroom",
-      "t": [
-        8,
-        7,
-        2,
-        3
+      "px": [
+        134,
+        420,
+        54,
+        80
       ]
     },
-    "prop.shelf.bottles.d": {
+    "prop.bookcase.2.b": {
       "sheet": "classroom",
-      "t": [
-        10,
-        7,
-        2,
-        3
+      "px": [
+        196,
+        420,
+        54,
+        80
       ]
     },
-    "prop.shelf.bottles.e": {
+    "prop.bookcase.2.c": {
       "sheet": "classroom",
-      "t": [
-        12,
-        7,
-        2,
-        3
+      "px": [
+        260,
+        438,
+        54,
+        62
       ]
     },
-    "prop.shelf.bottles.f": {
+    "prop.chalkboard.dark.3": {
       "sheet": "classroom",
-      "t": [
-        14,
-        7,
-        2,
-        3
+      "px": [
+        420,
+        174,
+        56,
+        46
+      ]
+    },
+    "prop.terminal.old": {
+      "sheet": "classroom",
+      "px": [
+        0,
+        334,
+        32,
+        38
       ]
     },
     "prop.ladder.a": {
       "sheet": "classroom",
-      "t": [
+      "px": [
         0,
-        7,
-        1,
-        2
-      ]
-    },
-    "prop.ladder.b": {
-      "sheet": "classroom",
-      "t": [
-        1,
-        7,
-        1,
-        2
+        228,
+        24,
+        40
       ]
     },
     "prop.corkboard.2x1": {
       "sheet": "classroom",
-      "t": [
-        0,
+      "px": [
         6,
-        2,
-        1
-      ]
-    },
-    "prop.pencils": {
-      "sheet": "classroom",
-      "t": [
-        0,
-        5,
-        1,
-        1
-      ]
-    },
-    "prop.markers": {
-      "sheet": "classroom",
-      "t": [
-        1,
-        5,
-        1,
-        1
+        192,
+        52,
+        26
       ]
     },
     "prop.cabinet.blue.1x2": {
       "sheet": "classroom",
-      "t": [
-        12,
-        5,
-        1,
-        2
+      "px": [
+        384,
+        160,
+        32,
+        64
+      ]
+    },
+    "prop.sign.arrow.r": {
+      "sheet": "generic",
+      "px": [
+        356,
+        88,
+        24,
+        18
+      ]
+    },
+    "prop.rug.green.2x2": {
+      "sheet": "generic",
+      "px": [
+        360,
+        338,
+        48,
+        36
+      ]
+    },
+    "prop.painting.sunset": {
+      "sheet": "generic",
+      "px": [
+        68,
+        438,
+        56,
+        26
+      ]
+    },
+    "prop.bench.wood.tan": {
+      "sheet": "generic",
+      "px": [
+        2,
+        508,
+        60,
+        36
+      ]
+    },
+    "prop.bench.wood.orange": {
+      "sheet": "generic",
+      "px": [
+        66,
+        508,
+        60,
+        36
+      ]
+    },
+    "prop.phone.gray": {
+      "sheet": "generic",
+      "px": [
+        334,
+        1266,
+        32,
+        26
+      ]
+    },
+    "prop.phone.black": {
+      "sheet": "generic",
+      "px": [
+        398,
+        1266,
+        32,
+        26
+      ]
+    },
+    "prop.phone.sky": {
+      "sheet": "generic",
+      "px": [
+        480,
+        1264,
+        32,
+        26
+      ]
+    },
+    "prop.phone.red": {
+      "sheet": "generic",
+      "px": [
+        398,
+        1330,
+        32,
+        26
+      ]
+    },
+    "prop.desk.wood.pc.3": {
+      "sheet": "generic",
+      "px": [
+        96,
+        1664,
+        96,
+        54
+      ]
+    },
+    "prop.desk.glass.2": {
+      "sheet": "generic",
+      "px": [
+        128,
+        1728,
+        64,
+        48
+      ]
+    },
+    "prop.chair.office.gray": {
+      "sheet": "generic",
+      "px": [
+        134,
+        2016,
+        20,
+        28
+      ]
+    },
+    "prop.chair.office.sky": {
+      "sheet": "generic",
+      "px": [
+        134,
+        2080,
+        20,
+        28
+      ]
+    },
+    "prop.mat.tan.3x2": {
+      "sheet": "generic",
+      "px": [
+        0,
+        1476,
+        96,
+        56
+      ]
+    },
+    "prop.fern.s": {
+      "sheet": "generic",
+      "px": [
+        194,
+        1828,
+        28,
+        46
+      ]
+    },
+    "prop.fern.m": {
+      "sheet": "generic",
+      "px": [
+        226,
+        1816,
+        28,
+        58
+      ]
+    },
+    "prop.drawers.tan": {
+      "sheet": "generic",
+      "px": [
+        258,
+        2032,
+        30,
+        36
       ]
     },
     "prop.mop": {
       "sheet": "generic",
-      "t": [
-        13,
-        70,
-        1,
-        2
+      "px": [
+        424,
+        2254,
+        18,
+        34
       ]
     },
-    "prop.plunger": {
-      "sheet": "generic",
-      "t": [
-        13,
-        72,
-        1,
-        2
-      ]
+    "prop.fridge.glass.tall": {
+      "sheet": "anim_fridge",
+      "px": [
+        0,
+        10,
+        64,
+        78
+      ],
+      "_note": "frame 0 of the 2-door glass fridge"
     },
     "anim.server.0": {
       "sheet": "anim_server",
@@ -5071,8 +3401,9 @@
         0,
         0,
         32,
-        64
-      ]
+        52
+      ],
+      "_note": "left monitor of the 3-bank, desk edge cropped"
     },
     "anim.monitor.1": {
       "sheet": "anim_monitor",
@@ -5080,8 +3411,9 @@
         96,
         0,
         32,
-        64
-      ]
+        52
+      ],
+      "_note": "left monitor of the 3-bank, desk edge cropped"
     },
     "anim.monitor.2": {
       "sheet": "anim_monitor",
@@ -5089,8 +3421,9 @@
         192,
         0,
         32,
-        64
-      ]
+        52
+      ],
+      "_note": "left monitor of the 3-bank, desk edge cropped"
     },
     "anim.monitor.3": {
       "sheet": "anim_monitor",
@@ -5098,8 +3431,9 @@
         288,
         0,
         32,
-        64
-      ]
+        52
+      ],
+      "_note": "left monitor of the 3-bank, desk edge cropped"
     },
     "anim.coffee.0": {
       "sheet": "anim_coffee",
@@ -5160,36 +3494,40 @@
       "px": [
         0,
         0,
-        64,
+        96,
         64
-      ]
+      ],
+      "_note": "every 6th frame of 24; whole 3-wide TV"
     },
     "anim.tvnews.1": {
       "sheet": "anim_tvnews",
       "px": [
         576,
         0,
-        64,
+        96,
         64
-      ]
+      ],
+      "_note": "every 6th frame of 24; whole 3-wide TV"
     },
     "anim.tvnews.2": {
       "sheet": "anim_tvnews",
       "px": [
         1152,
         0,
-        64,
+        96,
         64
-      ]
+      ],
+      "_note": "every 6th frame of 24; whole 3-wide TV"
     },
     "anim.tvnews.3": {
       "sheet": "anim_tvnews",
       "px": [
         1728,
         0,
-        64,
+        96,
         64
-      ]
+      ],
+      "_note": "every 6th frame of 24; whole 3-wide TV"
     },
     "anim.hscreen.0": {
       "sheet": "anim_hscreen",
@@ -5197,8 +3535,9 @@
         0,
         0,
         64,
-        32
-      ]
+        64
+      ],
+      "_note": "whole 2x2 screen"
     },
     "anim.hscreen.1": {
       "sheet": "anim_hscreen",
@@ -5206,8 +3545,9 @@
         64,
         0,
         64,
-        32
-      ]
+        64
+      ],
+      "_note": "whole 2x2 screen"
     },
     "anim.hscreen.2": {
       "sheet": "anim_hscreen",
@@ -5215,8 +3555,9 @@
         128,
         0,
         64,
-        32
-      ]
+        64
+      ],
+      "_note": "whole 2x2 screen"
     },
     "anim.hscreen.3": {
       "sheet": "anim_hscreen",
@@ -5224,8 +3565,19 @@
         192,
         0,
         64,
-        32
-      ]
+        64
+      ],
+      "_note": "whole 2x2 screen"
+    },
+    "anim.hscreen.4": {
+      "sheet": "anim_hscreen",
+      "px": [
+        256,
+        0,
+        64,
+        64
+      ],
+      "_note": "whole 2x2 screen"
     },
     "anim.camera.0": {
       "sheet": "anim_camera",
@@ -5278,8 +3630,9 @@
         0,
         0,
         128,
-        64
-      ]
+        66
+      ],
+      "_note": "top two rows of the 4x3 screen wall; the cut is the gap between monitor rows"
     },
     "anim.screens.1": {
       "sheet": "anim_screens",
@@ -5287,8 +3640,9 @@
         512,
         0,
         128,
-        64
-      ]
+        66
+      ],
+      "_note": "top two rows of the 4x3 screen wall; the cut is the gap between monitor rows"
     },
     "anim.screens.2": {
       "sheet": "anim_screens",
@@ -5296,26 +3650,30 @@
         1024,
         0,
         128,
-        64
-      ]
+        66
+      ],
+      "_note": "top two rows of the 4x3 screen wall; the cut is the gap between monitor rows"
     },
-    "prop.fridge.glass.tall": {
-      "sheet": "anim_fridge",
+    "prop.watercooler": {
+      "sheet": "custom",
       "px": [
         0,
         0,
         32,
-        96
-      ]
+        52
+      ],
+      "_note": "painted: scripts/art/custom-props.mjs (LimeZu has blenders, not coolers)"
     },
-    "prop.lightbar.2": {
-      "sheet": "basement",
+    "prop.dishrack": {
+      "sheet": "kitchen",
       "px": [
-        256,
-        992,
-        64,
-        32
-      ]
+        384,
+        228,
+        28,
+        22
+      ],
+      "_single": "kitchen#147",
+      "_note": "kitchen #147 is a dish rack with cutlery, not a mug"
     }
   }
 }

@@ -1,0 +1,16 @@
+[
+ {
+  "id": "closet_to_hallway",
+  "side": "bottom",
+  "kind": "face",
+  "state": "next",
+  "frame": "door.face.0",
+  "x": 160,
+  "y": 256,
+  "depth": 11.5
+ },
+ {
+  "id": "closet_to_hallway",
+  "check": "ajar → frame 1, SPACE → frame 4, arrived in hallway_break_lab"
+ }
+]

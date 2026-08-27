@@ -20,9 +20,9 @@
   "propDepth": 10
  },
  {
-  "prop": "plant@10@2",
+  "prop": "plant@9@2",
   "playerTile": [
-   10,
+   9,
    3
   ],
   "rel": "front",

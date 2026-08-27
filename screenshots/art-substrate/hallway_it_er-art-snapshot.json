@@ -33,7 +33,7 @@
    "y": 1,
    "w": 1,
    "h": 1,
-   "frame": "prop.lightbar.2",
+   "frame": "prop.lightbar.3",
    "depth": 2,
    "anchor": "wall"
   },
@@ -73,12 +73,12 @@
    "y": 5,
    "w": 1,
    "h": 1,
-   "frame": "prop.wheelchair.side.tan",
+   "frame": "prop.wheelchair.front.tan",
    "depth": 10,
    "anchor": "floor"
   }
  ],
- "decor": 5,
+ "decor": 4,
  "animated": 0,
  "missing": [],
  "imageRequests": 27

@@ -143,10 +143,13 @@ export function spawnInteractables(
     if (board) {
       // Run 11: the board hangs on the back wall right of centre (the PHI-tip poster
       // takes the centre); its interactable anchor is the floor tile beneath it.
+      // Room-clean: top at y14 — at y0 the board buried the wall cap band and its
+      // mount bracket poked onto the dark wall-top edge (whiteboard/notice-board
+      // precedent: wall paper hangs below the cap, above the baseboard).
       const boardX = w / 2 + TILE * 1.5;
       const boardY = TILE * 2 + TILE / 2;
 
-      scene.add.image(boardX - TILE, 0, ATLAS_KEY, 'prop.bulletin.notes').setOrigin(0, 0).setDepth(2);
+      scene.add.image(boardX - TILE, 14, ATLAS_KEY, 'prop.bulletin.notes').setOrigin(0, 0).setDepth(2);
 
       // Invisible interactive sprite overlapping the board
       const boardTex = objectTexture('poster');

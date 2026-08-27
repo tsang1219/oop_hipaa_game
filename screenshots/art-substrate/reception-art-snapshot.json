@@ -33,7 +33,7 @@
    "y": 2,
    "w": 2,
    "h": 1,
-   "frame": "prop.cabinet.gray.2",
+   "frame": "prop.locker.white.2",
    "depth": 7,
    "anchor": "floor"
   },
@@ -43,7 +43,7 @@
    "y": 2,
    "w": 2,
    "h": 1,
-   "frame": "prop.cabinet.pink.2",
+   "frame": "prop.locker.teal.2",
    "depth": 7,
    "anchor": "floor"
   },
@@ -93,7 +93,17 @@
    "y": 8,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.yellow",
+   "frame": "prop.chair.wait.yellow",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 2,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.yellow",
    "depth": 13,
    "anchor": "floor"
   },
@@ -103,7 +113,17 @@
    "y": 8,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.green",
+   "frame": "prop.chair.wait.green",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 16,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.green",
    "depth": 13,
    "anchor": "floor"
   },
@@ -113,7 +133,17 @@
    "y": 10,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.yellow",
+   "frame": "prop.chair.wait.yellow",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 2,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.yellow",
    "depth": 15,
    "anchor": "floor"
   },
@@ -123,7 +153,17 @@
    "y": 10,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.green",
+   "frame": "prop.chair.wait.green",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 16,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.green",
    "depth": 15,
    "anchor": "floor"
   },
@@ -140,11 +180,11 @@
   {
    "type": "magazine_rack",
    "x": 2,
-   "y": 12,
+   "y": 13,
    "w": 1,
    "h": 1,
-   "frame": "prop.bookshelf.wood",
-   "depth": 17,
+   "frame": "prop.shelf.narrow.books",
+   "depth": 18,
    "anchor": "floor"
   },
   {
@@ -163,7 +203,7 @@
    "y": 12,
    "w": 1,
    "h": 1,
-   "frame": "prop.machine.white",
+   "frame": "prop.watercooler",
    "depth": 17,
    "anchor": "floor"
   },
@@ -209,16 +249,16 @@
   },
   {
    "type": "iv_stand",
-   "x": 18,
+   "x": 17,
    "y": 4,
    "w": 1,
    "h": 1,
-   "frame": "prop.ivpole.a",
+   "frame": "prop.ivpole.single",
    "depth": 9,
    "anchor": "floor"
   }
  ],
- "decor": 15,
+ "decor": 14,
  "animated": 0,
  "missing": [],
  "imageRequests": 27

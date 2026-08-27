@@ -1,6 +1,7 @@
 import { eventBridge, BRIDGE_EVENTS } from './EventBridge';
 import { loadSave } from '../lib/saveData';
 import type { ArtSnapshot } from './systems/exploration/art/artRenderer';
+import type { DoorSnapshot } from './systems/exploration/DoorSystem';
 
 /**
  * QA Bridge — exposes rich game state to window for Playwright testing.
@@ -102,6 +103,8 @@ export interface QABridge {
   lastAmbient?: { id: string; line: string };
   /** Run 11 (art-substrate): what the atlas renderer drew for the current room. */
   art?: ArtSnapshot;
+  /** Run 11 (doors): every door's current atlas frame / anchor / openness (DoorSystem.snapshot). */
+  doors?: DoorSnapshot[];
 }
 
 declare global {

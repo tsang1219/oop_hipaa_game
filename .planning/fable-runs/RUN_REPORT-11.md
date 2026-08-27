@@ -59,12 +59,15 @@ needed to re-slice (`node scripts/art/slice-atlas.mjs`).
 ## 3. The pipeline (how assets land; how to add or change a room)
 
 1. **Acquire** → `attached_assets/vendor/modern-interiors/` (git-ignored, §1). **Credit** → `attached_assets/CREDITS.md`.
-2. **Pick frames by looking** → `scripts/art/sheet-inspector.mjs <sheet.png> <outDir>` renders any tileset as labeled
-   2× contact sheets with absolute tile coordinates; `scripts/art/tile-zoom.mjs` zooms a rect;
-   `scripts/art/atlas-contact.mjs --sheet living` renders the sliced frames by name (this is how I caught that the
-   sofas I had "read" off the Living Room sheet were actually on the Basement sheet).
-3. **Slice** → `scripts/art/atlas-manifest.json` lists every frame as `{sheet, t:[tx,ty,tw,th]}` (tile units; `px`
-   for pixel rects — the animated objects; `split` explodes a floor block into variants).
+2. **Pick frames from the pack's object list, not by tile** (§12) → `scripts/art/singles-index.mjs <sheet> <singlesDir>`
+   locates every LimeZu single in its theme sheet and writes `scripts/art/singles/<sheet>.json` + a numbered 3×
+   catalog; `scripts/art/objects.mjs <sheet> tx ty tw th` lists the separate objects in a region with exact rects
+   (for sheets without singles); `scripts/art/cut-audit.mjs` proves no frame cuts an object. The older eyeballing
+   tools (`sheet-inspector.mjs`, `tile-zoom.mjs`, `atlas-contact.mjs`) are still there for looking.
+3. **Slice** → `scripts/art/atlas-manifest.json`: floors/walls/trims are tile rects `{sheet, t:[tx,ty,tw,th]}`
+   (`split` explodes a floor block into variants); **every object is a pixel rect `px:[x,y,w,h]`** — the single's
+   bbox, or the union of the singles that make one composite (runs of end/middle/end pieces are composed in the
+   catalog with `parts` / `fillEnds` instead).
    `node scripts/art/slice-atlas.mjs` shelf-packs them (2 px pad, 1 px extrude) into `interiors.png/.json` and
    regenerates `art/atlasFrames.generated.ts`, a string-literal union so a typo in a frame name fails `tsc`.
 4. **Map** → `client/src/phaser/systems/exploration/art/artCatalog.ts`: `PROP_DEFAULTS` (type → how to draw it:
@@ -98,8 +101,8 @@ needed to re-slice (`node scripts/art/slice-atlas.mjs`).
 `client/src/phaser/sprites/furniture/{index,coreFurniture,medicalLabFurniture,commonAreasFurniture,officeFurniture}.ts`
 (3,441 lines), `client/src/phaser/systems/exploration/compositeFurniture.ts` (471), `client/src/phaser/sprites/objectTextures.ts`
 (210), and the floor/wall/tint/decor/light-pool/furniture body of `roomRenderer.ts` (~560). What remains procedural:
-the NPC fallback sheets (`npcTextures.ts`), the player fallback texture, the door frames/leaves (`DoorSystem.ts`,
-Run 12's animated doors, now placed inside the two-row face for back-wall doors), and the small Run-12 ambience
+the NPC fallback sheets (`npcTextures.ts`), the player fallback texture, ~~the door frames/leaves (`DoorSystem.ts`,
+Run 12's animated doors, now placed inside the two-row face for back-wall doors)~~ (tileset doors since §11), and the small Run-12 ambience
 overlays (LED blinks, monitor flashes, the ER "EMERGENCY" panel) which ride on top of the atlas props.
 
 ## 6. Every place gameplay geometry moved (all in `client/src/data/roomData.json`)
@@ -210,11 +213,11 @@ The fact that a room is now a data entry: the closet took twenty minutes. The at
 turned "I think that's a sofa" into "that is a cabinet, here is the sofa".
 
 **Not proud of / want your eyes on:**
-- **Doors.** Still Run 12's procedural wooden frame + swinging leaf, drawn over the new thin wall tops; the back-wall
+- **Doors.** ~~Still Run 12's procedural wooden frame + swinging leaf, drawn over the new thin wall tops; the back-wall
   closet door now sits inside the face. They work and animate, but they are the last brown rectangles in the game.
-  LimeZu has animated doors (`3_Animated_objects/.../animated_door_*`) that would close this — a half-day.
-- **The water dispensers** are LimeZu's white kiosk (`prop.machine.white`) in Reception and a stand + blender-bottle
-  elsewhere. Neither is a great water cooler; the pack doesn't have one.
+  LimeZu has animated doors (`3_Animated_objects/.../animated_door_*`) that would close this — a half-day.~~ **Done — §11.**
+- ~~**The water dispensers** are LimeZu's white kiosk (`prop.machine.white`) in Reception and a stand + blender-bottle
+  elsewhere. Neither is a great water cooler; the pack doesn't have one.~~ **Done — §12** (a painted cooler).
 - **Zone and item icons** sit on counters and walls now but are still bobbing 1×1 pickups with gold rings.
 - **The HUD** (banner, progress panel) covers the top 40 px of every wall and whatever is in the top-right corner.
   UI-03's problem, visible in every shot.
@@ -233,6 +236,266 @@ turned "I think that's a sofa" into "that is a cabinet, here is the sofa".
 
 ## 10. Next
 
-Doors from the tileset (animated LimeZu doors, `DoorSystem.ts`), a proper water cooler (a custom 1×2 frame is
-probably faster than hunting), re-tune the Run 12 ambience overlays to the new props, and then the UI runs
+~~Doors from the tileset (animated LimeZu doors, `DoorSystem.ts`)~~ (done, §11), ~~a proper water cooler (a custom 1×2 frame is
+probably faster than hunting)~~ (done, §12), re-tune the Run 12 ambience overlays to the new props, and then the UI runs
 (UI-01..05) — the HUD is now the least finished thing on screen.
+
+---
+
+## 11. Follow-up (2026-08-23): doors from the tileset (§10 item 1)
+
+**Open it:** `screenshots/art-substrate/doors-before-vs-after.png` — six door cases, left the Run 12 brown
+rectangles, right LimeZu's doors; each as closed → ajar on approach → 150 ms after SPACE. Full rooms:
+`grid-doors-before-vs-doors-after.png` (reception, two hallways, IT, the closet); every state in one
+sheet: `doors-grid-after.png` (available / locked / completed / next / seam / found / bottom-wall).
+
+### What is on screen now
+
+| Door | Wall | LimeZu sheet | How it sits |
+|---|---|---|---|
+| 22 side-wall doors (every room ↔ hallway) | thin top-view wall line | `animated_door_vertical_right_1` (left wall) / `…_left_1` (right wall), frames 0–4 of 8 | Closed it is the door seen edge-on: an 8 px line standing in the 14 px wall line, 82 px tall (height + the bit of depth the 3/4 view shows), lintel rising over the wall above the gap. Open it has swung 90° **into the room** and shows its face — hinge on the wall, knob toward you. The 64×96 frame's bottom edge is the door tile's bottom edge; x is offset 3 px (left) / −35 px (right) so the closed line centres on the wall line. |
+| the hidden closet door, once found | two-row back-wall face | `animated_door_big_1` (32×96; body 56 px at y 38..93) | Foot on the floor line, so the body fills the face under the cap and the leaf lifts toward the viewer when it opens. Behind it the renderer now paints a recess exactly the body's size (`artRenderer.ts`, after the ground pass) instead of two offset void tiles. |
+| the closet's exit | bottom wall line | same big door | Standing in the gap of the bottom wall, facing the camera, y-sorted one row below the player — LimeZu has no "door seen from behind" (`museum_ticket_office_door_back` is baked into its own wall), and a door you can read beats one you can't. Same cheat Run 12 used, now with real art. |
+| locked | any | big door: `animated_door_big_1_locked` (5-frame thud); side doors: a 2 px hinge shake | Dim tint + the `[X]`, **no swing** — see below. |
+
+Not a LimeZu pixel is drawn by code any more: `buildLeaf`'s wood slab, the frame posts, header, highlight and
+shadow are gone from `DoorSystem.ts`; the only Graphics left in the file are the unfound closet's seam, spill
+and paw prints, which are deliberately not a door.
+
+Colour: I sliced the taupe `_2` set first because it sat better on cream and beige. Closed, its edge-on
+line all but vanished into the wall line — compare `doors-grid-after-taupe.png` with `doors-grid-after.png`,
+same cases. The door is the navigation affordance; it has to read closed, from across the room, in a dark IT
+office. Orange `_1` everywhere; one family for all 24 doors. (The hospital glass doors in the pack are
+handsome and I looked hard at them — but a secret supply closet with a glass door is wrong, and two door
+families across 24 doors would read as arbitrary.)
+
+### Behaviour (Run 12's beats, unchanged, now frame-driven)
+
+`openness` (1 closed → 0 open) still drives everything; `art/doorArt.ts` maps it to a frame step
+(0–4), so ajar = frame 1 at 0.72, the walk-through = frames 1→4 over 230 ms before the 150 ms lead and the
+fade, walk away = back to 0. The creak, the round-robin open sound, the secret stinger, the prompt text and
+`nearDoor` are untouched. Two things did change:
+
+- **A locked door no longer swings open before React says no.** `enter()` never checked the local state, so
+  Run 12 opened the leaf, started the fade, and only then got `REACT_DOOR_LOCKED` and snapped back — the
+  dark doorway is visible in the *before* sheet's locked rows. Now a locally-locked door rattles on SPACE
+  (thud frames for the big door, a hinge shake for side doors, once per attempt), and `onDoorLocked` also
+  rattles — which shuts a leaf that had opened on a stale 'available', so React stays the authority.
+- **State dressing follows the door.** The blue/gold rings, the gold aura, the `[X]` and the ✓ badge centre
+  on the door line (8–9 px off the tile centre for side doors) and sit just above their own door in depth,
+  so the ring is no longer painted under the leaf.
+
+Depth: side and bottom doors are y-sorted at `5 + row − 0.5` (behind you when you stand beside them, in
+front of you when you walk up behind the closet's exit — which occludes your legs, correctly, since that door
+is between you and the camera); the back-wall door is at 2, inside the face, behind everything on the floor.
+
+### The bug I walked into: the closet was unreachable
+
+With the two-row wall the hallway's top obstacle is 20×2, so the nearest a player can stand to the closet
+door at (8,0) is row 2 — and `checkProximity` wanted `dy < 48 px` from the door tile's centre (64 px away).
+Since the wall grew, nobody could find the closet by walking (and the hidden-door prompt never showed). Three
+places assumed a one-row wall; all three now count `wall.rows`:
+
+- `DoorSystem.checkProximity` — a back-wall door measures from the doorway's floor edge (last wall row);
+- `ExplorationScene.init` — spawning from a `top` door lands on the first floor row, not inside the wall;
+- `onQANavigateDoor` — same inward rule, so the QA navigator stops "forcing" the transition.
+
+Pinned by a new proof (`hallway_break_lab → supply_closet → back`): found door at (256,64) depth 2, ajar
+from row 2, frame 4 before the fade, spawn (5,6) inside the closet at its bottom door, back out to (8,2).
+
+### Pipeline additions
+
+- `scripts/art/atlas-manifest.json`: 4 sheets, 20 `px` frames (`door.side.r.*`, `door.side.l.*`,
+  `door.face.*`, `door.face.locked.*`) → atlas now 681 frames, 1024×2154, 417 KB (+7 KB). Still one image
+  request.
+- `client/src/phaser/systems/exploration/art/doorArt.ts` — which door goes on which wall and the anchor
+  numbers, shared by `DoorSystem` and `artRenderer` (the recess).
+- Tooling, all `PW_CHANNEL=chrome`: `scripts/art/sheet-compare.mjs` (every frame of N vendor sheets side by
+  side at 3× on a 32 px grid — how the door families were compared), `scripts/art/bbox.mjs` (opaque bbox per
+  fixed-size frame of a sheet — how the hinge/foot numbers above were measured, not eyeballed),
+  `scripts/art/frame-bbox.mjs` (same for sliced atlas frames, with row/col alpha profiles — how the wall
+  line's 14 px was found), `scripts/art/png-zoom.mjs`, `scripts/art/doors-compare.mjs` (the before/after
+  sheet), `tests/art-doors-capture.mjs <suffix>` (the door close-ups: closed / ajar / after SPACE for
+  eight cases, with seeded progress so completed/next/locked all appear).
+- `window.__QA__.doors` — every door's kind, atlas frame, anchor, depth, state and openness, live through
+  the swing (published on each frame change).
+
+### Proof
+
+- `tests/art-substrate-proof.spec.ts` — now 53 tests: the Run 11 39 (atlas / depth / lighting × 13) plus
+  **doors × 13** (every door's frame is `door.*` on the expected anchor and depth, or a seam for the
+  unfound closet; with "everything before the previous department" seeded, the way back cracks ajar on
+  approach and reaches frame 4 before the target room loads, the way forward stays on frame 0 and the
+  room does not change) plus the closet round trip. **53/53 green**, 5.7 min, run against the final atlas at the 2× viewport.
+- `tests/progression/*.spec.ts` — **31 passed, 0 failed, 4 skipped** (the `breach-gameplay` `test.skip` group, unchanged), 5.3 min — door unlocks, full playthrough, NPC interaction, room completion and navigation all green, zero console errors. `tests/living-world-feel.spec.ts` 3/3.
+- `npm run check` clean. `tests/art-doors-capture.mjs` and `tests/art-substrate-capture.mjs`: console clean
+  on every capture. `tests/living-world-feel.spec.ts`'s door stills (`screenshots/living-world/feel/door-*.png`)
+  still shoot the reception door; nothing in it asserted on the old pixels.
+
+### Not done / for your eyes
+
+- The ajar pose is LimeZu's frame 1 — a bigger crack than Run 12's 28 % of a leaf. It reads as "opening for
+  you"; if it is too much, the only smaller step the sheet offers is none.
+- The lintel of a side door rises ~50 px over the wall line above the gap (that is how the pack draws
+  them); in hallways that puts its top 18 px into the back-wall's face region at the corner. It reads as a
+  door frame; it is visible in `hallway_it_er-doors-after.png`.
+- The closed big door's top overlaps the cap's lower 4 px (56 px door, 64 px face, 12 px cap). The cap's dark
+  bottom line and the door's outline coincide, so it does not show — but it is a 4 px cheat.
+- Labels are unchanged (still `6px` text under the door; "Supply Closet B" still runs across the closet
+  door's lower panel as before).
+- Working-tree note: `package.json`, `server/index.ts` (a `DEV_HOST`/`dev:tailscale` change) and the
+  `gameData.json` / `roomData.json` copy rewrites are **another session's uncommitted edits** that were in
+  this tree — not part of this item, not touched, and to be excluded from this item's commit.
+
+---
+
+## 12. Follow-up (2026-08-23): the cut-off objects — every frame re-sliced from the pack's own object list
+
+**Open it:** `screenshots/art-substrate/audit-break-room-before-vs-after.png`, `audit-er-before-vs-after.png`,
+`audit-reception-before-vs-after.png`; all thirteen rooms in `grid-audit-before-vs-audit-1.png`
+(`<room>-audit-before.png` / `<room>-audit-1.png` are the 2× captures behind it).
+
+### What was wrong, and why it was everywhere
+
+You were right about the cause. LimeZu's theme sheets are laid out for tile-map editors: every object is
+cut into 32-px-wide (and often 32-px-tall) *singles* — a reception counter is four of them, the conference
+table seven, a couch three, a glass cabinet an end/middle/end — and the sheets pack those singles edge to
+edge, with small props sitting between tile boundaries rather than on them. The first Run 11 pass sliced by
+tile coordinates read off a contact sheet, which cannot work on that layout: a tile rect either cuts the
+object (the TV was 2 of its 3 columns, the patient monitors were the top row of a 2×2, the ER "bed" was
+three one-tile cots stacked, the copier was the lower 1×2 of a 1×2.5, every clock/poster/sign was a 1×1
+window on a 1×2 object) or drags a neighbour in (the clipboard frames carried the next object's pen, the
+"gray vending machine" rect was offset a full column so half the machine drew in the wrong tile).
+
+Measured, not eyeballed: `scripts/art/cut-audit.mjs` checks, for every sliced frame, whether the object's
+opaque pixels continue past the rect's edge in the source sheet. **283 of 606 manifest frames were cut;
+123 of those were on screen.** Tile rects were the wrong tool for this pack, full stop.
+
+### What I did
+
+1. **Indexed the pack's singles.** `Theme_Sorter_Singles_32x32/` holds one PNG per object (numbered, not
+   named). `scripts/art/singles-index.mjs` locates each single inside its theme sheet by exact pixel match
+   (anchored on its rarest colour) and writes `scripts/art/singles/<theme>.json` — 428/550 hospital singles
+   placed in 1.6 s, plus kitchen 356, basement 185, living 87, studio 78, conference 58 — and renders a
+   numbered 3× catalog of each theme (`scratchpad/audit/singles-<theme>-NN.png` during the run). The
+   classroom export does not match its sheet and the generic sheet ships no singles; those use connected
+   components instead (`scripts/art/objects.mjs`, `scripts/art/tighten.mjs`).
+2. **Rebuilt the manifest.** Every object frame is now a *pixel* rect — the single's opaque bbox
+   (`_single: "hospital#333"`), a component bbox, or, for composites, the union of the singles that make
+   the whole object (`_note`). the 82 frames `frames-vs-singles.mjs` marked exact/cut took their single's rect directly; the 40
+   merged cases I looked at one by one. 282 unreferenced frames dropped; the atlas went from 681 frames / 417 KB to 453 / 229 KB.
+3. **Rebuilt the compositions** (`artCatalog.ts`) around whole objects: counter runs get real end pieces
+   (`fillEnds` on `PropDef`, `artRenderer.ts`), glass cabinets/fume hood compose end+middle+end,
+   workstations compose console ends, the nurse station is two different 2.2-wide stations, patient bays
+   are side-view beds + bedside cabinet + IV pole, the crash cart is the monitor cart, the microscope
+   station is LimeZu's whole 84×78 composite, the kitchenette's two counter rows butt (22-px counters).
+4. **Logic pass, room by room** (all 13 checked at 2× after the fix):
+   - Break room — the *phone on a chair*: the zone tile (12,7) sits above the mirrored chair (12,8); it now
+     has a side table under it and the phone sits on the table. The *egg* was a bread roll placed a row too
+     high (off the table, on the floor); lunch is on the table now. The gray "couch" was a 3×2 slice of an
+     L-shaped sectional (it read as lockers) → a front-facing 3-seat sofa (3 singles); the orange one was
+     whole all along (LimeZu's top-down couches look like that) but swapped for the matching sofa. The
+     snack machine is LimeZu's standalone 2×3 machine (#117); the gray one is #105, whole, centred.
+     `mug.red` was LimeZu's dish rack — the reception counter mug, the NPC "sip" fidget icon
+     (`npcLife.ts`) and the "overheard conversation" zone all drew a dish rack; now a mug, a mug, a plate.
+   - Reception/lobby — GERALD is a whole copier (lid + body), the filing cabinets are hospital lockers
+     (the old ones were a 2×2 window on a kitchen base-cabinet run), the "water dispenser" kiosk and the
+     hallway "stand + bottle" (which was a **blender with a power cord**, kitchen #183) are replaced by a
+     real water cooler — item 2 done: painted in the pack's palette, `scripts/art/custom-props.mjs` →
+     `attached_assets/art-src/custom_props_32x32.png`, sheet id `custom`. Waiting "chairs" are pairs of
+     LimeZu's waiting-room chairs. The lobby "coffee cart" (Run 12 ambience) was a bedside cabinet with
+     steam coming off it → a wood table with the espresso machine. The "patient rights poster" item drew
+     a PC monitor → a chart sign.
+   - Lab — `bottle.orange` was a plate of food and `papers.b`/`bottle.blue` a small glass desk (so the
+     benches had glass desks and lunch on them); the bench clutter is hospital bottle groups now. The
+     "microscope" decor was the 2×1 middle of the station. The bottle "hanging on the wall" at (8,1) is
+     gone. Sink station = the hospital sink counter; autoclave = the hospital autoclave (#111).
+   - IT — the screen wall is the top two of its three monitor rows (the cut falls in the gap between rows;
+     the 4×3 doesn't fit a 2-row wall), the glass desk is its real 2-wide self with the copier beside it,
+     the IT table was a 4-px sliver of a table plus a post → a wood desk, "headphones" (no such single)
+     → a monitor on its stand.
+   - Records — drawer columns are whole 32×110 units (one finished side each; the seam side is a drawer
+     seam), corkboard moved off the wall the bookcase now covers, trays are tables with papers/binders.
+   - Hallways — fluorescent tubes are the whole 96-px tube and hang near the top of the face (they sat on
+     the floor line); vending is the blue drinks machine (#119).
+   - Every room — clocks, posters, signs, pictures, first-aid box, light switch, dispensers, plants, IV
+     poles, wheelchairs (a 2-wide object previously drawn 1 wide), exam tables, carts: whole.
+   - A renderer quirk you could see in the closet and hallways: floor painted under the 14-px wall trims
+     showed beyond the wall line in camera-centred rooms. Void now covers the outer strips.
+5. **Proof.** `cut-audit.mjs` on the rebuilt manifest flags only seams (adjacent animation frames, run
+   pieces, objects touching their neighbours in the sheet) — each checked. `tests/art-substrate-proof.spec.ts`
+   **53/53 green** (5.8 min, 2× viewport; depth/lighting/door checks all on the new frames); `tests/progression` **31 passed, 0 failed, 4 skipped** (the `breach-gameplay` skips, unchanged; 5.3 min); `npm run check` clean, zero console errors
+   in every capture.
+
+### Still not right / your eyes
+
+- `document_cart` / `filing_cart` are LimeZu bedside cabinets (no carts with wheels in the pack).
+- The `centrifuge` is still a CT scanner + autoclave — lab machines, not a centrifuge.
+- `coat_rack` is a floor lamp; `chairs` footprints (2×1) hold two 28-px chairs with a 3-px margin.
+- Vending machines are 46×66 on 64×96 footprints, so you stop a little short of them; the lunch table is
+  2.1 rows of art on a 3-row footprint (as before). Both are roomData footprints I left alone.
+- The Run 12 ambience overlays (LED dots on the break-room floor, the ER "EMERGENCY" panel, the sconce glow
+  that no longer lines up with the raised tube) are item 3 and untouched.
+- Tooling added: `cut-audit.mjs`, `objects.mjs`, `tighten.mjs`, `singles-index.mjs`, `frames-vs-singles.mjs`,
+  `custom-props.mjs`, `crop-pair.mjs`, `bbox.mjs`, `frame-bbox.mjs`, `png-zoom.mjs`, `sheet-compare.mjs`.
+  The rule from here: **never slice LimeZu by tile; pick the single (or compose singles)**.
+
+---
+
+## 13. Follow-up (2026-08-25): the room-clean loop — every room swept by fresh eyes until zero defects
+
+Your verdict after §12 ("still not quite there — too many sprites cut in half, too many placed weirdly...")
+became a standing QA loop: one fresh-context **fixer** agent per room (captures the running game, reads
+nine overlapping 3× crops, fixes, repeats until TWO consecutive fully clean sweeps), then a separate
+**blind reviewer** agent (same sweep, no access to the fixer's notes, PASS/FAIL verdict), with reviewer
+FAILs fixed at master level and re-verified. Protocol: `.planning/fable-runs/ROOM_CLEAN_PROTOCOL.md`.
+Every round is logged in `.planning/fable-runs/room-clean-log.md`.
+
+**Open it:** `screenshots/art-substrate/grid-audit-1-vs-clean.png` (all 13 rooms, §12 state vs final);
+per-room finals are `<room_id>-clean.png`, reviewer captures `<room_id>-review.png`.
+
+### Results by room (defects found+fixed by fixers / blind-review verdict)
+
+- break_room 15 / PASS after 1 master fix round · reception 7 / PASS after 3 · hospital_entrance 9 /
+  PASS after 6 · lab 10 / PASS after 1 · records_room (2 rounds, 529-killed fixer replaced) / **PASS
+  outright** · it_office 15+3 / **PASS outright** · er 14 / FAIL→PASS (see below)
+- Hallway batch (one fixer): reception_break 4, break_lab 6, lab_records 4, records_it 3, it_er 3,
+  supply_closet 0. Blind reviews (two parallel reviewers, 3 rooms each): four PASS outright;
+  break_lab FAIL (4 real findings) and it_er FAIL (1) → master-fixed → PASS.
+
+### The finds worth remembering
+
+- **Every IV pole was secretly two poles.** `prop.ivpole.a` AND `.b` each spanned two stacked drip-stand
+  singles; all five ER poles + composites now use `prop.ivpole.single`. The doubles are deleted.
+- **The "wheelchair" was a mop.** `prop.wheelchair.side.tan` is LimeZu's mop-and-bucket single; it stood
+  in hallway_it_er as a parked wheelchair. Now `prop.wheelchair.front.tan`; the misnamed frame is deleted.
+- **The nurse station's floating monitors** (er reviewer): singles #544/#545 bake their back monitor 4px
+  above the counter — invisible against a wall, floating over floor on a free-standing island. Fixed by
+  splitting each single into body/counter/monitor pixel rects and re-seating the monitor (dy −45/−47).
+- **Painted light is a trap.** The sconce flicker halo+cone ellipses read as wall stains to both blind
+  reviewers ("light can't pool on a vertical plane"); the flicker now tweens the tube sprite's own alpha
+  and nothing is painted on bare wall. Same family: the act-tint "ribbon" floated with no board under it
+  (deleted), window/monitor glows re-anchored onto art pixels in every room, dust motes clamped to the
+  floor band and spawned under the actual sconces.
+- **Icons need furniture.** Fresh eyes consistently failed any pickup/zone icon on bare floor; every one
+  now sits on a desk, counter, stand, or hangs on the wall (display-stand pattern in artCatalog).
+- **Blind review works.** Six of nine reviewer rounds found real defects the fixer's saturated eyes had
+  passed — including the two-monitor miss after a 14-fix ER round. Two consecutive clean sweeps + a
+  blind PASS is the bar that finally stuck.
+
+### Proof
+
+`tests/art-substrate-proof.spec.ts` 53/53 (one test updated: the reception_break depth pin follows the
+logged plant move (10,2)→(9,2)); `tests/progression` 31 passed / 4 skipped; zero console errors in every
+capture; `npx tsc -p .` clean. Files: artCatalog/roomAmbience/manifest churn per room-clean-log;
+roomData.json obstacle-only moves (all logged); one hardcoded hallway-board y in interactableFactory.ts
+(0→14, commented); atlas now 455 frames.
+
+### Left open, deliberately
+
+- The hidden supply-closet door seam in hallway_break_lab reads as a "stray black line" to fresh eyes —
+  it is the Run 12 discoverable-door hint, kept.
+- The supply closet's "Zz Test" NPC name label reads as leftover QA naming (reviewer observation) —
+  NPC data was out of scope for this loop; worth a rename in gameData/roomData whenever you touch copy.
+- Reviewer taste notes (poster-height variance, it_er's blank blue poster + bare east wall, records_it's
+  free-standing server rack, the 1px learn-zone ring vs a softer pulse) are logged, unactioned.

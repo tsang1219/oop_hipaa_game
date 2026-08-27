@@ -81,11 +81,15 @@ export function addRoomAmbience(
     // (1) Coffee cart prop — non-interactable, rendered directly in scene
     const cartTileX = 5, cartTileY = 5;
     const cartCx = cartTileX * TILE + TILE / 2, cartCy = cartTileY * TILE + TILE / 2;
-    scene.add.ellipse(cartCx, cartCy + 12, TILE - 4, 8, 0x000000, 0.18).setDepth(2);
-    scene.add.sprite(cartCx, cartCy - 8, ATLAS_KEY, 'prop.cart.wood.a').setDepth(3);
-    // Tiny steam puff every ~2.6s above the cart
+    scene.add.ellipse(cartCx, cartCy + 12, TILE + 20, 8, 0x000000, 0.18).setDepth(2);
+    // Run 11 audit: a coffee cart is a little wood table with the kitchen's coffee maker on it
+    // (the old frame was LimeZu's bedside cabinet)
+    scene.add.sprite(cartCx, cartCy + 14, ATLAS_KEY, 'prop.desk.k.wood').setOrigin(0.5, 1).setDepth(3);
+    scene.add.sprite(cartCx, cartCy + 2, ATLAS_KEY, 'prop.coffeemaker.b').setOrigin(0.5, 1).setDepth(3);
+    // Tiny steam puff every ~2.6s above the machine (machine top sits at cartCy - 34;
+    // spawning lower left the puff rising out of the machine's body)
     scene.time.addEvent({ delay: 2600, loop: true, callback: () => {
-      const puff = scene.add.ellipse(cartCx + (Math.random() * 4 - 2), cartCy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
+      const puff = scene.add.ellipse(cartCx + (Math.random() * 4 - 2), cartCy - 36, 5, 4, 0xffffff, 0.55).setDepth(20);
       scene.tweens.add({ targets: puff, y: puff.y - 12, alpha: 0, scaleX: 1.5, scaleY: 1.5, duration: 1400, ease: 'Sine.easeOut', onComplete: () => puff.destroy() });
     } });
     // (2) Riley idle micro-animation — subtle angle sway on top of breathing tween
@@ -110,7 +114,14 @@ export function addRoomAmbience(
     const ledColors = [0xff4444, 0xffdd44, 0x44ff66, 0x44ccff];
     for (const obs of room.obstacles) {
       if ((obs as any).type !== 'vending_machine') continue;
-      const led = scene.add.rectangle(obs.x * TILE + obs.width * TILE - 6, obs.y * TILE + 6, 2, 2, ledColors[0]).setDepth(20);
+      // The LED sits ON the machine art: the sprite is bottom-center anchored on the
+      // footprint bottom and ~66-68px tall, so anchor near its top-right corner
+      // (footprint top-right floats on bare wall/floor — Run 12 bug).
+      const led = scene.add.rectangle(
+        obs.x * TILE + (obs.width * TILE) / 2 + 16,
+        (obs.y + obs.height) * TILE - 58,
+        2, 2, ledColors[0],
+      ).setDepth(20);
       let li = 0;
       scene.time.addEvent({ delay: 700, loop: true, callback: () => { li = (li + 1) % ledColors.length; led.setFillStyle(ledColors[li]); } });
 
@@ -128,7 +139,9 @@ export function addRoomAmbience(
     }
     const mw = room.obstacles.find((o: any) => o.type === 'microwave');
     if (mw) {
-      const mx = mw.x * TILE + TILE / 2, my = mw.y * TILE + TILE / 2;
+      // Flash centred on the microwave body, which sits on the counter run
+      // (composite bottom at footprint bottom; microwave spans roughly -50..-22 above it)
+      const mx = mw.x * TILE + TILE / 2, my = (mw.y + mw.height) * TILE - 36;
       scene.time.addEvent({ delay: 9000, loop: true, callback: () => {
         playBusSfx(scene, 'sfx_interact', { volume: 0.12, rate: 1.6 });
         const f = scene.add.rectangle(mx, my, TILE - 8, TILE - 8, 0xffeeaa, 0.5).setDepth(20);
@@ -153,19 +166,11 @@ export function addRoomAmbience(
 
   // ── Records Room final-demo polish (DESIGN-006) ──────────────
   if (room.id === 'records_room') {
-    // (1) Flickering fluorescent tube + dust motes in the upper filing aisle
-    const tubeCx = 10 * TILE + TILE / 2, tubeCy = 1 * TILE + TILE - 4;
-    const tube = scene.add.rectangle(tubeCx, tubeCy, TILE * 3, 3, 0xfff7d8, 0.85).setDepth(4);
-    const tubeHalo = scene.add.rectangle(tubeCx, tubeCy + 10, TILE * 4, 22, 0xfff2b8, 0.10).setDepth(3);
-    scene.time.addEvent({ delay: 3200, loop: true, callback: () => {
-      // Brief flicker — dim then snap back
-      scene.tweens.add({ targets: [tube, tubeHalo], alpha: { from: tube.alpha, to: 0.25 }, duration: 80, yoyo: true, repeat: 1, ease: 'Linear' });
-    } });
-    // Dust motes drifting in the light beam below the tube
-    scene.time.addEvent({ delay: 1400, loop: true, callback: () => {
-      const mote = scene.add.circle(tubeCx + (Math.random() * 80 - 40), tubeCy + 6, 1, 0xfff5c8, 0.7).setDepth(20);
-      scene.tweens.add({ targets: mote, y: mote.y + 18, alpha: 0, duration: 4200, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
-    } });
+    // (1) [removed — Run 11 room-clean] The fluorescent tube rectangle sat at the wall
+    // base (y 60) where it read as a stray white strip on the baseboard — the wall face
+    // above is covered by the screen-fixed room-name banner, so there is nowhere for a
+    // visible ceiling fixture on this wall. Its halo and the dust motes it justified
+    // went with it; the aisle light pools in ROOM_ART carry the overhead-light read.
     // (2) Idle fidget on the two strongest NPCs — CCO and Attorney
     for (const fidgetId of ['compliance_officer', 'attorney']) {
       const ia = interactables.find(i => i.type === 'npc' && i.id === fidgetId);
@@ -178,12 +183,10 @@ export function addRoomAmbience(
       const env = scene.add.sprite(attorney.sprite.x + 14, attorney.sprite.y + 4, envTex.key, envTex.frame).setScale(0.5).setDepth(attorney.sprite.depth - 1).setAngle(12);
       scene.tweens.add({ targets: env, y: env.y - 1, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
-    // (4) Decorative document cart drifting slowly down the central aisle (separate from the static cart at (6,5))
-    const cartY = 9 * TILE + TILE / 2;
-    const cartStartX = 13 * TILE + TILE / 2, cartEndX = 16 * TILE + TILE / 2;
-    scene.add.ellipse(cartStartX, cartY + 10, TILE - 6, 6, 0x000000, 0.18).setDepth(2);
-    const cart = scene.add.sprite(cartStartX, cartY - 8, ATLAS_KEY, 'prop.cart.wood.a').setDepth(3).setScale(0.85);
-    scene.tweens.add({ targets: cart, x: cartEndX, duration: 5200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+    // (4) [removed — Run 11 room-clean] The drifting document cart was a bedside-cabinet
+    // sprite sliding by itself with no wheels or pusher, and its shadow ellipse was
+    // static at the tween's start position — a detached shadow on bare floor whenever
+    // the cart was mid-drift. The room keeps its static document cart at (6,11).
     // Ambient paper rustle / drawer slide — every ~12s (AUD-06: real paper sample)
     scene.time.addEvent({ delay: 12500, loop: true, callback: () => {
       playBusSfx(scene, 'sfx_ambient_records_paper', { volume: 0.07, rate: 0.85 });
@@ -238,8 +241,12 @@ export function addRoomAmbience(
     // (2) Monitor flicker — single-frame cyan flash on each monitor_bank every 8-10s
     for (const obs of room.obstacles) {
       if ((obs as any).type !== 'monitor_bank') continue;
-      const mx = obs.x * TILE + (obs.width * TILE) / 2, my = obs.y * TILE + TILE / 2;
-      const flash = scene.add.rectangle(mx, my, obs.width * TILE - 4, TILE - 4, 0x66ddff, 0).setDepth(6);
+      // the monitor art is desk-mounted (anim.monitor at dy -16 on a counter): its
+      // screen centers ~50px above the footprint bottom — the old top-tile-center
+      // anchor put the flash half above the sprite, over bare floor
+      const mx = obs.x * TILE + (obs.width * TILE) / 2;
+      const my = (obs.y + obs.height) * TILE - 46;
+      const flash = scene.add.rectangle(mx, my, 24, 18, 0x66ddff, 0).setDepth(6);
       scene.time.addEvent({ delay: 8500 + Math.random() * 1500, loop: true, callback: () => {
         flash.setAlpha(0.55);
         scene.time.delayedCall(60, () => flash.setAlpha(0));
@@ -262,39 +269,48 @@ export function addRoomAmbience(
   // Worst 2 only (break_lab + it_er): flickering sconces + walking employee NPC.
   if (room.id.startsWith('hallway_')) {
     const isHeavyHallway = room.id === 'hallway_break_lab' || room.id === 'hallway_it_er';
-    // (A) Shared — Act-aware poster accent on the existing bulletin board
-    const act = ctx.getCurrentAct();
-    const actTint = act === 1 ? 0x4a90e2 : act === 2 ? 0xe2a04a : 0xc83a3a;
-    const ribbon = scene.add.rectangle(scene.cameras.main.width / 2 + 18, 64 - 16, 10, 4, actTint, 1).setDepth(8).setAngle(-12);
-    scene.tweens.add({ targets: ribbon, alpha: { from: 1, to: 0.65 }, duration: 1300, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
-    // (B) Shared — Drifting dust motes in two light columns (atmospheric texture)
-    const moteColumns = [5 * TILE + TILE / 2, 14 * TILE + TILE / 2];
+    // (A) [removed — Run 11 room-clean] The act-tinted "ribbon" rectangle floated on
+    // bare wall 12px below the bulletin board (and over the reception_break plant's
+    // foliage), and act 1's blue tint matched the board's own blue. The board's
+    // per-act TEXT (hallwayContent) carries the act signal; no procedural paint.
+    // (B) Shared — drifting dust motes under the actual wall tubes. The old fixed
+    // columns (5/14) missed the sconces in three of the five hallways: sconce
+    // positions vary per hallway (4/15, 4/16, 5/14, 4/16, 5-only).
+    const moteColumns = room.obstacles
+      .filter(o => (o as { type?: string }).type === 'wall_sconce')
+      .map(o => o.x * TILE + (o.width * TILE) / 2);
     for (const cx of moteColumns) {
       scene.time.addEvent({ delay: 1700 + Math.random() * 900, loop: true, callback: () => {
         const mote = scene.add.circle(cx + (Math.random() * 28 - 14), TILE + 4, 1, 0xfff5c8, 0.7).setDepth(20);
-        scene.tweens.add({ targets: mote, y: mote.y + 5 * TILE, alpha: 0, duration: 5200 + Math.random() * 800, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
+        // drift ends above the bottom wall band (row 6 starts y192) — an uncapped
+        // +5*TILE carried specks onto the trim/void (room-clean reviewer find)
+        scene.tweens.add({ targets: mote, y: 184, alpha: 0, duration: 5200 + Math.random() * 800, ease: 'Sine.easeOut', onComplete: () => mote.destroy() });
       } });
     }
-    // (C) Heavy-only — Flickering ceiling sconces
+    // (C) Heavy-only — Flickering sconces: tween the tube sprite's OWN alpha.
+    // Painted halo/cone ellipses on the wall face read as stains in both fresh-eyes
+    // reviews (the vertical wall plane can't catch a light pool) — the flicker now
+    // lives on the lamp pixels themselves and nothing is painted on bare wall.
     if (isHeavyHallway) {
+      const hallArt = getArtHandle(scene);
       for (const obs of room.obstacles) {
-        if ((obs as any).type !== 'wall_sconce') continue;
-        const sx = obs.x * TILE + (obs.width * TILE) / 2;
-        const sy = obs.y * TILE + TILE - 2;
-        const halo = scene.add.ellipse(sx, sy + 4, 22, 10, 0xffe6a8, 0.55).setDepth(4);
-        const cone = scene.add.ellipse(sx, sy + 14, 30, 18, 0xfff2c8, 0.18).setDepth(3);
+        if ((obs as { type?: string }).type !== 'wall_sconce') continue;
+        const tube = hallArt?.props.get(`wall_sconce@${obs.x},${obs.y}`);
+        if (!tube) continue;
         const flickerDelay = 2400 + Math.random() * 1800;
         scene.time.addEvent({ delay: flickerDelay, loop: true, callback: () => {
-          scene.tweens.add({ targets: [halo, cone], alpha: { from: 1, to: 0.35 }, duration: 70, yoyo: true, repeat: 1, ease: 'Linear' });
+          scene.tweens.add({ targets: tube, alpha: { from: 1, to: 0.55 }, duration: 70, yoyo: true, repeat: 1, ease: 'Linear' });
         } });
       }
-      // (D) Heavy-only — Walking employee NPC, non-interactable, patrols the corridor
+      // (D) Heavy-only — Walking employee NPC, non-interactable, patrols the corridor.
+      // The foot shadow tweens WITH the sprite — a static ellipse at the start tile
+      // read as a detached shadow on bare floor (the records drifting-cart fail).
       const empY = 4 * TILE + TILE / 2;
       const empStartX = 7 * TILE + TILE / 2;
       const empEndX = 13 * TILE + TILE / 2;
-      scene.add.ellipse(empStartX, empY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
+      const empShadow = scene.add.ellipse(empStartX, empY + TILE / 2 - 2, 18, 7, 0x000000, 0.25).setDepth(4);
       const empSprite = scene.add.sprite(empStartX, empY, 'npc_doctor').setDepth(5 + 4);
-      scene.tweens.add({ targets: empSprite, x: empEndX, duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => empSprite.setFlipX(true), onRepeat: () => empSprite.setFlipX(false) });
+      scene.tweens.add({ targets: [empSprite, empShadow], x: empEndX, duration: 2400, yoyo: true, repeat: -1, ease: 'Sine.easeInOut', onYoyo: () => empSprite.setFlipX(true), onRepeat: () => empSprite.setFlipX(false) });
       scene.tweens.add({ targets: empSprite, scaleY: { from: 1.0, to: 1.03 }, duration: 380, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
     }
   }
@@ -325,7 +341,9 @@ export function addFurnitureIdleAnimations(scene: Phaser.Scene, room: any): void
         });
         continue;
       }
-      if (obsType === 'plant' || obsType === 'privacy_screen') continue;
+      // curtain_partition: the ER's atlas curtain is a framed rolling screen — the
+      // procedural cloth-sway ellipse floated on bare floor above its art (Run 11)
+      if (obsType === 'plant' || obsType === 'privacy_screen' || obsType === 'curtain_partition') continue;
     }
 
     // ── curtain_partition / privacy_screen — cloth sway (ANIM-07) ────────
@@ -365,7 +383,11 @@ export function addFurnitureIdleAnimations(scene: Phaser.Scene, room: any): void
     // ── server_rack / monitor_bank / vital_monitor — screen flicker + LED blink ─
     if (obsType === 'server_rack' || obsType === 'monitor_bank' || obsType === 'vital_monitor') {
       const mx = obs.x * TILE + (obs.width * TILE) / 2;
-      const my = obs.y * TILE + (obs.height * TILE) / 2;
+      // monitor_bank art is desk-mounted (bottom-anchored counter + monitor): its
+      // screen sits ~52px above the footprint bottom, not at the obstacle center
+      const my = obsType === 'monitor_bank'
+        ? (obs.y + obs.height) * TILE - 52
+        : obs.y * TILE + (obs.height * TILE) / 2;
 
       // Screen glow rect — sits over the upper half of the sprite
       const glowColor = obsType === 'server_rack' ? 0x44ff66 : 0x66ccff;
@@ -386,8 +408,11 @@ export function addFurnitureIdleAnimations(scene: Phaser.Scene, room: any): void
       } });
 
       // LED dot — toggles between bright green and dim green every ~900ms
-      const ledX = obs.x * TILE + obs.width * TILE - 4;
-      const ledY = obs.y * TILE + 5;
+      // monitor_bank: the obstacle's top tile is empty air above the desk-mounted
+      // art — the old top-anchored LED floated as a green pixel on bare floor.
+      // It sits on the monitor head's top-right bezel instead (head top ~y-66).
+      const ledX = obs.x * TILE + obs.width * TILE - (obsType === 'monitor_bank' ? 6 : 4);
+      const ledY = obsType === 'monitor_bank' ? (obs.y + obs.height) * TILE - 58 : obs.y * TILE + 5;
       const led = scene.add.rectangle(ledX, ledY, 2, 2, 0x44ff44).setDepth(20);
       let ledOn = true;
       scene.time.addEvent({ delay: 880 + Math.random() * 200, loop: true, callback: () => {
@@ -397,24 +422,7 @@ export function addFurnitureIdleAnimations(scene: Phaser.Scene, room: any): void
       continue;
     }
 
-    // ── coffee_station — steam puffs (break_room's obstacle; entrance cart handled separately) ─
-    if (obsType === 'coffee_station') {
-      const cx = obs.x * TILE + (obs.width * TILE) / 2;
-      const cy = obs.y * TILE + 4;
-      scene.time.addEvent({ delay: 2600 + Math.random() * 400, loop: true, callback: () => {
-        const puff = scene.add.ellipse(cx + (Math.random() * 4 - 2), cy - 14, 5, 4, 0xffffff, 0.55).setDepth(20);
-        scene.tweens.add({
-          targets: puff,
-          y: puff.y - 12,
-          alpha: 0,
-          scaleX: 1.5,
-          scaleY: 1.5,
-          duration: 1400,
-          ease: 'Sine.easeOut',
-          onComplete: () => puff.destroy(),
-        });
-      } });
-      continue;
-    }
+    // coffee_station: no overlay — the kitchenette's anim.coffee frames carry
+    // baked steam, and the old puff anchor floated over the upper cabinet (Run 12 bug).
   }
 }

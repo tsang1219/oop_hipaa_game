@@ -1,0 +1,16 @@
+[
+ {
+  "id": "entrance_to_reception",
+  "side": "right",
+  "kind": "side-right",
+  "state": "next",
+  "frame": "door.side.l.0",
+  "x": 573,
+  "y": 256,
+  "depth": 11.5
+ },
+ {
+  "id": "entrance_to_reception",
+  "check": "ajar → frame 1, SPACE → frame 4, arrived in reception"
+ }
+]

@@ -29,7 +29,7 @@
   },
   {
    "type": "plant",
-   "x": 10,
+   "x": 9,
    "y": 2,
    "w": 1,
    "h": 1,
@@ -43,7 +43,7 @@
    "y": 1,
    "w": 1,
    "h": 1,
-   "frame": "prop.lightbar.2",
+   "frame": "prop.lightbar.3",
    "depth": 2,
    "anchor": "wall"
   },
@@ -53,7 +53,7 @@
    "y": 1,
    "w": 1,
    "h": 1,
-   "frame": "prop.lightbar.2",
+   "frame": "prop.lightbar.3",
    "depth": 2,
    "anchor": "wall"
   },
@@ -63,17 +63,7 @@
    "y": 5,
    "w": 1,
    "h": 1,
-   "frame": "prop.table.small.white",
-   "depth": 10,
-   "anchor": "floor"
-  },
-  {
-   "type": "water_cooler",
-   "x": 7,
-   "y": 5,
-   "w": 1,
-   "h": 1,
-   "frame": "prop.watercooler.top",
+   "frame": "prop.watercooler",
    "depth": 10,
    "anchor": "floor"
   },
@@ -83,7 +73,7 @@
    "y": 5,
    "w": 1,
    "h": 1,
-   "frame": "prop.fridge.glass.tall",
+   "frame": "prop.vending.drinks",
    "depth": 10,
    "anchor": "floor"
   }

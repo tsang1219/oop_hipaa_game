@@ -43,7 +43,7 @@
    "y": 1,
    "w": 1,
    "h": 1,
-   "frame": "prop.lightbar.2",
+   "frame": "prop.lightbar.3",
    "depth": 2,
    "anchor": "wall"
   },
@@ -53,7 +53,7 @@
    "y": 1,
    "w": 1,
    "h": 1,
-   "frame": "prop.lightbar.2",
+   "frame": "prop.lightbar.3",
    "depth": 2,
    "anchor": "wall"
   },
@@ -61,19 +61,9 @@
    "type": "filing_cart",
    "x": 12,
    "y": 5,
-   "w": 2,
+   "w": 1,
    "h": 1,
-   "frame": "prop.cart.wood.a",
-   "depth": 10,
-   "anchor": "floor"
-  },
-  {
-   "type": "filing_cart",
-   "x": 12,
-   "y": 5,
-   "w": 2,
-   "h": 1,
-   "frame": "prop.cart.wood.a",
+   "frame": "prop.cart.wood.b",
    "depth": 10,
    "anchor": "floor"
   },

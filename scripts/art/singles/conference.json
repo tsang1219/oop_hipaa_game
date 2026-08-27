@@ -1,0 +1,947 @@
+{
+ "sheet": "conference",
+ "source": "1_Interiors/32x32/Theme_Sorter_32x32/13_Conference_Hall_32x32.png",
+ "singles": "attached_assets/vendor/modern-interiors/1_Interiors/32x32/Theme_Sorter_Singles_32x32/13_Conference_Hall_Singles_32x32",
+ "objects": [
+  {
+   "n": 2,
+   "file": "Conference_Hall_Singles_32x32_2.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    32,
+    48
+   ],
+   "bbox": [
+    32,
+    54,
+    32,
+    68
+   ]
+  },
+  {
+   "n": 3,
+   "file": "Conference_Hall_Singles_32x32_3.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    64,
+    48
+   ],
+   "bbox": [
+    64,
+    54,
+    32,
+    68
+   ]
+  },
+  {
+   "n": 7,
+   "file": "Conference_Hall_Singles_32x32_7.png",
+   "w": 16,
+   "h": 80,
+   "at": [
+    128,
+    48
+   ],
+   "bbox": [
+    128,
+    54,
+    14,
+    66
+   ]
+  },
+  {
+   "n": 8,
+   "file": "Conference_Hall_Singles_32x32_8.png",
+   "w": 16,
+   "h": 32,
+   "at": [
+    16,
+    62
+   ],
+   "bbox": [
+    22,
+    62,
+    10,
+    32
+   ]
+  },
+  {
+   "n": 9,
+   "file": "Conference_Hall_Singles_32x32_9.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    64,
+    58
+   ],
+   "bbox": [
+    64,
+    58,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 10,
+   "file": "Conference_Hall_Singles_32x32_10.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    32,
+    60
+   ],
+   "bbox": [
+    32,
+    60,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 11,
+   "file": "Conference_Hall_Singles_32x32_11.png",
+   "w": 16,
+   "h": 32,
+   "at": [
+    64,
+    0
+   ],
+   "bbox": [
+    64,
+    0,
+    14,
+    32
+   ]
+  },
+  {
+   "n": 12,
+   "file": "Conference_Hall_Singles_32x32_12.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    48,
+    96
+   ],
+   "bbox": [
+    48,
+    96,
+    32,
+    26
+   ]
+  },
+  {
+   "n": 13,
+   "file": "Conference_Hall_Singles_32x32_13.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    32,
+    96
+   ],
+   "bbox": [
+    32,
+    96,
+    32,
+    26
+   ]
+  },
+  {
+   "n": 14,
+   "file": "Conference_Hall_Singles_32x32_14.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    32,
+    192
+   ],
+   "bbox": [
+    32,
+    192,
+    30,
+    56
+   ]
+  },
+  {
+   "n": 15,
+   "file": "Conference_Hall_Singles_32x32_15.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    0,
+    192
+   ],
+   "bbox": [
+    4,
+    192,
+    28,
+    56
+   ]
+  },
+  {
+   "n": 16,
+   "file": "Conference_Hall_Singles_32x32_16.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    64,
+    192
+   ],
+   "bbox": [
+    68,
+    192,
+    28,
+    64
+   ]
+  },
+  {
+   "n": 17,
+   "file": "Conference_Hall_Singles_32x32_17.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    96,
+    192
+   ],
+   "bbox": [
+    96,
+    192,
+    30,
+    64
+   ]
+  },
+  {
+   "n": 18,
+   "file": "Conference_Hall_Singles_32x32_18.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    160,
+    208
+   ],
+   "bbox": [
+    160,
+    212,
+    32,
+    44
+   ]
+  },
+  {
+   "n": 19,
+   "file": "Conference_Hall_Singles_32x32_19.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    160,
+    224
+   ],
+   "bbox": [
+    160,
+    224,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 20,
+   "file": "Conference_Hall_Singles_32x32_20.png",
+   "w": 64,
+   "h": 32,
+   "at": [
+    160,
+    256
+   ],
+   "bbox": [
+    160,
+    256,
+    64,
+    32
+   ]
+  },
+  {
+   "n": 21,
+   "file": "Conference_Hall_Singles_32x32_21.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    192,
+    208
+   ],
+   "bbox": [
+    192,
+    212,
+    32,
+    12
+   ]
+  },
+  {
+   "n": 22,
+   "file": "Conference_Hall_Singles_32x32_22.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    192,
+    224
+   ],
+   "bbox": [
+    192,
+    224,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 23,
+   "file": "Conference_Hall_Singles_32x32_23.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    224,
+    256
+   ],
+   "bbox": [
+    224,
+    256,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 24,
+   "file": "Conference_Hall_Singles_32x32_24.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    256,
+    256
+   ],
+   "bbox": [
+    256,
+    256,
+    32,
+    30
+   ]
+  },
+  {
+   "n": 25,
+   "file": "Conference_Hall_Singles_32x32_25.png",
+   "w": 48,
+   "h": 48,
+   "at": [
+    272,
+    144
+   ],
+   "bbox": [
+    282,
+    152,
+    38,
+    36
+   ]
+  },
+  {
+   "n": 26,
+   "file": "Conference_Hall_Singles_32x32_26.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    306,
+    144
+   ],
+   "bbox": [
+    306,
+    152,
+    32,
+    36
+   ]
+  },
+  {
+   "n": 27,
+   "file": "Conference_Hall_Singles_32x32_27.png",
+   "w": 48,
+   "h": 48,
+   "at": [
+    352,
+    144
+   ],
+   "bbox": [
+    352,
+    152,
+    38,
+    36
+   ]
+  },
+  {
+   "n": 33,
+   "file": "Conference_Hall_Singles_32x32_33.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    96,
+    0
+   ],
+   "bbox": [
+    98,
+    12,
+    28,
+    20
+   ]
+  },
+  {
+   "n": 34,
+   "file": "Conference_Hall_Singles_32x32_34.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    128,
+    0
+   ],
+   "bbox": [
+    130,
+    12,
+    28,
+    20
+   ]
+  },
+  {
+   "n": 35,
+   "file": "Conference_Hall_Singles_32x32_35.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    160,
+    0
+   ],
+   "bbox": [
+    162,
+    12,
+    28,
+    20
+   ]
+  },
+  {
+   "n": 36,
+   "file": "Conference_Hall_Singles_32x32_36.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    160,
+    48
+   ],
+   "bbox": [
+    166,
+    48,
+    20,
+    12
+   ]
+  },
+  {
+   "n": 38,
+   "file": "Conference_Hall_Singles_32x32_38.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    256,
+    0
+   ],
+   "bbox": [
+    258,
+    2,
+    26,
+    42
+   ]
+  },
+  {
+   "n": 39,
+   "file": "Conference_Hall_Singles_32x32_39.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    256,
+    16
+   ],
+   "bbox": [
+    260,
+    16,
+    24,
+    28
+   ]
+  },
+  {
+   "n": 40,
+   "file": "Conference_Hall_Singles_32x32_40.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    224,
+    0
+   ],
+   "bbox": [
+    224,
+    0,
+    32,
+    38
+   ]
+  },
+  {
+   "n": 41,
+   "file": "Conference_Hall_Singles_32x32_41.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    160,
+    64
+   ],
+   "bbox": [
+    160,
+    70,
+    32,
+    56
+   ]
+  },
+  {
+   "n": 42,
+   "file": "Conference_Hall_Singles_32x32_42.png",
+   "w": 16,
+   "h": 96,
+   "at": [
+    192,
+    32
+   ],
+   "bbox": [
+    192,
+    40,
+    6,
+    86
+   ]
+  },
+  {
+   "n": 43,
+   "file": "Conference_Hall_Singles_32x32_43.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    448,
+    256
+   ],
+   "bbox": [
+    448,
+    262,
+    32,
+    56
+   ]
+  },
+  {
+   "n": 44,
+   "file": "Conference_Hall_Singles_32x32_44.png",
+   "w": 16,
+   "h": 96,
+   "at": [
+    480,
+    224
+   ],
+   "bbox": [
+    480,
+    232,
+    6,
+    86
+   ]
+  },
+  {
+   "n": 45,
+   "file": "Conference_Hall_Singles_32x32_45.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    224,
+    80
+   ],
+   "bbox": [
+    226,
+    84,
+    28,
+    42
+   ]
+  },
+  {
+   "n": 46,
+   "file": "Conference_Hall_Singles_32x32_46.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    256,
+    80
+   ],
+   "bbox": [
+    258,
+    84,
+    28,
+    42
+   ]
+  },
+  {
+   "n": 47,
+   "file": "Conference_Hall_Singles_32x32_47.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    320,
+    16
+   ],
+   "bbox": [
+    322,
+    20,
+    30,
+    12
+   ]
+  },
+  {
+   "n": 48,
+   "file": "Conference_Hall_Singles_32x32_48.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    334,
+    16
+   ],
+   "bbox": [
+    334,
+    20,
+    32,
+    12
+   ]
+  },
+  {
+   "n": 49,
+   "file": "Conference_Hall_Singles_32x32_49.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    352,
+    16
+   ],
+   "bbox": [
+    352,
+    20,
+    30,
+    12
+   ]
+  },
+  {
+   "n": 50,
+   "file": "Conference_Hall_Singles_32x32_50.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    320,
+    48
+   ],
+   "bbox": [
+    322,
+    52,
+    30,
+    54
+   ]
+  },
+  {
+   "n": 51,
+   "file": "Conference_Hall_Singles_32x32_51.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    334,
+    48
+   ],
+   "bbox": [
+    334,
+    52,
+    32,
+    54
+   ]
+  },
+  {
+   "n": 52,
+   "file": "Conference_Hall_Singles_32x32_52.png",
+   "w": 32,
+   "h": 80,
+   "at": [
+    352,
+    48
+   ],
+   "bbox": [
+    352,
+    52,
+    30,
+    54
+   ]
+  },
+  {
+   "n": 53,
+   "file": "Conference_Hall_Singles_32x32_53.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    448,
+    16
+   ],
+   "bbox": [
+    456,
+    16,
+    18,
+    30
+   ]
+  },
+  {
+   "n": 54,
+   "file": "Conference_Hall_Singles_32x32_54.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    448,
+    64
+   ],
+   "bbox": [
+    452,
+    78,
+    26,
+    32
+   ]
+  },
+  {
+   "n": 55,
+   "file": "Conference_Hall_Singles_32x32_55.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    480,
+    64
+   ],
+   "bbox": [
+    484,
+    78,
+    26,
+    32
+   ]
+  },
+  {
+   "n": 56,
+   "file": "Conference_Hall_Singles_32x32_56.png",
+   "w": 48,
+   "h": 32,
+   "at": [
+    336,
+    192
+   ],
+   "bbox": [
+    344,
+    198,
+    40,
+    26
+   ]
+  },
+  {
+   "n": 57,
+   "file": "Conference_Hall_Singles_32x32_57.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    352,
+    192
+   ],
+   "bbox": [
+    352,
+    198,
+    32,
+    26
+   ]
+  },
+  {
+   "n": 58,
+   "file": "Conference_Hall_Singles_32x32_58.png",
+   "w": 16,
+   "h": 16,
+   "at": [
+    384,
+    208
+   ],
+   "bbox": [
+    384,
+    210,
+    8,
+    14
+   ]
+  },
+  {
+   "n": 59,
+   "file": "Conference_Hall_Singles_32x32_59.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    416,
+    224
+   ],
+   "bbox": [
+    420,
+    232,
+    24,
+    36
+   ]
+  },
+  {
+   "n": 60,
+   "file": "Conference_Hall_Singles_32x32_60.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    160,
+    128
+   ],
+   "bbox": [
+    162,
+    134,
+    28,
+    26
+   ]
+  },
+  {
+   "n": 61,
+   "file": "Conference_Hall_Singles_32x32_61.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    192,
+    128
+   ],
+   "bbox": [
+    194,
+    128,
+    28,
+    32
+   ]
+  },
+  {
+   "n": 62,
+   "file": "Conference_Hall_Singles_32x32_62.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    160,
+    160
+   ],
+   "bbox": [
+    162,
+    160,
+    28,
+    26
+   ]
+  },
+  {
+   "n": 63,
+   "file": "Conference_Hall_Singles_32x32_63.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    224,
+    128
+   ],
+   "bbox": [
+    226,
+    134,
+    28,
+    26
+   ]
+  },
+  {
+   "n": 64,
+   "file": "Conference_Hall_Singles_32x32_64.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    224,
+    140
+   ],
+   "bbox": [
+    226,
+    140,
+    28,
+    32
+   ]
+  },
+  {
+   "n": 65,
+   "file": "Conference_Hall_Singles_32x32_65.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    224,
+    160
+   ],
+   "bbox": [
+    226,
+    160,
+    28,
+    26
+   ]
+  },
+  {
+   "n": 66,
+   "file": "Conference_Hall_Singles_32x32_66.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    0,
+    256
+   ],
+   "bbox": [
+    4,
+    256,
+    60,
+    82
+   ]
+  },
+  {
+   "n": 67,
+   "file": "Conference_Hall_Singles_32x32_67.png",
+   "w": 64,
+   "h": 96,
+   "at": [
+    64,
+    256
+   ],
+   "bbox": [
+    64,
+    256,
+    64,
+    82
+   ]
+  },
+  {
+   "n": 68,
+   "file": "Conference_Hall_Singles_32x32_68.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    128,
+    256
+   ],
+   "bbox": [
+    128,
+    256,
+    28,
+    82
+   ]
+  }
+ ],
+ "missing": [
+  "Conference_Hall_Singles_32x32_1.png",
+  "Conference_Hall_Singles_32x32_4.png",
+  "Conference_Hall_Singles_32x32_5.png",
+  "Conference_Hall_Singles_32x32_6.png",
+  "Conference_Hall_Singles_32x32_28.png",
+  "Conference_Hall_Singles_32x32_29.png",
+  "Conference_Hall_Singles_32x32_30.png",
+  "Conference_Hall_Singles_32x32_31.png",
+  "Conference_Hall_Singles_32x32_32.png",
+  "Conference_Hall_Singles_32x32_37.png"
+ ]
+}

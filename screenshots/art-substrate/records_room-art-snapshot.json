@@ -43,7 +43,7 @@
    "y": 2,
    "w": 1,
    "h": 4,
-   "frame": "prop.drawers.column",
+   "frame": "prop.drawers.column.r",
    "depth": 10,
    "anchor": "floor"
   },
@@ -53,7 +53,7 @@
    "y": 2,
    "w": 4,
    "h": 1,
-   "frame": "prop.desk.k.wood",
+   "frame": "prop.counter.kt.l",
    "depth": 7,
    "anchor": "floor"
   },
@@ -63,17 +63,47 @@
    "y": 2,
    "w": 4,
    "h": 1,
-   "frame": "prop.desk.k.wood",
+   "frame": "prop.counter.kt.m",
    "depth": 7,
    "anchor": "floor"
   },
   {
-   "type": "inbox_tray",
-   "x": 7,
+   "type": "records_counter",
+   "x": 8,
    "y": 2,
-   "w": 1,
+   "w": 4,
    "h": 1,
-   "frame": "prop.table.small.brown",
+   "frame": "prop.counter.kt.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "records_counter",
+   "x": 8,
+   "y": 2,
+   "w": 4,
+   "h": 1,
+   "frame": "prop.counter.kt.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "records_counter",
+   "x": 8,
+   "y": 2,
+   "w": 4,
+   "h": 1,
+   "frame": "prop.counter.kt.m",
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "records_counter",
+   "x": 8,
+   "y": 2,
+   "w": 4,
+   "h": 1,
+   "frame": "prop.counter.kt.r",
    "depth": 7,
    "anchor": "floor"
   },
@@ -93,17 +123,7 @@
    "y": 2,
    "w": 1,
    "h": 1,
-   "frame": "prop.table.small.brown",
-   "depth": 7,
-   "anchor": "floor"
-  },
-  {
-   "type": "outbox_tray",
-   "x": 12,
-   "y": 2,
-   "w": 1,
-   "h": 1,
-   "frame": "prop.papers.b",
+   "frame": "prop.binders",
    "depth": 7,
    "anchor": "floor"
   },
@@ -113,7 +133,47 @@
    "y": 8,
    "w": 4,
    "h": 2,
-   "frame": "prop.desk.wood.pc.3",
+   "frame": "prop.counter.kt.l",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.counter.kt.m",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.counter.kt.m",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.counter.kt.r",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.counter.kt.l",
    "depth": 14,
    "anchor": "floor"
   },
@@ -123,7 +183,27 @@
    "y": 8,
    "w": 4,
    "h": 2,
-   "frame": "prop.drawers.tan",
+   "frame": "prop.counter.kt.m",
+   "depth": 14,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.counter.kt.m",
+   "depth": 14,
+   "anchor": "floor"
+  },
+  {
+   "type": "clerk_desk",
+   "x": 8,
+   "y": 8,
+   "w": 4,
+   "h": 2,
+   "frame": "prop.counter.kt.r",
    "depth": 14,
    "anchor": "floor"
   },
@@ -133,7 +213,47 @@
    "y": 11,
    "w": 2,
    "h": 2,
-   "frame": "prop.cabinet.gray.2",
+   "frame": "prop.counter.kw.plain",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "shredder_station",
+   "x": 2,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "shredder_station",
+   "x": 2,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "shredder_station",
+   "x": 2,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.counter.kw.plain",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "shredder_station",
+   "x": 2,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.printer.small",
    "depth": 17,
    "anchor": "floor"
   },
@@ -143,7 +263,37 @@
    "y": 11,
    "w": 2,
    "h": 2,
-   "frame": "prop.desk.wood.pc",
+   "frame": "prop.counter.kt.l",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "scanner_station",
+   "x": 16,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.counter.kt.r",
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "scanner_station",
+   "x": 16,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.counter.kt.l",
+   "depth": 17,
+   "anchor": "floor"
+  },
+  {
+   "type": "scanner_station",
+   "x": 16,
+   "y": 11,
+   "w": 2,
+   "h": 2,
+   "frame": "prop.counter.kt.r",
    "depth": 17,
    "anchor": "floor"
   },
@@ -169,7 +319,7 @@
   },
   {
    "type": "archive_box",
-   "x": 2,
+   "x": 3,
    "y": 13,
    "w": 2,
    "h": 1,
@@ -213,7 +363,7 @@
    "y": 13,
    "w": 1,
    "h": 1,
-   "frame": "prop.box.single",
+   "frame": "prop.boxes.tall",
    "depth": 18,
    "anchor": "floor"
   },
@@ -223,7 +373,7 @@
    "y": 13,
    "w": 1,
    "h": 1,
-   "frame": "prop.box.single",
+   "frame": "prop.boxes.tall",
    "depth": 18,
    "anchor": "floor"
   }

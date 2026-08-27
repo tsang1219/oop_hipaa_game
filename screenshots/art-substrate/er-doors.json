@@ -1,0 +1,16 @@
+[
+ {
+  "id": "er_to_hallway_it",
+  "side": "left",
+  "kind": "side-left",
+  "state": "next",
+  "frame": "door.side.r.0",
+  "x": 3,
+  "y": 256,
+  "depth": 11.5
+ },
+ {
+  "id": "er_to_hallway_it",
+  "check": "ajar → frame 1, SPACE → frame 4, arrived in hallway_it_er"
+ }
+]

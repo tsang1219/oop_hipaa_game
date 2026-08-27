@@ -1,0 +1,1259 @@
+{
+ "sheet": "tvstudio",
+ "source": "1_Interiors/32x32/Theme_Sorter_32x32/23_Television_and_Film_Studio_32x32.png",
+ "singles": "attached_assets/vendor/modern-interiors/1_Interiors/32x32/Theme_Sorter_Singles_32x32/23_Television_and_Film_Studio_SIngles_32x32",
+ "objects": [
+  {
+   "n": 1,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_1.png",
+   "w": 48,
+   "h": 64,
+   "at": [
+    0,
+    0
+   ],
+   "bbox": [
+    12,
+    14,
+    34,
+    48
+   ]
+  },
+  {
+   "n": 2,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_2.png",
+   "w": 48,
+   "h": 64,
+   "at": [
+    16,
+    64
+   ],
+   "bbox": [
+    18,
+    78,
+    34,
+    48
+   ]
+  },
+  {
+   "n": 3,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_3.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    64,
+    16
+   ],
+   "bbox": [
+    64,
+    20,
+    32,
+    42
+   ]
+  },
+  {
+   "n": 4,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_4.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    64,
+    80
+   ],
+   "bbox": [
+    64,
+    84,
+    32,
+    42
+   ]
+  },
+  {
+   "n": 5,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_5.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    96,
+    0
+   ],
+   "bbox": [
+    98,
+    6,
+    26,
+    50
+   ]
+  },
+  {
+   "n": 6,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_6.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    96,
+    64
+   ],
+   "bbox": [
+    100,
+    78,
+    26,
+    48
+   ]
+  },
+  {
+   "n": 7,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_7.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    128,
+    64
+   ],
+   "bbox": [
+    130,
+    64,
+    28,
+    62
+   ]
+  },
+  {
+   "n": 8,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_8.png",
+   "w": 48,
+   "h": 96,
+   "at": [
+    144,
+    0
+   ],
+   "bbox": [
+    154,
+    0,
+    38,
+    80
+   ]
+  },
+  {
+   "n": 9,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_9.png",
+   "w": 48,
+   "h": 96,
+   "at": [
+    192,
+    0
+   ],
+   "bbox": [
+    192,
+    0,
+    38,
+    80
+   ]
+  },
+  {
+   "n": 10,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_10.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    256,
+    0
+   ],
+   "bbox": [
+    256,
+    0,
+    32,
+    80
+   ]
+  },
+  {
+   "n": 11,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_11.png",
+   "w": 32,
+   "h": 96,
+   "at": [
+    288,
+    0
+   ],
+   "bbox": [
+    288,
+    0,
+    32,
+    80
+   ]
+  },
+  {
+   "n": 12,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_12.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    0,
+    128
+   ],
+   "bbox": [
+    0,
+    140,
+    32,
+    20
+   ]
+  },
+  {
+   "n": 13,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_13.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    0,
+    144
+   ],
+   "bbox": [
+    0,
+    144,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 14,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_14.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    0,
+    192
+   ],
+   "bbox": [
+    0,
+    192,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 15,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_15.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    0,
+    224
+   ],
+   "bbox": [
+    0,
+    224,
+    32,
+    30
+   ]
+  },
+  {
+   "n": 16,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_16.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    4,
+    224
+   ],
+   "bbox": [
+    4,
+    224,
+    32,
+    30
+   ]
+  },
+  {
+   "n": 17,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_17.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    64,
+    224
+   ],
+   "bbox": [
+    64,
+    224,
+    32,
+    30
+   ]
+  },
+  {
+   "n": 18,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_18.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    64,
+    192
+   ],
+   "bbox": [
+    64,
+    192,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 19,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_19.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    64,
+    144
+   ],
+   "bbox": [
+    64,
+    144,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 20,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_20.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    64,
+    128
+   ],
+   "bbox": [
+    64,
+    140,
+    32,
+    20
+   ]
+  },
+  {
+   "n": 21,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_21.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    2,
+    128
+   ],
+   "bbox": [
+    2,
+    140,
+    32,
+    20
+   ]
+  },
+  {
+   "n": 22,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_22.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    2,
+    144
+   ],
+   "bbox": [
+    2,
+    144,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 23,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_23.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    2,
+    192
+   ],
+   "bbox": [
+    2,
+    192,
+    32,
+    32
+   ]
+  },
+  {
+   "n": 24,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_24.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    96,
+    128
+   ],
+   "bbox": [
+    98,
+    128,
+    60,
+    64
+   ]
+  },
+  {
+   "n": 25,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_25.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    96,
+    192
+   ],
+   "bbox": [
+    98,
+    192,
+    28,
+    64
+   ]
+  },
+  {
+   "n": 26,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_26.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    128,
+    192
+   ],
+   "bbox": [
+    130,
+    192,
+    28,
+    32
+   ]
+  },
+  {
+   "n": 27,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_27.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    128,
+    224
+   ],
+   "bbox": [
+    130,
+    224,
+    28,
+    32
+   ]
+  },
+  {
+   "n": 28,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_28.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    160,
+    96
+   ],
+   "bbox": [
+    170,
+    110,
+    44,
+    46
+   ]
+  },
+  {
+   "n": 29,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_29.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    224,
+    96
+   ],
+   "bbox": [
+    234,
+    110,
+    44,
+    46
+   ]
+  },
+  {
+   "n": 30,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_30.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    224,
+    160
+   ],
+   "bbox": [
+    234,
+    174,
+    44,
+    46
+   ]
+  },
+  {
+   "n": 31,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_31.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    160,
+    160
+   ],
+   "bbox": [
+    170,
+    174,
+    44,
+    46
+   ]
+  },
+  {
+   "n": 32,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_32.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    448,
+    32
+   ],
+   "bbox": [
+    450,
+    42,
+    26,
+    38
+   ]
+  },
+  {
+   "n": 35,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_35.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    320,
+    16
+   ],
+   "bbox": [
+    334,
+    16,
+    18,
+    4
+   ]
+  },
+  {
+   "n": 36,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_36.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    352,
+    16
+   ],
+   "bbox": [
+    352,
+    16,
+    32,
+    16
+   ]
+  },
+  {
+   "n": 37,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_37.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    384,
+    16
+   ],
+   "bbox": [
+    384,
+    16,
+    32,
+    16
+   ]
+  },
+  {
+   "n": 38,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_38.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    394,
+    16
+   ],
+   "bbox": [
+    394,
+    16,
+    32,
+    16
+   ]
+  },
+  {
+   "n": 39,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_39.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    334,
+    16
+   ],
+   "bbox": [
+    334,
+    16,
+    32,
+    4
+   ]
+  },
+  {
+   "n": 40,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_40.png",
+   "w": 32,
+   "h": 16,
+   "at": [
+    334,
+    16
+   ],
+   "bbox": [
+    334,
+    16,
+    18,
+    4
+   ]
+  },
+  {
+   "n": 41,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_41.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    320,
+    32
+   ],
+   "bbox": [
+    322,
+    34,
+    62,
+    42
+   ]
+  },
+  {
+   "n": 42,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_42.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    384,
+    32
+   ],
+   "bbox": [
+    384,
+    34,
+    30,
+    42
+   ]
+  },
+  {
+   "n": 43,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_43.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    416,
+    32
+   ],
+   "bbox": [
+    418,
+    34,
+    28,
+    42
+   ]
+  },
+  {
+   "n": 44,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_44.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    320,
+    96
+   ],
+   "bbox": [
+    322,
+    98,
+    30,
+    42
+   ]
+  },
+  {
+   "n": 45,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_45.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    332,
+    96
+   ],
+   "bbox": [
+    332,
+    98,
+    32,
+    42
+   ]
+  },
+  {
+   "n": 46,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_46.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    384,
+    96
+   ],
+   "bbox": [
+    384,
+    98,
+    32,
+    42
+   ]
+  },
+  {
+   "n": 47,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_47.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    448,
+    96
+   ],
+   "bbox": [
+    448,
+    98,
+    30,
+    42
+   ]
+  },
+  {
+   "n": 48,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_48.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    288,
+    160
+   ],
+   "bbox": [
+    290,
+    162,
+    62,
+    42
+   ]
+  },
+  {
+   "n": 49,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_49.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    352,
+    160
+   ],
+   "bbox": [
+    352,
+    162,
+    30,
+    42
+   ]
+  },
+  {
+   "n": 50,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_50.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    384,
+    160
+   ],
+   "bbox": [
+    386,
+    162,
+    62,
+    42
+   ]
+  },
+  {
+   "n": 51,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_51.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    352,
+    160
+   ],
+   "bbox": [
+    352,
+    162,
+    30,
+    42
+   ]
+  },
+  {
+   "n": 52,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_52.png",
+   "w": 64,
+   "h": 64,
+   "at": [
+    288,
+    224
+   ],
+   "bbox": [
+    290,
+    226,
+    62,
+    42
+   ]
+  },
+  {
+   "n": 53,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_53.png",
+   "w": 32,
+   "h": 64,
+   "at": [
+    352,
+    224
+   ],
+   "bbox": [
+    352,
+    226,
+    30,
+    42
+   ]
+  },
+  {
+   "n": 54,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_54.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    0,
+    272
+   ],
+   "bbox": [
+    4,
+    272,
+    28,
+    44
+   ]
+  },
+  {
+   "n": 55,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_55.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    32,
+    272
+   ],
+   "bbox": [
+    32,
+    276,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 56,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_56.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    128,
+    272
+   ],
+   "bbox": [
+    128,
+    276,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 57,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_57.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    160,
+    272
+   ],
+   "bbox": [
+    160,
+    276,
+    32,
+    42
+   ]
+  },
+  {
+   "n": 58,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_58.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    192,
+    272
+   ],
+   "bbox": [
+    192,
+    276,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 59,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_59.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    64,
+    272
+   ],
+   "bbox": [
+    64,
+    272,
+    28,
+    44
+   ]
+  },
+  {
+   "n": 60,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_60.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    0,
+    336
+   ],
+   "bbox": [
+    4,
+    336,
+    28,
+    44
+   ]
+  },
+  {
+   "n": 61,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_61.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    32,
+    336
+   ],
+   "bbox": [
+    32,
+    340,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 62,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_62.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    128,
+    336
+   ],
+   "bbox": [
+    128,
+    340,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 63,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_63.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    160,
+    336
+   ],
+   "bbox": [
+    160,
+    340,
+    32,
+    42
+   ]
+  },
+  {
+   "n": 64,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_64.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    192,
+    336
+   ],
+   "bbox": [
+    192,
+    340,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 65,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_65.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    64,
+    336
+   ],
+   "bbox": [
+    64,
+    336,
+    28,
+    44
+   ]
+  },
+  {
+   "n": 66,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_66.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    0,
+    400
+   ],
+   "bbox": [
+    4,
+    400,
+    28,
+    44
+   ]
+  },
+  {
+   "n": 67,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_67.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    32,
+    400
+   ],
+   "bbox": [
+    32,
+    404,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 68,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_68.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    128,
+    400
+   ],
+   "bbox": [
+    128,
+    404,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 69,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_69.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    160,
+    400
+   ],
+   "bbox": [
+    160,
+    404,
+    32,
+    42
+   ]
+  },
+  {
+   "n": 70,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_70.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    192,
+    400
+   ],
+   "bbox": [
+    192,
+    404,
+    32,
+    40
+   ]
+  },
+  {
+   "n": 71,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_71.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    64,
+    400
+   ],
+   "bbox": [
+    64,
+    400,
+    28,
+    44
+   ]
+  },
+  {
+   "n": 72,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_72.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    224,
+    400
+   ],
+   "bbox": [
+    232,
+    402,
+    16,
+    20
+   ]
+  },
+  {
+   "n": 73,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_73.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    224,
+    336
+   ],
+   "bbox": [
+    232,
+    338,
+    16,
+    20
+   ]
+  },
+  {
+   "n": 74,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_74.png",
+   "w": 32,
+   "h": 48,
+   "at": [
+    224,
+    272
+   ],
+   "bbox": [
+    232,
+    274,
+    16,
+    20
+   ]
+  },
+  {
+   "n": 75,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_75.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    256,
+    256
+   ],
+   "bbox": [
+    256,
+    256,
+    30,
+    32
+   ]
+  },
+  {
+   "n": 76,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_76.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    256,
+    288
+   ],
+   "bbox": [
+    258,
+    288,
+    30,
+    32
+   ]
+  },
+  {
+   "n": 77,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_77.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    256,
+    320
+   ],
+   "bbox": [
+    256,
+    320,
+    30,
+    32
+   ]
+  },
+  {
+   "n": 78,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_78.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    256,
+    352
+   ],
+   "bbox": [
+    258,
+    352,
+    30,
+    32
+   ]
+  },
+  {
+   "n": 79,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_79.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    256,
+    384
+   ],
+   "bbox": [
+    256,
+    384,
+    30,
+    32
+   ]
+  },
+  {
+   "n": 80,
+   "file": "Television_and_FIlm_Studio_Singles_32x32_80.png",
+   "w": 32,
+   "h": 32,
+   "at": [
+    256,
+    416
+   ],
+   "bbox": [
+    258,
+    416,
+    30,
+    32
+   ]
+  }
+ ],
+ "missing": [
+  "Television_and_FIlm_Studio_Singles_32x32_33.png",
+  "Television_and_FIlm_Studio_Singles_32x32_34.png"
+ ]
+}

@@ -28,8 +28,18 @@
    "anchor": "floor"
   },
   {
+   "type": "desk",
+   "x": 7,
+   "y": 2,
+   "w": 6,
+   "h": 2,
+   "frame": "prop.counter.reception.white.front",
+   "depth": 8,
+   "anchor": "floor"
+  },
+  {
    "type": "bulletin_board",
-   "x": 2,
+   "x": 3,
    "y": 1,
    "w": 2,
    "h": 1,
@@ -60,11 +70,11 @@
   {
    "type": "plant",
    "x": 1,
-   "y": 11,
+   "y": 9,
    "w": 1,
    "h": 1,
-   "frame": "prop.plant.white.s",
-   "depth": 16,
+   "frame": "prop.plant.orange.s",
+   "depth": 14,
    "anchor": "floor"
   },
   {
@@ -83,7 +93,17 @@
    "y": 8,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.round.yellow",
+   "frame": "prop.chair.wait.tan",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 2,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.tan",
    "depth": 13,
    "anchor": "floor"
   },
@@ -93,7 +113,17 @@
    "y": 8,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.round.green",
+   "frame": "prop.chair.wait.blue",
+   "depth": 13,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 16,
+   "y": 8,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.blue",
    "depth": 13,
    "anchor": "floor"
   },
@@ -103,7 +133,17 @@
    "y": 10,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.round.yellow",
+   "frame": "prop.chair.wait.tan",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 2,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.tan",
    "depth": 15,
    "anchor": "floor"
   },
@@ -113,7 +153,17 @@
    "y": 10,
    "w": 2,
    "h": 1,
-   "frame": "prop.bench.round.pink",
+   "frame": "prop.chair.wait.blue",
+   "depth": 15,
+   "anchor": "floor"
+  },
+  {
+   "type": "chairs",
+   "x": 16,
+   "y": 10,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.chair.wait.blue",
    "depth": 15,
    "anchor": "floor"
   },
@@ -123,17 +173,7 @@
    "y": 9,
    "w": 1,
    "h": 1,
-   "frame": "prop.table.small.white",
-   "depth": 14,
-   "anchor": "floor"
-  },
-  {
-   "type": "table",
-   "x": 4,
-   "y": 9,
-   "w": 1,
-   "h": 1,
-   "frame": "prop.papers.b",
+   "frame": "prop.table.round.white",
    "depth": 14,
    "anchor": "floor"
   },
@@ -143,18 +183,18 @@
    "y": 9,
    "w": 1,
    "h": 1,
-   "frame": "prop.table.small.white",
+   "frame": "prop.table.round.white",
    "depth": 14,
    "anchor": "floor"
   },
   {
-   "type": "table",
-   "x": 15,
-   "y": 9,
+   "type": "hand_sanitizer",
+   "x": 6,
+   "y": 11,
    "w": 1,
    "h": 1,
-   "frame": "prop.papers.b",
-   "depth": 14,
+   "frame": "prop.table.small.white",
+   "depth": 16,
    "anchor": "floor"
   },
   {
@@ -173,7 +213,7 @@
    "y": 11,
    "w": 1,
    "h": 1,
-   "frame": "prop.basket",
+   "frame": "prop.trash.green",
    "depth": 16,
    "anchor": "floor"
   },
@@ -203,7 +243,7 @@
    "y": 9,
    "w": 1,
    "h": 1,
-   "frame": "prop.wheelchair.side.tan",
+   "frame": "prop.wheelchair.front.tan",
    "depth": 14,
    "anchor": "floor"
   },
@@ -213,12 +253,12 @@
    "y": 12,
    "w": 1,
    "h": 1,
-   "frame": "prop.bookshelf.wood",
+   "frame": "prop.shelf.narrow.books",
    "depth": 17,
    "anchor": "floor"
   }
  ],
- "decor": 12,
+ "decor": 11,
  "animated": 0,
  "missing": [],
  "imageRequests": 27
