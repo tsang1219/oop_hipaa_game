@@ -137,6 +137,11 @@ export class NameplateLayout {
       for (const c of art.colliders) {
         if (!c.active) continue;
         const r = boundsOf(c, 1.0);
+        // A part of a multi-tile obstacle is one large flat surface (desks,
+        // benches, workstations are §12 composites of small sprites) — judge
+        // small/large by the obstacle footprint when the renderer carries it.
+        const footprintTiles = (c.getData('npFootprintTiles') as number | undefined) ?? 0;
+        if (footprintTiles >= 2) r.small = false;
         r.weight = r.small ? 1.0 : c.depth < 5 ? 0.35 : 0.45;
         this.staticRects.push(r);
       }

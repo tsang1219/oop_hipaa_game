@@ -291,6 +291,10 @@ export function renderRoomArt(scene: Phaser.Scene, room: Room, style: RoomArtSty
       if (def.alpha !== undefined) img.setAlpha(def.alpha);
       if (def.flipX) img.setFlipX(true);
       if (!props.has(key)) props.set(key, img);
+      // Run 14 nameplates: parts of a multi-tile obstacle are one large flat
+      // surface, not N small garble hazards — carry the footprint for the
+      // solver's small/large call (§12 composites are many small sprites).
+      img.setData('npFootprintTiles', ow * oh);
       colliders.push(img);
       return img;
     };
