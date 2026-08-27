@@ -8,8 +8,9 @@
  * printer-fleet thread (GERALD, see whimsyData.ts), and two soft breadcrumbs
  * toward Supply Closet B.
  *
- * Voice rules (OOP_HUMOR_PLAYBOOK + VOICE doc): fragments, mundane-human,
- * at most one wry line per NPC, nobody performs. Targets are never patients.
+ * Voice rules (OOP_HUMOR_PLAYBOOK): recognizable motives and workplace behavior,
+ * consequential specificity, and no joke-announcing garnish. Characters may be
+ * genuinely witty; targets are never patients.
  *
  * Per CLAUDE.md: all game data lives in TypeScript constants files.
  */

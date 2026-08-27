@@ -6,6 +6,29 @@ This document expands on the design commandments in `CLAUDE.md` with concrete ex
 
 ---
 
+## 0. Intentional Joy Density
+
+PrivacyQuest should reward attention almost everywhere. A room is not finished because it contains enough furniture or visual detail; it is finished when the things the player notices feel chosen. Nearly every prominent prop should contribute a feeling: pleasure, humor, recognition, character, atmosphere, curiosity, or the tactile satisfaction of playing a video game.
+
+This does not mean attaching explanatory text or a punchline to every object. A jukebox may have a good button press, a short animation, a changing track, and a running dispute about who controls it. A water cooler may burble, dispense a cup, carry one department-specific note, or become the place where an ambient conversation happens. A copier may remember an earlier jam. A chair may squeak differently. A bulletin board may change after a story beat. Some objects should simply look or sound lovely.
+
+The governing standard is **intentionality, not utility**. Pure surface garnish is welcome. Small jokes are welcome. Animation and sound that teach nothing are welcome. What we should avoid is anonymous abundance: rooms filled with technically detailed objects that neither respond nor accumulate into a particular hospital and its people.
+
+Design room density across several layers:
+
+| Layer | Contribution |
+|---|---|
+| Touch | Animation, sound, squash, particles, repeat interaction |
+| Comedy | One-off jokes, visual gags, funny descriptions, awkward behavior |
+| Continuity | Recurring names, feuds, objects, consequences, callbacks |
+| Character | Evidence of who uses the room and what their day is like |
+| Healthcare texture | Annual training, workarounds, policy-versus-practice, real artifacts |
+| Atmosphere | Beauty, warmth, tension, quiet, rhythm, places to linger |
+
+Not every object needs all six layers. Across a room, all six should be present. When a prop is visible enough to invite attention, make a deliberate decision about what it gives back.
+
+---
+
 ## 1. Feedback & Juice
 
 "Juice" means layered feedback that makes interactions feel alive. A single player action should produce responses across multiple channels simultaneously.

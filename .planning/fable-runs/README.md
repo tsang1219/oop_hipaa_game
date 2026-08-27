@@ -56,6 +56,18 @@ and the FEEL/SPRITE backlog in `DEBUG_LOG.md` (half of which is already closed).
 Earlier launch (2026-07, complete): `02-planning-reconciliation`, `04-refactor-proposal`,
 `07-find-fix-verify-loop` — reports are in this folder.
 
+**Added 2026-08-25**: `14-ui-polish` → branch `fable/ui-polish`. Covers UI-01..05 (font hierarchy,
+nameplate collision, diegetic HUD, overlay motion, title/pause screen) — the one pillar nothing
+else claims. Fire after Run 11 has at least Reception done (UI-02/UI-05 need real art to work
+against); items 1/3/4 don't depend on 11 and could split off earlier if useful.
+
+**Added 2026-08-26**: `15-room-layout-design` → branch `fable/room-layout`. Not a pixel-defect
+pass (that's `ROOM_CLEAN_PROTOCOL.md`, already running) — this is floor-plan and furniture-
+relationship design for the 6 content rooms (reception, break room, lab, records room, IT office,
+ER). HEAVY checkpoint: design memo first, then break room built and approved, then the rest. **Do
+not fire until Run 11's room-clean loop finishes all 13 rooms + hallways** — branches from
+`fable/art-substrate`, not `main`.
+
 ## Shared guardrails (apply to EVERY run)
 1. **Own branch or worktree. Never commit to `main`.** One run = one branch.
 2. **Trust the screen, not the code.** Prove anything you call "done" against the

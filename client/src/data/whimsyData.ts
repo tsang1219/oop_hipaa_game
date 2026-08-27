@@ -15,8 +15,9 @@
  *     caps it at one or two — this is it, hidden behind a secret door),
  *     grounded in the real EHR convention of ZZTEST patients.
  *
- * Voice rules (OOP_HUMOR_PLAYBOOK): flat narration, diegetic captions,
- * fragments in character mouths, nobody announces a punchline.
+ * Voice rules (OOP_HUMOR_PLAYBOOK): start with a comic premise grounded in
+ * behavior, motive, or contradiction. Characters may be witty; avoid detachable
+ * garnish that merely announces where the joke is.
  *
  * Per CLAUDE.md: all game data lives in TypeScript constants files.
  */

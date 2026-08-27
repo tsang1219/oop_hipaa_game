@@ -3,12 +3,12 @@
     {
       "id": "scene1",
       "character": "Nurse Nina",
-      "dialogue": "Hi there! I need access to patient data to prepare for rounds tomorrow morning. Can you help me get into the EHR system?",
+      "dialogue": "Third time this rotation I've had to ask someone for this — can you help me get into the EHR system? Rounds start in ten minutes.",
       "choices": [
         {
           "text": "Sure, I'll give you full access to the EHR right now.",
           "score": -2,
-          "feedback": "Incorrect. Even though HIPAA's Minimum Necessary rule doesn't apply to treatment disclosures, your facility's access controls should still limit EHR access to what's appropriate for a nurse's role. Full access to everything isn't proper role-based access.",
+          "feedback": "Nobody gets \"full access\" — not even for treatment. HIPAA's treatment exception doesn't touch your facility's own access controls; those still have to limit her to what's appropriate for a nurse's role.",
           "nextSceneId": "scene2"
         },
         {
@@ -189,7 +189,7 @@
     {
       "id": "signin_violation",
       "character": "Observation",
-      "dialogue": "You notice the sign-in sheet at reception shows the names of all patients who checked in today, plus their appointment times and reasons for visit. This is visible to anyone walking by.",
+      "dialogue": "The sign-in sheet at reception lists every patient who checked in today — names, appointment times, reasons for visit — for anyone walking past to read. One reason for visit just says: \"follow-up on the knee — no, the other one — no, THAT one.\"",
       "choices": [
         {
           "text": "This is a HIPAA violation — patient names and visit reasons are PHI.",
@@ -207,7 +207,7 @@
     {
       "id": "phone_privacy",
       "character": "Observation",
-      "dialogue": "You hear Riley discussing a patient's test results over the phone at the front desk, speaking loudly enough that others in the waiting room can hear specific medical details.",
+      "dialogue": "Riley is on the phone at the front desk, loud enough that the whole waiting room can hear: \"—and NO, the cholesterol wasn't that bad, Frank, calm down—\"",
       "choices": [
         {
           "text": "This violates HIPAA — medical details shouldn't be discussed where others can hear.",
@@ -225,7 +225,7 @@
     {
       "id": "unlocked_files",
       "character": "Observation",
-      "dialogue": "The file cabinet containing patient medical records is unlocked and unattended. Anyone walking by could access these files. The room door is also propped open.",
+      "dialogue": "The file cabinet holding patient medical records is unlocked and unattended, and the room door is propped open with a fire extinguisher. A binder stamped \"PHI — DO NOT REMOVE FROM ROOM\" is wedged under a drawer that won't quite close.",
       "choices": [
         {
           "text": "This is a HIPAA violation — physical safeguards require securing PHI.",
@@ -243,7 +243,7 @@
     {
       "id": "proper_disposal",
       "character": "Observation",
-      "dialogue": "You find patient documents in the regular trash can instead of the designated shredder bin. The documents contain names, diagnoses, and Social Security numbers.",
+      "dialogue": "Patient documents — names, diagnoses, Social Security numbers — sit in the regular trash can instead of the shredder bin. A sticky note is taped to the shredder: \"OUT OF TONER — USE OTHER BIN (JUST THIS ONCE).\"",
       "choices": [
         {
           "text": "This is a serious HIPAA violation — PHI must be properly destroyed.",
@@ -284,7 +284,7 @@
     {
       "id": "whiteboard_phi",
       "character": "Observation",
-      "dialogue": "The ER status board shows patient names, room numbers, and chief complaints (\"chest pain,\" \"broken arm\"). It's visible to anyone walking through the ER.",
+      "dialogue": "The ER status board lists patient names next to room numbers and chief complaints — \"chest pain,\" \"broken arm\" — for anyone walking past to read. Someone tried to fix Room 4 with a Post-it. The Post-it is now on the floor.",
       "choices": [
         {
           "text": "This violates HIPAA — patient names linked to conditions shouldn't be publicly visible.",
@@ -302,7 +302,7 @@
     {
       "id": "unlocked_workstation",
       "character": "Observation",
-      "dialogue": "A computer workstation is left unlocked with a patient's full medical record displayed on screen. The staff member stepped away 10 minutes ago and hasn't returned.",
+      "dialogue": "A computer workstation is left unlocked with a patient's full medical record still on screen. The staff member stepped away ten minutes ago and hasn't come back — the only other window open is a shift-swap spreadsheet, mid-edit. Somebody's trying to get out of Saturday.",
       "choices": [
         {
           "text": "This is a HIPAA violation — workstations must be locked when unattended.",
@@ -325,12 +325,12 @@
         {
           "text": "No, and you shouldn't access or discuss patient records out of curiosity.",
           "score": 3,
-          "feedback": "Correct! Accessing PHI without a job-related reason violates HIPAA, even for staff members. Discussing it compounds the violation. Report this to a supervisor."
+          "feedback": "He violated HIPAA the moment he looked, out of curiosity, with no job-related reason. Talking about it compounds it. Report it — there's a form. There's a form for everything."
         },
         {
           "text": "Sure, tell me! We're both staff, so it's okay.",
           "score": -3,
-          "feedback": "Incorrect. Being staff doesn't authorize curiosity-driven access to PHI. This is a serious HIPAA violation that can result in termination and legal penalties."
+          "feedback": "You just became part of the problem — curiosity isn't a job-related reason for either of you. This is the kind of violation that ends careers, sometimes with lawyers attached."
         },
         {
           "text": "I won't listen, but you do you.",
@@ -366,7 +366,7 @@
     {
       "id": "password_sharing",
       "character": "Observation",
-      "dialogue": "You find a sticky note on a desk with a login username and password written on it. The credentials provide access to the patient database system.",
+      "dialogue": "A sticky note is taped to a monitor: \"jsmith / Passw0rd1! (don't tell IT)\". The credentials belong to the patient database system.",
       "choices": [
         {
           "text": "This undermines HIPAA security — credentials must be safeguarded, not left on sticky notes.",
@@ -566,7 +566,7 @@
         {
           "text": "Verify the request is legitimate, confirm patient authorization, follow proper disclosure procedures.",
           "score": 15,
-          "feedback": "Correct! Don't be bullied by aggressive attorneys. You need: (1) Written authorization from the patient, OR (2) A valid court order/subpoena (which you must verify), (3) Follow minimum necessary standards, (4) Document everything. Threats don't bypass HIPAA.",
+          "feedback": "Correct! Don't let aggressive attorneys rush you. You need patient authorization or a valid, verified court order — not just a threat. Stick to minimum necessary, document everything, and threats don't bypass HIPAA.",
           "nextSceneId": "final_boss_3"
         },
         {
@@ -597,7 +597,7 @@
         {
           "text": "Report the suspicious access to compliance, regardless of their title.",
           "score": 20,
-          "feedback": "Absolutely correct! HIPAA doesn't care about org charts. The CEO has no special rights to snoop in patient records. This is potentially a massive violation. Document what you saw, report to compliance, and let them investigate. Your job is to protect patient privacy, not the CEO's reputation.",
+          "feedback": "No org chart outranks this. Ever. The CEO doesn't get special rights to patient records just by being the CEO — document what you saw, report it to compliance, and let them investigate. Your job is protecting patient privacy, not anyone's reputation, no matter whose name is on the door.",
           "isEnd": true
         },
         {
@@ -738,7 +738,7 @@
     {
       "id": "sample_phi",
       "character": "Observation",
-      "dialogue": "You notice sample containers with patient labels sitting on an open counter near the hallway. The labels show full patient names, dates of birth, and the type of test being run (HIV screening, pregnancy test, etc.).",
+      "dialogue": "Sample containers sit on an open counter near the hallway, labels facing out — full patient names, dates of birth, the test being run. Someone's coffee cup is sitting on top of the rack. The ring stain lines up exactly with a name.",
       "choices": [
         {
           "text": "This is a HIPAA violation—samples with identifiable PHI shouldn't be left in open areas.",
@@ -756,7 +756,7 @@
     {
       "id": "exposed_results",
       "character": "Observation",
-      "dialogue": "Test results are sitting on the counter, clearly visible. You can see patient names, diagnoses, and lab values. The lab tech stepped away about 5 minutes ago.",
+      "dialogue": "Test results sit on the counter in plain view — patient names, diagnoses, lab values, all readable from the hallway. A sticky note is stuck on top, in pen: \"back in 5 :)\" The smiley face is doing a lot of work.",
       "choices": [
         {
           "text": "This violates HIPAA—PHI shouldn't be left visible and unattended.",
@@ -774,7 +774,7 @@
     {
       "id": "records_access",
       "character": "Records Clerk",
-      "dialogue": "Welcome to Medical Records! This is where patient stories live. Quick quiz: how long does HIPAA give us to respond when a patient requests their own records?",
+      "dialogue": "Welcome to Medical Records — this is where patient stories live, or at least where they wait for us to get to them. I've got a patient on hold right now asking how fast we can get her file to her.",
       "choices": [
         {
           "text": "30 days, with one possible 30-day extension if needed.",
@@ -866,7 +866,7 @@
     {
       "id": "security_training",
       "character": "Security Analyst",
-      "dialogue": "Welcome to IT Security. Fun fact: most breaches aren't from hackers—they're from employees. What's the #1 thing staff can do to prevent breaches?",
+      "dialogue": "Sorry about that — long story. Since you're here: if you want the one thing that actually stops most breaches around here, I've got theories.",
       "choices": [
         {
           "text": "Use strong, unique passwords and never share login credentials.",
@@ -980,7 +980,7 @@
     {
       "id": "intervene_gossip",
       "character": "Observation",
-      "dialogue": "You overhear two coworkers at the next table discussing a patient by name, including their diagnosis and family drama. They're speaking at normal volume. Other people can definitely hear.",
+      "dialogue": "Two coworkers at the next table are discussing a patient by name at normal volume — diagnosis, family drama, all of it. \"...and then she said the biopsy came back and I was like NO WAY because Gary's already planning the retirement party—\" Other people can definitely hear this.",
       "choices": [
         {
           "text": "Interrupt politely: 'Hey, we should probably take this somewhere private.'",
@@ -1003,7 +1003,7 @@
     {
       "id": "phone_security",
       "character": "Observation",
-      "dialogue": "Someone left their work phone unlocked on the table with the patient scheduling app open. You can see today's appointments including patient names and reasons for visit. The owner is nowhere in sight.",
+      "dialogue": "Someone left their work phone unlocked on the table, the patient scheduling app open — today's appointments, patient names, reasons for visit, all visible. A notification banner sits right over it: \"Mom Squad (12): are we still doing Sunday.\" The owner is nowhere in sight.",
       "choices": [
         {
           "text": "This is a HIPAA violation—mobile devices with PHI must be secured when unattended.",
@@ -1072,7 +1072,7 @@
     {
       "id": "vendor_baa",
       "character": "Observation",
-      "dialogue": "You notice a stack of unsigned vendor agreements on the IT manager's desk. The top one is from CloudMed Analytics — they process billing data for the hospital, which means they handle PHI. The agreement section labeled 'Business Associate Agreement' is blank.",
+      "dialogue": "A stack of unsigned vendor agreements sits on the IT manager's desk. The top one is from CloudMed Analytics — they process billing data, which means they handle PHI — and the section labeled 'Business Associate Agreement' is blank. A sticky note is clipped to the page: \"Legal — still waiting. This is reminder #4.\"",
       "choices": [
         {
           "text": "This is a problem — any vendor handling PHI needs a signed BAA before they touch patient data.",
