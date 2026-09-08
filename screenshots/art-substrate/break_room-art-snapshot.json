@@ -9,7 +9,7 @@
  "props": [
   {
    "type": "lunch_table",
-   "x": 8,
+   "x": 9,
    "y": 6,
    "w": 4,
    "h": 3,
@@ -29,7 +29,7 @@
   },
   {
    "type": "vending_machine",
-   "x": 5,
+   "x": 4,
    "y": 2,
    "w": 2,
    "h": 2,
@@ -129,72 +129,72 @@
   },
   {
    "type": "coat_rack",
-   "x": 1,
-   "y": 5,
+   "x": 6,
+   "y": 13,
    "w": 1,
    "h": 1,
    "frame": "prop.lamp.floor",
-   "depth": 10,
+   "depth": 18,
    "anchor": "floor"
   },
   {
    "type": "trash_bin",
-   "x": 13,
-   "y": 6,
+   "x": 6,
+   "y": 3,
    "w": 1,
-   "h": 2,
+   "h": 1,
    "frame": "prop.trash.green",
-   "depth": 12,
+   "depth": 8,
    "anchor": "floor"
   },
   {
    "type": "tv_stand",
-   "x": 7,
-   "y": 10,
+   "x": 3,
+   "y": 13,
    "w": 2,
    "h": 1,
    "frame": "prop.tv.sideboard",
-   "depth": 15,
+   "depth": 18,
    "anchor": "floor"
   },
   {
    "type": "tv_stand",
-   "x": 7,
-   "y": 10,
+   "x": 3,
+   "y": 13,
    "w": 2,
    "h": 1,
    "frame": "anim.tvnews.0",
-   "depth": 15,
+   "depth": 18,
    "anchor": "floor"
   },
   {
    "type": "couch",
-   "x": 2,
-   "y": 10,
+   "x": 1,
+   "y": 8,
    "w": 3,
    "h": 2,
-   "frame": "prop.couch.gray.3",
-   "depth": 16,
+   "frame": "prop.couch.blue.3",
+   "depth": 14,
    "anchor": "floor"
   },
   {
    "type": "couch",
-   "x": 15,
-   "y": 10,
+   "x": 4,
+   "y": 8,
    "w": 3,
    "h": 2,
-   "frame": "prop.couch.gray.3",
-   "depth": 16,
+   "frame": "prop.couch.blue.3",
+   "depth": 14,
    "anchor": "floor"
   },
   {
    "type": "lost_and_found_box",
-   "x": 5,
-   "y": 12,
+   "x": 17,
+   "y": 13,
    "w": 1,
    "h": 1,
    "frame": "prop.box.single",
-   "depth": 17,
+   "depth": 18,
    "anchor": "floor"
   },
   {
@@ -208,23 +208,33 @@
    "anchor": "floor"
   },
   {
-   "type": "chair",
-   "x": 7,
-   "y": 8,
+   "type": "plant",
+   "x": 14,
+   "y": 13,
    "w": 1,
    "h": 1,
-   "frame": "prop.stool.blue",
-   "depth": 13,
+   "frame": "prop.plant.orange.s",
+   "depth": 18,
    "anchor": "floor"
   },
   {
    "type": "chair",
-   "x": 12,
-   "y": 8,
+   "x": 9,
+   "y": 9,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.stool.blue",
+   "depth": 14,
+   "anchor": "floor"
+  },
+  {
+   "type": "chair",
+   "x": 11,
+   "y": 9,
    "w": 1,
    "h": 1,
    "frame": "prop.stool.red",
-   "depth": 13,
+   "depth": 14,
    "anchor": "floor"
   },
   {
@@ -238,7 +248,7 @@
    "anchor": "floor"
   }
  ],
- "decor": 14,
+ "decor": 13,
  "animated": 2,
  "missing": [],
  "imageRequests": 27

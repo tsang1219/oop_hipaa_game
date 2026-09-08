@@ -57,7 +57,7 @@
         },
         {
           "x": 7,
-          "y": 2,
+          "y": 3,
           "width": 6,
           "height": 2,
           "type": "desk"
@@ -92,7 +92,7 @@
         },
         {
           "x": 18,
-          "y": 11,
+          "y": 9,
           "width": 1,
           "height": 1,
           "type": "plant"
@@ -127,27 +127,27 @@
         },
         {
           "x": 4,
-          "y": 9,
+          "y": 8,
           "width": 1,
           "height": 1,
           "type": "table"
         },
         {
           "x": 15,
-          "y": 9,
+          "y": 8,
           "width": 1,
           "height": 1,
           "type": "table"
         },
         {
-          "x": 6,
-          "y": 11,
-          "width": 1,
+          "x": 17,
+          "y": 12,
+          "width": 2,
           "height": 1,
-          "type": "hand_sanitizer"
+          "type": "table"
         },
         {
-          "x": 13,
+          "x": 14,
           "y": 11,
           "width": 1,
           "height": 1,
@@ -168,18 +168,25 @@
           "type": "plant"
         },
         {
-          "x": 14,
+          "x": 15,
           "y": 11,
           "width": 1,
           "height": 1,
           "type": "trash_can"
         },
         {
-          "x": 18,
-          "y": 9,
+          "x": 13,
+          "y": 11,
           "width": 1,
           "height": 1,
           "type": "wheelchair"
+        },
+        {
+          "x": 1,
+          "y": 6,
+          "width": 1,
+          "height": 1,
+          "type": "water_cooler"
         },
         {
           "x": 1,
@@ -195,7 +202,7 @@
           "name": "Riley",
           "role": "receptionist",
           "x": 10,
-          "y": 4,
+          "y": 3,
           "sprite": "receptionist",
           "sceneId": "riley_scene1",
           "isFinalBoss": false
@@ -205,7 +212,7 @@
           "name": "Aiyana",
           "role": "Intake Volunteer",
           "x": 8,
-          "y": 4,
+          "y": 3,
           "sprite": "staff",
           "sceneId": "_encounter_phi_sort_reception",
           "encounterTrigger": {
@@ -1004,7 +1011,7 @@
         },
         {
           "x": 7,
-          "y": 2,
+          "y": 3,
           "width": 6,
           "height": 2,
           "type": "desk"
@@ -1087,8 +1094,8 @@
           "type": "chairs"
         },
         {
-          "x": 5,
-          "y": 11,
+          "x": 4,
+          "y": 8,
           "width": 1,
           "height": 1,
           "type": "tissue_box"
@@ -1123,7 +1130,7 @@
         },
         {
           "x": 1,
-          "y": 11,
+          "y": 10,
           "width": 1,
           "height": 1,
           "type": "wheelchair"
@@ -1144,10 +1151,24 @@
         },
         {
           "x": 17,
-          "y": 4,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "iv_stand"
+        },
+        {
+          "x": 3,
+          "y": 13,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
+        },
+        {
+          "x": 14,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
         }
       ],
       "npcs": [
@@ -1156,14 +1177,14 @@
           "name": "Front Desk Coordinator",
           "sprite": "receptionist",
           "x": 10,
-          "y": 4,
+          "y": 3,
           "sceneId": "riley_scene1"
         },
         {
           "id": "nervous_patient",
           "name": "Nervous New Patient",
           "sprite": "patient",
-          "x": 5,
+          "x": 3,
           "y": 9,
           "sceneId": "concerned_husband"
         },
@@ -1171,8 +1192,8 @@
           "id": "chatty_visitor",
           "name": "Chatty Visitor",
           "sprite": "visitor",
-          "x": 14,
-          "y": 9,
+          "x": 16,
+          "y": 11,
           "sceneId": "celebrity_crisis"
         }
       ],
@@ -1315,78 +1336,78 @@
           "type": "nurse_station"
         },
         {
-          "x": 8,
-          "y": 9,
+          "x": 3,
+          "y": 8,
           "width": 4,
           "height": 1,
           "type": "triage_desk"
         },
         {
-          "x": 2,
+          "x": 1,
           "y": 2,
-          "width": 4,
-          "height": 3,
+          "width": 3,
+          "height": 2,
           "type": "patient_bay"
+        },
+        {
+          "x": 15,
+          "y": 2,
+          "width": 3,
+          "height": 2,
+          "type": "patient_bay"
+        },
+        {
+          "x": 4,
+          "y": 2,
+          "width": 1,
+          "height": 3,
+          "type": "curtain_partition"
         },
         {
           "x": 14,
           "y": 2,
-          "width": 4,
-          "height": 3,
-          "type": "patient_bay"
-        },
-        {
-          "x": 6,
-          "y": 2,
-          "width": 1,
-          "height": 3,
-          "type": "curtain_partition"
-        },
-        {
-          "x": 13,
-          "y": 2,
           "width": 1,
           "height": 3,
           "type": "curtain_partition"
         },
         {
           "x": 2,
-          "y": 9,
+          "y": 12,
           "width": 3,
           "height": 2,
           "type": "gurney"
+        },
+        {
+          "x": 6,
+          "y": 13,
+          "width": 2,
+          "height": 1,
+          "type": "bench"
         },
         {
           "x": 15,
-          "y": 9,
+          "y": 8,
           "width": 3,
           "height": 2,
           "type": "gurney"
         },
         {
-          "x": 1,
-          "y": 10,
-          "width": 1,
-          "height": 1,
-          "type": "iv_stand"
-        },
-        {
           "x": 18,
-          "y": 4,
+          "y": 2,
           "width": 1,
           "height": 1,
           "type": "vital_monitor"
         },
         {
-          "x": 5,
-          "y": 11,
+          "x": 13,
+          "y": 8,
           "width": 2,
           "height": 1,
           "type": "equipment"
         },
         {
-          "x": 13,
-          "y": 11,
+          "x": 17,
+          "y": 6,
           "width": 2,
           "height": 1,
           "type": "crash_cart"
@@ -1418,24 +1439,24 @@
           "id": "dr_martinez",
           "name": "Rushed ER Doctor",
           "sprite": "doctor",
-          "x": 9,
-          "y": 8,
+          "x": 4,
+          "y": 7,
           "sceneId": "dr_martinez_scene1"
         },
         {
           "id": "officer",
           "name": "Police Officer",
           "sprite": "officer",
-          "x": 7,
-          "y": 8,
+          "x": 4,
+          "y": 9,
           "sceneId": "police_records"
         },
         {
           "id": "frantic_family",
           "name": "Frantic Family Member",
           "sprite": "visitor",
-          "x": 12,
-          "y": 8,
+          "x": 6,
+          "y": 9,
           "sceneId": "family_pressure"
         },
         {
@@ -1443,8 +1464,8 @@
           "name": "Priya",
           "role": "Privacy Officer",
           "sprite": "boss",
-          "x": 12,
-          "y": 11,
+          "x": 15,
+          "y": 12,
           "sceneId": "_encounter_breach_triage_er",
           "encounterTrigger": {
             "encounterId": "breach-triage-er",
@@ -1469,7 +1490,7 @@
         {
           "id": "unlocked_computer",
           "name": "Computer Left Logged In",
-          "x": 6,
+          "x": 7,
           "y": 6,
           "sceneId": "unlocked_workstation",
           "spriteType": "computer"
@@ -1480,8 +1501,8 @@
           "id": "emergency_exceptions",
           "title": "When You CAN Share PHI",
           "type": "whiteboard",
-          "x": 17,
-          "y": 11,
+          "x": 16,
+          "y": 12,
           "fact": "HIPAA isn't trying to STOP healthcare\u2014it just wants you to be thoughtful. You can share PHI without patient authorization for: Treatment, Payment, Operations (TPO - The Holy Trinity), Required by Law (court orders, mandatory reporting), Public Health (disease outbreaks), Law Enforcement (court orders, subpoenas, for suspect identification, crime on premises, or medical emergencies\u2014a warrant isn't always required), Deceased Persons (coroners, funeral directors), and Emergencies. The Catch: Even when permitted, still use MINIMUM NECESSARY."
         }
       ],
@@ -1587,18 +1608,25 @@
           "type": "wall"
         },
         {
-          "x": 3,
+          "x": 6,
           "y": 5,
-          "width": 5,
-          "height": 2,
+          "width": 8,
+          "height": 1,
           "type": "lab_bench"
         },
         {
-          "x": 12,
-          "y": 5,
-          "width": 5,
-          "height": 2,
+          "x": 6,
+          "y": 8,
+          "width": 8,
+          "height": 1,
           "type": "lab_bench"
+        },
+        {
+          "x": 7,
+          "y": 4,
+          "width": 1,
+          "height": 1,
+          "type": "chair"
         },
         {
           "x": 2,
@@ -1629,57 +1657,57 @@
           "type": "results_board"
         },
         {
-          "x": 2,
-          "y": 10,
+          "x": 1,
+          "y": 9,
           "width": 2,
           "height": 2,
           "type": "specimen_fridge"
         },
         {
-          "x": 16,
-          "y": 10,
+          "x": 17,
+          "y": 8,
           "width": 2,
           "height": 2,
           "type": "bio_cabinet"
         },
         {
-          "x": 7,
-          "y": 10,
+          "x": 12,
+          "y": 13,
           "width": 2,
           "height": 1,
           "type": "sink_station"
         },
         {
-          "x": 9,
-          "y": 10,
+          "x": 14,
+          "y": 13,
           "width": 1,
           "height": 1,
           "type": "eyewash_station"
         },
         {
-          "x": 11,
-          "y": 10,
+          "x": 2,
+          "y": 13,
           "width": 2,
           "height": 1,
           "type": "sample_rack"
         },
         {
-          "x": 13,
-          "y": 10,
+          "x": 15,
+          "y": 13,
           "width": 2,
           "height": 1,
           "type": "autoclave"
         },
         {
-          "x": 1,
-          "y": 8,
+          "x": 18,
+          "y": 10,
           "width": 1,
           "height": 1,
           "type": "chemical_shelf"
         },
         {
           "x": 18,
-          "y": 8,
+          "y": 11,
           "width": 1,
           "height": 1,
           "type": "chemical_shelf"
@@ -1692,7 +1720,7 @@
           "type": "plant"
         },
         {
-          "x": 1,
+          "x": 17,
           "y": 13,
           "width": 1,
           "height": 1,
@@ -1711,16 +1739,16 @@
           "id": "lab_tech",
           "name": "Lab Technician",
           "sprite": "it_tech",
-          "x": 5,
-          "y": 7,
+          "x": 8,
+          "y": 4,
           "sceneId": "lab_tech_scene"
         },
         {
           "id": "marcus_lab_aide",
           "name": "Marcus",
           "role": "Lab Aide",
-          "x": 14,
-          "y": 7,
+          "x": 8,
+          "y": 9,
           "sprite": "staff",
           "sceneId": "_encounter_phi_sort_lab",
           "encounterTrigger": {
@@ -1742,8 +1770,8 @@
           "id": "courier",
           "name": "Sample Courier",
           "sprite": "visitor",
-          "x": 16,
-          "y": 4,
+          "x": 3,
+          "y": 9,
           "sceneId": "third_party_access"
         }
       ],
@@ -1751,16 +1779,16 @@
         {
           "id": "sample_labels",
           "name": "Sample Labels",
-          "x": 4,
-          "y": 7,
+          "x": 7,
+          "y": 9,
           "sceneId": "sample_phi",
           "spriteType": "manual"
         },
         {
           "id": "results_printout",
           "name": "Results Left on Counter",
-          "x": 15,
-          "y": 7,
+          "x": 10,
+          "y": 6,
           "sceneId": "exposed_results",
           "spriteType": "poster"
         }
@@ -1770,8 +1798,8 @@
           "id": "phi_identifiers",
           "title": "The 18 PHI Identifiers",
           "type": "manual",
-          "x": 2,
-          "y": 8,
+          "x": 4,
+          "y": 11,
           "fact": "Welcome to healthcare, where Protected Health Information (PHI) is more valuable than Bitcoin and twice as regulated. Safe Harbor lists exactly 18 identifier types\u2014names, full ZIP codes, SSNs, device serials, even full-face photos. Strip all 18 and health data stops being PHI. Your codex (press I) logs every identifier you catch in the wild\u2014sort the paperwork, fill the wall, all eighteen. The Golden Rule stands: if you can connect health data to a specific person, congrats\u2014it's PHI. Treat it like your own embarrassing medical history."
         }
       ],
@@ -1964,7 +1992,7 @@
         },
         {
           "x": 12,
-          "y": 11,
+          "y": 13,
           "width": 1,
           "height": 1,
           "type": "printer_station"
@@ -1977,7 +2005,7 @@
           "type": "archive_box"
         },
         {
-          "x": 6,
+          "x": 4,
           "y": 11,
           "width": 1,
           "height": 1,
@@ -2018,30 +2046,30 @@
           "name": "Records Clerk",
           "sprite": "receptionist",
           "x": 10,
-          "y": 10,
+          "y": 7,
           "sceneId": "records_access"
         },
         {
           "id": "patient_request",
           "name": "Patient Requesting File",
           "sprite": "patient",
-          "x": 4,
-          "y": 8,
+          "x": 9,
+          "y": 10,
           "sceneId": "patient_access_rights"
         },
         {
           "id": "attorney",
           "name": "Nate the Lawyer",
           "sprite": "lawyer",
-          "x": 15,
-          "y": 8,
+          "x": 12,
+          "y": 9,
           "sceneId": "legal_request"
         },
         {
           "id": "compliance_officer",
           "name": "Chief Compliance Officer",
           "sprite": "boss",
-          "x": 8,
+          "x": 5,
           "y": 12,
           "sceneId": "final_boss_1",
           "isFinalBoss": true
@@ -2050,8 +2078,8 @@
           "id": "dr_tovar",
           "name": "Dr. Tovar",
           "role": "Compliance Lead",
-          "x": 14,
-          "y": 10,
+          "x": 15,
+          "y": 11,
           "sprite": "boss",
           "sceneId": "_encounter_phi_sort_records",
           "encounterTrigger": {
@@ -2296,21 +2324,21 @@
         {
           "x": 2,
           "y": 8,
-          "width": 2,
-          "height": 1,
-          "type": "workstation_cluster"
-        },
-        {
-          "x": 16,
-          "y": 8,
-          "width": 2,
-          "height": 1,
-          "type": "workstation_cluster"
-        },
-        {
-          "x": 2,
-          "y": 10,
           "width": 3,
+          "height": 1,
+          "type": "workstation_cluster"
+        },
+        {
+          "x": 15,
+          "y": 8,
+          "width": 3,
+          "height": 1,
+          "type": "workstation_cluster"
+        },
+        {
+          "x": 6,
+          "y": 13,
+          "width": 2,
           "height": 1,
           "type": "whiteboard_wall"
         },
@@ -2322,8 +2350,8 @@
           "type": "printer_station"
         },
         {
-          "x": 7,
-          "y": 12,
+          "x": 12,
+          "y": 11,
           "width": 2,
           "height": 1,
           "type": "table"
@@ -2357,15 +2385,15 @@
           "type": "trash"
         },
         {
-          "x": 1,
-          "y": 8,
+          "x": 3,
+          "y": 9,
           "width": 1,
           "height": 1,
           "type": "chair"
         },
         {
-          "x": 18,
-          "y": 8,
+          "x": 16,
+          "y": 9,
           "width": 1,
           "height": 1,
           "type": "chair"
@@ -2376,6 +2404,20 @@
           "width": 1,
           "height": 1,
           "type": "box"
+        },
+        {
+          "x": 2,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "box"
+        },
+        {
+          "x": 1,
+          "y": 10,
+          "width": 1,
+          "height": 1,
+          "type": "water_cooler"
         }
       ],
       "npcs": [
@@ -2384,14 +2426,14 @@
           "name": "Security Analyst",
           "sprite": "it_tech",
           "x": 10,
-          "y": 7,
+          "y": 4,
           "sceneId": "security_training"
         },
         {
           "id": "vendor",
           "name": "Vendor Requesting Access",
           "sprite": "visitor",
-          "x": 3,
+          "x": 4,
           "y": 9,
           "sceneId": "vendor_access"
         },
@@ -2399,7 +2441,7 @@
           "id": "workaround_employee",
           "name": "Employee Needs Workaround",
           "sprite": "staff",
-          "x": 16,
+          "x": 15,
           "y": 9,
           "sceneId": "convenience_vs_security"
         }
@@ -2416,8 +2458,8 @@
         {
           "id": "breach_playbook",
           "name": "Breach Response Playbook",
-          "x": 7,
-          "y": 11,
+          "x": 12,
+          "y": 12,
           "sceneId": "breach_response",
           "spriteType": "manual"
         },
@@ -2556,7 +2598,7 @@
           "type": "wall"
         },
         {
-          "x": 8,
+          "x": 9,
           "y": 6,
           "width": 4,
           "height": 3,
@@ -2570,7 +2612,7 @@
           "type": "vending_machine"
         },
         {
-          "x": 5,
+          "x": 4,
           "y": 2,
           "width": 2,
           "height": 2,
@@ -2605,43 +2647,43 @@
           "type": "notice_board"
         },
         {
-          "x": 1,
-          "y": 5,
+          "x": 6,
+          "y": 13,
           "width": 1,
           "height": 1,
           "type": "coat_rack"
         },
         {
-          "x": 13,
-          "y": 6,
+          "x": 6,
+          "y": 3,
           "width": 1,
-          "height": 2,
+          "height": 1,
           "type": "trash_bin"
         },
         {
-          "x": 7,
-          "y": 10,
+          "x": 3,
+          "y": 13,
           "width": 2,
           "height": 1,
           "type": "tv_stand"
         },
         {
-          "x": 2,
-          "y": 10,
+          "x": 1,
+          "y": 8,
           "width": 3,
           "height": 2,
           "type": "couch"
         },
         {
-          "x": 15,
-          "y": 10,
+          "x": 4,
+          "y": 8,
           "width": 3,
           "height": 2,
           "type": "couch"
         },
         {
-          "x": 5,
-          "y": 12,
+          "x": 17,
+          "y": 13,
           "width": 1,
           "height": 1,
           "type": "lost_and_found_box"
@@ -2654,15 +2696,22 @@
           "type": "plant"
         },
         {
-          "x": 7,
-          "y": 8,
+          "x": 14,
+          "y": 13,
+          "width": 1,
+          "height": 1,
+          "type": "plant"
+        },
+        {
+          "x": 9,
+          "y": 9,
           "width": 1,
           "height": 1,
           "type": "chair"
         },
         {
-          "x": 12,
-          "y": 8,
+          "x": 11,
+          "y": 9,
           "width": 1,
           "height": 1,
           "type": "chair"
@@ -2680,7 +2729,7 @@
           "id": "gossiping_coworker",
           "name": "Gossiping Coworker",
           "sprite": "staff",
-          "x": 7,
+          "x": 8,
           "y": 7,
           "sceneId": "gary_gossip"
         },
@@ -2696,15 +2745,15 @@
           "id": "tired_employee",
           "name": "Exhausted Employee",
           "sprite": "patient",
-          "x": 4,
-          "y": 12,
+          "x": 2,
+          "y": 10,
           "sceneId": "fatigue_lapse"
         },
         {
           "id": "hr_director",
           "name": "HR Director (Getting Coffee)",
           "sprite": "boss",
-          "x": 14,
+          "x": 15,
           "y": 4,
           "sceneId": "boss_man_brad"
         },
@@ -2712,8 +2761,8 @@
           "id": "selfie_coworker",
           "name": "Coworker with Phone",
           "sprite": "visitor",
-          "x": 14,
-          "y": 10,
+          "x": 17,
+          "y": 11,
           "sceneId": "social_media_slip"
         }
       ],
@@ -2729,8 +2778,8 @@
         {
           "id": "unlocked_phone",
           "name": "Phone Left Unlocked",
-          "x": 12,
-          "y": 7,
+          "x": 18,
+          "y": 10,
           "sceneId": "phone_security",
           "spriteType": "computer"
         },

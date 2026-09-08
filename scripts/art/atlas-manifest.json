@@ -1319,59 +1319,16 @@
       ],
       "_single": "hospital#243"
     },
-    "prop.poster.blue.a": {
+    "prop.tv.wall": {
       "sheet": "hospital",
       "px": [
-        0,
-        1552,
-        20,
-        32
-      ]
-    },
-    "prop.poster.blue.b": {
-      "sheet": "hospital",
-      "px": [
-        96,
-        1552,
-        20,
-        32
-      ]
-    },
-    "prop.poster.orange": {
-      "sheet": "hospital",
-      "px": [
-        0,
-        1616,
-        20,
-        32
-      ]
-    },
-    "prop.poster.pink": {
-      "sheet": "hospital",
-      "px": [
-        32,
-        1616,
-        20,
-        32
-      ]
-    },
-    "prop.poster.red": {
-      "sheet": "hospital",
-      "px": [
-        64,
-        1616,
-        20,
-        32
-      ]
-    },
-    "prop.poster.green": {
-      "sheet": "hospital",
-      "px": [
-        96,
-        1616,
-        20,
-        32
-      ]
+        38,
+        1550,
+        46,
+        34
+      ],
+      "_single": "hospital#265",
+      "_note": "whole wall TV (mount + full bezel, status-bar screen). Replaces the six prop.poster.* 20x32 panels which read as HALF TVs at game scale (asymmetric bezel, banner text running off the edge) - user-reported across 8 rooms"
     },
     "prop.picture.landscape.a": {
       "sheet": "hospital",
@@ -1539,9 +1496,19 @@
         128,
         14,
         192,
-        78
+        36
       ],
-      "_note": "whole 6-wide counter; the beige one touches it at x=320"
+      "_note": "U only (wings+back+pocket, source rows 0-35); the full-width tan slab moved to .front so it occludes the pocket NPC's feet (design review: Riley drew over the tied-depth slab)"
+    },
+    "prop.counter.reception.wood.front": {
+      "sheet": "hospital",
+      "px": [
+        128,
+        50,
+        192,
+        42
+      ],
+      "_note": "slab + front run (source rows 36-77, full width); depthRow 4 covers the depth-8 pocket NPC's boots \u2014 recomposes pixel-exact with the U at dy -42"
     },
     "prop.counter.reception.white": {
       "sheet": "hospital",
@@ -1718,6 +1685,39 @@
         24
       ],
       "_single": "hospital#205"
+    },
+    "prop.table.lab.a": {
+      "sheet": "hospital",
+      "px": [
+        420,
+        1024,
+        60,
+        40
+      ],
+      "_single": "hospital#224",
+      "_note": "front-facing lab work table, blue top + legs \u2014 the bench-run unit (design pass)"
+    },
+    "prop.table.lab.b": {
+      "sheet": "hospital",
+      "px": [
+        416,
+        1120,
+        60,
+        40
+      ],
+      "_single": "hospital#226",
+      "_note": "second blue-top lab table single \u2014 alternates with .a in bench runs"
+    },
+    "prop.analyzer.a": {
+      "sheet": "hospital",
+      "px": [
+        72,
+        1362,
+        46,
+        66
+      ],
+      "_single": "hospital#117",
+      "_note": "floor analyzer with orange readout screen \u2014 pairs with scanner.ct as the lab centrifuge bay (the old pairing reused the autoclave single already standing in the wash line)"
     },
     "prop.table.small.brown": {
       "sheet": "hospital",
@@ -3060,6 +3060,26 @@
         128,
         42
       ]
+    },
+    "prop.console.curve.blue": {
+      "sheet": "tvstudio",
+      "px": [
+        4,
+        272,
+        88,
+        44
+      ],
+      "_note": "curved control desk \u2014 deliberate union of tvstudio singles #54+#55+#59 (left wing + center + right wing butt on the sheet); complete silhouette for the it_office desk pods"
+    },
+    "prop.tower.mini.blue": {
+      "sheet": "tvstudio",
+      "px": [
+        232,
+        274,
+        16,
+        20
+      ],
+      "_single": "tvstudio#74"
     },
     "prop.console.blue.l": {
       "sheet": "tvstudio",

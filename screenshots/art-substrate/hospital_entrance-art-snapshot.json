@@ -20,7 +20,7 @@
   {
    "type": "desk",
    "x": 7,
-   "y": 2,
+   "y": 3,
    "w": 6,
    "h": 2,
    "frame": "prop.counter.reception.white",
@@ -30,11 +30,11 @@
   {
    "type": "desk",
    "x": 7,
-   "y": 2,
+   "y": 3,
    "w": 6,
    "h": 2,
    "frame": "prop.counter.reception.white.front",
-   "depth": 8,
+   "depth": 9,
    "anchor": "floor"
   },
   {
@@ -80,11 +80,11 @@
   {
    "type": "plant",
    "x": 18,
-   "y": 11,
+   "y": 9,
    "w": 1,
    "h": 1,
    "frame": "prop.plant.orange.s",
-   "depth": 16,
+   "depth": 14,
    "anchor": "floor"
   },
   {
@@ -170,46 +170,46 @@
   {
    "type": "table",
    "x": 4,
-   "y": 9,
+   "y": 8,
    "w": 1,
    "h": 1,
    "frame": "prop.table.round.white",
-   "depth": 14,
+   "depth": 13,
    "anchor": "floor"
   },
   {
    "type": "table",
    "x": 15,
-   "y": 9,
+   "y": 8,
    "w": 1,
    "h": 1,
    "frame": "prop.table.round.white",
-   "depth": 14,
+   "depth": 13,
    "anchor": "floor"
   },
   {
-   "type": "hand_sanitizer",
-   "x": 6,
-   "y": 11,
-   "w": 1,
+   "type": "table",
+   "x": 17,
+   "y": 12,
+   "w": 2,
    "h": 1,
-   "frame": "prop.table.small.white",
-   "depth": 16,
+   "frame": "prop.desk.k.wood",
+   "depth": 17,
    "anchor": "floor"
   },
   {
-   "type": "hand_sanitizer",
-   "x": 6,
-   "y": 11,
-   "w": 1,
+   "type": "table",
+   "x": 17,
+   "y": 12,
+   "w": 2,
    "h": 1,
-   "frame": "prop.dispenser.c",
-   "depth": 16,
+   "frame": "prop.coffeemaker.b",
+   "depth": 17,
    "anchor": "floor"
   },
   {
    "type": "umbrella_stand",
-   "x": 13,
+   "x": 14,
    "y": 11,
    "w": 1,
    "h": 1,
@@ -229,7 +229,7 @@
   },
   {
    "type": "trash_can",
-   "x": 14,
+   "x": 15,
    "y": 11,
    "w": 1,
    "h": 1,
@@ -239,12 +239,22 @@
   },
   {
    "type": "wheelchair",
-   "x": 18,
-   "y": 9,
+   "x": 13,
+   "y": 11,
    "w": 1,
    "h": 1,
    "frame": "prop.wheelchair.front.tan",
-   "depth": 14,
+   "depth": 16,
+   "anchor": "floor"
+  },
+  {
+   "type": "water_cooler",
+   "x": 1,
+   "y": 6,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.watercooler",
+   "depth": 11,
    "anchor": "floor"
   },
   {

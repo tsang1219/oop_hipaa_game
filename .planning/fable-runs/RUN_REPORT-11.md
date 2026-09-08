@@ -499,3 +499,69 @@ roomData.json obstacle-only moves (all logged); one hardcoded hallway-board y in
   NPC data was out of scope for this loop; worth a rename in gameData/roomData whenever you touch copy.
 - Reviewer taste notes (poster-height variance, it_er's blank blue poster + bare east wall, records_it's
   free-standing server rack, the 1px learn-zone ring vs a softer pulse) are logged, unactioned.
+
+---
+
+## 14. Follow-up (2026-08-26..29): half TVs + the interior design pass
+
+Your verdict on §13: better, but "half TVs" kept appearing on walls, some furniture still read cut
+off (ER beds, IT desks, lab tables), and "the furniture placement is sparse and kind of bizarre.
+It would be nice if it was arranged in a way that made sense... create an interior design pass —
+include their text too, i don't mind" (= NPCs/zones/items may move; positions only).
+
+**Open it:** `screenshots/art-substrate/grid-audit-1-vs-final.png` (all 13 rooms, §12 state → now);
+per-room finals `<room>-final.png`, design captures `<room>-design.png`.
+
+### The half TVs (fixed everywhere at once)
+
+All six `prop.poster.*` frames were 20x32 hospital-sheet panels drawn with an asymmetric bezel and
+banner text running off the edge — complete objects on the sheet, but at game scale each reads as
+HALF a TV. Every wall you called broken had one (lobby welcome icon + the panel by the clock,
+reception decor, break-room corkboard icon, lab decor, all five hallway tip icons + two hallway
+decor panels); every wall you called good had none. All six frames are deleted. `prop.tv.wall`
+(the sheet's whole 46x34 wall TV, single #265) replaces them — the five hallway tips now share it
+as one consistent "info screen" pickup language — and paper spots got real signs/pictures. The
+break-room "half object by the bin" (a litter pile cut off its shelf single's base bar) is deleted.
+
+### The design pass (`.planning/fable-runs/INTERIOR_DESIGN_PASS.md`)
+
+Same loop as §13 — fresh designer per room, then a blind reviewer, master fixes on FAILs — but the
+bar is composition: purposeful zones a stranger can name, walls work / floors breathe, people
+belong to places, perspective honesty, readable at a glance. Seven rooms (hallways + closet
+excluded as corridors):
+
+- **break_room** — PASS outright. Kitchenette / dining set / TV lounge (couches finally FACE the
+  TV across a rug; the front-facing "couch" frame was secretly the back-view row — swapped).
+- **lab** — FAIL(7)→PASS. Root cause of your "bizarre tables": the benches were kitchen-cabinet
+  FRONTS (a wall of drawers, no work surface) — rebuilt as whole cap-pair lab tables in two clean
+  runs with tucked stools; microscope corner, analyzer bay, specimen intake, wash line.
+- **it_office** — FAIL(2)→PASS. Your "cut off desks": workstation "clusters" were two console END
+  CAPS with the entire middle missing — now the complete curved tvstudio control desk as staffed
+  pods; response row (chalkboard re-anchored to the south wall), print corner, server wall kept.
+- **er** — PASS outright. Your "cut off beds": side-view bays replaced with the pack's whole
+  front-facing vertical bed (head against the wall) per bay + curtain + pole; triage row moved to
+  the door with the queue in front; robot/crash-cart parked with purpose.
+- **hospital_entrance** — FAIL(4)→PASS. Staffed U-counter (staff stand INSIDE the transparent
+  pocket), arrival axis, mirrored waiting rows, info corner, coffee corner rebuilt as a real
+  obstacle with re-anchored steam.
+- **reception** — FAIL(3)→PASS. Same staffed-pocket pattern; the FAIL included the wood counter's
+  split line leaving its slab at the NPC's tied depth (Riley "stood on the desk") — frames
+  re-split so the slab occludes her; queue stanchions, rows, office nook.
+- **records_room** — light touch, FAIL(3)→PASS. Five NPCs to nameable posts (the "who do you help
+  first?" queue now visible at the clerk's island); GERALD's camouflaged pale copier anchored to
+  the south wall; disposal line completed.
+
+### Rules the reviewers taught us (now in the log's STATE)
+
+`prop.table.small.white` is banned (read as an office chair, then a printer); the wood nightstand
+is the display pedestal; wall items share one hang line and stay off the cap (top 12px) and
+baseboard (y56-64) bands; pale-bodied props need a dark backing (wall band), not just a contact
+shadow; a composite's front notch gets furniture tucked in front of it; painted light on any
+vertical surface reads as a stain.
+
+### Proof
+
+`tests/art-substrate-proof.spec.ts` **53/53** (depth pins re-anchored with each logged move);
+progression suite green (22-31 passed / 4 skipped across runs; one flaky door-unlock retry);
+`npx tsc -p .` clean; every capture console-clean. Entity moves (obstacles, NPCs, zones, items)
+are all itemized per room in `.planning/fable-runs/room-clean-log.md`.

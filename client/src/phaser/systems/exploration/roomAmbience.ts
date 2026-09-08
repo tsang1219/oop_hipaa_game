@@ -78,20 +78,20 @@ export function addRoomAmbience(
 
   // ── Hospital Lobby first-frame polish (DESIGN-004) ────────────
   if (room.id === 'hospital_entrance') {
-    // (1) Coffee cart prop — non-interactable, rendered directly in scene
-    const cartTileX = 5, cartTileY = 5;
-    const cartCx = cartTileX * TILE + TILE / 2, cartCy = cartTileY * TILE + TILE / 2;
-    scene.add.ellipse(cartCx, cartCy + 12, TILE + 20, 8, 0x000000, 0.18).setDepth(2);
-    // Run 11 audit: a coffee cart is a little wood table with the kitchen's coffee maker on it
-    // (the old frame was LimeZu's bedside cabinet)
-    scene.add.sprite(cartCx, cartCy + 14, ATLAS_KEY, 'prop.desk.k.wood').setOrigin(0.5, 1).setDepth(3);
-    scene.add.sprite(cartCx, cartCy + 2, ATLAS_KEY, 'prop.coffeemaker.b').setOrigin(0.5, 1).setDepth(3);
-    // Tiny steam puff every ~2.6s above the machine (machine top sits at cartCy - 34;
-    // spawning lower left the puff rising out of the machine's body)
-    scene.time.addEvent({ delay: 2600, loop: true, callback: () => {
-      const puff = scene.add.ellipse(cartCx + (Math.random() * 4 - 2), cartCy - 36, 5, 4, 0xffffff, 0.55).setDepth(20);
-      scene.tweens.add({ targets: puff, y: puff.y - 12, alpha: 0, scaleX: 1.5, scaleY: 1.5, duration: 1400, ease: 'Sine.easeOut', onComplete: () => puff.destroy() });
-    } });
+    // (1) Coffee-cart steam — the cart itself is a real obstacle now (design pass:
+    // 'table@17,12' in artCatalog draws the wood table + espresso machine in the SE
+    // corner; the old collisionless sprites floated mid-floor at (5,5)). Only the
+    // steam overlay lives here, anchored to the machine's top on the current obstacle.
+    const cartObs = room.obstacles.find(o => (o as { type?: string }).type === 'table' && o.x === 17 && o.y === 12);
+    if (cartObs) {
+      const cartCx = (cartObs.x + cartObs.width / 2) * TILE; // machine part is centered on the 2x1
+      // machine part: dy -12 off the footprint bottom, 36px tall → top of the machine
+      const machineTop = (cartObs.y + cartObs.height) * TILE - 12 - 36;
+      scene.time.addEvent({ delay: 2600, loop: true, callback: () => {
+        const puff = scene.add.ellipse(cartCx + (Math.random() * 4 - 2), machineTop - 2, 5, 4, 0xffffff, 0.55).setDepth(20);
+        scene.tweens.add({ targets: puff, y: puff.y - 12, alpha: 0, scaleX: 1.5, scaleY: 1.5, duration: 1400, ease: 'Sine.easeOut', onComplete: () => puff.destroy() });
+      } });
+    }
     // (2) Riley idle micro-animation — subtle angle sway on top of breathing tween
     const riley = interactables.find(ia => ia.type === 'npc' && ia.id === 'riley_entrance');
     if (riley) {
@@ -181,7 +181,17 @@ export function addRoomAmbience(
     if (attorney) {
       const envTex = objectTexture('manual');
       const env = scene.add.sprite(attorney.sprite.x + 14, attorney.sprite.y + 4, envTex.key, envTex.frame).setScale(0.5).setDepth(attorney.sprite.depth - 1).setAngle(12);
-      scene.tweens.add({ targets: env, y: env.y - 1, duration: 2200, yoyo: true, repeat: -1, ease: 'Sine.easeInOut' });
+      // Design pass: the attorney WANDERS (radius 2) — the old static sprite + y-bob
+      // tween stayed at his spawn point and read as orphan papers on bare floor once
+      // he walked off. The envelope now follows him every frame (carried document),
+      // with the same gentle bob folded into the follow.
+      const followEnvelope = () => {
+        if (!env.active || !attorney.sprite.active) return;
+        env.setPosition(attorney.sprite.x + 14, attorney.sprite.y + 4 + Math.sin(scene.time.now / 1100) * 1.2);
+        env.setDepth(attorney.sprite.depth - 1);
+      };
+      scene.events.on('update', followEnvelope);
+      env.once('destroy', () => scene.events.off('update', followEnvelope));
     }
     // (4) [removed — Run 11 room-clean] The drifting document cart was a bedside-cabinet
     // sprite sliding by itself with no wheels or pusher, and its shadow ellipse was

@@ -310,11 +310,11 @@
   {
    "type": "printer_station",
    "x": 12,
-   "y": 11,
+   "y": 13,
    "w": 1,
    "h": 1,
    "frame": "prop.copier",
-   "depth": 16,
+   "depth": 18,
    "anchor": "floor"
   },
   {
@@ -329,7 +329,7 @@
   },
   {
    "type": "document_cart",
-   "x": 6,
+   "x": 4,
    "y": 11,
    "w": 1,
    "h": 1,
@@ -378,7 +378,7 @@
    "anchor": "floor"
   }
  ],
- "decor": 12,
+ "decor": 13,
  "animated": 1,
  "missing": [],
  "imageRequests": 27

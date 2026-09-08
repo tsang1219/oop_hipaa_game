@@ -198,6 +198,16 @@
    "anchor": "floor"
   },
   {
+   "type": "monitoring_desk",
+   "x": 8,
+   "y": 5,
+   "w": 4,
+   "h": 2,
+   "frame": "anim.monitor.0",
+   "depth": 11,
+   "anchor": "floor"
+  },
+  {
    "type": "coffee_mug",
    "x": 7,
    "y": 6,
@@ -241,9 +251,9 @@
    "type": "workstation_cluster",
    "x": 2,
    "y": 8,
-   "w": 2,
+   "w": 3,
    "h": 1,
-   "frame": "prop.console.blue.l",
+   "frame": "prop.console.curve.blue",
    "depth": 13,
    "anchor": "floor"
   },
@@ -251,40 +261,40 @@
    "type": "workstation_cluster",
    "x": 2,
    "y": 8,
-   "w": 2,
+   "w": 3,
    "h": 1,
-   "frame": "prop.console.blue.r",
+   "frame": "anim.monitor.0",
    "depth": 13,
    "anchor": "floor"
   },
   {
    "type": "workstation_cluster",
-   "x": 16,
+   "x": 15,
    "y": 8,
-   "w": 2,
+   "w": 3,
    "h": 1,
-   "frame": "prop.console.blue.l",
+   "frame": "prop.console.curve.blue",
    "depth": 13,
    "anchor": "floor"
   },
   {
    "type": "workstation_cluster",
-   "x": 16,
+   "x": 15,
    "y": 8,
-   "w": 2,
+   "w": 3,
    "h": 1,
-   "frame": "prop.console.blue.r",
+   "frame": "anim.monitor.0",
    "depth": 13,
    "anchor": "floor"
   },
   {
    "type": "whiteboard_wall",
-   "x": 2,
-   "y": 10,
-   "w": 3,
+   "x": 6,
+   "y": 13,
+   "w": 2,
    "h": 1,
    "frame": "prop.chalkboard.dark.3",
-   "depth": 15,
+   "depth": 18,
    "anchor": "floor"
   },
   {
@@ -309,12 +319,12 @@
   },
   {
    "type": "table",
-   "x": 7,
-   "y": 12,
+   "x": 12,
+   "y": 11,
    "w": 2,
    "h": 1,
    "frame": "prop.desk.k.wood",
-   "depth": 17,
+   "depth": 16,
    "anchor": "floor"
   },
   {
@@ -359,22 +369,22 @@
   },
   {
    "type": "chair",
-   "x": 1,
-   "y": 8,
+   "x": 3,
+   "y": 9,
    "w": 1,
    "h": 1,
    "frame": "prop.chair.office.gray",
-   "depth": 13,
+   "depth": 14,
    "anchor": "floor"
   },
   {
    "type": "chair",
-   "x": 18,
-   "y": 8,
+   "x": 16,
+   "y": 9,
    "w": 1,
    "h": 1,
    "frame": "prop.chair.office.sky",
-   "depth": 13,
+   "depth": 14,
    "anchor": "floor"
   },
   {
@@ -386,10 +396,30 @@
    "frame": "prop.boxes.tall",
    "depth": 17,
    "anchor": "floor"
+  },
+  {
+   "type": "box",
+   "x": 2,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.boxes.tall",
+   "depth": 18,
+   "anchor": "floor"
+  },
+  {
+   "type": "water_cooler",
+   "x": 1,
+   "y": 10,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.watercooler",
+   "depth": 15,
+   "anchor": "floor"
   }
  ],
- "decor": 17,
- "animated": 17,
+ "decor": 19,
+ "animated": 20,
  "missing": [],
  "imageRequests": 27
 }

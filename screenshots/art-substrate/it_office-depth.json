@@ -1,32 +1,32 @@
 [
  {
-  "prop": "whiteboard_wall@2@10",
+  "prop": "table@12@11",
   "playerTile": [
-   2,
-   9
-  ],
-  "rel": "behind",
-  "playerDepth": 14,
-  "propDepth": 15
- },
- {
-  "prop": "whiteboard_wall@2@10",
-  "playerTile": [
-   1,
+   12,
    10
   ],
-  "rel": "beside",
+  "rel": "behind",
   "playerDepth": 15,
-  "propDepth": 15
+  "propDepth": 16
  },
  {
-  "prop": "whiteboard_wall@2@10",
+  "prop": "table@12@11",
   "playerTile": [
-   3,
+   14,
    11
   ],
-  "rel": "front",
+  "rel": "beside",
   "playerDepth": 16,
-  "propDepth": 15
+  "propDepth": 16
+ },
+ {
+  "prop": "table@12@11",
+  "playerTile": [
+   12,
+   12
+  ],
+  "rel": "front",
+  "playerDepth": 17,
+  "propDepth": 16
  }
 ]
