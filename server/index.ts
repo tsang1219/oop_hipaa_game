@@ -59,10 +59,13 @@ app.use((req, res, next) => {
   // Serve the app on the port specified in the environment variable PORT.
   // Defaults to 8080 if not specified.
   const port = parseInt(process.env.PORT || '8080', 10);
+  // Keep local-only as the default. Set DEV_HOST to a trusted interface address
+  // (for example, this machine's Tailscale IPv4) for remote playtesting.
+  const host = process.env.DEV_HOST || '127.0.0.1';
   server.listen({
     port,
-    host: "127.0.0.1",
+    host,
   }, () => {
-    log(`serving on port ${port}`);
+    log(`serving on http://${host}:${port}`);
   });
 })();
