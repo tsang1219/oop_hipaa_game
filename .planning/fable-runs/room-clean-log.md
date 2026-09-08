@@ -11,9 +11,27 @@ then a blind reviewer; fix reviewer FAILs at master level or via another fixer; 
   Reviewer FAILs and their master fixes: er (nurse-station monitor split), hallway_break_lab
   (dispenser wall-mount, sign dy, sconce-flicker rework, mote clamp), hallway_it_er (sconce-flicker
   rework) — see the per-room reviewer rounds below.
-- REMAINING (wrap-up): run tests/art-substrate-proof.spec.ts + tests/progression (PW_CHANNEL=chrome),
-  rebuild the all-rooms grid, append RUN_REPORT-11.md, update auto-memory, present the commit list.
-  Nothing is committed yet.
+- **NEW PHASE (2026-08-26): interior design pass** — user verdict on the cleaned rooms: walls still
+  had "half TVs" (the six 20x32 prop.poster.* panels — ALL replaced by the whole prop.tv.wall
+  single #265 / sign.chart / sign.small / landscape.b; poster frames deleted; break_room rubbish
+  pile deleted) and "furniture placement is sparse and kind of bizarre — create an interior design
+  pass to lay out the furniture in a good way, include their text too, i don't mind" = NPCs/zones/
+  items MAY now move (positions only, text untouched). Protocol:
+  `.planning/fable-runs/INTERIOR_DESIGN_PASS.md`. Room order: break_room, lab, it_office, er,
+  hospital_entrance, reception, records_room (hallways + closet excluded — corridors read fine).
+  Designer then blind reviewer per room, same loop mechanics.
+  DESIGN PASS COMPLETE (2026-08-29): break_room PASS outright · lab FAIL(7)→master-fixed→PASS ·
+  it_office FAIL(2)→fixed→PASS · er PASS outright · hospital_entrance FAIL(4)→fixed→PASS ·
+  reception FAIL(3, incl. the wood-counter split-line depth fix)→fixed→PASS · records_room
+  FAIL(3, incl. GERALD-copier wall-anchoring)→fixed→PASS. Recurring traps documented per round:
+  table.small.white banned (read as chair/printer twice), nightstand prop.table.phone.wood is
+  the pedestal, wall items share one hang line + stay off cap (top 12px) and baseboard (56-64)
+  bands, pale bodies need a dark backing (wall band) not just a shadow.
+  WRAP-UP IN PROGRESS: full proof + progression suites, 13 fresh `-final` captures (hallway
+  `-clean` shots predate the tv.wall tip swap), grid, RUN_REPORT append, memory, commit list.
+- AFTER THE DESIGN PASS: full proof + progression suites (designers update depth-trio pins for
+  moved props as they go), rebuild the grid, append RUN_REPORT-11.md, update auto-memory, present
+  the commit list. Nothing is committed yet.
 - GLOBAL changes later rooms must respect (already applied): clipboard frames are board-only; the
   tray tables (`table.small.*`) have their legs; door labels render at depth 30; `sink.counter` is
   the counter body only; `infostand.blue` is the clean right-hand stand; notice/bulletin boards hang
@@ -970,3 +988,869 @@ shows a clean wall face at tiles 4.6-5.5. Final screenshots replaced:
 `hallway_break_lab-clean.png`, `hallway_it_er-clean.png` (copies of fix1).
 break_lab VERDICT after fixes: PASS (master-verified). it_er VERDICT after fixes: PASS
 (master-verified).
+
+## break_room — design pass (2026-08-26)
+
+Brief: three purposeful zones (kitchenette / dining / TV lounge), vending bank kept, phone+trash
+off the dining table's flank. Result — the zone story reads left to right, top to bottom:
+**snack wall top-left** (vending bank + bin + open fridge), **info wall top-center** (notice board
++ corkboard zone), **kitchenette top-right** (counter run + coffee huddle), **dining center**
+(table + 2 stools + gossiper + overheard plate), **TV lounge bottom-left** (two front-facing
+couches facing the TV across a rug, plant/lamp framing, dozing employee), **phone nook east wall**
+(nightstand + phone zone + selfie coworker), **storage corner bottom-right** (box stack + lost &
+found), spawn landing kept clear.
+
+### Entity moves (roomData.json, break_room only)
+
+Obstacles:
+- vending_machine (5,2)→(4,2) — butts the bank flush against its twin at (2,2)
+- lunch_table (8,6)→(9,6) — frees the col-7/8 west passage between lounge and table
+- trash_bin (13,6) 1x2 → (6,3) 1x1 — off the dining table's flank; parks at the vending bank's
+  end on the machines' baseline (reception's trash_can@6,3 precedent); footprint now matches
+  the 28x34 art
+- tv_stand (7,10)→(3,13) — TV backs onto the bottom wall, screen facing the couches (it was
+  jammed against the lunch table's south edge; user-flagged)
+- couch (2,10)→(1,8) and couch (15,10)→(4,8) — the two couches butt into one suite on the
+  lounge's north side, both FACING the TV at ~1.7 tiles sitting distance
+- chair (7,8)→(9,9), chair (12,8)→(11,9) — stools tuck against the table's south edge flanking
+  the overheard_conversation plate (the blue one used to sit under the gossiper's feet)
+- coat_rack/floor-lamp (1,5)→(6,13) — was an orphan mid-wall; now frames the TV's right side
+- lost_and_found_box (5,12)→(17,13) — was stranded mid-floor; joins the box stack as a storage
+  corner
+- ADDED plant (14,13) 1x1 (prop.plant.orange.s default) — anchors the bare bottom-wall stretch
+  between spawn and storage corner
+
+NPCs (positions only, text untouched):
+- gossiping_coworker (7,7)→(8,7) — stands at the table's west end (his stool no longer under him)
+- tired_employee (4,12)→(2,10) — dozing in the lounge, on the rug in front of the left couch
+  (Z/! markers follow him)
+- hr_director (14,4)→(15,4) — directly below the coffee maker; forms a coffee-station huddle
+  with friend_fishing (16,5, unmoved)
+- selfie_coworker (14,10)→(17,11) — stands beside the phone nook
+
+Zones:
+- unlocked_phone (12,7)→(18,10) — the nightstand+phone move to the east wall (they crowded the
+  dining table); same icon/dy pairing as before
+- overheard_conversation (10,9) and staff_corkboard (11,2) unmoved; verbal_disclosure item
+  (17,4) unmoved (still the note on the kitchen fridge door)
+
+### artCatalog.ts (break_room)
+
+- Overrides re-keyed for the moves (vending@4,2, chair@9,9, chair@11,9).
+- **couches switched prop.couch.gray.3 → prop.couch.blue.3 (one flipX)** — gray.3 is LimeZu's
+  BACK-view couch (smooth back panel, cushion tops peeking over; its manifest _note saying
+  "front-facing" is wrong — left as-is to avoid a re-slice, flagged here). blue.3 is the true
+  front-facing 3-seat, so the pair now shows cushions toward the TV. gray.3 stays in
+  PROP_DEFAULTS (no other room uses `couch`).
+- Vending dx nudges (+6/-6) close the 16px art gap between the two machines' centered arts.
+- Decor: tabletop food shifted +1 col with the table; phone nightstand decor (12,7)→(18,10)
+  depthRow 10; green 48x36 rug replaced by prop.mat.tan.3x2 at tx2 dx16 / ty9 dy29 — fills the
+  couch→TV sitting gap (y317..373), tucks 3px under the couch feet, 1px clear of the TV screen.
+- Wall decor untouched.
+
+### roomAmbience
+
+No edits — vending LED and microwave flash compute from obstacle rects and followed the moves
+(verified in captures: LEDs sit on both machines' top-right; flash on the microwave body).
+
+### Tests
+
+- tests/art-substrate-proof.spec.ts: break_room depth-trio pin updated for the bin move —
+  trash_bin (6,3), behind (6,2) / beside (7,3) / front (6,4). `ART_ROOM=break_room` proof run:
+  4/4 pass (atlas, depth, doors, lighting). `npx tsc -p .` clean; all captures console-clean.
+
+### Chose NOT to do
+
+- No third stool / east-side stool — it would pinch the right-door approach lane at (13,7).
+- Tired employee not seated ON a couch — NPC bottom-anchor vs couch depth would read as
+  standing-in-furniture; he stands on the rug instead.
+- Left the "Hallway" door label overlapping couch A's back edge — screen-fixed door UI (depth
+  30), same behavior in other rooms, not room geometry.
+- Left the food cluster on the table's west half — it sits between the two occupied seats; the
+  east half is the approach from the right door.
+
+### Verification
+
+Sweep 1 (design2, 9 crops + 4 targeted zooms): 0 integrity defects; design tweaks applied
+(vending gap, catalog comments). Sweep 2 (design3, 9 crops): clean. Sweep 3 (design4, fresh
+capture, 9 crops): clean. Two consecutive clean sweeps. Final: screenshots/art-substrate/
+break_room-design.png (copy of design4).
+
+### break_room — design reviewer round (master)
+Blind design reviewer: zero defects on both checklists (integrity + design bar) across nine crops and
+six zooms; briefed zones all present and nameable; TV-vs-table user flag confirmed fixed; walkways and
+door approaches clear. Taste-only observations logged, no action: second open "staff lunch fridge"
+floats between the vending bank and the board (nameable but zone-less); the counter run's microwave
+segment sits 2px low at 9x; one flyer dangles into the baseboard margin; dining set seats only two;
+lone box slightly apart from the corner stack. VERDICT: PASS.
+
+## lab — design pass (2026-08-26)
+
+Brief: bench ROWS with a workflow (specimen in → bench work → sink/autoclave out), microscope
+station as focal point, fridge/storage against walls; user-flagged "the desk doesn't make sense,
+or the tables — kind of bizarre". Root cause found: the old 5x2 benches were two butted rows of
+22px kitchen-cabinet FRONTS (counter.kw.*) — no visible work surface, bottles perched on the seam.
+Result — the zone story reads: **microscope corner top-left** (hero + researcher + fern),
+**chemistry wall top-center** (fume-hood glass cabinets + results board), **analyzer bay
+top-right** (centrifuge drum + NEW readout analyzer), **bench hall center** (two clean parallel
+8-tile runs of front-facing blue-top lab tables, aisle rows 6-7 door-to-door, tech behind the
+north run with his chair, Marcus at the south run with a stool, both zone pickups ON bench tops),
+**specimen intake bottom-left** (glass fridge on the west wall + courier + sample rack on the
+bottom wall + PHI binders display stand), **wash line bottom-right along the bottom wall**
+(sink → eyewash → autoclave → trash bin → box stack, wet-floor mat at the sink), **chemicals
+wall east below the door** (bio glass cabinet + two stacked meds shelves — the old door-flanking
+orphan shelves joined this storage wall).
+
+### New atlas frames (manifest + slice; cut-audit flags are packed-neighbour touches only)
+
+- prop.table.lab.a / prop.table.lab.b — hospital#224/#226, the front-facing blue-top lab work
+  tables (60x40, left-cap/right-cap pair; a+b butt seamlessly into one 4-tile counter).
+- prop.analyzer.a — hospital#117, floor analyzer with orange readout; replaces the autoclave
+  single inside the centrifuge composite (the same autoclave art now stands in the wash line —
+  one identity per object).
+
+### Obstacle moves (roomData.json, lab only)
+
+- lab_bench (3,5) 5x2 → (6,5) 8x1 and lab_bench (12,5) 5x2 → (6,8) 8x1 — two aligned parallel
+  runs (each four tables: a,b,a,b at dx 8/68/128/188) replacing the side-by-side cabinet slabs
+- ADDED chair (7,4) 1x1 (stool.tan override) — tech's chair behind the north bench
+- ADDED chair (12,9) 1x1 (stool.yellow override) — stool tucked at the south bench's east end
+- specimen_fridge (2,10) → (1,9) — off mid-floor, flush against the west wall (intake corner)
+- sample_rack (11,10) → (2,13) — joins the intake corner on the bottom wall
+- sink_station (7,10) → (12,13), eyewash_station (9,10) → (14,13), autoclave (13,10) → (15,13) —
+  the free-standing mid-floor station row becomes a wash line on the bottom wall, eyewash beside
+  the sink, sink → autoclave workflow
+- trash_can (1,13) → (17,13) — waste bin at the wash line's end (bins live by sinks)
+- bio_cabinet (16,10) → (17,8) — against the east wall below the door
+- chemical_shelf (1,8) → (18,10) and (18,8) → (18,11) — the two lone door-flanking wall shelves
+  stack under the bio cabinet as one supplies column (second gets the .b single so it doesn't
+  tile); beaker-bubble ambience anchors to the obstacles and followed automatically
+- plant (1,4), box (18,13), microscope_station (2,2), fume_hood (5,2), results_board (8,1),
+  centrifuge (15,2) unmoved (centrifuge art recomposed in place)
+
+### NPC / zone / item moves (positions only, text untouched)
+
+- lab_tech (5,7) → (8,4) — works BEHIND the north bench facing the room (shopkeeper composition;
+  feet correctly hidden by the table edge), his chair beside him at (7,4)
+- marcus_lab_aide (14,7) → (8,9) — at the south bench's front beside the sample_labels zone (his
+  encounter is about sample labels), stool at (12,9)
+- courier (16,4) → (3,9) — from under the centrifuge to the specimen fridge (the "specimen in"
+  end; his fidget follows via NPC lookup)
+- researcher (3,4) unmoved (already at the microscope)
+- sample_labels zone (4,7) → (7,9) — icon (clipboard.orange, dy -48) lies ON the south bench top
+- results_printout zone (15,7) → (10,6) — icon (papers.a, dx -16 dy -48) lies ON the north bench
+  top, straddling the run's mid-joint (the paper stack doubles as the joint cover)
+- phi_identifiers item (2,8) → (4,11) — binders (dy -20) rest on the display stand in the intake
+  corner ((2,8) would have hidden behind the moved fridge's top)
+
+### artCatalog.ts (lab)
+
+- LAB_BENCH_5x2 (10 kw cabinet parts) → LAB_BENCH_8x1 (4 lab tables); kw frames stay (ER/records
+  still use them)
+- centrifuge = scanner.ct + analyzer.a (was scanner.ct + autoclave)
+- lab overrides: chair@7,4 stool.tan, chair@12,9 stool.yellow, chemical_shelf@18,11 narrow.meds.b
+- Decor rebuilt: bench-top clutter sparse + deliberate (bottles.a on north table 1 dx 8 — dx 0
+  overhung the rounded corner; clipboard.sky north table 4; bottles.c straddling the south run's
+  mid-joint; papers.a south table 4; bottles.lab.b no longer placed), display stand (2,8) →
+  (4,11), NEW wet-floor mat.gray at (13,12) by the sink; wall decor and door mats untouched
+- roomAmbience: no edits — eyepiece glow anchors to the unmoved microscope; bubbles compute from
+  chemical_shelf obstacles; fidgets follow NPCs (verified in captures)
+
+### Tests
+
+- tests/art-substrate-proof.spec.ts: lab depth-trio pin specimen_fridge (2,10)→(1,9): behind
+  (1,8) / beside (3,10) / front (1,11). ART_ROOM=lab run: 4/4 pass (atlas, depth, doors,
+  lighting). npx tsc -p . clean; every capture console-clean.
+
+### Chose NOT to do
+
+- No continuous 8-tile bench top: the pack has no middle table single (224/226 are caps), so each
+  run is two butted 4-tile counters; both mid-joints are covered by straddling clutter/pickup and
+  the butted-pair read is honest lab furniture. Flagged for the reviewer.
+- Left the east-center floor (x14-16, rows 4-6 and 9-12) open — it is the door corridor junction
+  and the analyzer/wash-line approach; wear pools keep it from reading untextured.
+- Did not re-identify the fume hood (glass wall cabinets) — accepted identity from the clean pass.
+- papers.a appears as south-bench decor AND as the results icon on the north bench — different
+  benches, 5 tiles apart; kept for the "paperwork everywhere" fiction.
+- Pre-existing faint vertical ambient-light seam at world x~256 (present in design0 before this
+  pass, all rooms' whitetile lighting) — untouched, out of scope.
+
+### Verification
+
+Sweep 1 (design1, 9 crops + 5 zooms): 4 defects — bottles.a overhanging the north run's west
+corner; both mid-run joints reading as accidental gaps; results icon + tech stacking into a
+muddle at (8,5); phi binders 2px shy of the stand tray. All fixed (clutter shifts, zone move to
+(10,6), dy -20). Sweep 2 (design3, 9 crops): clean. Sweep 3 (design4, fresh capture, 9 crops):
+clean. Two consecutive clean sweeps. False alarms cleared: the red-white flask by the tech is
+npcLife's transient 'chart' fidget icon; the "gray diamond" over the south bench is bottles.c's
+top peeking over the table's back edge; NPC quest markers overlap bench fronts while wandering
+(markers follow NPCs). Final: screenshots/art-substrate/lab-design.png (copy of design4).
+
+### lab — design reviewer round + master fixes (2026-08-27)
+
+Blind design reviewer: **FAIL**, 7 findings (4 integrity, 3 design); zone story, workflow, doors,
+NPC posts and bench rows all praised. Dispositions (all master-fixed, verified at 4x + room proof
+4/4 green):
+1. "Wall texture seam at x8" = the fume hood's flat glass slab ending against ribbed wall — the
+   junction sliver (hood edge x256 → chalkboard art x~277) now carries a first-aid box, so the
+   edge reads as furniture-next-to-wall-fixture, not a material seam.
+2+3. White smears under both bench-run mid joints = the butted table caps' rounded inner corners
+   leaving a pale notch below the tabletop. A blue stool is now tucked at each joint front
+   (decor, depthRow = bench row) covering the notch — and giving the runs their seats.
+4+5. "Documents floating on a chair back" = the 40px binder fan overhanging the 22px white tray
+   stand (which itself read as an office chair). Swapped to the 32px wood nightstand pedestal;
+   binders dy -30 seats the whole fan on its top face. Nameable now: the PHI-binders display.
+6. "Orphan yellow basket" = `prop.stool.yellow` (reads as wicker basket) at (12,9), detached from
+   the bench edge. Deleted (obstacle + override); the tucked joint stools seat Marcus's run.
+7. "No stools at the benches" — satisfied by the two tucked joint stools + the tan stool behind
+   the north run.
+Files: artCatalog.ts (decor stools/pedestal/firstaid, phi dy, override removal), roomData.json
+(chair@12,9 obstacle deleted). tsc clean, captures console-clean.
+lab VERDICT after fixes: PASS (master-verified at 4x on all seven find sites).
+
+## it_office — design pass (2026-08-27)
+
+Brief: keep the reviewed-good server wall; make the floor read as desk PODS; GERALD's
+printer corner stays a corner; keep the dark-room sight lines to the THREATS console
+(label untouched). User flags addressed: "furniture placement is sparse and kind of
+bizarre" and "the desks/countertops look cut off" — root cause of the second found:
+`workstation_cluster` butted console.blue.l+r, the two END CAPS of the 4-tile studio
+console with its whole middle missing (a blank slab), and the monitoring desk's white
+top carried nothing but two strays. Result — the zone story: **server wall top**
+(4 rack banks + camera + warning sign + underfloor cable runs, untouched), **center
+spine** (control-screens wall → safeguards chart on its stand → analyst BEHIND the big
+blue console at his own live monitor → orange password note on the console front → open
+aisle straight down to the spawn), **operator bullpen rows 8-9** (two matched curved
+desk pods flanking the aisle, each with live monitor + tucked office chair: vendor
+standing at the west "guest" pod beside the unsigned-agreements stand, GERALD at the
+east pod with his coffee, the fax stand at its side), **response row 11** (rolling
+chalkboard | 2-tile aisle mouth | THREATS terminal + wood response desk with the breach
+playbook binders, all beside the spawn), **print corner SE** (glass desk + copier,
+locked cabinet + keypad, crate + bin — unchanged geometry), **west service edge**
+(water cooler on the wall, plant + spare crates in the SW corner).
+
+### New atlas frames (manifest + slice; cut-audit does not flag either)
+
+- prop.console.curve.blue — tvstudio [4,272,88,44], deliberate union of singles
+  #54+#55+#59 (left wing + center + right wing butt on the sheet): the complete curved
+  control desk. Replaces the cap-butt for workstation_cluster; console.blue.l/r frames
+  stay registered (unused, harmless).
+- prop.tower.mini.blue — tvstudio [232,274,16,20] single #74 (mini PC tower).
+
+### PROP_DEFAULTS (both types exist only in it_office)
+
+- monitoring_desk: console.blue.4 + anim.monitor part at dx 64 dy -24 — a live screen
+  planted on the desk top at col 10, directly in front of the analyst; its bottom
+  bridges the floor strip between his feet (row 4) and the desk art's back edge.
+- workstation_cluster: prop.console.curve.blue (dx 4 on the new 3x1 footprint) +
+  anim.monitor at dx 32 dy -24 crowning the curve's center.
+
+### Obstacle moves (roomData.json, it_office only)
+
+- workstation_cluster (2,8) 2x1 → (2,8) 3x1 — curve art needs 3 tiles; west pod
+- workstation_cluster (16,8) 2x1 → (15,8) 3x1 — east pod, mirrored about the aisle
+- chair (1,8) → (3,9) — gray office chair tucked at the west pod's front-center
+  (was stranded against the wall below the door, reading as a gray bin)
+- chair (18,8) → (16,9) — sky office chair tucked at the east pod's front-center
+- whiteboard_wall (2,10) 3x1 → (6,11) 2x1 — joins the response row as its briefing
+  board facing the spawn; footprint 3→2 because the art is 56px (the 3-tile rect
+  carried ~20px of invisible collision each side)
+- table (7,12) → (12,11) — the wood desk butts the THREATS terminal: response desk
+- ADDED box (2,13) 1x1 (boxes.tall) — spare-hardware crates; SW corner set w/ plant
+- ADDED water_cooler (1,10) 1x1 — west wall service fixture by the bullpen
+- unchanged: server racks, cable trays, monitor banks, monitoring desk footprint,
+  coffee_mug (7,6), headphones (12,6), printer_station, defense_console (11,11),
+  locked_cabinet, plant, trash, box (18,12)
+
+### NPC / zone moves (positions only, text untouched)
+
+- security_analyst (10,7) → (10,4) — mans the console from BEHIND (shopkeeper
+  composition); his desk monitor fronts him, and he now can't see the password note
+  stuck on the public side of his own console. Reachable at (10,3)/(9,4)/(11,4).
+- vendor (3,9) → (4,9) — stands at the guest pod's east wing, agreement stand beside
+- workaround_employee (15,9 ← 16,9) — GERALD stands between his pod and his beloved
+  print corner, fax stand at his other side
+- breach_playbook zone (7,11) → (12,12) — the playbook moved with its desk; icon
+  dy -48 dx 6 seats the binder fan on the desk top (at -38 it slid off the front edge)
+- unchanged: password_note (9,7), fax_machine (14,9), vendor_agreement (5,9),
+  security_safeguards item (10,2)
+
+### artCatalog.ts (it_office)
+
+- Overrides re-keyed: chair@3,9 (gray) / chair@16,9 (sky), both dy -12 (seat backs
+  tuck over the pods' base bands).
+- Decor: papers.a (10,6)→(8,6) (frees col 10 for the desk monitor); NEW tower.mini.blue
+  at (11,6) on the desk top; NEW mug.brown on GERALD's pod east wing (17,8) dy -26;
+  display stands at (5,9)/(14,9)/(10,2), keypad, warning sign, rails, camera, mats
+  unchanged.
+- Interactables: password_note clipboard.sky → clipboard.orange (the pale board was
+  white-on-white against the console front; the observation gate wants it noticed);
+  breach_playbook dx 6 dy -48 (see above).
+
+### roomAmbience
+
+No edits. Rack LEDs and monitor_bank glow/flash/LED anchor to obstacle rects of types
+whose positions did not change (verified on captures: LEDs on rack corners and monitor
+bezels, flash on screens). Analyst/GERALD fidgets follow their NPCs.
+
+### Tests
+
+- tests/art-substrate-proof.spec.ts: it_office depth-trio re-pinned for the board move
+  — whiteboard_wall (6,11): behind (6,10) / beside (5,11) / front (7,12).
+- ART_ROOM=it_office proof run: 4/4 pass (atlas, depth, doors, lighting).
+- npx tsc -p . clean; every capture console-clean; cut-audit: no flags on new frames.
+
+### Chose NOT to do
+
+- No board directly behind the terminal/desk (label text would sit on the dark board;
+  trio front tile would have been blocked) — the board fronts the row from the west.
+- Left rows 12-13 cols 3-9 as open dark floor — it is the spawn's breathing room and
+  the walkway to the west door, and this is the game's darkest room by design.
+- Did not remove the third+fourth anim.monitor reuse (banks + pods + desk): identical
+  synced dashboards read as a SOC's standard-issue screens, and the pack has one
+  animated control monitor.
+- Quest "!" bubbles overlap pod desk edges when NPCs stand at desks — game UI that
+  follows NPCs (depth 30+), not room art; left alone.
+- The keyboard frame's baked desk-mic (and its 1px satellite dot) kept — it is part of
+  the LimeZu single and reads as a comms mic on the monitoring desk.
+
+### Verification
+
+Sweep 1 (design1, 9 crops + 7 targeted zooms): 2 defects — password_note's pale
+clipboard camouflaged against the white console front; playbook binder fan overhanging
+the response desk's front-left corner (floating-documents fail). Both fixed (orange
+pad; dy -48 dx 6). Sweep 2 (design3, all 9 crops): clean. Sweep 3 (design4, fresh
+capture, all 9 crops): clean. Two consecutive clean sweeps on integrity + design bar.
+Final: screenshots/art-substrate/it_office-design.png (copy of design4).
+
+### it_office — design reviewer round + master fixes (2026-08-27)
+
+Blind design reviewer: **FAIL**, 2 findings; zones, pods, sight lines, overlay anchoring and NPC
+placement all praised. Dispositions (master-fixed, verified at 3-5x, ART_ROOM proof 4/4):
+1. [integrity] The pod-side "printer" (= anim.coffee machine on its gray stand, coffee_mug type)
+   floated 2-3px above the stand — part dy -7 → -4 seats its visible base on the stand top.
+2. [design] The wall-bracket chalkboard stood mid-floor at (6,11) with nothing anchoring it —
+   obstacle moved to (6,13), backed against the previously-bare south wall stretch (the reviewer's
+   own observation slot). Depth trio re-pinned from whiteboard_wall to the wood response desk
+   table@12,11 (behind (12,10) / beside (14,11) / front (12,12)) because a south-wall prop has no
+   walkable "front" tile.
+Taste notes left: pedestal stands' chair-like silhouette (worst instance fixed by #1), empty glass
+desk, [X] badge row tight against the door-side terminals.
+it_office VERDICT after fixes: PASS (master-verified).
+## er — design pass (2026-08-27)
+
+Brief: bays along the top kept; middle reads triage row → nurse island → treatment side;
+user-flagged "cut off" side-view beds replaced with the pack's front-facing vertical bed;
+equipment parks at walls or bay-side. Result — the zone story: **patient bays top-left /
+top-right** (each a coherent unit: whole vertical bed with its head against the top wall,
+IV pole at the bed's mid-length, bedside cabinet at the head, rolling curtain closing the
+bay toward center; vitals monitor at (18,2) beside the right bed), **status wall top-center**
+(EMERGENCY panel + patient status board zone on its stand between the bays, info screens
+re-hung over the two curtains), **nurse island center** (untouched 6-part composite, patrol
+nurse behind it, the logged-in computer stand now butted to its west flank), **triage row
+west** (white counter at (3,8) near the door: cap / drawers+clipboard / counter+red hotline
+phone / end piece; the doctor posted BEHIND it, officer and frantic family queued at its
+front — the mid-room trio now has a place), **treatment side east** (surgical robot beside
+the vitals-stand + blue exam table pod at rows 8-9; crash cart parked flush at the east wall
+above it), **waiting south** (new wood bench against the bottom wall west of the spawn),
+**stretcher parking SW** (white exam table + pole flush to the bottom wall, bin beside),
+**equipment corner SE** (exceptions chart on its stand, Priya's post beside it, wheelchair +
+IV pole parked in the corner). West door approach and spawn kept clear.
+
+### Obstacle moves (roomData.json, er only)
+
+- patient_bay (2,2) 4x3 → (1,2) 3x2 — vertical-bed bay hugs the west wall (footprint tracks
+  the new art)
+- patient_bay (14,2) 4x3 → (15,2) 3x2 — mirrored bay, bed against the east end
+- curtain_partition (6,2) → (4,2) — closes the narrowed left bay
+- curtain_partition (13,2) → (14,2) — closes the right bay
+- vital_monitor (18,4) → (18,2) — the monitor joins the right bay at the bed's head
+- triage_desk (8,9) → (3,8) — the triage counter meets arrivals from the west door
+- gurney (2,9) → (2,12) — ready-stretcher parks flush along the bottom wall
+- gurney (15,9) → (15,8) — treatment pod (monitor stand + blue exam table) anchors the east side
+- equipment (5,11) → (13,8) — the surgical robot works beside the treatment table (was adrift
+  mid-south)
+- crash_cart (13,11) → (17,6) — parked flush at the east wall between bays and pod
+- iv_stand (1,10) DELETED — lone pole on the door corridor read as an orphan; poles remain in
+  both bays, on the parked stretcher, and at (18,12)
+- ADDED bench (6,13) 2x1 (prop.bench.wood.tan default) — waiting bench for the triage row,
+  anchors the previously bare bottom-wall stretch (hallway-proven pattern)
+- unchanged: nurse_station (8,4), trash_can (1,13), iv_stand (18,12), wheelchair (18,13)
+
+### NPC / zone / item moves (positions only, text untouched)
+
+- dr_martinez (9,8) → (4,7) — posted behind the triage desk (shopkeeper composition; his
+  radius-3 "rushes" orbit the desk)
+- officer (7,8) → (4,9) — demands records at the desk front
+- frantic_family (12,8) → (6,9) — pressures the desk's other end
+- priya_privacy_officer (12,11) → (15,12) — her incident-triage post beside the exceptions
+  stand in the SE corner. NOTE: Priya has minAct 3 — she does not render in qa captures
+  (act 1); verified pre-existing (absent in er-clean.png at (12,11) too)
+- unlocked_computer zone (6,6) → (7,6) — the logged-in workstation butts the nurse island's
+  west face (stand decor moved with it, same icon anchors)
+- emergency_exceptions item (17,11) → (16,12) — the chart stand joins the SE corner group
+  (same depthRow-4 stand trick, same icon dy)
+- whiteboard zone (10,2) unchanged (stand at (10,3), proven clear of the EMERGENCY panel)
+
+### artCatalog.ts (er)
+
+- PROP_DEFAULTS.patient_bay rebuilt: prop.bed.blue (hospital#178, the whole 38x78 vertical
+  bed) + ivpole.single dx44 dy-20 + bedside.white dx62 dy-40 — head-line tops ~y50 against
+  the wall (vending-machine overlap convention). Side-view bed.side.* frames stay registered
+  (unused by er now).
+- er overrides: patient_bay@15,2 mirrored (bedside.wood dx10 / pole dx38 / bed dx56 — 2px
+  clear of the monitor at (18,2)); curtain re-keyed @14,2 (tan flipX); gurney re-keyed @15,8;
+  NEW equipment@13,8 dx-6 (6px gap to the pod monitor); NEW crash_cart@17,6 parts dx -6/32
+  (4px clear of the east wall column); NEW triage_desk explicit run [kw.plain, kw.drawers,
+  kw.plain2, kw.end] — the position hash at (3,8) picked kw.doors twice, whose X door-braces
+  read as packing crates.
+- Decor: both anim.hscreen re-hung over the curtains (tx 3→4, tx 15→13; visible art y14..47
+  clears the bay head-line); sign.cross tx 5.5→6 (clear of screen and title);
+  prop.whiteboard wall board DELETED (bays + right screen claim the face; the status-board
+  zone carries the identity); clipboard.navy → (4,8), phone.red → (5,8) dx0 (on the counter
+  proper — on the end cap the 32px phone dwarfed and overhung the little leg piece);
+  display stands (6,6)→(7,6) and (17,11)→(16,12) (depthRow 4 kept); (10,3) stand unchanged.
+- ROOM_INTERACTABLE_ART.er unchanged (same stand-relative anchors).
+
+### roomAmbience
+
+No edits. Nurse patrol (x8-11, y4) intersects nothing new — the island is untouched; the
+EMERGENCY panel, officer/family fidgets and monitor beep all follow. Verified on captures.
+
+### Tests
+
+- tests/art-substrate-proof.spec.ts: er depth trio re-pinned crash_cart (13,11)→(17,6):
+  behind (17,5) / beside (16,6) west (east neighbour is the wall) / front (17,7).
+- ART_ROOM=er proof run: 4/4 pass (atlas, depth, doors, lighting). npx tsc -p . clean;
+  every capture console-clean.
+
+### Chose NOT to do
+
+- No second bed color: hospital#178 is the pack's only vertical hospital bed — two identical
+  blue beds read as a standardized matched pair; bedside variety (white left / wood right)
+  differentiates the bays.
+- Left rows 9-11 west open — it is the door corridor and the triage queue floor; wear pools
+  keep it textured (lab/it_office precedent).
+- Did not seat the robot flush against the pod monitor (dx tuned to a 6px gap) — full butt
+  merged their silhouettes at 1x.
+- Phone stays chunky (32px art) — proven "ER hotline" scale from the clean pass, now
+  anchored fully on the counter.
+- vital_monitor's screen top sits under the HUD in captures (18,2 corner) — HUD occlusion is
+  expected per protocol; the art is whole and registered.
+
+### Verification
+
+Sweep 1 (design1, 9 crops + 6 targeted zooms): 2 defects — triage-desk hash mids read as
+X-braced crates; phone dwarfing/overhanging the end cap — plus the bench addition judged
+against design bar 2 (bare south wall). All fixed (explicit desk run, phone tx5, bench).
+Sweep 2 (design3, fresh, all 9 crops): clean. Sweep 3 (design4, fresh, all 9 crops): clean —
+two consecutive clean sweeps on integrity + design bar.
+Final: screenshots/art-substrate/er-design.png (copy of design4).
+
+### er — design reviewer round (master)
+Blind design reviewer: zero defects on both checklists across nine crops + nine zooms — outright
+PASS. Every briefed zone named on sight (bays with whole vertical beds, status axis, nurse island,
+triage row at the door with the queue, treatment side, stretcher/linen SW, bench, SE corner).
+Taste-only observations logged, no action: triage row is a four-material patchwork with a 1px floor
+sliver at one junction; status monitor reads near-orphan until the EMERGENCY axis registers; SE
+pickup chair is the weakest "why there"; the reused pole prop lacks a hook/bag at zoom; south-center
+open plain (defensible as gurney corridor + spawn circulation). VERDICT: PASS.
+
+## hospital_entrance — design pass (2026-08-27)
+
+Brief: arrival flow (mat → clear aisle → reception desk), waiting rows facing the desk/TV wall,
+kiosk near the flow, plants/coffee anchoring corners; first thing a player ever sees. Root problem
+found: the U-shaped reception counter sat inside the wall band with its baked workstation (monitor +
+chair pocket) EMPTY while both staff NPCs stood on the public side reading as queueing visitors; the
+coffee cart was a collisionless ambience sprite floating mid-floor at (5,5); side tables floated
+diagonally off the seat columns; sanitizer stood mid-floor; the wheelchair read as an extra seat
+inside the east column. Result — the zone story: **reception axis top-center** (free-standing U
+counter at (7,3) with a walkable staff corridor behind it; Riley and Aiyana stand INSIDE the
+transparent pocket on the desk's own footprint tiles — heads over the back counter, front counter
+closing in front of their feet; window daylight above; desk phone on the right counter section),
+**waiting west** (tan pairs rows 8/10 + row-end table at (4,8), plant between rows at the wall,
+magazine rack anchoring SW, water cooler on the west wall), **waiting east** (mirrored blue pairs +
+row-end table with a left-behind mug, plant between rows at the east wall), **info corner NE**
+(kiosk + brochure display + fern, kiosk top-aligned with the desk on the same furniture line),
+**entrance threshold south** (sanitizer stand snug at the mat's left edge, spawn on the mat,
+wheelchair parked right of the mat, waste/recycling bin pair outboard), **coffee corner SE** (the
+cart rebuilt as a real obstacle: wood table + espresso machine + steam), corners: NW plant, NE fern,
+SW rack, SE cart. Center rows 5-10 stay open as the arrival plaza (the brief's "wide open" axis).
+
+### Obstacle moves (roomData.json, hospital_entrance only)
+
+- desk (7,2) 6x2 → (7,3) 6x2 — off the wall band; creates the row-2 staff corridor and puts the
+  U pocket on walkable-adjacent tiles (shopkeeper composition, lab/ER/IT precedent)
+- table (4,9) → (4,8) — west side table aligns with the top pair's row (was floating diagonally)
+- table (15,9) → (15,8) — east mirror of the same fix
+- ADDED table (17,12) 2x1 — the coffee cart as a real y-sorted obstacle in the SE corner
+  (instance override draws wood table + espresso machine; replaces the roomAmbience sprites)
+- plant (18,11) → (18,9) — east wall between the blue pairs (mirror of the west plant at (1,9))
+- wheelchair (18,9) → (13,11) — parked at the entrance threshold right of the mat (dx -6 kept:
+  clears the green bin by 3px)
+- umbrella_stand [green bin] (13,11) → (14,11), trash_can [blue bin] (14,11) → (15,11) — bins
+  shift outboard to make room for the wheelchair; the pair stays together
+- hand_sanitizer (6,11) → (8,11) — sanitize-on-entry station snug against the mat's left edge
+  (was mid-floor 3 cols away)
+- ADDED water_cooler (1,6) 1x1 — west wall service fixture between corner plant and waiting
+  column (it_office's (1,10) pattern); fills the bare 6-tile west edge
+
+### NPC moves (positions only, text untouched)
+
+- riley_entrance (10,4) → (10,3) — INSIDE the desk pocket at the baked monitor (her scene is a
+  phone call at the desk; the desk phone sits one tile right). On the desk's own footprint tile;
+  reachable at (10,2) — proven via QA-bridge probe (nearbyInteractable = riley_entrance)
+- aiyana_intake (8,4) → (8,3) — the pocket's left station (intake side). Reachable at (8,2),
+  proven the same way. Zones/items unmoved: welcome_board (2,2), hipaa_brochure (16,5) — both
+  re-proven reachable
+
+### artCatalog.ts (hospital_entrance)
+
+- desk override parts get explicit depths: U slab depthRow 3 (ties with pocket NPCs at row 3 —
+  NPCs are created later, so they win and draw over the back counter's lip; the player behind
+  the desk at row 2 is correctly covered), front slab depthRow 4 (closes the pocket in front)
+- NEW 'table@17,12' override: desk.k.wood + coffeemaker.b (dx 17, dy -12) + shadow — the cart
+- 'plant@18,11' key → 'plant@18,9' (follows the plant); STALE 'plant@1,10' key deleted (dead
+  since the clean-pass reviewer moved that plant to (1,9); the shipped look was the default
+  orange.s fallback, now the explicit state)
+- Decor: NEW window.gray.3 at tx 8.9 dy 14 (daylight over the now-freestanding desk — the move
+  exposed bare wall; "sunlight spills through the glass doors" is the room's own text);
+  phone.gray (8,1) → (11,2) dy -6 (the right counter section, beside Riley);
+  chair.office.sky decor DELETED (fully visible in the pocket it read as a water-cooler jug);
+  clipboard.plain DELETED and papers.a NOT re-added — every intake-forms placement near Aiyana
+  (back counter, front ledge) merged with her boots or her transient chart-fidget icons into a
+  machine-looking blob, and papers on the tiny round tables is the documented clean-pass trap;
+  NEW mug.blue on the east table (15,8) dy -12 (left-behind coffee, pairs with the SE cart);
+  brochure display table (16,5), door mat, wall items otherwise untouched
+
+### roomAmbience.ts (lobby)
+
+- Coffee-cart block: the three collisionless sprites (shadow ellipse + wood table + machine at
+  (5,5), drawn at fixed depth 3 under everything) DELETED; the steam puff re-anchored to the new
+  'table@17,12' obstacle (computed from the obstacle rect: machine top = footprint bottom − 12 −
+  36). Riley sway, chatter, door whoosh untouched.
+
+### Tests
+
+- Depth-trio pin info_kiosk@16,3 UNCHANGED (kiosk deliberately kept at (16,3): its top row now
+  aligns with the desk on one furniture line, and behind/beside/front tiles stay walkable).
+- ART_ROOM=hospital_entrance proof run: 4/4 pass (atlas, depth, doors, lighting).
+- npx tsc -p . clean; every capture console-clean.
+- Interaction probe (QA bridge teleports): riley_entrance from (10,2), aiyana_intake from (8,2),
+  welcome_board from (2,3), hipaa_brochure from (16,6) all prompt; desk front (10,5) correctly
+  none — the player rounds the counter, entering via the open row-2 corridor on either side.
+
+### Chose NOT to do
+
+- No NPC left on the desk's public side: Riley's dialogue ("I'm on the phone with a patient's
+  employer") and the sticky note "see Riley at the front desk" pin both staff to the desk; the
+  U single's own baked pocket is LimeZu's intended staff position and the interaction radius
+  (Manhattan ≤ 1) is satisfied through the back corridor.
+- No desk-top paper clutter (see above — three placements tried, all read as debris/machines).
+- Waiting-column side tables NOT placed between pair rows: at (2,9)/(17,9) the table+decor
+  stacked into the chair backrests behind them and read as one confused appliance tower
+  (verified in pixels, reverted same round); row-end placement keeps every silhouette whole.
+- Wall band (two note boards + zone-icon TV + tv.wall + clock left, landscape/sanitizer/arrow
+  right) left as the clean pass fixed it, except the added window over the exposed desk stretch.
+- Center rows 5-10 left open on purpose — mat → desk arrival axis plus circulation between both
+  waiting columns and the east door (wear pools + light pools texture it; ER/lab precedent).
+
+### Verification
+
+Sweep 1 (design1, 9 crops + 4 zooms): 4 defects — papers-on-table read as a gray machine at
+(2,9) (the documented trap, recreated); table+mug merged with chair backrests at (17,9); pocket
+chair decor read as a water jug; papers on the back counter collided with Aiyana's fidget zone.
+All fixed (tables to row ends, chair + papers deleted). Sweep 2 (design2 → papers moved to the
+front ledge, still muddy at Aiyana's feet — deleted). Sweep 3 (design3, fresh, all 9 crops):
+clean on integrity + design bar. Sweep 4 (design4, fresh, all 9 crops): clean — two consecutive
+clean sweeps. Final: screenshots/art-substrate/hospital_entrance-design.png (copy of design4).
+
+### hospital_entrance — design reviewer round + master fixes (2026-08-27)
+
+Blind design reviewer: **FAIL**, 4 findings; the desk-pocket staffing, arrival flow, waiting rows
+and corner anchoring all praised ("near-pass; the design story is genuinely good"). Dispositions
+(master-fixed, verified at 3x, ART_ROOM proof 4/4):
+1. Clock rode the cap band — decor dy 8→16.
+2. Wall board trio hung at three heights — bulletin_board dy -6→-18, welcome_board icon dy
+   -36→-48: all three tops now level at y14, bottoms clear of the wood rail.
+3. "Printer on bare floor" beside the kiosk = prop.table.small.white again (lab read it as an
+   office chair; here a fax) — swapped to the nightstand pedestal, brochure clipboard dy -12→-30
+   seated on its top.
+4. The sanitizer trinket at the mat flank (dispenser-on-stand composite reading as a wall
+   thermometer + cylinders) — obstacle deleted; the top-wall sanitizer covers the identity.
+Taste notes left: rows face the entrance (no TV wall exists), fountain-table mushy at 1x, board
+uniformity, oversized reception phone.
+hospital_entrance VERDICT after fixes: PASS (master-verified).
+
+## reception — design pass (2026-08-29)
+
+Brief: the queue — door → counter, waiting chairs in tidy facing rows, GERALD's copier corner
+as the office nook; Riley works the desk (sign-in + privacy-notice zones ON the counter). Root
+problem found: the wood U counter sat flush against the wall band with Riley standing on the
+PUBLIC side (reading as a queueing visitor at her own desk), the zone icons floated on the
+front panel / floor corner, and the room's loose props (round table, IV pole, wheelchair,
+nervous patient) drifted mid-floor. Result — the zone story: **office nook NW** (plant +
+GERALD the copier + white lockers, bin at the counter's end), **patient-rights display W**
+(chart on the wood nightstand pedestal at (2,4), fern below), **reception axis top-center**
+(free-standing wood U counter at (7,3) with a walkable staff corridor behind it; Riley INSIDE
+the transparent pocket — heads over the back ledge, front panel closing over her feet
+(lobby-PASSed pattern, same counter model); sign-in clipboard and privacy-notice placard ON
+the front counter flanking her; window daylight above (same exterior wall as the lobby's);
+clipboard + mug clutter on the wing tops), **queue mouth** (tan runner at the counter's foot,
+stanchion pair flanking it as the rope funnel), **staff wall NE** (teal lockers + parked IV
+pole + plant), **waiting west** (two yellow pairs + round side table at the row end + nervous
+patient pacing between the rows + wheelchair parked flush beside the row-10 pair as the
+accessible seat), **reading corner SW** (magazine rack + new wood bench), **waiting east**
+(two green pairs + chatty visitor gossiping at the water cooler + toy chest corner + plant
+(14,13) breaking the bottom run), spawn landing kept clear.
+
+### New atlas frames (manifest + slice; alpha-scanned split, recomposes pixel-exact)
+
+- prop.counter.reception.wood re-rected [128,14,192,78] → [128,14,192,50] (top slab: wings +
+  back ledge + monitors + pocket; source rows 0-49)
+- NEW prop.counter.reception.wood.front [160,64,128,28] (front modesty panel, source rows
+  50-77 — no pixels exist outside the x32-159 inset in those rows; same split geometry as the
+  white lobby counter)
+
+### PROP_DEFAULTS
+
+- desk → two-part composite: top slab dy -28 depthRow 3, front panel dx 32 depthRow 4 (only
+  reception uses the default; the lobby keeps its white override). Riley (row 3, created
+  later) wins the tie with the top slab and the front panel covers her feet — shopkeeper
+  sandwich, lobby-proven. Reception's redundant `desk` override removed.
+
+### Obstacle moves (roomData.json, reception only)
+
+- desk (7,2) → (7,3) — off the wall band; opens the row-2 staff corridor (east entry via
+  (13,2)/(14,2)) and puts the U pocket on walkable-adjacent tiles
+- tissue_box [round side table] (5,11) → (4,8) — orphan mid-floor → west row-end table
+  (lobby's exact (4,8) pattern)
+- wheelchair (1,10 ← 1,11) — aligned flush beside the row-10 yellow pair: the accessible
+  seat at the row's end (was floating between rows and rack)
+- iv_stand (17,4) → (17,2) — orphan mid-floor → parked at the top wall between the teal
+  lockers and the NE plant (staff equipment staged by the lockers)
+- ADDED bench (3,13) 2x1 (prop.bench.wood.tan default) — reading corner with the magazine
+  rack; anchors the bare SW bottom wall (first placed (4,13), moved 1 tile to butt the rack
+  group after sweep 1)
+- ADDED plant (14,13) 1x1 (orange.s default) — breaks the bare bottom-wall run east of the
+  spawn
+- unchanged: trash_can (6,3) — with the desk at (7,3) it now reads as the bin at the
+  counter's end (its depth-trio tiles (6,2)/(5,3)/(6,4) all stay walkable); stanchions
+  (6,5)/(13,5) — the desk coming down turns them into the queue funnel at the counter's
+  corners; chairs, lockers, copier, rack, cooler, toy chest, plants (1,2)/(18,2)/(1,5)
+
+### NPC / zone / item moves (positions only, text untouched)
+
+- riley (10,4) → (10,3) — INSIDE the desk pocket (her sprite is desk-bound, never wanders);
+  reachable from the corridor at (10,2), QA-probed (nearbyInteractable = riley)
+- nervous_patient (5,9) → (3,9) — paces between the west waiting rows in front of his seat
+  (first tried (4,9): the row-end table at (4,8) sat on his head-line — the totem trap);
+  wander radius 1 keeps him in the row pocket; probed reachable from (4,9)
+- chatty_visitor (14,9) → (16,11) — gossips at the water cooler in front of the row-10 green
+  pair (celebrity_crisis scene = water-cooler gossip); probed reachable from (16,12)
+- sign_in_sheet (8,4) and privacy_notice (12,4) zones UNMOVED — the desk's move puts both
+  tiles ON the counter's front row; players interact from (8,5)/(12,5) (QA-probed)
+- patient_rights_poster (2,4) UNMOVED — pedestal upgraded (below)
+
+### artCatalog.ts (reception)
+
+- Decor: chair.office.gray @ (10,2) DELETED (Riley stands in the pocket now; a collisionless
+  chair on the walkable corridor read as ghost furniture — lobby precedent);
+  papers.a DELETED (the back ledge's free span left of Riley is narrower than the tray art;
+  paper trays near a pocket NPC merged into a machine blob in the lobby review);
+  clipboard.green ty1→2 (dy -5→-3) and mug.blue ty1→2 — same relative wing-top perches on
+  the moved desk; NEW window.gray.3 wall decor tx 8.9 dy 14 (daylight over the exposed wall
+  behind the corridor, centered on the desk; lobby's window, same building face);
+  mat.tan.3x2 ty 8.5→5 (mid-floor rug related to nothing → queue runner at the counter's
+  foot, top edge abutting the front panel, centered between the stanchions);
+  display table at (2,4) prop.table.small.white → prop.table.phone.wood (the white tray
+  table is the twice-failed frame — read as office chair in lab, printer in the lobby; the
+  nightstand is the proven pedestal)
+- ROOM_INTERACTABLE_ART: sign_in_sheet dy -26→-20 and privacy_notice dy -26→-22 (icons sit
+  ON the front counter's top face, flanking Riley); patient_rights_poster dy -12→-30 (chart
+  rests on the nightstand's top face — entrance/lab anchor)
+
+### roomAmbience
+
+No edits — reception's block is interactable pulses + ambient footsteps only (no geometry
+overlays). Verified in captures.
+
+### Tests
+
+- Depth-trio pins UNCHANGED: water_dispenser (17,12) and trash_can (6,3) both unmoved, all
+  six stand tiles still walkable (stanchions deliberately kept off (6,4)).
+- ART_ROOM=reception proof run: 4/4 pass (atlas, depth, doors, lighting). npx tsc -p . clean
+  after every change; every capture console-clean.
+- Interaction probe (QA-bridge teleports): riley from (10,2), sign_in_sheet from (8,5),
+  privacy_notice from (12,5), patient_rights_poster from (2,3), nervous_patient from (4,9),
+  chatty_visitor from (16,12) — all prompt.
+
+### Chose NOT to do
+
+- Riley's head vs the baked back-ledge monitor: its top-right corner peeks ~9px over her
+  hair — pixel-compared against hospital_entrance-design.png: the PASSed lobby pocket has
+  the identical peek (same counter model, same tile). Left as the sibling-consistent look.
+- Stanchions not butted to the desk corners at (6,4)/(13,4): (6,4) is the trash trio's
+  "front" stand tile, and one row out they read as the queue funnel without merging into
+  the counter silhouette.
+- Trash bin kept at (6,3) despite the brief's "re-home?" flag — with the desk one row down
+  it reads as the counter-end bin (baseline 4px above the desk foot, 2px x-gap to the wing),
+  and moving it would re-pin the trio for no visual gain.
+- South-center rows 11-13 left open — spawn landing + three-route circulation (wear pools
+  texture it; er/lobby precedent), framed by bench/rack west and plant/cooler/toychest east.
+- NPC "!" quest bubbles drift over chair backs while their owners wander — game UI that
+  follows NPCs (depth 30+), transient, same disposition as it_office/lab.
+- Wall items (landscape.a, lightswitch, clock, sanitizer, tv.wall, notice board,
+  landscape.b) untouched except the added window — the hang line was fixed in the clean
+  pass and re-verified level in every sweep.
+
+### Verification
+
+Sweep 1 (design1, 9 crops + 8x Riley zoom + lobby-pocket comparison): 0 integrity defects;
+2 design finds — round table on the nervous patient's head-line (totem read) and the bench
+floating 3 tiles off the rack group. Both fixed (patient to (3,9), bench to (3,13)).
+Sweep 2 (design2, fresh, all 9 crops): clean on integrity + design bar. Sweep 3 (design3,
+fresh, all 9 crops): clean. Two consecutive clean sweeps. Final:
+screenshots/art-substrate/reception-design.png (copy of design3).
+
+### reception — design reviewer round + master fixes (2026-08-29)
+
+Blind design reviewer: **FAIL**, 3 findings; the queue story, rows, nook, corners and counter
+junctions all praised ("the design pass itself lands"). Dispositions (master-fixed, verified at
+3-4x, ART_ROOM proof green):
+1. Riley stood ON the counter: the wood counter's split line left the full-width tan slab in the
+   depth-tied U frame, so the later-created NPC drew over it. Split line moved up — U frame
+   [128,14,192,36] (rows 0-35), front frame [128,50,192,42] (rows 36-77, slab + panel, depthRow 4);
+   parts recomposed (U dy -42, front dx 0) pixel-exact. The slab now occludes her waist down; no
+   shadow on wood. (The lobby's white counter split was already correct and is untouched.)
+2. Clock crossed the cap trim — decor dy 8→16 (same fix as the lobby clock).
+3. Notice-board's lowest baked notes dipped into the baseboard — reception override dy -8→-14
+   (break_room keeps the shared default; fixing a first-attempt duplicate-key here too).
+Taste notes left: all chairs face south (convention), TV over the queue not the seating, intercom
+panel distance, undressed south plain (circulation).
+reception VERDICT after fixes: PASS (master-verified).
+
+## records_room — design pass (2026-08-29)
+
+Brief: LIGHT TOUCH (user's favorite room; walls reviewed-good). Tighten shelving into stacks
+with aisle logic, reading/sorting table as a station, wall untouched. Result — the zone story:
+**archive wall top** (bookcase + white drawers column + book stack flanking each side, the tan
+service counter with inbox tray / phone / outbox binders in the middle — kept as-is, judged
+already reading as symmetric stacks with display aisles at cols 4-5 / 14-15), **sorting
+station center** (clerk BEHIND his 4x2 island facing the room, sorting tray directly in front
+of him on the desk top, audit-log monitor on the west end, case binders east — and the two
+requesters of the entry gate now QUEUE at the desk: patient at the front-west corner, attorney
+waiting at the east corner, so "Two people need help. Who do you assist first?" is visible in
+one glance), **disposal corner SW** (shredder island + zone + crate stacks + debris, the CCO
+posted beside the shredder zone overseeing, document cart capping the line at (6,11)),
+**GERALD print pad south-center** (copier + whimsy sign, now with a contact shadow),
+**scanner station SE** (tan island + fax with Dr. Tovar posted at its west flank — his
+Safe Harbor data-set review belongs at the digitization station), spawn landing kept clear.
+
+### Entity moves (roomData.json, records_room; NPC positions only, text untouched)
+
+- records_clerk (10,10) → (10,7) — he stood on the PUBLIC side with his back to his own desk;
+  now works BEHIND it facing the spawn (shopkeeper composition; stationary NPC holds the mark)
+- patient_request (4,8) → (9,10) — was an orphan mid-floor on the west plain; queues at the
+  clerk desk's front-west corner (wander r1 keeps her in the pocket)
+- attorney (15,8) → (12,9) — was adrift on the east flank; waits at the desk's east corner
+  (wander r2 = he paces the desk/GERALD pocket, in character)
+- compliance_officer (8,12) → (5,12) — final boss held a mark next to the spawn; now oversees
+  the shredder zone (the disposal line reads island → zone → BOSS → cart)
+- dr_tovar (14,10) → (15,11) — floated between GERALD and scanner; posted at the scanner
+  island's west flank (encounter NPC, never wanders)
+- Obstacles, zones, items, doors, spawn: NO changes. document_cart (6,11) untouched — the
+  depth-trio pin (behind (6,10) / beside (5,11) / front (6,12)) is unchanged and all three
+  tiles stay walkable (CCO at (5,12) is adjacent, not on them).
+
+### artCatalog.ts (records_room)
+
+- ROOM_DECOR: NEW prop.papers.a at (10,8) dy -6 depthRow 9 — the sorting pile on the desk top
+  directly in front of the clerk; bridges the 20px floor strip between his feet (y256) and the
+  kt back row's top (y276), the it_office analyst-monitor trick.
+- ROOM_PROP_OVERRIDES: NEW 'printer_station@12,11' = prop.copier + shadow:true — the
+  reviewer's taste note (pale copier body faded into the beige floor). Room-scoped so
+  reception's GERALD (against its darker wall band, PASSed) is untouched.
+- The reviewer's optional "darker mat/rug under GERALD" was TRIED TWICE and reverted: a 2-tile
+  gray mat.gray pad read as two doormats flanking the machine; prop.rug.green.2x2 read as
+  furniture noise (and floor-layer fractional tx floored, off-centering it). The soft contact
+  shadow is the tasteful minimum; the GERALD sign + green screen carry the identity.
+
+### roomAmbience.ts (records block)
+
+- Attorney subpoena envelope: the static sprite + y-bob tween stayed at his SPAWN point while
+  he wandered (radius 2), reading as orphan papers on bare floor once he walked off — found in
+  the design1 capture, 1.5 tiles from his body. Replaced with a per-frame follow (position +
+  depth track the NPC sprite, bob folded into the follow; listener removed on destroy). The
+  clean-pass note "stays at his side through idle turns" only held because he had not wandered
+  yet in that capture.
+
+### Chose NOT to do
+
+- Archive stacks NOT rebuilt — checklist allowed "symmetric pairs may already suffice" and the
+  pixels agree: bookcase + drawers-column pairs and the two book-stack columns flank the
+  counter symmetrically; the cols 4-5 / 14-15 gaps read as display aisles (west one holds the
+  unlocked_cabinet display, wear pools texture both).
+- records_counter (top) left unstaffed — inbox/outbox trays + phone read as a drop-off window;
+  the room's one clerk works the sorting desk.
+- West plain (cols 2-7, rows 5-10) left open — it is the junction of west door corridor,
+  shredder approach, desk approach and cabinet-zone approach (wear + light pools texture it;
+  er/lab/reception precedent). The patient's old orphan spot was ON this plain.
+- minimum_necessary_manual (17,8) and hipaa_penalties (10,4) untouched — both already sit on
+  brown display stands (verified at 5x; the clipboard nests in the (17,8) stand's tray).
+- Attorney's chart-fidget icon occasionally doubles his carried envelope (two paper icons near
+  one NPC for ~2s) — transient npcLife fidget, same false-alarm family the lab pass cleared.
+- His home tile (12,9) leaves his shadow ellipse kissing the GERALD sign's top edge by ~2px —
+  imperceptible at 1x, judged not a defect.
+
+### Verification
+
+- Sweep 1 (design1, 9 crops + zooms): 0 integrity defects; design finds = clerk on the wrong
+  side of his desk, patient/CCO/tovar orphan posts, attorney envelope left behind on wander,
+  GERALD contrast. Fixes above (design2/3 captures judged the mat attempt and papers position;
+  mat attempts reverted).
+- Sweep 2 (design4, fresh, all 9 crops): clean on integrity + design bar. Sweep 3 (design5,
+  fresh, all 9 crops): clean. **Two consecutive clean sweeps.**
+- Interaction probe (QA-bridge teleports, 3-attempt retry for wanderers): records_clerk from
+  (10,6), patient_request from (9,11), attorney from (12,10), dr_tovar from (15,10),
+  compliance_officer from (5,13), audit_log on (7,9), shredder on (4,12), unlocked_cabinet on
+  (4,4), minimum_necessary_manual from (17,9), hipaa_penalties from (10,5) — all 10 PASS,
+  console clean.
+- ART_ROOM=records_room proof run: 4/4 pass (atlas, depth, doors, lighting). npx tsc -p .
+  clean; every capture console-clean. No manifest change, no re-slice, no pin updates.
+- Final: screenshots/art-substrate/records_room-design.png (copy of design5).
+
+### records_room — design reviewer round + master fixes (2026-08-29)
+
+Blind design reviewer: **FAIL**, 3 findings; the room story, stacks, sorting station, queue and
+corners all read ("the room's story reads well overall"). Dispositions (master-fixed, verified at
+4-5x, ART_ROOM proof 4/4):
+1. "Floating document stack" off the sorting desk's east end = the binders decor overhanging the
+   desk edge — dx -2→-14, fully on the desk top.
+2. "Fragmented machine below GERALD" = the copier's pale body in full camouflage against the beige
+   floor (only lid rails / green screen / tray visible; the contact shadow wasn't enough) —
+   obstacle moved (12,11)→(12,13) to back onto the south wall's dark band (IT-chalkboard
+   anchoring pattern); override key follows.
+3. Orphan narrow cabinet mid-floor = document_cart — moved (6,11)→(4,11), butting the shredder
+   station as the disposal line's cap; depth trio re-pinned to (4,11) (behind (4,10) / beside
+   (5,11) / front (4,12)).
+Taste notes left: blank-faced white towers, lookup terminal 1.5 tiles off the wall, boxed-in print
+corner, monitor cable overhang (intentional), operator facing (sprite tolerance).
+records_room VERDICT after fixes: PASS (master-verified). **DESIGN PASS COMPLETE — all 7 rooms.**
+
+### wrap-up finding (2026-08-30): stale test coordinates, masked by piped exit codes
+
+The progression suite's "green" runs after the design pass were false: piping through `tail`
+masked playwright's exit code, and the line reporter's ANSI rewriting hid "N failed" from the
+captured logs. Running door-unlocks alone surfaced 3 real failures (records-after-lab,
+IT-after-records, ER-after-IT): `tests/helpers/qa-helpers.ts`'s hand-maintained ROOMS coordinate
+table had gone stale for every entity the design pass moved — the exact failure class its own
+2026-07-06 comment documents. Fix: ROOMS entity positions are now DERIVED from roomData.json at
+load (requirements/door wiring stay hand-written); the table can no longer go stale on a move.
+
+### wrap-up complete (2026-08-30)
+Final suites, honestly exit-checked: art-substrate proof 53/53; progression 31 passed / 4 skipped /
+35 accounted, EXIT 0, in 7.7m (the stale coordinates had also been the slowness — the false-green
+runs took 37m). Grid: screenshots/art-substrate/grid-audit-1-vs-final.png. RUN_REPORT-11 §14 and
+auto-memory updated. Nothing committed; the §11-13 work was committed as a88f0df by the user/other
+session, so the dirty tree is the §14 set awaiting approval.

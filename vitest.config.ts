@@ -4,6 +4,7 @@ import path from 'path';
 export default defineConfig({
   test: {
     environment: 'jsdom',
+    setupFiles: ['./vitest.setup.ts'],
     globals: true,
     // Run 07 (test-harness fix): only collect real vitest files. A bare
     // `vitest run` used to pick up the 14 Playwright .spec.ts files (all

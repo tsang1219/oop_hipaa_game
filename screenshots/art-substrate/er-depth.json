@@ -1,32 +1,32 @@
 [
  {
-  "prop": "crash_cart@13@11",
+  "prop": "crash_cart@17@6",
   "playerTile": [
-   13,
-   10
+   17,
+   5
   ],
   "rel": "behind",
-  "playerDepth": 15,
-  "propDepth": 16
+  "playerDepth": 10,
+  "propDepth": 11
  },
  {
-  "prop": "crash_cart@13@11",
+  "prop": "crash_cart@17@6",
   "playerTile": [
-   15,
-   11
+   16,
+   6
   ],
   "rel": "beside",
-  "playerDepth": 16,
-  "propDepth": 16
+  "playerDepth": 11,
+  "propDepth": 11
  },
  {
-  "prop": "crash_cart@13@11",
+  "prop": "crash_cart@17@6",
   "playerTile": [
-   13,
-   12
+   17,
+   7
   ],
   "rel": "front",
-  "playerDepth": 17,
-  "propDepth": 16
+  "playerDepth": 12,
+  "propDepth": 11
  }
 ]

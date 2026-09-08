@@ -412,69 +412,64 @@ export async function loadFresh(page: Page): Promise<void> {
 
 // ── Room Data Reference ────────────────────────────────────────
 
+// Positions are DERIVED from roomData.json at load time. The table was
+// hand-refreshed twice (feel-pass 9397d61, then went stale again when the
+// Run 11 interior-design pass moved NPCs/zones/items) — stale coordinates make
+// pressSpace's closest-within-2-tiles fallback hit the WRONG interactable
+// (e.g. an old zone tile lands next to an NPC whose encounter modal then
+// blocks the whole spec). Requirements and door wiring stay hand-written:
+// they encode game logic, not geometry.
+import * as fs from 'fs';
+const _roomData: { rooms: Array<Record<string, any>> } = JSON.parse(
+  fs.readFileSync('client/src/data/roomData.json', 'utf-8'),
+);
+type TilePos = { x: number; y: number };
+function _entityPositions(roomId: string) {
+  const room = _roomData.rooms.find(r => r.id === roomId);
+  if (!room) throw new Error(`qa-helpers: room ${roomId} missing from roomData.json`);
+  const byId = (list: Array<Record<string, any>> | undefined): Record<string, TilePos> =>
+    Object.fromEntries((list ?? []).map(e => [e.id, { x: e.x, y: e.y }]));
+  return { npcs: byId(room.npcs), zones: byId(room.interactionZones), items: byId(room.educationalItems) };
+}
+
 /** All department rooms with their completion requirements and interactable positions */
 export const ROOMS = {
-  // Positions refreshed 2026-07-06 against roomData.json after the feel-pass
-  // 12-room redesign (9397d61) moved NPCs/zones — stale coordinates made
-  // pressSpace's closest-within-2-tiles fallback hit the WRONG interactable
-  // (e.g. lab results_printout's old tile now sits next to Marcus, whose
-  // encounter modal then blocks the whole spec).
   hospital_entrance: {
-    npcs: { riley_entrance: { x: 10, y: 4 } },
-    zones: { welcome_board: { x: 2, y: 2 } },
-    items: { hipaa_brochure: { x: 16, y: 5 } },
+    ..._entityPositions('hospital_entrance'),
     requirements: { npcs: ['riley_entrance'], zones: [], items: [] },
     doors: { entrance_to_reception: 'reception' },
   },
   reception: {
-    npcs: { riley: { x: 10, y: 4 }, nervous_patient: { x: 5, y: 9 }, chatty_visitor: { x: 14, y: 9 } },
-    zones: { sign_in_sheet: { x: 8, y: 4 }, privacy_notice: { x: 12, y: 4 } },
-    items: { patient_rights_poster: { x: 2, y: 4 } },
+    ..._entityPositions('reception'),
     requirements: { npcs: ['riley', 'nervous_patient'], zones: ['sign_in_sheet'], items: ['patient_rights_poster'] },
     doors: { reception_to_entrance: 'hospital_entrance', reception_to_hallway_break: 'hallway_reception_break' },
   },
   break_room: {
-    npcs: {
-      gossiping_coworker: { x: 7, y: 7 }, friend_fishing: { x: 16, y: 5 },
-      tired_employee: { x: 4, y: 12 }, hr_director: { x: 14, y: 4 }, selfie_coworker: { x: 14, y: 10 },
-    },
-    zones: { overheard_conversation: { x: 10, y: 9 }, unlocked_phone: { x: 12, y: 7 }, staff_corkboard: { x: 11, y: 2 } },
-    items: { verbal_disclosure: { x: 17, y: 4 } },
+    ..._entityPositions('break_room'),
     requirements: { npcs: ['gossiping_coworker', 'friend_fishing'], zones: ['overheard_conversation'], items: ['verbal_disclosure'] },
     doors: { break_to_hallway_reception: 'hallway_reception_break', break_to_hallway_lab: 'hallway_break_lab' },
   },
   lab: {
-    npcs: { lab_tech: { x: 5, y: 7 }, researcher: { x: 3, y: 4 }, courier: { x: 16, y: 4 } },
-    zones: { sample_labels: { x: 4, y: 7 }, results_printout: { x: 15, y: 7 } },
-    items: { phi_identifiers: { x: 2, y: 8 } },
+    ..._entityPositions('lab'),
     requirements: { npcs: ['lab_tech', 'researcher'], zones: ['results_printout'], items: ['phi_identifiers'] },
     doors: { lab_to_hallway_break: 'hallway_break_lab', lab_to_hallway_records: 'hallway_lab_records' },
   },
   records_room: {
-    npcs: {
-      records_clerk: { x: 10, y: 10 }, patient_request: { x: 4, y: 8 },
-      attorney: { x: 15, y: 8 }, compliance_officer: { x: 8, y: 12 },
-    },
-    zones: { unlocked_cabinet: { x: 4, y: 4 }, audit_log: { x: 7, y: 9 }, shredder: { x: 4, y: 12 } },
-    items: { minimum_necessary_manual: { x: 17, y: 8 }, hipaa_penalties: { x: 10, y: 4 } },
+    ..._entityPositions('records_room'),
     requirements: { npcs: ['records_clerk'], zones: ['unlocked_cabinet'], items: ['minimum_necessary_manual'] },
     doors: { records_to_hallway_lab: 'hallway_lab_records', records_to_hallway_it: 'hallway_records_it' },
   },
   it_office: {
-    npcs: { security_analyst: { x: 10, y: 7 }, vendor: { x: 3, y: 9 }, workaround_employee: { x: 16, y: 9 } },
-    zones: { password_note: { x: 9, y: 7 }, breach_playbook: { x: 7, y: 11 }, fax_machine: { x: 14, y: 9 }, vendor_agreement: { x: 5, y: 9 } },
-    items: { security_safeguards: { x: 10, y: 2 } },
+    ..._entityPositions('it_office'),
     requirements: { npcs: ['security_analyst', 'vendor'], zones: ['password_note'], items: ['security_safeguards'] },
     doors: { it_to_hallway_records: 'hallway_records_it', it_to_hallway_er: 'hallway_it_er' },
   },
   er: {
-    npcs: { dr_martinez: { x: 9, y: 8 }, officer: { x: 7, y: 8 }, frantic_family: { x: 12, y: 8 } },
-    zones: { whiteboard: { x: 10, y: 2 }, unlocked_computer: { x: 6, y: 6 } },
-    items: { emergency_exceptions: { x: 17, y: 11 } },
+    ..._entityPositions('er'),
     requirements: { npcs: ['dr_martinez', 'officer'], zones: ['whiteboard'], items: ['emergency_exceptions'] },
     doors: { er_to_hallway_it: 'hallway_it_er' },
   },
-} as const;
+};
 
 /** Hallway rooms and their door connections */
 export const HALLWAYS = {

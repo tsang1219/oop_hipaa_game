@@ -44,11 +44,17 @@ const DEPTH_CASES: Record<string, DepthCase[]> = {
   hallway_records_it: [{ prop: ['server_rack', 15, 5], at: [15, 4], rel: 'behind' }, { prop: ['server_rack', 15, 5], at: [14, 5], rel: 'beside' }, { prop: ['plant', 7, 2], at: [7, 3], rel: 'front' }],
   hallway_it_er: [{ prop: ['wheelchair', 10, 5], at: [10, 4], rel: 'behind' }, { prop: ['wheelchair', 10, 5], at: [9, 5], rel: 'beside' }, { prop: ['plant', 14, 2], at: [14, 3], rel: 'front' }],
   supply_closet: [{ prop: ['plant', 8, 6], at: [8, 5], rel: 'behind' }, { prop: ['plant', 8, 6], at: [7, 6], rel: 'beside' }, { prop: ['archive_box', 7, 2], at: [7, 3], rel: 'front' }],
-  lab: [{ prop: ['specimen_fridge', 2, 10], at: [2, 9], rel: 'behind' }, { prop: ['specimen_fridge', 2, 10], at: [4, 11], rel: 'beside' }, { prop: ['specimen_fridge', 2, 10], at: [2, 12], rel: 'front' }],
-  records_room: [{ prop: ['document_cart', 6, 11], at: [6, 10], rel: 'behind' }, { prop: ['document_cart', 6, 11], at: [5, 11], rel: 'beside' }, { prop: ['document_cart', 6, 11], at: [6, 12], rel: 'front' }],
-  it_office: [{ prop: ['whiteboard_wall', 2, 10], at: [2, 9], rel: 'behind' }, { prop: ['whiteboard_wall', 2, 10], at: [1, 10], rel: 'beside' }, { prop: ['whiteboard_wall', 2, 10], at: [3, 11], rel: 'front' }],
-  er: [{ prop: ['crash_cart', 13, 11], at: [13, 10], rel: 'behind' }, { prop: ['crash_cart', 13, 11], at: [15, 11], rel: 'beside' }, { prop: ['crash_cart', 13, 11], at: [13, 12], rel: 'front' }],
-  break_room: [{ prop: ['trash_bin', 13, 6], at: [13, 5], rel: 'behind' }, { prop: ['trash_bin', 13, 6], at: [14, 7], rel: 'beside' }, { prop: ['trash_bin', 13, 6], at: [13, 8], rel: 'front' }],
+  // design pass: the fridge hugs the west wall at (1,9) now (intake corner)
+  lab: [{ prop: ['specimen_fridge', 1, 9], at: [1, 8], rel: 'behind' }, { prop: ['specimen_fridge', 1, 9], at: [3, 10], rel: 'beside' }, { prop: ['specimen_fridge', 1, 9], at: [1, 11], rel: 'front' }],
+  // design-review fix: the cart joined the shredder line at (4,11)
+  records_room: [{ prop: ['document_cart', 4, 11], at: [4, 10], rel: 'behind' }, { prop: ['document_cart', 4, 11], at: [5, 11], rel: 'beside' }, { prop: ['document_cart', 4, 11], at: [4, 12], rel: 'front' }],
+  // design-review fix: the chalkboard moved to the south wall (6,13), where "front"
+  // has no walkable tile — the trio pins the free-standing wood response desk instead
+  it_office: [{ prop: ['table', 12, 11], at: [12, 10], rel: 'behind' }, { prop: ['table', 12, 11], at: [14, 11], rel: 'beside' }, { prop: ['table', 12, 11], at: [12, 12], rel: 'front' }],
+  // design pass: the cart parks at the east wall (17,6) — beside must sit WEST of it
+  er: [{ prop: ['crash_cart', 17, 6], at: [17, 5], rel: 'behind' }, { prop: ['crash_cart', 17, 6], at: [16, 6], rel: 'beside' }, { prop: ['crash_cart', 17, 6], at: [17, 7], rel: 'front' }],
+  // design pass: the bin moved to the vending bank's end (6,3), 1x1 now
+  break_room: [{ prop: ['trash_bin', 6, 3], at: [6, 2], rel: 'behind' }, { prop: ['trash_bin', 6, 3], at: [7, 3], rel: 'beside' }, { prop: ['trash_bin', 6, 3], at: [6, 4], rel: 'front' }],
 };
 const ROOMS = process.env.ART_ROOM ? [process.env.ART_ROOM] : Object.keys(DEPTH_CASES);
 

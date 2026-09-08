@@ -113,22 +113,17 @@ const SERVER_RACK_3: PropDef = {
 /** LimeZu counters are runs: a left end, middles, a right end (the "end" piece carries the side panel). */
 const WHITE_COUNTER_MID: AtlasFrame[] = ['prop.counter.kw.drawers', 'prop.counter.kw.doors', 'prop.counter.kw.shelf', 'prop.counter.kw.plain2'];
 const WHITE_COUNTER_ENDS: [AtlasFrame, AtlasFrame] = ['prop.counter.kw.plain', 'prop.counter.kw.end'];
-/** Double-sided 5×2 island bench. The kw counters are 22 px tall, so `fill` (one per
- *  footprint tile, bottom-anchored per row) leaves a 10 px floor sliver between the two
- *  rows — compose instead, back row butted onto the front row (dy −22). */
-const LAB_BENCH_5x2: PropDef = {
-  frame: 'prop.counter.kw.plain',
+/** One 8×1 bench run = four blue-top lab work tables (hospital#224/#226) butted edge
+ *  to edge, 8 px margin each end. The old two-row kw-cabinet composite read as a tan
+ *  kitchen dresser with no work surface (design pass, user-flagged "bizarre tables");
+ *  these singles are front-facing tables with a visible top for the bottle clutter. */
+const LAB_BENCH_8x1: PropDef = {
+  frame: 'prop.table.lab.a',
   parts: [
-    { frame: 'prop.counter.kw.plain', dx: 0, dy: -22, depthRow: 5 },
-    { frame: 'prop.counter.kw.drawers', dx: 32, dy: -22, depthRow: 5 },
-    { frame: 'prop.counter.kw.doors', dx: 64, dy: -22, depthRow: 5 },
-    { frame: 'prop.counter.kw.plain2', dx: 96, dy: -22, depthRow: 5 },
-    { frame: 'prop.counter.kw.plain', dx: 128, dy: -22, depthRow: 5 },
-    { frame: 'prop.counter.kw.plain', dx: 0, depthRow: 6 },
-    { frame: 'prop.counter.kw.doors', dx: 32, depthRow: 6 },
-    { frame: 'prop.counter.kw.drawers', dx: 64, depthRow: 6 },
-    { frame: 'prop.counter.kw.shelf', dx: 96, depthRow: 6 },
-    { frame: 'prop.counter.kw.end', dx: 128, depthRow: 6 },
+    { frame: 'prop.table.lab.a', dx: 8 },
+    { frame: 'prop.table.lab.b', dx: 68 },
+    { frame: 'prop.table.lab.a', dx: 128 },
+    { frame: 'prop.table.lab.b', dx: 188 },
   ],
 };
 /** Two waiting-room chairs side by side on a 2×1 footprint (LimeZu's chairs are 28 px wide). */
@@ -139,7 +134,22 @@ const onStand = (top: AtlasFrame, dy = -12): PropDef => ({ frame: 'prop.table.sm
 // ── Game-wide defaults ────────────────────────────────────────────────────────
 export const PROP_DEFAULTS: Record<string, PropDef> = {
   // counters / desks
-  desk: { frame: 'prop.counter.reception.wood' },
+  // the wood U counter, split like the entrance's white one (design pass): top slab
+  // (wings + back ledge + monitors) at the footprint's top row, front modesty panel a
+  // row deeper — Riley stands INSIDE the transparent pocket on the desk's own footprint
+  // tiles (created later, she wins the depth tie with the top slab; the front panel
+  // closes over her feet). Only reception uses this default (the lobby overrides it).
+  desk: {
+    frame: 'prop.counter.reception.wood',
+    // split line moved UP vs the first cut: the full-width tan slab now lives in the
+    // .front frame (depthRow 4) so it occludes the depth-8 pocket NPC's boots — with
+    // the slab in the tied-depth U, Riley drew over it and "stood on the desk"
+    // (design review). U dy -42 + front dy 0 recompose the source pixel-exact.
+    parts: [
+      { frame: 'prop.counter.reception.wood', dx: 0, dy: -42, depthRow: 3 },
+      { frame: 'prop.counter.reception.wood.front', dx: 0, dy: 0, depthRow: 4 },
+    ],
+  },
   // records service counter: one continuous tan run spanning cols 7-12 — the art extends
   // one tile past each end of the 4x1 footprint so the inbox/outbox tray obstacles at
   // (7,2)/(12,2) seat their trays ON the counter (the desk pair left a floor gap mid-run
@@ -173,7 +183,7 @@ export const PROP_DEFAULTS: Record<string, PropDef> = {
     ],
   },
   triage_desk: { frame: 'prop.counter.kw.plain', fill: WHITE_COUNTER_MID, fillEnds: WHITE_COUNTER_ENDS },
-  lab_bench: LAB_BENCH_5x2,
+  lab_bench: LAB_BENCH_8x1,
   // each station single (#544/#545) bakes its back monitor floating 4px above the counter
   // (fine against a wall, wrong on a free-standing island) — the splits re-seat each
   // monitor's slab on the counter/paper-box (dy -45/-47 vs the natural -50)
@@ -185,8 +195,28 @@ export const PROP_DEFAULTS: Record<string, PropDef> = {
     { frame: 'prop.nurse_station.meds.counter', dx: 108 },
     { frame: 'prop.nurse_station.meds.mon', dx: 108, dy: -47 },
   ] },
-  monitoring_desk: { frame: 'prop.console.blue.4' },
-  workstation_cluster: { frame: 'prop.console.blue.l', parts: [{ frame: 'prop.console.blue.l', dx: 0 }, { frame: 'prop.console.blue.r', dx: 32 }] },
+  // the 4-tile studio console + a live monitor planted on the top face at col 10
+  // (the bare console top read as a cut-off blank slab — user-flagged); the analyst
+  // stands BEHIND the desk at (10,4), so the screen sits in front of him and its
+  // bottom bridges the floor strip between his feet and the desk's back edge
+  monitoring_desk: {
+    frame: 'prop.console.blue.4',
+    parts: [
+      { frame: 'prop.console.blue.4', dx: 0 },
+      { frame: 'anim.monitor.0', dx: 64, dy: -24, anim: ANIM_MONITOR },
+    ],
+  },
+  // desk pod (it_office-only type, now 3x1): the curved tvstudio control desk —
+  // a complete free-standing silhouette (the old console.blue.l+r butt was the
+  // caps of the 4-tile console with the middle cut out: a blank slab that read
+  // as a truncated countertop, user-flagged) — crowned with a live monitor
+  workstation_cluster: {
+    frame: 'prop.console.curve.blue',
+    parts: [
+      { frame: 'prop.console.curve.blue', dx: 4 },
+      { frame: 'anim.monitor.0', dx: 32, dy: -24, anim: ANIM_MONITOR },
+    ],
+  },
   table: { frame: 'prop.table.small.brown' },
   lunch_table: { frame: 'prop.conftable' },
   // seating
@@ -269,7 +299,9 @@ export const PROP_DEFAULTS: Record<string, PropDef> = {
   water_cooler: { frame: 'prop.watercooler' },
   // anim.coffee carries ~8px of transparent bottom padding — dy -7 lands the machine's
   // visible base on the tray table's top face
-  coffee_mug: { frame: 'prop.table.small.gray', parts: [{ frame: 'prop.table.small.gray', dx: 5 }, { frame: 'anim.coffee.0', dx: 0, dy: -7, anim: ANIM_COFFEE }] },
+  // dy -4: at -7 the machine's visible base still floated 2-3px above the stand's top
+// face (design review read it as a printer hovering over a chair)
+coffee_mug: { frame: 'prop.table.small.gray', parts: [{ frame: 'prop.table.small.gray', dx: 5 }, { frame: 'anim.coffee.0', dx: 0, dy: -4, anim: ANIM_COFFEE }] },
   headphones: { frame: 'prop.table.small.gray', parts: [{ frame: 'prop.table.small.gray', dx: 5 }, { frame: 'prop.monitor.pc', dx: 2, dy: -12 }] },
   // one cell of the break-room kitchenette run: tan counter end + microwave on the top
   microwave: { frame: 'prop.counter.kt.l', parts: [{ frame: 'prop.counter.kt.l', dx: 1 }, { frame: 'prop.microwave.b', dx: 0, dy: -22 }] },
@@ -291,9 +323,12 @@ export const PROP_DEFAULTS: Record<string, PropDef> = {
   tv_stand: { frame: 'prop.tv.stand.dark' },
   // medical
   bed: { frame: 'prop.bed.blue' },
-  // bed + bedside + ONE drip stand (ivpole.a/b were secretly two stacked poles, 108px
-  // tall — they poked into the wall band; ivpole.single is the reception-proven pole)
-  patient_bay: { frame: 'prop.bed.side.blue', parts: [{ frame: 'prop.bed.side.blue', dx: 0 }, { frame: 'prop.bedside.white', dx: 70 }, { frame: 'prop.ivpole.single', dx: 96 }] },
+  // design pass: FRONT-facing bay — the side-view beds read as "cut off" (user flag).
+  // hospital#178 is the whole vertical bed; head against the top wall (art tops ~y50,
+  // the vending-machine wall-overlap convention), IV pole at the bed's mid-length,
+  // bedside cabinet at the head (dy -40 = deeper = beside the pillow, correct
+  // perspective). 3x2 footprint (was 4x3).
+  patient_bay: { frame: 'prop.bed.blue', parts: [{ frame: 'prop.bed.blue', dx: 0 }, { frame: 'prop.ivpole.single', dx: 44, dy: -20 }, { frame: 'prop.bedside.white', dx: 62, dy: -40 }] },
   gurney: { frame: 'prop.examtable.white', parts: [{ frame: 'prop.examtable.white', dx: 0 }, { frame: 'prop.ivpole.single', dx: 68 }] },
   exam_table: { frame: 'prop.examtable.white' },
   iv_stand: { frame: 'prop.ivpole.single' },
@@ -306,7 +341,9 @@ export const PROP_DEFAULTS: Record<string, PropDef> = {
   equipment: { frame: 'prop.machine.arms' },
   microscope: { frame: 'prop.microscope' },
   microscope_station: { frame: 'prop.microscope' },
-  centrifuge: { frame: 'prop.scanner.ct', parts: [{ frame: 'prop.scanner.ct', dx: -2 }, { frame: 'prop.autoclave', dx: 56 }] },
+  // round-drum machine + readout analyzer (the old pairing reused the autoclave single,
+  // which now stands in the wash line — one identity per object)
+  centrifuge: { frame: 'prop.scanner.ct', parts: [{ frame: 'prop.scanner.ct', dx: -2 }, { frame: 'prop.analyzer.a', dx: 56 }] },
   fume_hood: { frame: 'prop.cabinet.glass.l', parts: [{ frame: 'prop.cabinet.glass.l', dx: 0 }, { frame: 'prop.cabinet.glass.m', dx: 32 }, { frame: 'prop.cabinet.glass.r', dx: 64 }] },
   // l + mirrored l = symmetric double glass doors (the bare .r panel read as window shutters)
   bio_cabinet: { frame: 'prop.cabinet.glass.l', parts: [{ frame: 'prop.cabinet.glass.l', dx: 0 }, { frame: 'prop.cabinet.glass.l', dx: 32, flipX: true }] },
@@ -321,7 +358,9 @@ export const PROP_DEFAULTS: Record<string, PropDef> = {
   // wall-mounted
   // boards hang fully inside the wall face: frame heights 38/34, face band y 0..64
   notice_board: { frame: 'prop.noticeboard', anchor: 'wall', dy: -8 },
-  bulletin_board: { frame: 'prop.bulletin.notes', anchor: 'wall', dy: -6 },
+  // dy -18: top y14, level with the lobby's tv.wall decor + welcome icon (the wall
+  // trio hung at three heights, design review); bottom y60 clears the wood rail
+  bulletin_board: { frame: 'prop.bulletin.notes', anchor: 'wall', dy: -18 },
   // 46-tall board inside the 2-row face band (12..64): dy −16 → top 16, bottom 62
   results_board: { frame: 'prop.chalkboard.dark.3', anchor: 'wall', dy: -16 },
   whiteboard_wall: { frame: 'prop.chalkboard.dark.3' },
@@ -361,17 +400,34 @@ export const ROOM_PROP_OVERRIDES: Record<string, Record<string, PropDef>> = {
     // the white counter is drawn as two butt-jointed slabs (adjacent sheet rows, seam
     // invisible): the source single's rect bottom-left held a detached leaf bush that
     // rendered as debris at the counter's foot.
+    // Design pass: the desk is free-standing at (7,3) with a staff corridor behind it —
+    // the U's pocket is transparent, so Riley/Aiyana stand INSIDE it on the desk's own
+    // footprint tiles. depthRow 3 on the U slab ties with the pocket NPCs (row 3) and
+    // NPCs are created later, so they draw over the back counter's lip; the front slab
+    // stays a row deeper and closes the pocket in front of their feet.
     desk: {
       frame: 'prop.counter.reception.white',
       parts: [
-        { frame: 'prop.counter.reception.white', dx: 0, dy: -28 },
-        { frame: 'prop.counter.reception.white.front', dx: 32, dy: 0 },
+        { frame: 'prop.counter.reception.white', dx: 0, dy: -28, depthRow: 3 },
+        { frame: 'prop.counter.reception.white.front', dx: 32, dy: 0, depthRow: 4 },
+      ],
+    },
+    // the SE coffee cart (was a collisionless ambience sprite floating mid-floor at
+    // (5,5)): a wood table with the kitchen espresso machine, now a real y-sorted
+    // obstacle anchoring the corner by the waiting chairs
+    'table@17,12': {
+      frame: 'prop.desk.k.wood',
+      shadow: true,
+      parts: [
+        { frame: 'prop.desk.k.wood', dx: 3 },
+        { frame: 'prop.coffeemaker.b', dx: 17, dy: -12 },
       ],
     },
     'plant@18,2': { frame: 'prop.fern.m' },
     'plant@1,2': { frame: 'prop.plant.orange.m' },
-    'plant@1,10': { frame: 'prop.plant.white.s' },
-    'plant@18,11': { frame: 'prop.plant.orange.s' },
+    // ('plant@1,10' key deleted — stale since the reviewer moved that plant to (1,9);
+    // the default small orange plant it fell back to is the reviewed, shipped look)
+    'plant@18,9': { frame: 'prop.plant.orange.s' },
     'chairs@2,8': chairPair('prop.chair.wait.tan'),
     'chairs@2,10': chairPair('prop.chair.wait.tan'),
     'chairs@16,8': chairPair('prop.chair.wait.blue'),
@@ -385,7 +441,8 @@ export const ROOM_PROP_OVERRIDES: Record<string, Record<string, PropDef>> = {
     umbrella_stand: { frame: 'prop.trash.green' },
   },
   reception: {
-    desk: { frame: 'prop.counter.reception.wood' },
+    // (desk uses the PROP_DEFAULTS wood-counter composite — obstacle moved to (7,3)
+    // so the staff corridor runs behind it and Riley works inside the pocket)
     'filing_cabinet@4,2': { frame: 'prop.locker.white.2' },
     'filing_cabinet@15,2': { frame: 'prop.locker.teal.2' },
     'plant@1,2': { frame: 'prop.plant.orange.m' },
@@ -395,7 +452,9 @@ export const ROOM_PROP_OVERRIDES: Record<string, Record<string, PropDef>> = {
     'chairs@2,10': chairPair('prop.chair.wait.yellow'),
     'chairs@16,8': chairPair('prop.chair.wait.green'),
     'chairs@16,10': chairPair('prop.chair.wait.green'),
-    notice_board: { frame: 'prop.noticeboard', anchor: 'wall', dy: -8 },
+    // dy -14: at -8 the board's lowest baked notes dipped into the baseboard band
+    // (design review; break_room keeps the default -8)
+    notice_board: { frame: 'prop.noticeboard', anchor: 'wall', dy: -14 },
     // the 80px bookshelf lives at (2,13) against the bottom wall (at (2,12) its top
     // overlapped the chairs@2,10); dx 2 opens a gap from the wheelchair at (1,11)
     'magazine_rack@2,13': { frame: 'prop.shelf.narrow.books', dx: 2 },
@@ -443,8 +502,19 @@ export const ROOM_PROP_OVERRIDES: Record<string, Record<string, PropDef>> = {
   },
   lab: {
     'plant@1,4': { frame: 'prop.fern.m' },
+    // tan lab stool behind the north bench (the tech's). Marcus's yellow stool at
+    // (12,9) read as a stranded wicker basket (design review) — deleted; the tucked
+    // joint stools in ROOM_DECOR seat the runs now
+    'chair@7,4': { frame: 'prop.stool.tan' },
+    // second meds shelf gets the .b single so the chemicals wall doesn't tile
+    'chemical_shelf@18,11': { frame: 'prop.shelf.narrow.meds.b' },
   },
   records_room: {
+    // design review: even with the contact shadow, the copier's pale body fully
+    // camouflaged against the beige floor mid-room ("four disconnected strips") —
+    // the obstacle now backs onto the south wall at (12,13), whose dark band sits
+    // behind the white body (the IT-chalkboard anchoring pattern)
+    'printer_station@12,13': { frame: 'prop.copier', shadow: true },
     'filing_cabinet@3,2': { frame: 'prop.drawers.column' },
     'filing_cabinet@16,2': { frame: 'prop.drawers.column.r' },
     'filing_cabinet@6,2': { frame: 'prop.shelf.narrow.books' },
@@ -455,29 +525,57 @@ export const ROOM_PROP_OVERRIDES: Record<string, Record<string, PropDef>> = {
   it_office: {
     table: { frame: 'prop.desk.k.wood' },
     printer_station: { frame: 'prop.desk.glass.2', parts: [{ frame: 'prop.desk.glass.2', dx: 0 }, { frame: 'prop.copier', dx: 66 }] },
-    'chair@1,8': { frame: 'prop.chair.office.gray' },
-    'chair@18,8': { frame: 'prop.chair.office.sky' },
+    // office chairs tucked into each desk pod's front-center (dy pulls the seat
+    // back up over the pod's base band — the old wall-side chairs at (1,8)/(18,8)
+    // read as gray bins stranded by the doors)
+    'chair@3,9': { frame: 'prop.chair.office.gray', dy: -12 },
+    'chair@16,9': { frame: 'prop.chair.office.sky', dy: -12 },
     plant: { frame: 'prop.fern.s' },
   },
   er: {
-    // mirrors the left bay's layout (bed, bedside, single pole) so the bays read as a
-    // matched pair; the pink pillow ends up beside the wood bedside cabinet
-    'patient_bay@14,2': { frame: 'prop.bed.side.pink', parts: [{ frame: 'prop.bed.side.pink', dx: 0 }, { frame: 'prop.bedside.wood', dx: 70 }, { frame: 'prop.ivpole.single', dx: 96 }] },
+    // explicit run (cap, drawers, plain-shelf, end): the position-hash mids picked
+    // kw.doors twice at (3,8), whose X door-braces read as packing crates
+    triage_desk: {
+      frame: 'prop.counter.kw.plain',
+      parts: [
+        { frame: 'prop.counter.kw.plain', dx: 0 },
+        { frame: 'prop.counter.kw.drawers', dx: 32 },
+        { frame: 'prop.counter.kw.plain2', dx: 64 },
+        { frame: 'prop.counter.kw.end', dx: 96 },
+      ],
+    },
+    // right bay mirrors the left (bed against the east end, pole mid, wood bedside on
+    // the curtain side); bed dx 56 leaves 2px to the vital monitor at (18,2)
+    'patient_bay@15,2': { frame: 'prop.bed.blue', parts: [{ frame: 'prop.bedside.wood', dx: 10, dy: -40 }, { frame: 'prop.ivpole.single', dx: 38, dy: -20 }, { frame: 'prop.bed.blue', dx: 56 }] },
     // flipX puts the curtain's support post on the bay side, mirroring the left curtain
-    'curtain_partition@13,2': { frame: 'prop.curtain.tan', flipX: true },
-    'gurney@15,9': { frame: 'prop.examtable.blue', parts: [{ frame: 'prop.monitor.stand', dx: 0 }, { frame: 'prop.examtable.blue', dx: 34 }] },
+    'curtain_partition@14,2': { frame: 'prop.curtain.tan', flipX: true },
+    // treatment pod: vitals stand + blue exam table (the active treatment spot east)
+    'gurney@15,8': { frame: 'prop.examtable.blue', parts: [{ frame: 'prop.monitor.stand', dx: 0 }, { frame: 'prop.examtable.blue', dx: 34 }] },
+    // surgical robot beside the treatment table; dx -6 opens a gap to the pod's monitor
+    'equipment@13,8': { frame: 'prop.machine.arms', dx: -6 },
+    // crash cart parked flush at the east wall (dx shift keeps cart.wood off the wall
+    // column base; the default -2/38 pair geometry preserved at -6/32... overlap seam
+    // between the two carts is the proven butt from the clean pass)
+    'crash_cart@17,6': { frame: 'prop.cart.monitor', parts: [{ frame: 'prop.cart.monitor', dx: -6 }, { frame: 'prop.cart.wood.a', dx: 32 }] },
     // wheelchair.side.tan is actually LimeZu's mop-and-bucket single — use the front
     // view proven in hospital_entrance (dx -6 keeps it off the east wall column)
     wheelchair: { frame: 'prop.wheelchair.front.tan', dx: -6 },
   },
   break_room: {
-    'vending_machine@2,2': { frame: 'prop.vending.snacks' },
-    'vending_machine@5,2': { frame: 'prop.vending.gray' },
-    'couch@2,10': { frame: 'prop.couch.gray.3' },
-    'couch@15,10': { frame: 'prop.couch.gray.3', flipX: true },
-    // cushioned stools tuck under the lunch table without hiding the NPCs standing behind them
-    'chair@7,8': { frame: 'prop.stool.blue' },
-    'chair@12,8': { frame: 'prop.stool.red' },
+    // dx nudges close the 16px art gap between the two machines so they read as one
+    // bank (46/50px arts centered on adjacent 2x2 footprints leave daylight)
+    'vending_machine@2,2': { frame: 'prop.vending.snacks', dx: 6 },
+    'vending_machine@4,2': { frame: 'prop.vending.gray', dx: -6 },
+    // lounge pair: the FRONT-facing 3-seat couch (blue.3). gray.3 is LimeZu's
+    // back-view couch (smooth back panel, cushion tops peeking over) — with the TV
+    // south of the seats both couches must show their cushions. One flipped = a
+    // matched left/right suite.
+    'couch@1,8': { frame: 'prop.couch.blue.3' },
+    'couch@4,8': { frame: 'prop.couch.blue.3', flipX: true },
+    // cushioned stools pulled up to the lunch table's near side, flanking the
+    // overheard-conversation plate at (10,9)
+    'chair@9,9': { frame: 'prop.stool.blue' },
+    'chair@11,9': { frame: 'prop.stool.red' },
     'plant@1,13': { frame: 'prop.fern.m' },
     // the waiting-room TV is on (LimeZu's news report, every 6th of its 24 frames);
     // it stands on a low wood dresser — the tvnews cell carries ~20px of transparent
@@ -506,17 +604,31 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     { frame: 'prop.lightswitch', tx: 1, ty: 1, dy: -2, layer: 'wall' },
     // poster sits right of the clock now — the bulletin board moved to (3,1) so the
     // welcome_board zone icon has clear wall face over its own tile at (2,2)
-    { frame: 'prop.poster.blue.b', tx: 6, ty: 0, dy: 14, layer: 'wall' },
-    { frame: 'prop.clock.blue', tx: 5, ty: 0, dy: 8, layer: 'wall' },
+    { frame: 'prop.tv.wall', tx: 6, ty: 0, dy: 14, layer: 'wall' },
+    // dy 16: at dy 8 the clock's top frame rode the dark cap band (design review)
+    { frame: 'prop.clock.blue', tx: 5, ty: 0, dy: 16, layer: 'wall' },
+    // daylight over the free-standing desk — the desk's move to (7,3) exposed this
+    // wall stretch (it was behind the counter's back riser before); "sunlight spills
+    // through the glass doors" is the room's own description
+    { frame: 'prop.window.gray.3', tx: 8.9, ty: 0, dy: 14, layer: 'wall' },
     { frame: 'prop.picture.landscape.b', tx: 13, ty: 0, dy: 14, layer: 'wall' },
     { frame: 'prop.sanitizer', tx: 15, ty: 0, dy: 22, layer: 'wall' },
     { frame: 'prop.sign.arrow.r', tx: 16, ty: 0, dy: 18, layer: 'wall' },
-    { frame: 'prop.chair.office.sky', tx: 10, ty: 2, dy: -3, layer: 'prop', depthRow: 2 },
-    { frame: 'prop.phone.gray', tx: 8, ty: 1, dx: -6, dy: -6, layer: 'prop', depthRow: 3 },
-    { frame: 'prop.clipboard.plain', tx: 11, ty: 1, dx: 6, dy: -5, layer: 'prop', depthRow: 3 },
+    // the desk phone on the back counter's right section (Riley is on the phone in
+    // her scene). No paper-tray clutter: anywhere near Aiyana it merged with her
+    // boots or her transient chart-fidget icons into a machine-looking blob (tried
+    // the back counter and the front ledge), and the office-chair orb decor read
+    // as a water jug once fully visible — the pocket keeps just people + monitor.
+    { frame: 'prop.phone.gray', tx: 11, ty: 2, dy: -6, layer: 'prop', depthRow: 3 },
     // display table under the hipaa_brochure pickup at (16,5) — a clipboard flat on
     // open floor read as dropped litter (same fix reception's poster pickup got)
-    { frame: 'prop.table.small.white', tx: 16, ty: 5, layer: 'prop', depthRow: 5 },
+    // nightstand pedestal for the brochure pickup — the white tray-table read as a
+    // printer/fax on bare floor (design review; same frame read "office chair" in lab)
+    { frame: 'prop.table.phone.wood', tx: 16, ty: 5, layer: 'prop', depthRow: 5 },
+    // a left-behind coffee mug on the east row-end table (the coffee cart is in the
+    // SE corner below); the west table stays bare — papers on these tiny pedestal
+    // tables read as a gray machine (the clean-pass trap, recreated and re-deleted)
+    { frame: 'prop.mug.blue', tx: 15, ty: 8, dy: -12, layer: 'prop', depthRow: 8 },
     ...doorMats([[18, 7]]),
     // (no floor litter in the lobby — the papers at (5,6) and the rubbish ghost at
     // (14,12) read as junk on the walkway; reception's review set the precedent)
@@ -524,22 +636,35 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
   reception: [
     { frame: 'prop.picture.landscape.a', tx: 1, ty: 0, dy: 16, layer: 'wall' },
     { frame: 'prop.lightswitch', tx: 2, ty: 1, dy: -2, layer: 'wall' },
-    { frame: 'prop.clock.white', tx: 4, ty: 0, dy: 8, layer: 'wall' },
+    // dy 16: at dy 8 the clock's frame crossed the cap trim (design review — same
+    // find as the lobby clock)
+    { frame: 'prop.clock.white', tx: 4, ty: 0, dy: 16, layer: 'wall' },
     { frame: 'prop.sanitizer', tx: 6, ty: 0, dy: 22, layer: 'wall' },
-    // poster.green sat at tx 16 where the teal locker (top y38) swallowed its bottom 8px;
+    // the wall TV sat at tx 16 where the teal locker (top y38) swallowed its bottom 8px;
     // over the counter's right wing the wall is clear down to y50.
-    { frame: 'prop.poster.green', tx: 12, ty: 0, dy: 14, layer: 'wall' },
-    { frame: 'prop.poster.blue.a', tx: 17, ty: 0, dy: 16, layer: 'wall' },
-    { frame: 'prop.chair.office.gray', tx: 10, ty: 2, dy: -3, layer: 'prop', depthRow: 2 },
-    { frame: 'prop.clipboard.green', tx: 8, ty: 1, dx: -4, dy: -5, layer: 'prop', depthRow: 3 },
-    // papers.a is now a flat 22x18 stack — dy 0 lays it on the counter surface (y46-64)
-    { frame: 'prop.papers.a', tx: 11, ty: 1, dx: -6, dy: 0, layer: 'prop', depthRow: 3 },
+    { frame: 'prop.tv.wall', tx: 12, ty: 0, dy: 14, layer: 'wall' },
+    { frame: 'prop.picture.landscape.b', tx: 17, ty: 0, dy: 16, layer: 'wall' },
+    // daylight over the free-standing desk — moving it to (7,3) exposed the bare
+    // cream stretch between the sanitizer (tx6) and the TV (tx12); same exterior
+    // wall as the lobby's window (the rooms are neighbours), centered on the desk
+    { frame: 'prop.window.gray.3', tx: 8.9, ty: 0, dy: 14, layer: 'wall' },
+    // (the office-chair decor in the pocket is gone — Riley stands there now, and a
+    // collisionless chair on the walkable staff corridor read as ghost furniture)
+    // clipboard standing on the desk's left wing top (wing face y86-99 world)
+    { frame: 'prop.clipboard.green', tx: 8, ty: 2, dx: -4, dy: -3, layer: 'prop', depthRow: 3 },
+    // (papers.a deleted — the back ledge's free span left of Riley is narrower than
+    // the tray art, and paper trays near a pocket NPC merged into a machine blob in
+    // the lobby review; the wings carry the clipboard + mug clutter instead)
     // the "brown" mug frame is LimeZu's tri-colour red mug and read as a lidded jar here;
     // the blue mug (proven on the break-room counter) reads as a mug at game zoom
-    { frame: 'prop.mug.blue', tx: 11, ty: 1, dx: 12, dy: -2, layer: 'prop', depthRow: 3 },
-    { frame: 'prop.mat.tan.3x2', tx: 8.5, ty: 8.5, layer: 'floor' },
-    // display table under the patient-rights poster pickup at (2,4)
-    { frame: 'prop.table.small.white', tx: 2, ty: 4, layer: 'prop', depthRow: 4 },
+    { frame: 'prop.mug.blue', tx: 11, ty: 2, dx: 12, dy: -2, layer: 'prop', depthRow: 3 },
+    // queue runner at the counter's foot, centered on the desk between the stanchions
+    // (mid-floor at (8.5,8.5) the rug related to nothing)
+    { frame: 'prop.mat.tan.3x2', tx: 8.5, ty: 5, layer: 'floor' },
+    // display pedestal under the patient-rights poster pickup at (2,4) — the white
+    // tray table read as a printer/office chair twice (lab + lobby reviews); the
+    // nightstand is the proven pedestal
+    { frame: 'prop.table.phone.wood', tx: 2, ty: 4, layer: 'prop', depthRow: 4 },
     ...doorMats([[1, 7], [18, 7]]),
     // (no floor litter in reception — a boulder-looking bag pile and an orphaned paper stack
     // mid-walkway failed review; the closet and back rooms keep their clutter)
@@ -547,7 +672,9 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
   hallway_reception_break: hallwayDecor([
     { frame: 'prop.picture.landscape.c', tx: 1, ty: 0, dy: 16, layer: 'wall' },
     { frame: 'prop.extinguisher', tx: 17, ty: 1, dy: 2, layer: 'wall' },
-    { frame: 'prop.poster.orange', tx: 13, ty: 0, dy: 14, layer: 'wall' },
+    // sign at 14: the old panel at tx 13 overlapped the bulletin board's right edge
+    // (board ends x~422); 14*32=448 clears it and stops short of the (15,1) tube at x480
+    { frame: 'prop.sign.chart', tx: 14, ty: 0, dy: 16, layer: 'wall' },
   ]),
   hallway_break_lab: hallwayDecor([
     { frame: 'prop.picture.landscape.d', tx: 1, ty: 0, dy: 16, layer: 'wall' },
@@ -559,9 +686,8 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     { frame: 'prop.extinguisher', tx: 17, ty: 1, dy: 6, layer: 'wall' },
   ]),
   hallway_lab_records: hallwayDecor([
-    // orange, not green — the room's tip ITEM is the green poster at (8,1); two
-    // identical green posters on one wall read as a copy-paste
-    { frame: 'prop.poster.orange', tx: 2, ty: 0, dy: 14, layer: 'wall' },
+    // small records sign, not another screen — the room's tip ITEM is the info TV at (8,1)
+    { frame: 'prop.sign.small', tx: 2, ty: 0, dy: 16, layer: 'wall' },
     { frame: 'prop.picture.landscape.a', tx: 16, ty: 0, dy: 16, layer: 'wall' },
     // at tx 12 the kit's right edge clipped into the (14,1) sconce tube's left end
     // (tube spans x400..496) and crowded the bulletin board (ends x382)
@@ -594,17 +720,31 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     { frame: 'prop.sign.warning', tx: 1, ty: 0, dy: 16, layer: 'wall' },
     { frame: 'prop.window.gray.3', tx: 12, ty: 0, dy: 6, layer: 'wall' },
     { frame: 'prop.sign.cross', tx: 16, ty: 0, dy: 16, layer: 'wall' },
-    { frame: 'prop.poster.green', tx: 17, ty: 0, dy: 16, layer: 'wall' },
-    { frame: 'prop.bottles.lab.a', tx: 4, ty: 5, dx: 4, dy: -8, layer: 'prop', depthRow: 5 },
-    { frame: 'prop.bottles.lab.b', tx: 6, ty: 5, dx: -6, dy: -8, layer: 'prop', depthRow: 5 },
-    { frame: 'prop.papers.a', tx: 7, ty: 6, dy: -8, layer: 'prop', depthRow: 6 },
-    { frame: 'prop.bottles.lab.c', tx: 13, ty: 5, dx: 6, dy: -9, layer: 'prop', depthRow: 5 },
-    // moved off (15,6): the results_printout pickup now sits on that stretch of counter
-    { frame: 'prop.bottles.lab.b', tx: 14, ty: 5, dx: 4, dy: -8, layer: 'prop', depthRow: 5 },
-    { frame: 'prop.clipboard.sky', tx: 16, ty: 5, dx: -4, dy: -8, layer: 'prop', depthRow: 5 },
-    // display stand under the phi_identifiers pickup at (2,8) — binders flat on open
-    // floor read as dropped litter (reception's display-table precedent)
-    { frame: 'prop.table.small.white', tx: 2, ty: 8, layer: 'prop', depthRow: 8 },
+    { frame: 'prop.sign.chart', tx: 17, ty: 0, dy: 16, layer: 'wall' },
+    // bench-top clutter — sparse, deliberate groups ON the table tops (top band sits
+    // ~25 px above each bench row's bottom edge). Each 8-tile run is two capped
+    // 4-tile counters (#224 left / #226 right), so the mid-run joint at tx 10 gets a
+    // straddling piece: the results_printout icon on the north bench, bottles.c on
+    // the south one. bottles.a dx 8 keeps the pair off table 1's rounded corner.
+    { frame: 'prop.bottles.lab.a', tx: 6, ty: 5, dx: 8, dy: -27, layer: 'prop', depthRow: 5 },
+    { frame: 'prop.clipboard.sky', tx: 12, ty: 5, dx: 4, dy: -26, layer: 'prop', depthRow: 5 },
+    { frame: 'prop.bottles.lab.c', tx: 10, ty: 8, dx: -16, dy: -27, layer: 'prop', depthRow: 8 },
+    { frame: 'prop.papers.a', tx: 13, ty: 8, dx: -4, dy: -25, layer: 'prop', depthRow: 8 },
+    // stools tucked at each run's mid joint: the butted caps' rounded inner corners
+    // leave a pale notch under the tabletop that read as a smear (design review) —
+    // the stool covers the joint's front face AND gives each bench its seat
+    { frame: 'prop.stool.blue', tx: 10, ty: 5, dx: -16, dy: -6, layer: 'prop', depthRow: 5 },
+    { frame: 'prop.stool.blue', tx: 10, ty: 8, dx: -16, dy: -6, layer: 'prop', depthRow: 8 },
+    // display pedestal under the phi_identifiers pickup at (4,11): the 22px tray
+    // stands were too narrow for the 40px binder fan (docs overhung onto bare floor
+    // both reviews) — the 32px nightstand carries the whole fan
+    { frame: 'prop.table.phone.wood', tx: 4, ty: 11, layer: 'prop', depthRow: 11 },
+    // first-aid box on the sliver of bare wall between the fume hood's right edge
+    // (x256) and the chalkboard art (x~277) — the exposed junction of the hood's
+    // flat glass slab and the ribbed wall read as an accidental material seam
+    { frame: 'prop.firstaid', tx: 8, ty: 0, dy: 20, layer: 'wall' },
+    // wet-area mat at the wash line's sink front
+    { frame: 'prop.mat.gray', tx: 13, ty: 12, layer: 'floor' },
     ...doorMats([[1, 7], [18, 7]], 'prop.mat.gray'),
     // (no bare-floor paper litter — the tray art read as a dropped gray device mid-walkway)
   ],
@@ -619,7 +759,14 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     // phone stands on the kt counter run (top face at footprintBottom -22)
     { frame: 'prop.phone.black', tx: 10, ty: 2, dx: 8, dy: -22, layer: 'prop', depthRow: 2 },
     // case binders rest on the clerk island's back row (top face y 276..286)
-    { frame: 'prop.binders', tx: 11, ty: 8, dx: -2, dy: -6, layer: 'prop', depthRow: 9 },
+    // dx -14: at -2 the binders' right third overhung the desk's east edge over bare
+    // floor (design review "floating document stack")
+    { frame: 'prop.binders', tx: 11, ty: 8, dx: -14, dy: -6, layer: 'prop', depthRow: 9 },
+    // design pass: the sorting pile — a paper tray on the desk top directly in front
+    // of the clerk, who now works BEHIND the desk at (10,7); the tray bridges the
+    // floor strip between his feet (y256) and the back row's top (y276), the same
+    // trick as the it_office analyst's desk monitor
+    { frame: 'prop.papers.a', tx: 10, ty: 8, dx: 0, dy: -6, layer: 'prop', depthRow: 9 },
     // shred-waste crumple in the floor slot between the box stacks (boxes.tall ends x64,
     // the archive_box crate pile starts x96 since its move to (3,13))
     { frame: 'prop.debris', tx: 2, ty: 13, dx: 0, dy: 10, layer: 'floor', alpha: 0.8 },
@@ -627,6 +774,10 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     { frame: 'prop.table.small.brown', tx: 4, ty: 4, layer: 'prop', depthRow: 4 },
     { frame: 'prop.table.small.brown', tx: 10, ty: 4, layer: 'prop', depthRow: 4 },
     { frame: 'prop.table.small.brown', tx: 17, ty: 8, layer: 'prop', depthRow: 8 },
+    // (design pass: the reviewer's optional "mat under GERALD" was tried twice — a
+    // 2-tile gray pad read as two doormats flanking the copier, the green 2x2 rug as
+    // furniture noise. Both reverted; the copier gets a soft contact shadow via a
+    // room override instead, and the GERALD sign + green screen carry the identity.)
     ...doorMats([[1, 7], [18, 7]], 'prop.mat.gray'),
     // (no bare-floor paper litter — the tray art read as dropped machines mid-walkway)
   ],
@@ -641,9 +792,14 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     // keypad on the locked cabinet's front — follows the cabinet to (16,13)
     { frame: 'prop.switch.a', tx: 17, ty: 13, dx: 4, dy: -22, layer: 'prop', depthRow: 13 },
     // console top face is world y182..205 — at dy -10 both sat on the blue front band
-    // and read as slipping off the desk edge
+    // and read as slipping off the desk edge. Desk top, west to east: papers (8),
+    // keyboard+mic (9), the live monitor part (10, in front of the analyst), mini
+    // tower (11) — the top used to be blank white except two strays (user-flagged)
+    { frame: 'prop.papers.a', tx: 8, ty: 6, dx: 4, dy: -22, layer: 'prop', depthRow: 6 },
     { frame: 'prop.keyboard', tx: 9, ty: 6, dx: 2, dy: -22, layer: 'prop', depthRow: 6 },
-    { frame: 'prop.papers.a', tx: 10, ty: 6, dx: 6, dy: -22, layer: 'prop', depthRow: 6 },
+    { frame: 'prop.tower.mini.blue', tx: 11, ty: 6, dx: 2, dy: -23, layer: 'prop', depthRow: 6 },
+    // GERALD's coffee on his pod's east wing (small personal touch per pod)
+    { frame: 'prop.mug.brown', tx: 17, ty: 8, dx: 2, dy: -26, layer: 'prop', depthRow: 8 },
     // display stands under the three bare-floor pickups (records/entrance pattern);
     // the (10,2) stand sits at the control wall's base, so it drops 8px into row 3
     { frame: 'prop.table.small.gray', tx: 10, ty: 2, dy: 8, layer: 'prop', depthRow: 2 },
@@ -658,23 +814,28 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     // machine with an LED, the same fail records/lobby reviews called)
   ],
   er: [
-    { frame: 'anim.hscreen.0', tx: 3, ty: 0, dy: 0, layer: 'wall', anim: ANIM_HSCREEN },
-    // tiles ~7-12.6 of the wall face sit behind the screen-fixed room-title text, so the
-    // cross sign and whiteboard hang clear of it (they were half-buried under the title)
-    { frame: 'prop.sign.cross', tx: 5.5, ty: 0, dy: 14, layer: 'wall' },
-    // dy 14 keeps the 36px board below the cap band (top ~12px of the face)
-    { frame: 'prop.whiteboard', tx: 13, ty: 0, dy: 14, layer: 'wall' },
+    // both info screens hang over the rolling curtains (art x-bands clear of the
+    // vertical bays' head-line, which tops at ~y50; hscreen visible art is y14..47)
+    { frame: 'anim.hscreen.0', tx: 4, ty: 0, dy: 0, layer: 'wall', anim: ANIM_HSCREEN },
+    // tiles ~7-12.6 of the wall face sit behind the screen-fixed room-title text, so
+    // the cross sign hangs in the gap between the left screen and the title
+    { frame: 'prop.sign.cross', tx: 6, ty: 0, dy: 14, layer: 'wall' },
+    // (prop.whiteboard wall board deleted — the narrowed bays + right screen claim the
+    // face, and the status-board zone below already carries the "board" identity)
     { frame: 'prop.firstaid', tx: 12, ty: 0, dy: 26, layer: 'wall' },
-    { frame: 'anim.hscreen.0', tx: 15, ty: 0, dy: 0, layer: 'wall', anim: ANIM_HSCREEN },
+    { frame: 'anim.hscreen.0', tx: 13, ty: 0, dy: 0, layer: 'wall', anim: ANIM_HSCREEN },
     { frame: 'prop.clock.white', tx: 1, ty: 0, dy: 8, layer: 'wall' },
-    { frame: 'prop.clipboard.navy', tx: 9, ty: 9, dx: -6, dy: -8, layer: 'prop', depthRow: 9 },
-    { frame: 'prop.phone.red', tx: 11, ty: 9, dx: 4, dy: -8, layer: 'prop', depthRow: 9 },
+    // triage clutter rides the desk (now at (3,8)): clipboard on the col-4 drawers,
+    // red "ER hotline" phone centered on the col-5 counter (on the end cap it
+    // dwarfed and overhung the little leg piece — the end stays a bare side table)
+    { frame: 'prop.clipboard.navy', tx: 4, ty: 8, dx: -6, dy: -8, layer: 'prop', depthRow: 8 },
+    { frame: 'prop.phone.red', tx: 5, ty: 8, dx: 0, dy: -8, layer: 'prop', depthRow: 8 },
     ...doorMats([[1, 7]], 'prop.mat.gray'),
-    // display stands under the three bare-floor pickups (records/it_office pattern);
-    // the (17,11) stand takes depthRow 4 so the item icon (depth 10) draws on top
+    // display stands under the three pickups (records/it_office pattern);
+    // the (16,12) stand takes depthRow 4 so the item icon (depth 10) draws on top
     { frame: 'prop.table.small.gray', tx: 10, ty: 3, layer: 'prop', depthRow: 3 },
-    { frame: 'prop.table.small.gray', tx: 6, ty: 6, layer: 'prop', depthRow: 6 },
-    { frame: 'prop.table.small.gray', tx: 17, ty: 11, layer: 'prop', depthRow: 4 },
+    { frame: 'prop.table.small.gray', tx: 7, ty: 6, layer: 'prop', depthRow: 6 },
+    { frame: 'prop.table.small.gray', tx: 16, ty: 12, layer: 'prop', depthRow: 4 },
     // (no bare-floor litter — the debris pile read as rocks and papers.a as a dropped
     // device, the same fail records/lobby reviews called)
   ],
@@ -686,16 +847,19 @@ export const ROOM_DECOR: Record<string, DecorDef[]> = {
     // glass-door upper cabinet over the kitchenette counters (cols 15-16; the fridge at 17 stays clear)
     { frame: 'prop.cabinet.upper.wood', tx: 15, ty: 0, dy: 14, layer: 'wall' },
     // lunch on the table (the table top is the upper two thirds of its 4×3 footprint)
-    { frame: 'prop.food.a', tx: 8, ty: 7, dx: 6, dy: -14, layer: 'prop', depthRow: 8 },
-    { frame: 'prop.mug.brown', tx: 10, ty: 7, dx: 4, dy: -16, layer: 'prop', depthRow: 8 },
-    { frame: 'prop.food.c', tx: 10, ty: 7, dx: -10, dy: -4, layer: 'prop', depthRow: 8 },
-    { frame: 'prop.plate.a', tx: 9, ty: 7, dx: 10, dy: -2, layer: 'prop', depthRow: 8 },
-    // a nightstand-height side table for the phone zone, above the red stool
-    { frame: 'prop.table.phone.wood', tx: 12, ty: 7, dy: -2, layer: 'prop', depthRow: 7 },
-    { frame: 'prop.rug.green.2x2', tx: 2, ty: 12, layer: 'floor' },
+    { frame: 'prop.food.a', tx: 9, ty: 7, dx: 6, dy: -14, layer: 'prop', depthRow: 8 },
+    { frame: 'prop.mug.brown', tx: 11, ty: 7, dx: 4, dy: -16, layer: 'prop', depthRow: 8 },
+    { frame: 'prop.food.c', tx: 11, ty: 7, dx: -10, dy: -4, layer: 'prop', depthRow: 8 },
+    { frame: 'prop.plate.a', tx: 10, ty: 7, dx: 10, dy: -2, layer: 'prop', depthRow: 8 },
+    // the phone zone's side table, against the east wall below the right door
+    { frame: 'prop.table.phone.wood', tx: 18, ty: 10, dy: -2, layer: 'prop', depthRow: 10 },
+    // lounge rug: fills the sitting gap between the couch pair (bottoms y320) and the
+    // TV screen top (y374); centered on the pair's seam at x128
+    { frame: 'prop.mat.tan.3x2', tx: 2, ty: 9, dx: 16, dy: 29, layer: 'floor' },
     ...doorMats([[1, 7], [18, 7]]),
     // crumpled paper that missed the bin, right beside its base
-    { frame: 'prop.rubbish', tx: 14, ty: 7, layer: 'floor', alpha: 0.75 },
+    // (rubbish pile deleted — the frame is a pile cut off its shelf single's base bar
+    // and read as half an object beside the bin; user-reported)
   ],
 };
 
@@ -704,30 +868,39 @@ const WALL_POSTER = (frame: AtlasFrame): InteractableArt => ({ frame, dy: -6 });
 
 export const ROOM_INTERACTABLE_ART: Record<string, Record<string, InteractableArt>> = {
   hospital_entrance: {
-    // dy -34 keeps the whole poster inside the wall-face band (break_room's proven anchor)
-    welcome_board: { frame: 'prop.poster.orange', dy: -34 },
-    // the clipboard rests on the display table decor at (16,5)
-    hipaa_brochure: { frame: 'prop.clipboard.sky', dy: -12 },
+    // dy -48: top lands at y14, level with the bulletin board and the tv.wall decor
+    // (the wall trio hung at three heights, design review)
+    welcome_board: { frame: 'prop.tv.wall', dy: -48 },
+    // the clipboard rests on the nightstand pedestal's top face (≈30px up, lab precedent)
+    hipaa_brochure: { frame: 'prop.clipboard.sky', dy: -30 },
   },
   reception: {
-    sign_in_sheet: { frame: 'prop.clipboard.blue', dy: -26 },
-    privacy_notice: { frame: 'prop.sign.small', dy: -26 },
-    patient_rights_poster: { frame: 'prop.sign.chart', dy: -12 },
+    // both zone tiles are ON the desk's front row (7,3 6x2 → rows 3-4): the icons sit
+    // on the front counter's top face (world y118-132), flanking Riley in the pocket
+    sign_in_sheet: { frame: 'prop.clipboard.blue', dy: -20 },
+    privacy_notice: { frame: 'prop.sign.small', dy: -22 },
+    // chart rests on the nightstand pedestal's top face (entrance/lab anchor)
+    patient_rights_poster: { frame: 'prop.sign.chart', dy: -30 },
   },
-  hallway_reception_break: { hallway1_phi_tip: WALL_POSTER('prop.poster.blue.a') },
-  // tip items at (10,1) (center x336) collide with the bulletin board's left edge
-  // (board hangs at x336..382): dx -26 hangs those posters on clear wall face
-  hallway_break_lab: { hallway2_verbal_tip: { frame: 'prop.poster.red', dx: -26, dy: -6 } },
-  hallway_lab_records: { hallway3_deidentify_tip: WALL_POSTER('prop.poster.green') },
-  hallway_records_it: { hallway4_breach_tip: { frame: 'prop.poster.pink', dx: -26, dy: -6 } },
-  hallway_it_er: { hallway5_emergency_tip: { frame: 'prop.poster.blue.b', dx: -26, dy: -6 } },
+  // one consistent pickup language for the tip series: a whole wall info screen.
+  // (the six old 20x32 "poster" panels each read as HALF a TV at game scale — user-reported)
+  // Tip items at (10,1) (center x336) collide with the bulletin board's left edge
+  // (board hangs at x336..382): dx -26 centers the 46px TV at x310 (spans 287..333, clear).
+  hallway_reception_break: { hallway1_phi_tip: WALL_POSTER('prop.tv.wall') },
+  hallway_break_lab: { hallway2_verbal_tip: { frame: 'prop.tv.wall', dx: -26, dy: -6 } },
+  hallway_lab_records: { hallway3_deidentify_tip: WALL_POSTER('prop.tv.wall') },
+  hallway_records_it: { hallway4_breach_tip: { frame: 'prop.tv.wall', dx: -26, dy: -6 } },
+  hallway_it_er: { hallway5_emergency_tip: { frame: 'prop.tv.wall', dx: -26, dy: -6 } },
   lab: {
-    // both zone icons sit ON the bench front row (the gate literally says "results on
-    // the counter") — ER's unlocked_computer pattern; zone tiles stay on the floor
-    sample_labels: { frame: 'prop.clipboard.orange', dx: -6, dy: -42 },
-    results_printout: { frame: 'prop.papers.a', dy: -40 },
-    // binders rest in the display stand's tray at (2,8)
-    phi_identifiers: { frame: 'prop.binders', dy: -22 },
+    // both zone icons sit ON a bench top (the gate literally says "results on the
+    // counter"): zone tiles are the walkable tile beside the bench, dy -48 lands the
+    // icon on the table's top band one row up. results_printout dx -16 centers the
+    // paper stack on the north run's mid joint (it doubles as the joint's cover).
+    sample_labels: { frame: 'prop.clipboard.orange', dy: -48 },
+    results_printout: { frame: 'prop.papers.a', dx: -16, dy: -48 },
+    // binders rest ON the nightstand pedestal's top face at (4,11) (top ≈ 30px above
+    // the tile bottom) — lower anchors left the fan hovering at rail height
+    phi_identifiers: { frame: 'prop.binders', dy: -30 },
   },
   records_room: {
     // binders rest on the display stand at (4,4) (lab's phi_identifiers anchor)
@@ -743,10 +916,16 @@ export const ROOM_INTERACTABLE_ART: Record<string, Record<string, InteractableAr
   },
   it_office: {
     // the sticky note is stuck to the monitoring console's blue front band
-    // (break_room verbal_disclosure / reception sign_in_sheet anchor)
-    password_note: { frame: 'prop.clipboard.sky', dy: -26 },
-    // binders rest on the wood desk's top at (7,12), one row below the zone tile
-    breach_playbook: { frame: 'prop.binders', dx: 6, dy: 17 },
+    // (break_room verbal_disclosure / reception sign_in_sheet anchor). Orange
+    // pad: clipboard.sky was white-on-white against the console front — the
+    // observation gate wants the note to pop ("Is that a password on a sticky
+    // note?"), and orange is the one color the blue/white console doesn't have
+    password_note: { frame: 'prop.clipboard.orange', dy: -26 },
+    // binders rest on the wood desk's top at (12,11)-(13,11), one row above the
+    // zone tile (12,12) — the response desk beside the THREATS terminal.
+    // dy -48: at -38 the fan's bottom crossed the desk's front edge and the
+    // stack read as sliding off the corner (lab reviewer's "floating documents")
+    breach_playbook: { frame: 'prop.binders', dx: 6, dy: -48 },
     // fax + vendor clipboard + safeguards chart sit on display stands (decor above)
     fax_machine: { frame: 'prop.fax.a', dy: -8 },
     vendor_agreement: { frame: 'prop.clipboard.plain', dy: -8 },
@@ -769,7 +948,7 @@ export const ROOM_INTERACTABLE_ART: Record<string, Record<string, InteractableAr
     // the phone rests on the nightstand top at (12,7)
     unlocked_phone: { frame: 'prop.phone.sky', dy: -27 },
     // pinned on the wall face just right of the notice board (board spans x 323..381)
-    staff_corkboard: { frame: 'prop.poster.orange', dx: 24, dy: -34 },
+    staff_corkboard: { frame: 'prop.sign.small', dx: 24, dy: -34 },
     // a note stuck to the kitchenette fridge door (fridge face x 544..576, y 56..128)
     verbal_disclosure: { frame: 'prop.clipboard.green', dy: -50 },
   },

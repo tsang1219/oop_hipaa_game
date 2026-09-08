@@ -10,11 +10,21 @@
   {
    "type": "desk",
    "x": 7,
-   "y": 2,
+   "y": 3,
    "w": 6,
    "h": 2,
    "frame": "prop.counter.reception.wood",
    "depth": 8,
+   "anchor": "floor"
+  },
+  {
+   "type": "desk",
+   "x": 7,
+   "y": 3,
+   "w": 6,
+   "h": 2,
+   "frame": "prop.counter.reception.wood.front",
+   "depth": 9,
    "anchor": "floor"
   },
   {
@@ -169,12 +179,12 @@
   },
   {
    "type": "tissue_box",
-   "x": 5,
-   "y": 11,
+   "x": 4,
+   "y": 8,
    "w": 1,
    "h": 1,
    "frame": "prop.table.round.white",
-   "depth": 16,
+   "depth": 13,
    "anchor": "floor"
   },
   {
@@ -220,11 +230,11 @@
   {
    "type": "wheelchair",
    "x": 1,
-   "y": 11,
+   "y": 10,
    "w": 1,
    "h": 1,
    "frame": "prop.wheelchair.side.blue",
-   "depth": 16,
+   "depth": 15,
    "anchor": "floor"
   },
   {
@@ -250,15 +260,35 @@
   {
    "type": "iv_stand",
    "x": 17,
-   "y": 4,
+   "y": 2,
    "w": 1,
    "h": 1,
    "frame": "prop.ivpole.single",
-   "depth": 9,
+   "depth": 7,
+   "anchor": "floor"
+  },
+  {
+   "type": "bench",
+   "x": 3,
+   "y": 13,
+   "w": 2,
+   "h": 1,
+   "frame": "prop.bench.wood.tan",
+   "depth": 18,
+   "anchor": "floor"
+  },
+  {
+   "type": "plant",
+   "x": 14,
+   "y": 13,
+   "w": 1,
+   "h": 1,
+   "frame": "prop.plant.orange.s",
+   "depth": 18,
    "anchor": "floor"
   }
  ],
- "decor": 14,
+ "decor": 13,
  "animated": 0,
  "missing": [],
  "imageRequests": 27

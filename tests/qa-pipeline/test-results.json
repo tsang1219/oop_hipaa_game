@@ -1,7 +1,7 @@
 {
   "config": {
-    "configFile": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/playwright.config.ts",
-    "rootDir": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests",
+    "configFile": "/Users/admin/Documents/GitHub/oop_hipaa_game/playwright.config.ts",
+    "rootDir": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": null,
@@ -10,21 +10,17 @@
     "grep": {},
     "grepInvert": null,
     "maxFailures": 0,
-    "metadata": {
-      "actualWorkers": 1
-    },
+    "metadata": {},
     "preserveOutput": "always",
     "projects": [
       {
-        "outputDir": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/test-results",
+        "outputDir": "/Users/admin/Documents/GitHub/oop_hipaa_game/test-results",
         "repeatEach": 1,
         "retries": 1,
-        "metadata": {
-          "actualWorkers": 1
-        },
+        "metadata": {},
         "id": "",
         "name": "",
-        "testDir": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests",
+        "testDir": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests",
         "testIgnore": [],
         "testMatch": [
           "**/*.spec.ts"
@@ -63,1933 +59,13 @@
     "version": "1.58.2",
     "workers": 1,
     "webServer": {
-      "command": "PORT=8090 npm run dev",
-      "port": 8090,
+      "command": "npm run dev",
+      "port": 8080,
       "reuseExistingServer": true,
       "timeout": 30000
     }
   },
   "suites": [
-    {
-      "title": "art-substrate-proof.spec.ts",
-      "file": "art-substrate-proof.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "hallway_break_lab → supply_closet → back: the found closet door is a big door in the face, the exit a door in the bottom wall",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 15652,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:36:37.405Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-ae9e2ec59de953a16024",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 140,
-          "column": 3
-        },
-        {
-          "title": "hospital_entrance: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4348,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:36:53.712Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-36d71553c5bc51f7896b",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "hospital_entrance: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5962,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:36:58.070Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-2b2d8d87a52e32b409cd",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "hospital_entrance: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6212,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:04.042Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-f32c20e5814d43b13324",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "hospital_entrance: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4960,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:10.264Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-89715a6aed69286dca42",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "reception: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4520,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:15.237Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-41616cec9b1e55442ada",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "reception: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8063,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:19.770Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-4212dea53904b7bf78a4",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "reception: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8340,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:27.843Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-a3030ba1f873e3bef1e1",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "reception: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5171,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:36.195Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-c523a889de8ce0f40f40",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "hallway_reception_break: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4439,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:41.382Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-bfa5445174467897c567",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "hallway_reception_break: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6132,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:45.833Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-dcd952116a1ad3373183",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "hallway_reception_break: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8285,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:37:51.978Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-2905c748167efdeda1f7",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "hallway_reception_break: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5075,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:00.274Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-d2f81d0c1cebebc83cf7",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "hallway_break_lab: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4468,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:05.359Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-48ec37c1e7ff17593214",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "hallway_break_lab: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6135,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:09.839Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-515c92d3abaeaa186cf0",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "hallway_break_lab: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8380,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:15.985Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-2d72638c89214d0a2012",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "hallway_break_lab: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5097,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:24.372Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-eef51af5d3fdddf3896d",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "hallway_lab_records: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4463,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:29.477Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-96708ac0185bff5a7e44",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "hallway_lab_records: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6080,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:33.950Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-ce7ca84be743ee79c46a",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "hallway_lab_records: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8421,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:40.039Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-3e8ff2cbc30304d4d2ab",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "hallway_lab_records: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5091,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:48.470Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-6af42d4d120820a1614e",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "hallway_records_it: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4470,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:53.571Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-0eaf531619eccef09b72",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "hallway_records_it: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6181,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:38:58.055Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-073ea98c670f94a8832c",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "hallway_records_it: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8696,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:04.245Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-07b5dbb0d16a236a6bb5",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "hallway_records_it: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5069,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:12.948Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-6fbe53496adf15e4152e",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "hallway_it_er: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4513,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:18.025Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-6c66833f403d3bf60c28",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "hallway_it_er: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6146,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:22.545Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-f5e8fe008af1f6a26da5",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "hallway_it_er: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8348,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:28.698Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-8d02ab652cc12f20324e",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "hallway_it_er: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5138,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:37.054Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-b9f0ea6c507ea935a53c",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "supply_closet: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4439,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:42.200Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-a85e1411881d11c646ec",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "supply_closet: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6087,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:46.649Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-a79fcdef0e0075f88cd5",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "supply_closet: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6340,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:52.744Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-4ea16459356969f8936d",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "supply_closet: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5052,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:39:59.093Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-ac521b2add5fd4a5dbca",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "lab: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4483,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:04.154Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-eeb5b8941d66b7e704ca",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "lab: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6214,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:08.649Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-1600be7a2ff797c7502c",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "lab: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8389,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:14.871Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-6d046a6d6868c11aff8e",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "lab: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5145,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:23.270Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-16477bfc29b33cec8bd7",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "records_room: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5101,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:28.423Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-ca3541449bb852aa5b18",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "records_room: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6821,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:33.531Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-bebd0a6566077f0208d1",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "records_room: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8970,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:40.358Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-d3fcfa029429f9768c71",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "records_room: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5752,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:49.337Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-c6bfc9a90c2341276775",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "it_office: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4456,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:55.099Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-edbe6fb37125a5ca17bf",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "it_office: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6283,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:40:59.565Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-554bb7792bf1aef88ae7",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "it_office: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8413,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:05.856Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-66ddbfe98e771ccfe40c",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "it_office: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5124,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:14.279Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-9037391e026a83fa0ac3",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "er: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5205,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:19.412Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-75324336142dd4304b85",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "er: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6280,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:24.625Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-8b7a20b11d4f9edf89fe",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "er: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6595,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:30.843Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-c73c9e4b498ec59ec5e7",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "er: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5209,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:37.447Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-52d66939db2b5e7850bc",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        },
-        {
-          "title": "break_room: renders from the atlas — no missing frames, one atlas request, zero console errors",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4456,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:42.663Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-26e4fd47b49f615af3e8",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 174,
-          "column": 3
-        },
-        {
-          "title": "break_room: y-sorted depth — behind / beside / in front of a tall prop",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 6298,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:47.127Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-7de9db6cfdd95fbd4b02",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 191,
-          "column": 3
-        },
-        {
-          "title": "break_room: doors come from the atlas, sit on the wall, crack ajar on approach and swing open on SPACE",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8612,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:41:53.434Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-7fd0d57dd6312dcae040",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 214,
-          "column": 3
-        },
-        {
-          "title": "break_room: lighting layer toggles off and the room edges brighten",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 5329,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:42:02.053Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "bcb7417cefdc5b8f942d-e63cba208d1be9f5465d",
-          "file": "art-substrate-proof.spec.ts",
-          "line": 287,
-          "column": 3
-        }
-      ]
-    },
-    {
-      "title": "living-world-feel.spec.ts",
-      "file": "living-world-feel.spec.ts",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "FEEL-20 — NPC squash frame + door leaf ajar/open frames",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 1,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 8067,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:42:08.152Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "c737f18c1186d91559de-878dfd102c918acbee62",
-          "file": "living-world-feel.spec.ts",
-          "line": 24,
-          "column": 1
-        },
-        {
-          "title": "ANIM-01 — catch a blink on camera",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 1,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 4682,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:42:16.787Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "c737f18c1186d91559de-7621779e0f0002aa3431",
-          "file": "living-world-feel.spec.ts",
-          "line": 58,
-          "column": 1
-        },
-        {
-          "title": "ANIM-01 — the generated closed-eye frames, magnified, next to the originals",
-          "ok": true,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 60000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "",
-              "projectName": "",
-              "results": [
-                {
-                  "workerIndex": 1,
-                  "parallelIndex": 0,
-                  "status": "passed",
-                  "duration": 2520,
-                  "errors": [],
-                  "stdout": [],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2026-08-27T03:42:21.481Z",
-                  "annotations": [],
-                  "attachments": []
-                }
-              ],
-              "status": "expected"
-            }
-          ],
-          "id": "c737f18c1186d91559de-6aa00df267ac6aaa6e2b",
-          "file": "living-world-feel.spec.ts",
-          "line": 73,
-          "column": 1
-        }
-      ]
-    },
     {
       "title": "progression/breach-gameplay.spec.ts",
       "file": "progression/breach-gameplay.spec.ts",
@@ -2014,7 +90,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
+                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
                         "line": 18,
                         "column": 8
                       }
@@ -2023,30 +99,7 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:24.010Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
-                            "line": 18,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
+                  "results": [],
                   "status": "skipped"
                 }
               ],
@@ -2066,7 +119,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
+                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
                         "line": 22,
                         "column": 8
                       }
@@ -2075,30 +128,7 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:24.010Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
-                            "line": 22,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
+                  "results": [],
                   "status": "skipped"
                 }
               ],
@@ -2118,7 +148,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
+                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
                         "line": 26,
                         "column": 8
                       }
@@ -2127,30 +157,7 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:24.010Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
-                            "line": 26,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
+                  "results": [],
                   "status": "skipped"
                 }
               ],
@@ -2170,7 +177,7 @@
                     {
                       "type": "skip",
                       "location": {
-                        "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
+                        "file": "/Users/admin/Documents/GitHub/oop_hipaa_game/tests/progression/breach-gameplay.spec.ts",
                         "line": 30,
                         "column": 8
                       }
@@ -2179,30 +186,7 @@
                   "expectedStatus": "skipped",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": -1,
-                      "parallelIndex": -1,
-                      "status": "skipped",
-                      "duration": 0,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:24.010Z",
-                      "annotations": [
-                        {
-                          "type": "skip",
-                          "location": {
-                            "file": "/private/tmp/claude-501/-Users-admin-Documents-GitHub-oop-hipaa-game/e370fd08-e5a2-4874-b050-f99034e5e392/scratchpad/wt-ui-polish/tests/progression/breach-gameplay.spec.ts",
-                            "line": 30,
-                            "column": 8
-                          }
-                        }
-                      ],
-                      "attachments": []
-                    }
-                  ],
+                  "results": [],
                   "status": "skipped"
                 }
               ],
@@ -2239,22 +223,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9432,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:24.692Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-b12240683f62683eab70",
@@ -2273,22 +243,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4409,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:34.660Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-599e20ce16c9e37162ff",
@@ -2307,22 +263,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 20413,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:39.081Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-3ec92c42f9600adfd611",
@@ -2341,22 +283,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 20215,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:42:59.511Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-da59fae822a3f7828c58",
@@ -2375,22 +303,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 17168,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:43:19.744Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-d0cd18f6f1fda3cbad2c",
@@ -2409,22 +323,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 16020,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:43:36.925Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-e5a6bed0bed2e1066993",
@@ -2443,22 +343,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 17492,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:43:52.957Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-254e7cc5afab8f4cdfe7",
@@ -2477,22 +363,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 10681,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:44:10.459Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "3ad502fa7408326ec0f1-1d5616f3d1d08175ebcc",
@@ -2528,22 +400,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 26117,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:44:21.163Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "2bfb80d3c40e2a656f1a-5e91cef178f3acbfddd4",
@@ -2562,22 +420,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 26679,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:44:47.287Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "2bfb80d3c40e2a656f1a-3bb13b8a825bf6fa1c4a",
@@ -2613,22 +457,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 7605,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:45:13.981Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "005ada3f36d72ed697a3-9e0c88633cb45b3ba5f5",
@@ -2647,22 +477,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 6647,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:45:21.593Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "005ada3f36d72ed697a3-8a28f9ea0cf9b75a00fd",
@@ -2681,22 +497,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 11781,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:45:28.250Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "005ada3f36d72ed697a3-a152fa79992941c3fc79",
@@ -2715,22 +517,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 7582,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:45:40.043Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "005ada3f36d72ed697a3-a37d348aa10fbe1b5ad0",
@@ -2749,22 +537,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 14899,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:45:47.634Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "005ada3f36d72ed697a3-6d71b3e03e967d66f26f",
@@ -2800,22 +574,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9161,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:46:02.555Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "cd2f9af4161352775043-d4ef7e8f57231b74ade7",
@@ -2834,22 +594,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 18911,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:46:11.725Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "cd2f9af4161352775043-cd33e4d014b637780c5b",
@@ -2868,22 +614,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9133,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:46:30.647Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "cd2f9af4161352775043-b5f2bd84fbcdbf344cdd",
@@ -2902,22 +634,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 11557,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:46:39.791Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "cd2f9af4161352775043-31c571c102fcbeedf3f4",
@@ -2953,22 +671,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2436,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:46:51.367Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "7de6de0e276c92e06065-a548ff06e2849cc03c89",
@@ -2987,22 +691,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9107,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:46:53.812Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "7de6de0e276c92e06065-a7a5a2346b22f9c80708",
@@ -3021,22 +711,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 4021,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:47:02.928Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "7de6de0e276c92e06065-1167c1b70872d589661e",
@@ -3055,22 +731,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 2417,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:47:06.960Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "7de6de0e276c92e06065-bb2e288647d8351a4abb",
@@ -3089,22 +751,8 @@
                   "expectedStatus": "passed",
                   "projectId": "",
                   "projectName": "",
-                  "results": [
-                    {
-                      "workerIndex": 2,
-                      "parallelIndex": 0,
-                      "status": "passed",
-                      "duration": 9079,
-                      "errors": [],
-                      "stdout": [],
-                      "stderr": [],
-                      "retry": 0,
-                      "startTime": "2026-08-27T03:47:26.352Z",
-                      "annotations": [],
-                      "attachments": []
-                    }
-                  ],
-                  "status": "expected"
+                  "results": [],
+                  "status": "skipped"
                 }
               ],
               "id": "7de6de0e276c92e06065-d072d03e60997aa99ac7",
@@ -3131,22 +779,8 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2410,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-27T03:47:09.386Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-8ef699ebea77e616309a",
@@ -3165,22 +799,8 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2419,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-27T03:47:11.804Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-bf0d855c310a4180069a",
@@ -3199,22 +819,8 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2406,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-27T03:47:14.231Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-93cb3ca90ee22101cdc7",
@@ -3233,22 +839,8 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2404,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-27T03:47:16.647Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-9e9ea1f9f194a6b72633",
@@ -3267,22 +859,8 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2424,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-27T03:47:19.061Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-070ea3a7f03a67439a75",
@@ -3301,22 +879,8 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2418,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-27T03:47:21.494Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-9317e6b0ab92da8bd0a9",
@@ -3335,22 +899,8 @@
                       "expectedStatus": "passed",
                       "projectId": "",
                       "projectName": "",
-                      "results": [
-                        {
-                          "workerIndex": 2,
-                          "parallelIndex": 0,
-                          "status": "passed",
-                          "duration": 2423,
-                          "errors": [],
-                          "stdout": [],
-                          "stderr": [],
-                          "retry": 0,
-                          "startTime": "2026-08-27T03:47:23.920Z",
-                          "annotations": [],
-                          "attachments": []
-                        }
-                      ],
-                      "status": "expected"
+                      "results": [],
+                      "status": "skipped"
                     }
                   ],
                   "id": "7de6de0e276c92e06065-a650522b3a08a169d626",
@@ -3367,10 +917,10 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2026-08-27T03:36:36.651Z",
-    "duration": 658957.51,
-    "expected": 87,
-    "skipped": 4,
+    "startTime": "2026-08-30T05:21:09.661Z",
+    "duration": 40.67100000000005,
+    "expected": 0,
+    "skipped": 35,
     "unexpected": 0,
     "flaky": 0
   }

@@ -1,32 +1,32 @@
 [
  {
-  "prop": "specimen_fridge@2@10",
+  "prop": "specimen_fridge@1@9",
   "playerTile": [
-   2,
-   9
+   1,
+   8
   ],
   "rel": "behind",
-  "playerDepth": 14,
-  "propDepth": 16
+  "playerDepth": 13,
+  "propDepth": 15
  },
  {
-  "prop": "specimen_fridge@2@10",
+  "prop": "specimen_fridge@1@9",
   "playerTile": [
-   4,
-   11
+   3,
+   10
   ],
   "rel": "beside",
-  "playerDepth": 16,
-  "propDepth": 16
+  "playerDepth": 15,
+  "propDepth": 15
  },
  {
-  "prop": "specimen_fridge@2@10",
+  "prop": "specimen_fridge@1@9",
   "playerTile": [
-   2,
-   12
+   1,
+   11
   ],
   "rel": "front",
-  "playerDepth": 17,
-  "propDepth": 16
+  "playerDepth": 16,
+  "propDepth": 15
  }
 ]

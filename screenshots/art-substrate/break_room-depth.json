@@ -1,32 +1,32 @@
 [
  {
-  "prop": "trash_bin@13@6",
+  "prop": "trash_bin@6@3",
   "playerTile": [
-   13,
-   5
+   6,
+   2
   ],
   "rel": "behind",
-  "playerDepth": 10,
-  "propDepth": 12
+  "playerDepth": 7,
+  "propDepth": 8
  },
  {
-  "prop": "trash_bin@13@6",
+  "prop": "trash_bin@6@3",
   "playerTile": [
-   14,
-   7
+   7,
+   3
   ],
   "rel": "beside",
-  "playerDepth": 12,
-  "propDepth": 12
+  "playerDepth": 8,
+  "propDepth": 8
  },
  {
-  "prop": "trash_bin@13@6",
+  "prop": "trash_bin@6@3",
   "playerTile": [
-   13,
-   8
+   6,
+   4
   ],
   "rel": "front",
-  "playerDepth": 13,
-  "propDepth": 12
+  "playerDepth": 9,
+  "propDepth": 8
  }
 ]
