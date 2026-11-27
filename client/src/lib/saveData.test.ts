@@ -154,8 +154,9 @@ describe('saveData', () => {
     expect(result.musicVolume).toBe(0.8);
 
     // v1 audio keys should be removed
-    expect(localStorage.getItem('sfx_muted')).toBeNull();
-    expect(localStorage.getItem('music_volume')).toBeNull();
+    // Still live device prefs (audioMixer / MusicController read them) — kept.
+    expect(localStorage.getItem('sfx_muted')).toBe('true');
+    expect(localStorage.getItem('music_volume')).toBe('0.8');
   });
 });
 

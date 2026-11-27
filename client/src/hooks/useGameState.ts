@@ -9,7 +9,7 @@
  */
 
 import { useState, useCallback, useEffect, useRef } from 'react';
-import { loadSave, writeSave, type SaveDataV2 } from '@/lib/saveData';
+import { loadSave, writeSave, clearProgress, type SaveDataV2 } from '@/lib/saveData';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
 import {
   type ActState,
@@ -251,7 +251,7 @@ export function useGameState() {
   );
 
   const resetProgress = useCallback(() => {
-    localStorage.clear();
+    clearProgress();
     window.location.reload();
   }, []);
 

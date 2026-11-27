@@ -25,6 +25,11 @@ import { SPONSOR_CONFIG } from '../data/sponsorConfig';
 export interface StartMenuProps {
   /** A resumable full-game save exists — show CONTINUE and reframe FULL GAME as NEW GAME. */
   hasSave: boolean;
+  /**
+   * Where the save left off, e.g. "BREAK ROOM · 2 ROOMS CLEARED" and
+   * "SAVED 3 HR AGO". Shown on the CONTINUE card; falls back to stock copy.
+   */
+  saveSummary?: { where: string; when: string | null };
   onDemo: () => void;
   onTowerDefense: () => void;
   /** Start a fresh full game (clears any existing save on the way to character select). */
@@ -56,6 +61,10 @@ interface MenuItem {
   icon: 'cross' | 'bolt' | 'shield';
   section: SectionId;
   action: () => void;
+  /** Optional second line under the description (CONTINUE's "SAVED 3 HR AGO"). */
+  detail?: string;
+  /** Destructive: the first press arms a warning, the second runs the action. */
+  confirmFirst?: boolean;
 }
 
 const SECTIONS: { id: SectionId; label: string }[] = [
@@ -211,7 +220,7 @@ function CorkboardBackdrop() {
   );
 }
 
-export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume }: StartMenuProps): JSX.Element {
+export function StartMenu({ hasSave, saveSummary, onDemo, onTowerDefense, onNewGame, onResume }: StartMenuProps): JSX.Element {
   const [variant] = useState<TitleVariant>(resolveVariant);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showLogo, setShowLogo] = useState(false);
@@ -219,6 +228,10 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
   const [showMenu, setShowMenu] = useState(false);
   const [showFooter, setShowFooter] = useState(false);
   const lastSelectedRef = useRef(0);
+  // NEW GAME over an existing save takes two presses: the first arms an
+  // "erase your shift?" warning, the second commits. Moving off the card
+  // disarms it. One stray Enter must never cost someone their progress.
+  const [eraseArmed, setEraseArmed] = useState(false);
 
   // Resume + New Game live directly on the main menu (no intermediate title
   // screen). CONTINUE only appears when a save exists, and is the default
@@ -227,7 +240,8 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
     ...(hasSave
       ? [{
           label: 'CONTINUE',
-          description: 'BACK TO YOUR SHIFT',
+          description: saveSummary?.where ?? 'BACK TO YOUR SHIFT',
+          detail: saveSummary?.when ?? undefined,
           accent: '#FFD23F',
           icon: 'cross' as const,
           section: 'main-rpg' as const,
@@ -235,12 +249,15 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
         }]
       : []),
     {
-      label: hasSave ? 'NEW GAME' : 'FULL GAME',
-      description: hasSave ? 'START OVER FROM DAY ONE' : 'PROTECT THE HOSPITAL',
-      accent: hasSave ? '#FF9EC4' : '#FFD23F',
+      label: hasSave ? (eraseArmed ? 'ERASE SAVE?' : 'NEW GAME') : 'FULL GAME',
+      description: hasSave
+        ? (eraseArmed ? 'PRESS AGAIN TO START OVER' : 'START OVER FROM DAY ONE')
+        : 'PROTECT THE HOSPITAL',
+      accent: hasSave ? (eraseArmed ? '#FF4D4D' : '#FF9EC4') : '#FFD23F',
       icon: 'cross',
       section: 'main-rpg',
       action: onNewGame,
+      confirmFirst: hasSave,
     },
     {
       label: 'DEMO',
@@ -296,13 +313,26 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
   }, [selectedIndex, showMenu, playNav]);
 
   const confirm = useCallback(
-    (action: () => void) => {
+    (item: MenuItem) => {
+      if (item.confirmFirst && !eraseArmed) {
+        // Arm the warning: lower, heavier thunk than a normal select.
+        setEraseArmed(true);
+        eventBridge.emit(BRIDGE_EVENTS.REACT_PLAY_SFX, { key: 'sfx_interact', volume: 0.55, rate: 0.6 });
+        return;
+      }
       playSelect();
       // Tiny delay so the click sound has a moment to fire before the page swaps.
-      setTimeout(action, 90);
+      setTimeout(item.action, 90);
     },
-    [playSelect],
+    [playSelect, eraseArmed],
   );
+
+  // Moving the cursor anywhere else disarms the erase warning.
+  useEffect(() => {
+    if (menuItems[selectedIndex]?.confirmFirst) return;
+    setEraseArmed(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedIndex]);
 
   // Keyboard navigation.
   const handleKeyDown = useCallback(
@@ -316,7 +346,7 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
         setSelectedIndex(i => (i + 1) % menuItems.length);
       } else if (e.key === 'Enter' || e.key === ' ') {
         e.preventDefault();
-        confirm(menuItems[selectedIndex].action);
+        confirm(menuItems[selectedIndex]);
       }
     },
     [showMenu, selectedIndex, menuItems, confirm],
@@ -487,14 +517,15 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
                 const tilt = paper ? (idx % 2 === 0 ? -0.9 : 0.8) : 0;
                 return (
                   <button
-                    key={item.label}
-                    onClick={() => confirm(item.action)}
+                    key={item.confirmFirst ? 'new-game' : item.label}
+                    onClick={() => confirm(item)}
                     onMouseEnter={() => setSelectedIndex(idx)}
                     className="group relative text-left transition-transform duration-150"
                     style={{
                       transform: `translateX(${isSelected ? 6 : 0}px) rotate(${tilt}deg)`,
                     }}
-                    data-testid={`start-menu-${item.label.toLowerCase().replace(/\s+/g, '-')}`}
+                    data-testid={`start-menu-${(item.confirmFirst ? 'new game' : item.label).toLowerCase().replace(/\s+/g, '-')}`}
+                    data-armed={item.confirmFirst ? String(eraseArmed) : undefined}
                   >
                     {paper && (
                       <span className="absolute -top-1.5 left-1/2 -translate-x-1/2 z-10">
@@ -556,6 +587,15 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
                         >
                           {item.description}
                         </div>
+                        {item.detail && (
+                          <div
+                            className="text-[6px] tracking-[0.2em]"
+                            style={{ color: paper ? '#8d6820' : '#8a8aa0' }}
+                            data-testid="start-menu-save-age"
+                          >
+                            {item.detail}
+                          </div>
+                        )}
                       </div>
 
                       {/* Right chevron — appears on selected */}
