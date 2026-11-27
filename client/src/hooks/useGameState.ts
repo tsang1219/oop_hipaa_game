@@ -10,6 +10,7 @@
 
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { loadSave, writeSave, type SaveDataV2 } from '@/lib/saveData';
+import { clearProgressKeepingHighscores } from '@/lib/highscores';
 import { eventBridge, BRIDGE_EVENTS } from '../phaser/EventBridge';
 import {
   type ActState,
@@ -251,7 +252,7 @@ export function useGameState() {
   );
 
   const resetProgress = useCallback(() => {
-    localStorage.clear();
+    clearProgressKeepingHighscores();
     window.location.reload();
   }, []);
 
