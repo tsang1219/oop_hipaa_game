@@ -463,7 +463,7 @@
           "type": "poster",
           "x": 10,
           "y": 1,
-          "fact": "Most HIPAA breaches aren't hackers \u2014 they're conversations. Discussing patients in elevators, cafeterias, or hallways where others can overhear is a violation of the Minimum Necessary standard. Rule of thumb: if you can be overheard by someone without a need to know, find a private space. Somebody has written underneath, in different pen: \"the closet works too.\""
+          "fact": "The breaches that make the news are hackers. The ones that happen every single day are conversations. Discussing patients in elevators, cafeterias, or hallways where others can overhear is a violation of the Minimum Necessary standard. Rule of thumb: if you can be overheard by someone without a need to know, find a private space. Somebody has written underneath, in different pen: \"the closet works too.\""
         }
       ],
       "completionRequirements": {
@@ -2521,7 +2521,7 @@
       "unlockRequirement": "reception",
       "patientStory": {
         "title": "James's Story",
-        "text": "Because you changed the subject when your coworkers started gossiping, James's coworker\u2014sitting two tables away\u2014never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
+        "text": "Because you spoke up when your coworkers started gossiping, James's coworker\u2014sitting two tables away\u2014never learned about his cancer diagnosis. He told people when he was ready. His news. His way.",
         "icon": "users"
       },
       "config": {

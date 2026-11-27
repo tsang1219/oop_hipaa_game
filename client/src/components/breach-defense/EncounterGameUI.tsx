@@ -10,7 +10,7 @@ type TowerType = keyof typeof TOWERS;
 
 const TOWER_ICONS: Record<string, string> = {
   MFA: '\u{1F510}',        // locked with key
-  FIREWALL: '\u{1F6E1}',   // shield
+  FIREWALL: '\u{1F6E1}\u{FE0F}',   // shield
   TRAINING: '\u{1F4DA}',   // books
   ACCESS: '\u{1F6AA}',     // door
   PATCH: '\u{1F529}',      // nut and bolt
@@ -242,7 +242,7 @@ export function EncounterGameUI({ availableTowerIds, onExit }: EncounterGameUIPr
                   )}
                   {/* Icon + Name row */}
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-xl leading-none">{TOWER_ICONS[id] ?? '\u{1F6E1}'}</span>
+                    <span className="text-xl leading-none">{TOWER_ICONS[id] ?? '\u{1F6E1}\u{FE0F}'}</span>
                     <span className="text-[9px] font-bold" style={{ ...pixelFont, color: tower.color }}>
                       {tower.name}
                     </span>
