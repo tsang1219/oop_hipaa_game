@@ -5,17 +5,18 @@
  * arrive here as props; this component only renders.
  */
 
-import { useState, useEffect } from 'react';
 import type Phaser from 'phaser';
 import { PhaserGame } from '../../phaser/PhaserGame';
 import { EncounterGameUI } from './EncounterGameUI';
+import { RunScorePanel } from '../highscores/RunScorePanel';
 
 // Phase 19 — standalone TD round result. Distinct from EncounterResult (which carries
 // scoreContribution / outcome semantics tied to the unified compliance score).
 // Standalone mode is score-isolated by design (TD-02 / TD-03).
+// runId: one id per round so the highscore board never books a round twice.
 export type TDStandaloneResult =
-  | { outcome: 'victory'; securityScore: number; wavesCompleted: number; towersPlaced: number }
-  | { outcome: 'defeat'; wavesCompleted: number; towersPlaced: number };
+  | { outcome: 'victory'; securityScore: number; wavesCompleted: number; towersPlaced: number; runId: string }
+  | { outcome: 'defeat'; wavesCompleted: number; towersPlaced: number; runId: string };
 
 interface StandaloneTDViewProps {
   gameRef: React.Ref<Phaser.Game | null>;
@@ -27,6 +28,7 @@ interface StandaloneTDViewProps {
   onPlayAgain: () => void;
   onBackToMenu: () => void;
   onDismissHelper: () => void;
+  onViewHighscores?: (runId: string | null) => void;
 }
 
 // Mounts the Phaser canvas + EncounterGameUI HUD with no exploration overlays,
@@ -44,6 +46,7 @@ export function StandaloneTDView({
   onPlayAgain,
   onBackToMenu,
   onDismissHelper,
+  onViewHighscores,
 }: StandaloneTDViewProps): JSX.Element {
   return (
     <div className="min-h-screen bg-[#1a1a2e] flex flex-col items-center justify-center gap-4">
@@ -110,9 +113,11 @@ export function StandaloneTDView({
         {/* Win / lose overlay — minimal, no compliance-score wiring. */}
         {result && (
           <StandaloneTDResultOverlay
+            key={result.runId}
             result={result}
             onPlayAgain={onPlayAgain}
             onBackToMenu={onBackToMenu}
+            onViewHighscores={onViewHighscores}
           />
         )}
 
@@ -139,64 +144,57 @@ interface StandaloneTDResultOverlayProps {
   result: TDStandaloneResult;
   onPlayAgain: () => void;
   onBackToMenu: () => void;
+  onViewHighscores?: (runId: string | null) => void;
 }
 
 function StandaloneTDResultOverlay({
   result,
   onPlayAgain,
   onBackToMenu,
+  onViewHighscores,
 }: StandaloneTDResultOverlayProps): JSX.Element {
   const isWin = result.outcome === 'victory';
-  const targetScore = isWin ? result.securityScore : 0; // DESIGN-009: count-up
-  const [shownScore, setShownScore] = useState(0);
-  useEffect(() => {
-    if (!isWin) return;
-    const start = performance.now();
-    let raf = 0;
-    const tick = (now: number) => {
-      const t = Math.min(1, (now - start) / 900);
-      setShownScore(Math.round((1 - Math.pow(1 - t, 3)) * targetScore));
-      if (t < 1) raf = requestAnimationFrame(tick);
-    };
-    raf = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(raf);
-  }, [isWin, targetScore]);
   return (
     <div
-      className="absolute inset-0 bg-black/85 flex items-center justify-center z-50"
+      className="absolute inset-0 bg-black/85 flex items-start justify-center z-50 overflow-y-auto py-3"
       data-testid="td-standalone-result"
     >
       <div
-        className={`text-center border-4 ${isWin ? 'border-[#2ECC71]' : 'border-red-500'} bg-[#1a1a2e] p-8 max-w-md`}
+        className={`text-center border-4 ${isWin ? 'border-[#2ECC71]' : 'border-red-500'} bg-[#1a1a2e] px-6 py-4 max-w-md my-auto`}
         style={{ fontFamily: '"Press Start 2P", monospace', animation: `td-result-in 460ms cubic-bezier(0.34,1.56,0.64,1) forwards, ${isWin ? 'td-result-glow-win' : 'td-result-glow-lose'} 2.4s ease-in-out infinite` }}
       >
         <h1
-          className={`text-xl font-bold mb-3 ${
+          className={`text-xl font-bold mb-2 ${
             isWin ? 'text-[#2ECC71]' : 'text-red-400'
           }`}
         >
           {isWin ? 'NETWORK SECURED' : 'NETWORK BREACHED'}
         </h1>
-        <p className="text-[15px] text-gray-400 mb-4 leading-snug" style={{ fontFamily: 'var(--font-body)' }}>
+        <p className="text-[14px] text-gray-400 mb-2 leading-snug" style={{ fontFamily: 'var(--font-body)' }}>
           {isWin
             ? 'You held the line through every wave. The patient data is safe today.'
             : 'The attackers got through. Try again — every restart is more practice.'}
         </p>
-        <div className="bg-[#2a2a3e] border-2 border-gray-600 p-3 rounded mb-6">
-          {result.outcome === 'victory' && (
-            <p className="text-[8px] text-gray-300">
-              Security:{' '}
-              <span className="text-green-400">{shownScore}%</span>
-            </p>
-          )}
-          <p className="text-[8px] text-gray-300">
-            Waves Cleared:{' '}
-            <span className="text-yellow-400">{result.wavesCompleted}</span>
-          </p>
-          <p className="text-[8px] text-gray-300">
-            Towers Placed:{' '}
-            <span className="text-blue-400">{result.towersPlaced}</span>
-          </p>
+        {/* One-line run stats; the score panel below does the count-up. */}
+        <p className="text-[7px] text-gray-400 mb-3 tracking-wide">
+          {isWin && (<>SECURITY <span className="text-green-400">{result.securityScore}%</span> &bull; </>)}
+          WAVES <span className="text-yellow-400">{result.wavesCompleted}</span> &bull; TOWERS{' '}
+          <span className="text-blue-400">{result.towersPlaced}</span>
+        </p>
+        <div className="mb-3 text-left">
+          <RunScorePanel
+            mode="breach-defense"
+            outcome={isWin ? 'win' : 'loss'}
+            stats={{
+              security: isWin ? result.securityScore : 0,
+              wavesCompleted: result.wavesCompleted,
+              towersPlaced: result.towersPlaced,
+            }}
+            runId={result.runId}
+            compact
+            accent={isWin ? '#2ECC71' : '#FF6B9D'}
+            onViewHighscores={onViewHighscores}
+          />
         </div>
         <div className="flex gap-3 justify-center">
           <button

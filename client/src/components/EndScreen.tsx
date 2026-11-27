@@ -3,6 +3,8 @@ import { Button } from '@/components/ui/button';
 import { Trophy, XCircle } from 'lucide-react';
 import { eventBridge, BRIDGE_EVENTS } from '@/phaser/EventBridge';
 import { SPONSOR_CONFIG } from '@/data/sponsorConfig';
+import type { PrivacyQuestStats } from '@shared/scoring';
+import { RunScorePanel } from '@/components/highscores/RunScorePanel';
 
 interface EndScreenProps {
   isWin: boolean;
@@ -11,6 +13,13 @@ interface EndScreenProps {
   totalScenarios: number;
   timeElapsed: string;
   onPlayAgain: () => void;
+  /** Arcade score inputs for the highscore tally. Omit to hide the panel. */
+  scoreStats?: PrivacyQuestStats;
+  /** One id per playthrough, so the same run never lands on the board twice. */
+  runId?: string;
+  /** False during demo sessions: show the tally, don't record it. */
+  recordScore?: boolean;
+  onViewHighscores?: (runId: string | null) => void;
 }
 
 export default function EndScreen({
@@ -20,6 +29,10 @@ export default function EndScreen({
   totalScenarios,
   timeElapsed,
   onPlayAgain,
+  scoreStats,
+  runId,
+  recordScore = true,
+  onViewHighscores,
 }: EndScreenProps) {
   const [showIcon, setShowIcon] = useState(false);
   const [showTitle, setShowTitle] = useState(false);
@@ -144,6 +157,18 @@ export default function EndScreen({
             </div>
           </div>
         </div>
+
+        {scoreStats && runId && showStats && (
+          <RunScorePanel
+            mode="privacy-quest"
+            outcome={isWin ? 'win' : 'loss'}
+            stats={scoreStats}
+            runId={runId}
+            record={recordScore}
+            accent={isWin ? '#FFD23F' : '#FF6B9D'}
+            onViewHighscores={onViewHighscores}
+          />
+        )}
 
         <div style={{
           opacity: showButton ? 1 : 0,

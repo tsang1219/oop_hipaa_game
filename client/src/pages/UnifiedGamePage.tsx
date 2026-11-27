@@ -17,6 +17,8 @@ import ObservationHint from '@/components/ObservationHint';
 import ChoicePrompt from '@/components/ChoicePrompt';
 import { PatientStoryReveal } from '@/components/PatientStoryReveal';
 import EndScreen from '@/components/EndScreen';
+import { HighscoresScreen } from '@/components/highscores/HighscoresScreen';
+import { clearProgressKeepingHighscores, type HighscoreMode } from '@/lib/highscores';
 import { RoomProgressHUD } from '@/components/RoomProgressHUD';
 import { RoomIntroOverlay } from '@/components/RoomIntroOverlay';
 import { TutorialModal } from '../components/breach-defense/TutorialModal';
@@ -102,6 +104,7 @@ type PageMode =
   | 'gameover'
   | 'win'
   | 'tower-defense-standalone'
+  | 'highscores' // Hall of Fame (local top-10 boards)
   | 'demo-complete'; // Phase 21 — sponsor demo capstone (cert + sponsor handoff)
 
 const rooms = roomDataJson.rooms as RoomWithDoors[];
@@ -196,6 +199,17 @@ export default function UnifiedGamePage() {
   // gameState (no score, no encounter registry, no save write) — this is enforced by
   // the handlers below not calling any gameState mutator.
   const [tdStandaloneResult, setTdStandaloneResult] = useState<TDStandaloneResult | null>(null);
+  // Hall of Fame view: which tab opens, which run to highlight, and whether we
+  // arrived from an end-of-run screen (BACK then reloads to the start menu).
+  const [highscoresView, setHighscoresView] = useState<{
+    mode: HighscoreMode;
+    highlightRunId: string | null;
+    fromRun: boolean;
+  }>({ mode: 'privacy-quest', highlightRunId: null, fromRun: false });
+  const openHighscores = useCallback((mode: HighscoreMode, highlightRunId: string | null, fromRun: boolean) => {
+    setHighscoresView({ mode, highlightRunId, fromRun });
+    setPageMode('highscores');
+  }, []);
   const [tdWaveBanner, setTdWaveBanner] = useState<{ wave: number; key: number } | null>(null); // DESIGN-009
   const [tdHelperVisible, setTdHelperVisible] = useState(false); // DESIGN-009
   // Standalone TD wave-pause state — drives the "START NEXT WAVE" button.
@@ -1017,10 +1031,10 @@ export default function UnifiedGamePage() {
   useEffect(() => {
     if (pageMode !== 'tower-defense-standalone') return;
     const onVictory = (data: { securityScore: number; wavesCompleted: number; towersPlaced: number }) => {
-      setTdStandaloneResult({ outcome: 'victory', ...data });
+      setTdStandaloneResult({ outcome: 'victory', ...data, runId: `td-${Date.now().toString(36)}` });
     };
     const onGameOver = (data: { wavesCompleted: number; towersPlaced: number }) => {
-      setTdStandaloneResult({ outcome: 'defeat', ...data });
+      setTdStandaloneResult({ outcome: 'defeat', ...data, runId: `td-${Date.now().toString(36)}` });
     };
     // BreachDefenseScene now PAUSES between every wave in standalone mode and
     // waits for the player to click "START NEXT WAVE". This handler only owns
@@ -1564,7 +1578,7 @@ export default function UnifiedGamePage() {
   }, []);
 
   const handleNewGame = useCallback(() => {
-    localStorage.clear();
+    clearProgressKeepingHighscores();
     // After reload, land on character-select instead of start-menu so the
     // player immediately picks a hero for their fresh game.
     sessionStorage.setItem('pq:goto-character-select', '1');
@@ -1623,7 +1637,7 @@ export default function UnifiedGamePage() {
   // anchor comment here for grep discoverability.
 
   const handlePlayAgain = () => {
-    localStorage.clear();
+    clearProgressKeepingHighscores();
     window.location.reload();
   };
 
@@ -1676,6 +1690,24 @@ export default function UnifiedGamePage() {
     return `${seconds}s`;
   };
 
+  // ── Hall of Fame ──────────────────────────────────────────────
+  // From the start menu: plain mode switch, BACK returns to the menu. From an
+  // end-of-run screen: Phaser has already been torn down (or is mid-round in
+  // TD), so BACK reloads to the cold-boot StartMenu, the same exit every other
+  // post-run path uses.
+  if (pageMode === 'highscores') {
+    return (
+      <HighscoresScreen
+        initialMode={highscoresView.mode}
+        highlightRunId={highscoresView.highlightRunId}
+        onBack={() => {
+          if (highscoresView.fromRun) window.location.reload();
+          else setPageMode('start-menu');
+        }}
+      />
+    );
+  }
+
   // ── Start menu (Phase 18 — DEMO-01) ──────────────────────────
   // First screen the player sees on `/`. Routes:
   //   CONTINUE      → resume the in-progress save (only shown when one exists)
@@ -1692,6 +1724,7 @@ export default function UnifiedGamePage() {
         onTowerDefense={handleSelectTowerDefense}
         onNewGame={handleStartNewFullGame}
         onResume={handleResume}
+        onHighscores={() => openHighscores('privacy-quest', null, false)}
       />
     );
   }
@@ -1725,6 +1758,7 @@ export default function UnifiedGamePage() {
         onPlayAgain={handleTdPlayAgain}
         onBackToMenu={handleTdBackToMenu}
         onDismissHelper={() => setTdHelperVisible(false)}
+        onViewHighscores={(runId) => openHighscores('breach-defense', runId, true)}
       />
     );
   }
@@ -1762,6 +1796,16 @@ export default function UnifiedGamePage() {
         totalScenarios={totalScenarios + 1}
         timeElapsed={formatElapsedTime()}
         onPlayAgain={handlePlayAgain}
+        scoreStats={{
+          trust: gameState.state.privacyScore,
+          npcsCompleted: gameState.state.completedNPCs.length,
+          identifiersFound: gameState.state.identifiersFound.length,
+          storiesCollected: gameState.state.collectedStories.length,
+          elapsedMs: Date.now() - gameState.state.gameStartTime,
+        }}
+        runId={`pq-${gameState.state.gameStartTime}`}
+        recordScore={!isDemoActive()}
+        onViewHighscores={(runId) => openHighscores('privacy-quest', runId, true)}
       />
     );
   }

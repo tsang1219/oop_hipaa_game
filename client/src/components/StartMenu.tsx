@@ -31,9 +31,11 @@ export interface StartMenuProps {
   onNewGame: () => void;
   /** Resume the in-progress full-game save. Only invoked when hasSave is true. */
   onResume: () => void;
+  /** Open the Hall of Fame (local highscores). */
+  onHighscores?: () => void;
 }
 
-type SectionId = 'main-rpg' | 'mini-games';
+type SectionId = 'main-rpg' | 'mini-games' | 'records';
 type TitleVariant = 'a' | 'b' | 'c' | 'classic';
 
 const LOBBY_PLATE = '/attached_assets/generated_images/privacyquest/title/hospital_entrance-plate-1x.png';
@@ -53,14 +55,17 @@ interface MenuItem {
   label: string;
   description: string;
   accent: string;
-  icon: 'cross' | 'bolt' | 'shield';
+  icon: 'cross' | 'bolt' | 'shield' | 'trophy';
   section: SectionId;
   action: () => void;
+  /** Slim single-line row (no description) — keeps the menu short on 768px screens. */
+  slim?: boolean;
 }
 
-const SECTIONS: { id: SectionId; label: string }[] = [
+const SECTIONS: { id: SectionId; label: string | null }[] = [
   { id: 'main-rpg', label: 'MAIN RPG' },
   { id: 'mini-games', label: 'MINI GAMES' },
+  { id: 'records', label: null }, // slim HIGH SCORES row, no header
 ];
 
 function ModeIcon({ icon, color }: { icon: MenuItem['icon']; color: string }) {
@@ -81,6 +86,19 @@ function ModeIcon({ icon, color }: { icon: MenuItem['icon']; color: string }) {
     return (
       <svg {...common}>
         <path d="M 9 1 L 3 9 L 7 9 L 5 15 L 13 6 L 9 6 Z" fill={color} stroke={stroke} strokeWidth="1" strokeLinejoin="miter" />
+      </svg>
+    );
+  }
+  if (icon === 'trophy') {
+    // Pixel trophy cup — bowl, handles, stem, base
+    return (
+      <svg {...common} shapeRendering="crispEdges">
+        <rect x="4" y="2" width="8" height="6" fill={color} stroke={stroke} strokeWidth="1" />
+        <rect x="2" y="3" width="2" height="3" fill="none" stroke={color} strokeWidth="1" />
+        <rect x="12" y="3" width="2" height="3" fill="none" stroke={color} strokeWidth="1" />
+        <rect x="7" y="8" width="2" height="3" fill={color} />
+        <rect x="5" y="11" width="6" height="3" fill={color} stroke={stroke} strokeWidth="1" />
+        <rect x="6" y="3" width="1" height="3" fill="#ffffff" opacity="0.7" />
       </svg>
     );
   }
@@ -211,7 +229,7 @@ function CorkboardBackdrop() {
   );
 }
 
-export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume }: StartMenuProps): JSX.Element {
+export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume, onHighscores }: StartMenuProps): JSX.Element {
   const [variant] = useState<TitleVariant>(resolveVariant);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const [showLogo, setShowLogo] = useState(false);
@@ -258,6 +276,17 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
       section: 'mini-games',
       action: onTowerDefense,
     },
+    ...(onHighscores
+      ? [{
+          label: 'HIGH SCORES',
+          description: 'HALL OF FAME — TOP 10',
+          accent: '#6DD8F9',
+          icon: 'trophy' as const,
+          section: 'records' as const,
+          action: onHighscores,
+          slim: true,
+        }]
+      : []),
   ];
 
   // Staggered reveal.
@@ -473,13 +502,13 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
           return (
             <div key={section.id} className="flex flex-col gap-3">
               {/* Section header */}
-              <div className="flex items-center gap-3 px-1">
+              {section.label && <div className="flex items-center gap-3 px-1">
                 <div className={`h-[2px] w-6 ${paper ? 'bg-[#5a3a1a]' : 'bg-gray-600'}`} />
                 <p className={`text-[8px] tracking-[0.4em] ${paper ? 'text-[#4a3012]' : 'text-gray-400'}`}>
                   {section.label}
                 </p>
                 <div className={`h-[2px] flex-1 ${paper ? 'bg-[#5a3a1a]' : 'bg-gray-600'}`} />
-              </div>
+              </div>}
 
               {/* Section items */}
               {sectionItems.map(({ item, idx }) => {
@@ -502,7 +531,7 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
                       </span>
                     )}
                     <div
-                      className="relative flex items-center gap-4 px-5 py-4 border-4 rounded-[4px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-150"
+                      className={`relative flex items-center gap-4 px-5 ${item.slim ? 'py-2' : 'py-4'} border-4 rounded-[4px] shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all duration-150`}
                       style={{
                         backgroundColor: paper
                           ? (isSelected ? '#fffaf0' : '#f0e6cc')
@@ -539,23 +568,25 @@ export function StartMenu({ hasSave, onDemo, onTowerDefense, onNewGame, onResume
                           imageRendering: 'pixelated',
                         }}
                       >
-                        <ModeIcon icon={item.icon} color={item.accent} />
+                        <div style={item.slim ? { transform: "scale(0.75)", margin: "-4px 0" } : undefined}><ModeIcon icon={item.icon} color={item.accent} /></div>
                       </div>
 
                       {/* Label + description */}
                       <div className="flex flex-col gap-1.5 flex-1">
                         <div
-                          className="text-[14px] tracking-wider transition-colors duration-150"
+                          className={`${item.slim ? "text-[11px]" : "text-[14px]"} tracking-wider transition-colors duration-150`}
                           style={{ color: paper ? (isSelected ? '#2a2118' : '#5a4a32') : isSelected ? '#ffffff' : '#888899' }}
                         >
                           {item.label}
                         </div>
-                        <div
-                          className="text-[7px] tracking-[0.2em] transition-colors duration-150"
-                          style={{ color: paper ? '#8d6820' : isSelected ? item.accent : '#555569' }}
-                        >
-                          {item.description}
-                        </div>
+                        {!item.slim && (
+                          <div
+                            className="text-[7px] tracking-[0.2em] transition-colors duration-150"
+                            style={{ color: paper ? '#8d6820' : isSelected ? item.accent : '#555569' }}
+                          >
+                            {item.description}
+                          </div>
+                        )}
                       </div>
 
                       {/* Right chevron — appears on selected */}
