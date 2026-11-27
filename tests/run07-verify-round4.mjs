@@ -82,7 +82,7 @@ try {
   await page.waitForTimeout(800);
   await page.click('text=BEGIN ADVENTURE', { timeout: 10000 }).catch(() => {});
   await page.waitForTimeout(3000);
-  const modalShown = await page.evaluate(() => (document.body.textContent || '').includes('Welcome to HIPAA General'));
+  const modalShown = await page.evaluate(() => (document.body.textContent || '').includes('Welcome to Valley General'));
   await page.screenshot({ path: `${OUT}/F16-demo-no-onboarding.png` });
   report('F-16a', !modalShown, `demo boot shows full-game onboarding modal: ${modalShown}`);
   // clean up demo session flag for the following sections

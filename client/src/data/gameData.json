@@ -26,7 +26,7 @@
         {
           "text": "Check with your supervisor about the scope of your role first.",
           "score": 1,
-          "feedback": "Partial credit. Good instinct to verify, but HIPAA does permit treatment-related access — the Minimum Necessary rule has a treatment exception. The real question is whether her role-based access is set up correctly for tomorrow's rounds.",
+          "feedback": "Partial credit. Good instinct to verify, but HIPAA does permit treatment-related access — the Minimum Necessary rule has a treatment exception. The real question is whether her role-based access is set up correctly before rounds start.",
           "nextSceneId": "scene2"
         }
       ]
@@ -230,7 +230,7 @@
         {
           "text": "This is a HIPAA violation — physical safeguards require securing PHI.",
           "score": 3,
-          "feedback": "Correct! HIPAA's Security Rule requires physical safeguards for PHI. Unlocked cabinets and open doors create unauthorized access risks."
+          "feedback": "Correct! HIPAA's Privacy Rule requires reasonable physical safeguards for PHI in any form, paper included. Unlocked cabinets and open doors create unauthorized access risks."
         },
         {
           "text": "This is fine — it's in a records room, not a public area.",
@@ -489,7 +489,7 @@
         {
           "text": "Let me check with Jessica first and see if she'll authorize me to share.",
           "score": 5,
-          "feedback": "Better than just handing over the chart, but you're still treating this as negotiable. Employers don't get medical info, period. Jessica can provide a work note, but her diagnosis is none of HR's business."
+          "feedback": "Better than just handing over the chart, and technically, with Jessica's signed authorization, sharing would be legal. But Brad doesn't get to start that conversation through you. If HR needs proof, Jessica brings her own work note. Her diagnosis is none of HR's business unless she decides it is."
         },
         {
           "text": "I can tell you dates of service but not diagnosis or treatment details.",
@@ -541,7 +541,7 @@
         {
           "text": "Give them a warning but don't report this time.",
           "score": -15,
-          "feedback": "Wrong. By not reporting, YOU'RE now complicit in the violation. This isn't a judgment call—it's a mandatory reporting situation. Unauthorized access to medical records, especially for personal reasons, is a federal crime.",
+          "feedback": "Wrong. By not reporting, YOU'RE now complicit in the violation. This isn't a judgment call—it's a mandatory reporting situation. Knowingly accessing medical records for personal reasons can even be a federal crime.",
           "nextSceneId": "final_boss_2"
         },
         {
@@ -553,7 +553,7 @@
         {
           "text": "Mind your own business—it's not your problem.",
           "score": -20,
-          "feedback": "Disastrous. If you witness a HIPAA violation and don't report it, you can be personally fined and face criminal charges. This is exactly your problem. Report it immediately or face the consequences.",
+          "feedback": "Disastrous. Your hospital's policy requires you to report what you saw, and covering for a snooper can cost you your own job. Meanwhile the ex-spouse whose chart got read has no idea. This is exactly your problem. Report it.",
           "nextSceneId": "final_boss_2"
         }
       ]
@@ -944,7 +944,7 @@
         {
           "text": "Got it—document everything, notify the Privacy Officer immediately, don't try to fix it alone.",
           "score": 15,
-          "feedback": "Correct! Breach response requires: (1) Immediate documentation, (2) Privacy Officer notification, (3) Risk assessment, (4) Patient notification within 60 days of discovery, (5) HHS reporting (immediately if 500+ people affected, annually for smaller breaches). The cover-up is always worse than the breach."
+          "feedback": "Correct! Breach response requires: (1) Immediate documentation, (2) Privacy Officer notification, (3) Risk assessment, (4) Patient notification within 60 days of discovery, (5) HHS reporting (within the same 60 days if 500+ people are affected, or in the annual log for smaller breaches). The cover-up is always worse than the breach."
         },
         {
           "text": "Seems like a lot of paperwork. I'd probably just try to fix it quietly first.",

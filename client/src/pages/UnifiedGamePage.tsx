@@ -2122,9 +2122,9 @@ export default function UnifiedGamePage() {
             literal first navigation attempt failed silently. */}
         {showIntroModal && !isDemoActive() && (
           <TutorialModal
-            title="Welcome to HIPAA General"
+            title="Welcome to Valley General"
             description={
-              "You're a new employee at HIPAA General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nHold SHIFT \u2014 Run\nSPACE \u2014 Talk to people and interact\nSPACE at a door \u2014 Go to the next area"
+              "You're a new employee at Valley General Hospital. Explore rooms, talk to staff, and learn how patient privacy really works.\n\nWASD or Arrow Keys \u2014 Move\nHold SHIFT \u2014 Run\nSPACE \u2014 Talk to people and interact\nSPACE at a door \u2014 Go to the next area"
             }
             onAcknowledge={handleDismissIntroModal}
             type="info"
