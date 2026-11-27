@@ -29,8 +29,9 @@ import { ValidationOverlay } from '../dev/ValidationOverlay';
 import type { Scene, Gate } from '@shared/schema';
 import gameDataJson from '@/data/gameData.json';
 import roomDataJson from '@/data/roomData.json';
-import { migrateV1toV2, loadSave, writeSave, hasSaveData } from '@/lib/saveData';
+import { migrateV1toV2, loadSave, writeSave, hasSaveData, clearProgress, getSaveSummary, formatSaveAge } from '@/lib/saveData';
 import { StartMenu } from '../components/StartMenu';
+import { SaveIndicator } from '../components/SaveIndicator';
 import { CharacterSelectScreen } from '../components/CharacterSelectScreen';
 import {
   startDemo,
@@ -1564,12 +1565,23 @@ export default function UnifiedGamePage() {
   }, []);
 
   const handleNewGame = useCallback(() => {
-    localStorage.clear();
+    clearProgress();
     // After reload, land on character-select instead of start-menu so the
     // player immediately picks a hero for their fresh game.
     sessionStorage.setItem('pq:goto-character-select', '1');
     window.location.reload();
   }, []);
+
+  // CONTINUE card copy: "BREAK ROOM · 2 ROOMS CLEARED" + "SAVED 3 HR AGO".
+  const describeSaveForMenu = (): { where: string; when: string | null } => {
+    const summary = getSaveSummary();
+    const roomName = rooms.find(r => r.id === summary.currentRoomId)?.name ?? 'Hospital Lobby';
+    const cleared = summary.roomsCleared === 1 ? '1 ROOM CLEARED' : `${summary.roomsCleared} ROOMS CLEARED`;
+    return {
+      where: `${roomName.toUpperCase()} · ${cleared}`,
+      when: summary.savedAt ? `SAVED ${formatSaveAge(summary.savedAt)}` : null,
+    };
+  };
 
   const handleResume = useCallback(() => {
     setPageMode('exploration');
@@ -1623,7 +1635,7 @@ export default function UnifiedGamePage() {
   // anchor comment here for grep discoverability.
 
   const handlePlayAgain = () => {
-    localStorage.clear();
+    clearProgress();
     window.location.reload();
   };
 
@@ -1688,6 +1700,7 @@ export default function UnifiedGamePage() {
     return (
       <StartMenu
         hasSave={hasSaveData()}
+        saveSummary={describeSaveForMenu()}
         onDemo={handleSelectDemo}
         onTowerDefense={handleSelectTowerDefense}
         onNewGame={handleStartNewFullGame}
@@ -1849,6 +1862,9 @@ export default function UnifiedGamePage() {
             <span className="text-white/40 ml-1.5">[I]</span>
           </button>
         )}
+
+        {/* Autosave chip — full game only (demo + QA no-save never write) */}
+        {pageMode === 'exploration' && !isDemoActive() && <SaveIndicator />}
 
         {/* The Eighteen codex overlay */}
         {showCodex && (
